@@ -52,7 +52,6 @@ public class RobotContainer implements Logged {
 
         Commands.run(DriverStation::refreshData)
                 .until(() -> !DriverStation.getAlliance().equals(Optional.empty()))
-                .andThen(update())
                 .ignoringDisable(true).schedule();
     }
 
@@ -95,7 +94,7 @@ public class RobotContainer implements Logged {
     }
 
     public void onDisabled() {
-        update().ignoringDisable(true).repeatedly().schedule();
+        update();
     }
 
     public void onEnabled() {
@@ -105,10 +104,8 @@ public class RobotContainer implements Logged {
     public void periodic() {
     }    
 
-    public Command update() {
-        return Commands.runOnce(() -> {
-            FieldConstants.ALLIANCE = DriverStation.getAlliance();
-        });
+    public void update() {
+        FieldConstants.ALLIANCE = DriverStation.getAlliance();
     }
 
     private void incinerateMotors() {
