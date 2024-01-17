@@ -19,37 +19,28 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
+ * Welcome to the home of the many many variables :D
+ * Each component of the robot gets its own class,
+ * and each class has its own constants.
+ * Be sure to keep it organized! And PLEASE do not forget units.
+ * If possible, include them in the name of the variable, 
+ * or in a comment next to it.
  */
 public final class Constants {
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = 3;
-        public static double DYNAMIC_MAX_ANGULAR_SPEED = 3 * Math.PI; // radians per second
-        public static final double MIN_ANGULAR_SPEED = 4 * Math.PI; // radians per second
-        // NEEDS TO BE TESTED vvv
-        public static final double MAX_ANGULAR_SPEED = 8 * Math.PI; // radians per second
+
+        public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(14.61);
-
-        public static final double DIRECTION_SLEW_RATE = 6.28; // radians per second
-        public static final double MAGNITUDE_SLEW_RATE = 80.0; // percent per second (1 = 100%)
-        public static final double ROTATIONAL_SLEW_RATE = 80.0; // percent per second (1 = 100%)
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
         public static final double TRACK_WIDTH = Units.inchesToMeters(21.5);
         // Distance between front and back wheels on robot
+        // Easiest measured from the center of the bore of the vortex
         public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
 
         public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
@@ -57,9 +48,9 @@ public final class Constants {
 
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
                 // Front Positive, Left Positive
-                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // Front Left
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // Front Right
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // Rear Left
+                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),    // Front Left
+                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),   // Front Right
+                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),   // Rear Left
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
 
         // Angular offsets of the modules relative to the chassis in radians
@@ -87,11 +78,11 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3; // 2.5 has worked very well for us so far
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5; // 2.5; (2.5vel and 2.5accel output
-                                                                                     // 3s runtime on _1_A)
+        // The below values need to be tuned for each new robot.
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3; 
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5; 
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 9;// Math.PI/1.7;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 3 * Math.PI;
 
         public static final double PX_CONTROLLER = 1;
         public static final double PY_CONTROLLER = 1;
@@ -132,11 +123,12 @@ public final class Constants {
     }
 
     public static final class ModuleConstants {
-        // The MAXSwerve module can be configured with one of three pinion gears: 12T,
-        // 13T, or 14T.
+        // The MAXSwerve module can be configured with one of three pinion gears: 
+        // L1 = 12T (slow, high torque)
+        // L2 = 13T (medium)
+        // L3 = 14T (fast, low torque)
         // This changes the drive speed of the module (a pinion gear with more teeth
-        // will result in a
-        // robot that drives faster).
+        // will result in a robot that drives faster).
         public static final int DRIVING_MOTOR_PINION_TEETH = 14;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite
@@ -208,11 +200,14 @@ public final class Constants {
 
     public static final class IntakeConstants {
         public static final int INTAKE_CAN_ID = 10;
+
+        // % speeds of the motor
         public static final double INTAKE_SPEED = 0.5;
         public static final double OUTTAKE_SPEED = -0.5;
 	public static final double STOP_SPEED = 0;
-        public static final int INTAKE_FREE_LIMIT = 15;
-        public static final int INTAKE_STALL_LIMIT = 7;
+
+        public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
+        public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
     }
 
     public static final class FieldConstants {
@@ -222,13 +217,8 @@ public final class Constants {
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
 
-        public static final double CONE_OFFSET_METERS = 0.542615;
-        public static final double GRID_BARRIER_METERS = Units.inchesToMeters(12); // real is 14-15
-        public static final double SUBSTATION_OFFSET_METERS = 0.7;
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.53;
-
-        public static final double CHARGE_PAD_CORRECTION_P = 0.05;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
@@ -240,7 +230,6 @@ public final class Constants {
         };
 
         public static GameMode GAME_MODE;
-
     }
 
 
