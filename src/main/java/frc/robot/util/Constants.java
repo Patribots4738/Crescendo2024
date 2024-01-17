@@ -194,6 +194,7 @@ public final class Constants {
 
     public static final class NeoMotorConstants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
+        public static final double NEO_FREE_SPEED_RPM = 5676;
 
         public static ArrayList<CANSparkBase> motors = new ArrayList<>();
     }
