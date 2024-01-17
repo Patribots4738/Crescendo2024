@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-//import io.github.oblarg.oblog.Logger;
+import frc.robot.util.Constants.FieldConstants;
 import monologue.Monologue;
 
 /**
@@ -25,7 +25,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() { 
         robotContainer = new RobotContainer();
-
         Monologue.setupMonologue(robotContainer, "Robot", false, false);
     }
 
@@ -38,10 +37,9 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        //Logger.updateEntries();
         Monologue.updateAll();
         CommandScheduler.getInstance().run();
-        robotContainer.periodic();
+
         DriverUI.previousTimestmap = DriverUI.currentTimestamp;
         DriverUI.currentTimestamp = Timer.getFPGATimestamp();
     }
@@ -52,11 +50,19 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void disabledPeriodic() { }
+    public void disabledPeriodic() {
+        // Now while this may not necesarily be a constant...
+        // it needs to be updated.
+        FieldConstants.ALLIANCE = DriverStation.getAlliance();
+    }
+
+    @Override
+    public void disabledExit() {
+        robotContainer.onEnabled();
+    }
 
     @Override
     public void autonomousInit() { 
-        robotContainer.onEnabled();
         autonomousCommand = robotContainer.getAutonomousCommand();
         
         if (autonomousCommand != null) {
@@ -69,7 +75,6 @@ public class Robot extends TimedRobot {
     
     @Override
     public void teleopInit() {
-        robotContainer.onEnabled();
         // Stop our autonomous command if it is still running.
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
@@ -81,7 +86,6 @@ public class Robot extends TimedRobot {
     
     @Override
     public void testInit() { 
-        robotContainer.onEnabled();
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
     }

@@ -49,10 +49,6 @@ public class RobotContainer implements Logged {
 
         incinerateMotors();
         configureButtonBindings();
-
-        Commands.run(DriverStation::refreshData)
-                .until(() -> !DriverStation.getAlliance().equals(Optional.empty()))
-                .ignoringDisable(true).schedule();
     }
 
     private void configureButtonBindings(){
@@ -64,6 +60,9 @@ public class RobotContainer implements Logged {
 
     private void configureDriverBindings() {
 
+        // Upon hitting start or back,
+        // reset the orientation of the robot
+        // to be facing away from the driver station
         driver.start().or(driver.back()).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
@@ -78,7 +77,6 @@ public class RobotContainer implements Logged {
         driver.leftBumper().whileTrue(Commands.run(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
-        
       
         driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
 
@@ -93,20 +91,9 @@ public class RobotContainer implements Logged {
         return null;
     }
 
-    public void onDisabled() {
-        update();
-    }
+    public void onDisabled() {}
 
-    public void onEnabled() {
-        swerve.resetEncoders();
-    }
-
-    public void periodic() {
-    }    
-
-    public void update() {
-        FieldConstants.ALLIANCE = DriverStation.getAlliance();
-    }
+    public void onEnabled() {}
 
     private void incinerateMotors() {
         Timer.delay(0.25);
