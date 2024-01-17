@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
      * This function is called every 20 ms, no matter the mode. Used for items like diagnostics
      * ran during disabled, autonomous, teleoperated and test. :D
      * <p>
-     * This runs after the mode specific periodic functions, but before LiveWindow and
+     * This runs *after* the mode specific periodic functions, but before LiveWindow and
      * SmartDashboard integrated updating.
      */
     @Override
@@ -73,17 +73,23 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() { }
-    
+
     @Override
-    public void teleopInit() {
+    public void autonomousExit() {
         // Stop our autonomous command if it is still running.
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
     }
+    
+    @Override
+    public void teleopInit() { }
 
     @Override
     public void teleopPeriodic() { }
+
+    @Override
+    public void teleopExit() { }
     
     @Override
     public void testInit() { 
@@ -93,6 +99,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() { }
+
+    @Override
+    public void testExit() { }
 
     @Override
     public void simulationInit() { }
