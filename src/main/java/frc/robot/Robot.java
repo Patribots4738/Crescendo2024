@@ -53,6 +53,7 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {
         // Now while this may not necesarily be a constant...
         // it needs to be updated.
+        DriverStation.refreshData();
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
     }
 
