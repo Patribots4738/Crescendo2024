@@ -19,7 +19,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.util.Pose3dLogger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,8 +56,11 @@ public class Swerve extends SubsystemBase implements Logged {
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-    private double[] desiredModuleStates = new double[6];
-    private double[] realModuleStates = new double[6];
+    @Log.NT
+    SwerveModuleState[] measuredStates;
+
+    @Log.NT
+    SwerveModuleState[] desiredStates;
 
     @Log.NT
     Pose3d robotPose3d = new Pose3d();
@@ -100,18 +102,12 @@ public class Swerve extends SubsystemBase implements Logged {
      * Creates a new DriveSu1stem.
      */
     public Swerve() {
-        configurateMotors();
 
         resetEncoders();
         gyro.setYaw(0);
         setBrakeMode();
 
-        realModuleStates = new double[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-
-        SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
-        SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
         SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
-        
     }
 
     @Override
@@ -126,7 +122,7 @@ public class Swerve extends SubsystemBase implements Logged {
             }
         }
 
-        SwerveModuleState[] measuredStates = new SwerveModuleState[] {
+        measuredStates = new SwerveModuleState[] {
             frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
         };
         
@@ -137,20 +133,10 @@ public class Swerve extends SubsystemBase implements Logged {
                     0, 0,
                     speeds.omegaRadiansPerSecond * .02)));
 
-        realModuleStates = new double[] {
-            measuredStates[0].angle.getRadians(), measuredStates[0].speedMetersPerSecond,
-            measuredStates[1].angle.getRadians(), measuredStates[1].speedMetersPerSecond,
-            measuredStates[2].angle.getRadians(), measuredStates[2].speedMetersPerSecond,
-            measuredStates[3].angle.getRadians(), measuredStates[3].speedMetersPerSecond
-        };
     }
 
     public void logPositions() {
         DriverUI.field.setRobotPose(getPose());
-
-        SmartDashboard.putNumberArray("Swerve/RealStates", realModuleStates);
-
-        SmartDashboard.putNumberArray("Swerve/DesiredStates", desiredModuleStates);
         SmartDashboard.putNumber("Swerve/RobotRotation", gyro.getRotation2d().getRadians());
         
         robotPose3d = new Pose3d(
@@ -163,9 +149,6 @@ public class Swerve extends SubsystemBase implements Logged {
                                                 Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
                                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
                                 gyro.getRotation3d());
-
-        SmartDashboard.putNumberArray("RobotPose3d",
-                Pose3dLogger.composePose3ds(robotPose3d));
     }
 
     /**
@@ -194,7 +177,6 @@ public class Swerve extends SubsystemBase implements Logged {
                         : ChassisSpeeds.discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed), (Timer.getFPGATimestamp()-DriverUI.previousTimestmap)));
 
         setModuleStates(swerveModuleStates);
-
     }
 
     /**
@@ -211,13 +193,6 @@ public class Swerve extends SubsystemBase implements Logged {
         return run(this::setWheelsX);
     }
 
-    public void setWheelsUp() {
-        frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(gyro.getRotation2d())));
-        frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(gyro.getRotation2d())));
-        rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(gyro.getRotation2d())));
-        rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(90).minus(gyro.getRotation2d())));
-    }
-
     /**
      * Sets the swerve ModuleStates.
      *
@@ -231,12 +206,7 @@ public class Swerve extends SubsystemBase implements Logged {
         rearLeft.setDesiredState(desiredStates[2]);
         rearRight.setDesiredState(desiredStates[3]);
 
-        desiredModuleStates = new double[] {
-                desiredStates[0].angle.getRadians(), desiredStates[0].speedMetersPerSecond,
-                desiredStates[1].angle.getRadians(), desiredStates[1].speedMetersPerSecond,
-                desiredStates[2].angle.getRadians(), desiredStates[2].speedMetersPerSecond,
-                desiredStates[3].angle.getRadians(), desiredStates[3].speedMetersPerSecond
-        };
+        this.desiredStates = desiredStates;
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -258,8 +228,8 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public double getSpeedMetersPerSecond() {
-        // We update the UI at the end of the loop, so this is a way of looking into the
-        // past.
+        // We update the UI at the end of the loop, 
+        // so this is a way of looking into the past.
         return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
     }
 
@@ -278,15 +248,6 @@ public class Swerve extends SubsystemBase implements Logged {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
             mSwerveMod.resetEncoders();
         }
-    }
-
-    /**
-     * Returns the turn rate of the robot.
-     *
-     * @return The turn rate of the robot, in degrees per second
-     */
-    public double getTurnRate() {
-        return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public Command toggleSpeed() {
@@ -331,25 +292,13 @@ public class Swerve extends SubsystemBase implements Logged {
     }
     
     public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds, Supplier<ChassisSpeeds> controllerSpeeds) {
-      return new Drive(this, () -> {
-        ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
-        ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
-        return new ChassisSpeeds(
-            controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond,
-            controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond,
-            controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond
-        );
-    }, () -> false, () -> false);
-    }
-
-    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, boolean fieldRelative, boolean rateLimit) {
-      return new Drive(this, speeds, () -> fieldRelative, () -> false);
-    }
-
-    public void configurateMotors() {
-        for(int i = 0; i < swerveModules.length; i++) {
-            swerveModules[i].getConfigCommand().ignoringDisable(true).schedule();
-            Timer.delay(0.25);
-        }
+        return new Drive(this, () -> {
+            ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
+            ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
+            return new ChassisSpeeds(
+                    controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond,
+                    controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond,
+                    controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
+        }, () -> false, () -> false);
     }
 }
