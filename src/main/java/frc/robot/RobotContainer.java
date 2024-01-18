@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.Optional;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -87,8 +88,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        // TODO: Add auto commands here
-        return null;
+        return new PathPlannerAuto("BetterThanBread");
     }
 
     public void onDisabled() {}
