@@ -83,8 +83,8 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are curently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4.277; 
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.344; 
+        public static final double MAX_SPEED_METERS_PER_SECOND = .000001; 
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = .00001; 
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;
 
@@ -92,13 +92,13 @@ public final class Constants {
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 0.0001;// 7;
+        public static final double X_CORRECTION_P = 1.6;// 7;
         public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0.00001;
+        public static final double X_CORRECTION_D = 0;
 
-        public static final double Y_CORRECTION_P = 0.0001;// 6.03;
+        public static final double Y_CORRECTION_P = 1.6;// 6.03;
         public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0.00001;
+        public static final double Y_CORRECTION_D = 0;
 
         public static final double ROTATION_CORRECTION_P = .063;
         public static final double ROTATION_CORRECTION_I = 0;
