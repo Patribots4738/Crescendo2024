@@ -88,7 +88,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("BetterThanBread");
+        return new PathPlannerAuto("Smile");
     }
 
     public void onDisabled() {}
