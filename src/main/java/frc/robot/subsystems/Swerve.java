@@ -77,7 +77,6 @@ public class Swerve extends SubsystemBase implements Logged {
 
     // The gyro sensor
     private final Pigeon2 gyro = new Pigeon2(DriveConstants.GYRO_CAN_ID);
-    private final Pigeon2SimState gyroSim = new Pigeon2SimState(gyro);
 
     private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[] {
             frontLeft,
