@@ -33,11 +33,11 @@ public final class Constants {
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
-        public static double MAX_SPEED_METERS_PER_SECOND = 4.277;
+        public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 
         public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = Units.feetToMeters(14.61);
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.377;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -83,7 +83,7 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are curently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = .000001; 
+        public static final double MAX_SPEED_METERS_PER_SECOND = 2; 
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = .00001; 
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;

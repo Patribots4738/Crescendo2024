@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-        "x": 0.7673627138137817,
-        "y": 3.2464332580566406,
+        "x": 1.5,
+        "y": 7,
     },
-    "rotation": 0
+    "rotation": -124.904799
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TestPath"
+            "pathName": "SW1SW2SW3S"
           }
         }
         

@@ -44,8 +44,8 @@ public class RobotContainer implements Logged {
             driver::getLeftY,
             driver::getLeftX,
             () -> -driver.getRightX(),
-            () -> !driver.y().getAsBoolean(),
-            () -> (driver.y().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Blue)))
+            () -> !driver.leftBumper().getAsBoolean(),
+            () -> (driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Blue)))
         ));
 
         incinerateMotors();
@@ -88,7 +88,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("StraightPath");
+        return new PathPlannerAuto("Smile");
     }
 
     public void onDisabled() {}
