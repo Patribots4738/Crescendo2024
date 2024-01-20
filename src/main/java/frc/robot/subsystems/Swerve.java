@@ -138,17 +138,8 @@ public class Swerve extends SubsystemBase implements Logged {
     public void periodic() {
 
         poseEstimator.updateWithTime(DriverUI.currentTimestamp, gyro.getRotation2d(), getModulePositions());
-        if (FieldConstants.IS_SIMULATION) {
-            setSimGyro();
-        }
         logPositions();
 
-    }
-
-    public void setSimGyro() {
-        gyroSim.setRawYaw(gyro.getYaw().refresh().getValue());
-        gyroSim.setPitch(gyro.getPitch().refresh().getValue());
-        gyroSim.setRoll(gyro.getRoll().refresh().getValue());
     }
 
     public void logPositions() {
