@@ -29,6 +29,8 @@ public class RobotContainer implements Logged {
     private final Intake intake;
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
+
+    private final Elevator elevator;
     
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -36,6 +38,7 @@ public class RobotContainer implements Logged {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         intake = new Intake();
+        elevator = new Elevator();
         swerve = new Swerve();
         driverUI = new DriverUI();
 
@@ -57,7 +60,11 @@ public class RobotContainer implements Logged {
         configureOperatorBindings();
     }
 
-    private void configureOperatorBindings() { }
+    private void configureOperatorBindings() {
+        operator.y().onTrue((elevator.toTop(true)));
+        operator.x().onTrue((elevator.toTop(false)));
+        operator.a().onTrue((elevator.toBottom()));
+    }
 
     private void configureDriverBindings() {
 
@@ -88,12 +95,13 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("Smile");
+        return new PathPlannerAuto("BetterThanBread");
     }
 
     public void onDisabled() {}
 
-    public void onEnabled() {}
+    public void onEnabled() {
+    }
 
     private void incinerateMotors() {
         Timer.delay(0.25);

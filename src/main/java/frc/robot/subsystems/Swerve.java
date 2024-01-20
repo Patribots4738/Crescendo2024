@@ -137,6 +137,7 @@ public class Swerve extends SubsystemBase implements Logged {
     public void periodic() {
 
         poseEstimator.updateWithTime(DriverUI.currentTimestamp, gyro.getRotation2d(), getModulePositions());
+        System.out.print("angle: " + gyro.getAngle()+ ", yaw: " + gyro.getYaw().getValueAsDouble());
         logPositions();
 
     }
@@ -166,7 +167,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
 
         DriverUI.field.setRobotPose(getPose());
-        SmartDashboard.putNumber("Swerve/RobotRotation", gyro.getRotation2d().getRadians());
+        SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getRadians());
 
         robotPose2d = getPose();
         
@@ -179,9 +180,8 @@ public class Swerve extends SubsystemBase implements Logged {
                                                         * DriveConstants.ROBOT_LENGTH_METERS / 2.0,
                                                 Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
                                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
-                                FieldConstants.IS_SIMULATION 
-                                ? new Rotation3d(0, 0, getPose().getRotation().getRadians()) 
-                                : gyro.getRotation3d());
+                                
+                                new Rotation3d(0, 0, getPose().getRotation().getRadians()));
     
     }
 
@@ -342,5 +342,9 @@ public class Swerve extends SubsystemBase implements Logged {
                     controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond,
                     controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
         }, () -> false, () -> false);
+    }
+
+    public void setGyroAngle() {
+        gyro.setYaw(0);
     }
 }

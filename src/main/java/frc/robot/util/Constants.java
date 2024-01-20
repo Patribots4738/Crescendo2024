@@ -79,6 +79,15 @@ public final class Constants {
         public static final boolean GYRO_REVERSED = true;
     }
 
+    public static final class ElevatorConstants {
+        public static final double HIGH_LIMIT = 3.0;
+        public static final double ROCK_BOTTOM = 0.0;
+        public static final double AMP_REACH = 0;
+        public static final double SpeakerShootPose = 0;
+        public static final double Speaker_Shoot_Pose = 0;
+        public static final double SPEAKER_SHOOT_POSE = 0;
+        public static final double ALMOST_HIGH_LIMIT = 2.5;
+    }
     public static final class AutoConstants {
 
         // The below values need to be tuned for each new robot.
