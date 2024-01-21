@@ -80,7 +80,7 @@ public class Neo extends CANSparkMax {
      * @param position Position to set the NEOS to in rotations.
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
-    public synchronized void setTargetPosition(double position, double arbitraryFeedForward, int slot) {
+    public void setTargetPosition(double position, double arbitraryFeedForward, int slot) {
         if (!FieldConstants.IS_SIMULATION) {
             pidController.setReference(position, ControlType.kPosition, slot, arbitraryFeedForward, SparkPIDController.ArbFFUnits.kVoltage);
         }
@@ -88,11 +88,11 @@ public class Neo extends CANSparkMax {
         controlType = ControlLoopType.POSITION;
     }
 
-    public synchronized void setTargetPosition(double position, double arbitraryFeedForward) {
+    public void setTargetPosition(double position, double arbitraryFeedForward) {
         setTargetPosition(position, arbitraryFeedForward, 0);
     }
 
-    public synchronized void setTargetPosition(double position) {
+    public void setTargetPosition(double position) {
         setTargetPosition(position, 0, 0);
     }
 
@@ -100,7 +100,7 @@ public class Neo extends CANSparkMax {
      * Sets the target velocity for the NEO.
      * @param velocity Velocity to set the NEOS to in rotations per minute.
      */
-    public synchronized void setTargetVelocity(double velocity) {
+    public void setTargetVelocity(double velocity) {
         setTargetVelocity(velocity, 0, 0);
     }
 
@@ -109,7 +109,7 @@ public class Neo extends CANSparkMax {
      * @param velocity Velocity to set the NEOS to in rotations per minute.
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
-    public synchronized void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
+    public void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
         if (velocity == 0) {
             setVoltage(0);
         } else {
@@ -119,7 +119,7 @@ public class Neo extends CANSparkMax {
         controlType = ControlLoopType.VELOCITY;
     }
 
-    public synchronized void set(double percent) {
+    public void set(double percent) {
         setVoltage(percent * RobotController.getBatteryVoltage());
         controlType = ControlLoopType.PERCENT;
     }
@@ -177,7 +177,7 @@ public class Neo extends CANSparkMax {
         }
     }
 
-    public synchronized void setPosition(double position) {
+    public void setPosition(double position) {
         encoder.setPosition(position);
     }
 
