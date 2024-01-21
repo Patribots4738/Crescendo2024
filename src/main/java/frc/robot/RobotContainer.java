@@ -33,16 +33,33 @@ public class RobotContainer implements Logged {
     private final DriverUI driverUI;
 
     private final Climb climb;
+    private final Limelight limelight;
     
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
 
+        limelight = new Limelight();
+        swerve = new Swerve();
         intake = new Intake();
         climb = new Climb();
-        swerve = new Swerve();
         driverUI = new DriverUI();
+
+        limelight.setDefaultCommand(Commands.run(() -> {
+            // Create an "Optional" object that contains the estimated pose of the robot
+            // This can be present (sees tag) or not present (does not see tag)
+            Optional<Pose2d> result = limelight.getPose2d();
+            // The skew of the tag represents how confident the camera is
+            // If the result of the estimatedRobotPose exists, 
+            // and the skew of the tag is less than 3 degrees, 
+            // then we can confirm that the estimated position is realistic
+            if (result.isPresent()) {
+                swerve.getPoseEstimator().addVisionMeasurement(
+                        result.get(),
+                        DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
+            }
+        }, limelight));
 
         swerve.setDefaultCommand(new Drive(
             swerve,
