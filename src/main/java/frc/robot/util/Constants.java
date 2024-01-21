@@ -5,12 +5,15 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import java.util.Optional;
+
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -105,6 +108,18 @@ public final class Constants {
         public static final double SHOOTER_MIN_OUTPUT = -1;
         public static final double SHOOTER_MAX_OUTPUT = 1;
         
+
+        public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
+        /**
+         * The distances are in feet, the speeds are in RPM, and the angles are in degrees.
+         */
+        public static final HashMap<Integer, SpeedAnglePair> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAnglePair>() {{
+            put(5,  SpeedAnglePair.of(0.4, 10.0));
+            put(10, SpeedAnglePair.of(0.4, 10.0));
+            put(15, SpeedAnglePair.of(0.4, 10.0));
+            put(20, SpeedAnglePair.of(0.4, 10.0));
+            put(25, SpeedAnglePair.of(0.4, 10.0));
+        }};
     }
 
     public static final class TrapConstants {
@@ -275,6 +290,7 @@ public final class Constants {
 
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.53;
+        public static final double FIELD_HEIGHT_METERS = 8.278;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
@@ -288,7 +304,7 @@ public final class Constants {
         public static GameMode GAME_MODE;
         
         // Field: https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
-        // Chain Positions:
+        // Chain Positions: Blue alliance left
         // @formatter:off
         //  2              5
         //      1      4
@@ -304,7 +320,32 @@ public final class Constants {
                 // Red Stage
                 new Pose2d(12.07, 3.237, Rotation2d.fromDegrees(120)),
                 new Pose2d(10.638, 4.204, Rotation2d.fromDegrees(0)),
-                new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
+        new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
+        };
+
+        // Speaker Positions: Blue alliance left
+        // @formatter:off
+        //
+        //  0             1
+        //
+        //
+        // @formatter:on
+        public static Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
+                // All points are in meters and radians
+                // All relative to the blue origin
+                // Blue Speaker
+                new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)),
+                // Red Speaker
+                new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(180)),
+        };
+
+        public static Pose2d[] AMP_POSITIONS = new Pose2d[] {
+                // All points are in meters and radians
+                // All relative to the blue origin
+                // Blue Speaker
+                new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
+                // Red Speaker
+                new Pose2d(14.706, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
         };
 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
