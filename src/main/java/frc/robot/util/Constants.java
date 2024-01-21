@@ -100,6 +100,8 @@ public final class Constants {
         public static final int RIGHT_SHOOTER_CAN_ID = 12;
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
+        public static final int PIVOT_MOTOR_CURRENT_LIMIT = 20; // amps
+
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
@@ -274,7 +276,6 @@ public final class Constants {
         public static final double INTAKE_SPEED = 0.5;
         public static final double OUTTAKE_SPEED = -0.5;
 	public static final double STOP_SPEED = 0;
-
         public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
         public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
 
