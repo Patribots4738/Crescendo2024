@@ -32,8 +32,6 @@ public class Climb extends SubsystemBase implements Logged {
         rightMotor.setPosition(pos2);
     }
 
-    
-
     public Command toTop(ChainPosition chainPosition) {
     
        if (chainPosition == ChainPosition.LEFT) {
@@ -53,8 +51,9 @@ public class Climb extends SubsystemBase implements Logged {
         ParallelRaceGroup group = new ParallelRaceGroup();
         group.addCommands(Commands.runOnce(() -> rightMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
         group.addCommands(Commands.runOnce(() -> leftMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
+        group.addRequirements(this);
         
-        return Commands.runOnce(() -> group.execute(), this);
+        return group;
     }
     
 }
