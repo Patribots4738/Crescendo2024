@@ -108,10 +108,12 @@ public final class Constants {
         public static final double SHOOTER_MIN_OUTPUT = -1;
         public static final double SHOOTER_MAX_OUTPUT = 1;
         
+
+        public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
         /**
          * The distances are in feet, the speeds are in RPM, and the angles are in degrees.
          */
-        public static final HashMap<Integer, SpeedAnglePair> DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAnglePair>() {{
+        public static final HashMap<Integer, SpeedAnglePair> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAnglePair>() {{
             put(5,  SpeedAnglePair.of(0.4, 10.0));
             put(10, SpeedAnglePair.of(0.4, 10.0));
             put(15, SpeedAnglePair.of(0.4, 10.0));
@@ -316,7 +318,7 @@ public final class Constants {
                 // Red Stage
                 new Pose2d(12.07, 3.237, Rotation2d.fromDegrees(120)),
                 new Pose2d(10.638, 4.204, Rotation2d.fromDegrees(0)),
-                new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
+        new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
         };
 
         // Speaker Positions: Blue alliance left

@@ -52,6 +52,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command shoot(Pose2d position, boolean shootingAtSpeaker) {
+        SpeedAnglePair pair = calculateSpeed(position, shootingAtSpeaker);
         return runOnce(() -> motorLeft.setTargetVelocity(1));
     }
 
@@ -72,13 +73,12 @@ public class Shooter extends SubsystemBase {
         }
 
         double distance = Units.metersToFeet(robotPose.getTranslation().getNorm());
-        int lowerIndex = (int) Math.floor(distance / 5.0) * 5;
-        int upperIndex = (int) Math.ceil(distance / 5.0) * 5;
-
-        SpeedAnglePair lowerPair = ShooterConstants.DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(lowerIndex);
-        SpeedAnglePair upperPair = ShooterConstants.DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(upperIndex);
+        int lowerIndex = (int) (Math.floor(distance / ShooterConstants.MEASUREMENT_INTERVAL_FEET) * ShooterConstants.MEASUREMENT_INTERVAL_FEET);
+        int upperIndex = (int) (Math.ceil(distance / ShooterConstants.MEASUREMENT_INTERVAL_FEET) * ShooterConstants.MEASUREMENT_INTERVAL_FEET);
+ 
+        SpeedAnglePair lowerPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(lowerIndex);
+        SpeedAnglePair upperPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(upperIndex);
 
         return lowerPair.interpolate(upperPair, (distance - lowerIndex) / (upperIndex - lowerIndex));
     }
-
 }
