@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.Optional;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.*;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
@@ -30,7 +32,7 @@ public class RobotContainer implements Logged {
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
 
-    private final Elevator elevator;
+    private final Climb elevator;
     
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -38,7 +40,7 @@ public class RobotContainer implements Logged {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         intake = new Intake();
-        elevator = new Elevator();
+        elevator = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
 
@@ -53,6 +55,8 @@ public class RobotContainer implements Logged {
 
         incinerateMotors();
         configureButtonBindings();
+
+        prepareNamedCommands();
     }
 
     private void configureButtonBindings(){
@@ -61,8 +65,7 @@ public class RobotContainer implements Logged {
     }
 
     private void configureOperatorBindings() {
-        operator.y().onTrue((elevator.toTop(true)));
-        operator.x().onTrue((elevator.toTop(false)));
+        operator.y().onTrue((elevator.toTop(PoseCalculations.getChainPosition(swerve.getPose()))));
         operator.a().onTrue((elevator.toBottom()));
     }
 
@@ -95,12 +98,16 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("BetterThanBread");
+        return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
     }
 
     public void onDisabled() {}
 
     public void onEnabled() {
+    }
+
+    public void prepareNamedCommands() {
+        NamedCommands.registerCommand("Intake", intake.inCommand());
     }
 
     private void incinerateMotors() {

@@ -206,6 +206,17 @@ public class Neo extends CANSparkMax {
         follower.follow(this);
     }
 
+    public void setPID(double P, double I, double D, double minOutput, double maxOutput) {
+        setPID(P, I, D, minOutput, maxOutput, 0);
+    }
+
+    public void setPID(double P, double I, double D, double minOutput, double maxOutput, int slotID) {
+        pidController.setP(P, slotID);
+        pidController.setI(I, slotID);
+        pidController.setD(D, slotID);
+
+        pidController.setOutputRange(minOutput, maxOutput, slotID);
+    }
     /**
      * Gets the proportional gain constant for PIDFF controller.
      * @return The proportional gain constant for PIDFF controller.
@@ -229,7 +240,6 @@ public class Neo extends CANSparkMax {
     public double getD() {
         return pidController.getD();
     }
-
 
     /**
      * Gets the I-Zone constant for PIDFF controller.

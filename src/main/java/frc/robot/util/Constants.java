@@ -14,6 +14,8 @@ import java.util.Optional;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -75,25 +77,47 @@ public final class Constants {
         public static final int FRONT_RIGHT_TURNING_CAN_ID = 2;
         public static final int REAR_RIGHT_TURNING_CAN_ID = 8;
 
-        public static final int GYRO_CAN_ID = 9;
+        public static final int PIGEON_CAN_ID = 29;
         public static final boolean GYRO_REVERSED = true;
     }
 
-    public static final class ElevatorConstants {
+    public static final class ClimbConstants {
+
+        public static final int LEFT_CLIMB_CAN_ID = 16;
+        public static final int RIGHT_CLIMB_CAN_ID = 17;
+
         public static final double HIGH_LIMIT = 3.0;
         public static final double ROCK_BOTTOM = 0.0;
-        public static final double AMP_REACH = 0;
-        public static final double SpeakerShootPose = 0;
-        public static final double Speaker_Shoot_Pose = 0;
-        public static final double SPEAKER_SHOOT_POSE = 0;
         public static final double ALMOST_HIGH_LIMIT = 2.5;
     }
+
+
+    public static final class ShooterConstants {
+        public static final int LEFT_SHOOTER_CAN_ID = 11;
+        public static final int RIGHT_SHOOTER_CAN_ID = 12;
+        public static final int SHOOTER_PIVOT_CAN_ID = 13;
+
+        public static final double SHOOTER_P = 0.01;
+        public static final double SHOOTER_I = 0;
+        public static final double SHOOTER_D = 0;
+
+        // These are in %
+        public static final double SHOOTER_MIN_OUTPUT = -1;
+        public static final double SHOOTER_MAX_OUTPUT = 1;
+        
+    }
+
+    public static final class TrapConstants {
+        public static final int LEFT_TRAP_CAN_ID = 14;
+        public static final int RIGHT_TRAP_CAN_ID = 15;
+    }
+    
     public static final class AutoConstants {
 
         // The below values need to be tuned for each new robot.
         // They are curently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 2; 
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = .00001; 
+        public static final double MAX_SPEED_METERS_PER_SECOND = 4.377; 
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.344; 
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;
 
@@ -229,7 +253,8 @@ public final class Constants {
 
     public static final class IntakeConstants {
         public static final int INTAKE_CAN_ID = 10;
-
+        public static final int TRIGGER_WHEEL_CAN_ID = 11;
+        
         // % speeds of the motor
         public static final double INTAKE_SPEED = 0.5;
         public static final double OUTTAKE_SPEED = -0.5;
@@ -259,7 +284,33 @@ public final class Constants {
         };
 
         public static GameMode GAME_MODE;
+        
+        // Field: https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
+        // Chain Positions:
+        // @formatter:off
+        //  2              5
+        //      1      4
+        //  0              3
+        // @formatter:on
+        public static Pose2d[] CHAIN_POSITIONS = new Pose2d[] {
+                // All points are in meters and radians
+                // All relative to the blue origin
+                // Blue Stage
+                new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(60)),
+                new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(180)),
+                new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(-60)),
+                // Red Stage
+                new Pose2d(12.07, 3.237, Rotation2d.fromDegrees(120)),
+                new Pose2d(10.638, 4.204, Rotation2d.fromDegrees(0)),
+                new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
+        };
+
+        public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
+
+        public static enum ChainPosition {
+                LEFT,
+                RIGHT,
+                CENTER
+        }
     }
-
-
 }

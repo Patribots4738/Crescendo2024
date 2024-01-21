@@ -75,7 +75,7 @@ public class Swerve extends SubsystemBase implements Logged {
     Pose2d robotPose2d = new Pose2d();
 
     // The gyro sensor
-    private final Pigeon2 gyro = new Pigeon2(DriveConstants.GYRO_CAN_ID);
+    private final Pigeon2 gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
 
     private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[] {
             frontLeft,
