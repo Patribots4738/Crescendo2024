@@ -86,8 +86,8 @@ public final class Constants {
 
     public static final class ClimbConstants {
 
-        public static final int LEFT_CLIMB_CAN_ID = 16;
-        public static final int RIGHT_CLIMB_CAN_ID = 17;
+        public static final int LEFT_CLIMB_CAN_ID = 17;
+        public static final int RIGHT_CLIMB_CAN_ID = 18;
 
         public static final double HIGH_LIMIT = 3.0;
         public static final double ROCK_BOTTOM = 0.0;
@@ -123,8 +123,24 @@ public final class Constants {
     }
 
     public static final class TrapConstants {
-        public static final int LEFT_TRAP_CAN_ID = 14;
-        public static final int RIGHT_TRAP_CAN_ID = 15;
+        public static final int LEFT_ELEVATOR_CAN_ID = 14;
+        public static final int RIGHT_ELEVATOR_CAN_ID = 15;
+        public static final int CLAW_CAN_ID = 16;
+        public static final double ELEVATOR_DEADBAND = .3;
+        public static final double OUTTAKE_TIME = .2;
+
+        public static final int CLAW_CURRENT_LIMIT = 7;
+
+        public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
+        public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;
+
+        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0/25.0;
+
+        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; //amps
+        
+        public static final double TRAP_P = 0.01;
+        public static final double TRAP_I = 0;
+        public static final double TRAP_D = 0;
     }
     
     public static final class AutoConstants {
@@ -273,7 +289,7 @@ public final class Constants {
         // % speeds of the motor
         public static final double INTAKE_SPEED = 0.5;
         public static final double OUTTAKE_SPEED = -0.5;
-	public static final double STOP_SPEED = 0;
+	    public static final double STOP_SPEED = 0;
 
         public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
         public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;

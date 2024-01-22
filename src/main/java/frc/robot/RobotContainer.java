@@ -32,8 +32,8 @@ public class RobotContainer implements Logged {
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
 
-    private final Climb climb;
     private final Limelight limelight;
+    private final Climb climb;
     
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -44,6 +44,7 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         intake = new Intake();
         climb = new Climb();
+        swerve = new Swerve();
         driverUI = new DriverUI();
 
         limelight.setDefaultCommand(Commands.run(() -> {
@@ -67,7 +68,7 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX(),
             () -> !driver.leftBumper().getAsBoolean(),
-            () -> (driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Blue)))
+            () -> (driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))
         ));
 
         incinerateMotors();
@@ -102,7 +103,7 @@ public class RobotContainer implements Logged {
             ), swerve)
         );
 
-        driver.leftBumper().whileTrue(Commands.run(swerve::getSetWheelsX));
+        driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
       
