@@ -43,6 +43,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        triggerWheel = new Trigger();
 
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -94,7 +95,7 @@ public class RobotContainer implements Logged {
         driver.y().onTrue(intake.outCommand());
 
         driver.x().onTrue(intake.stopCommand());
-
+        
     }
 
     public Command getAutonomousCommand() {
