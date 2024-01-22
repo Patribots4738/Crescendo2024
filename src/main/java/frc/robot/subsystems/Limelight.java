@@ -49,6 +49,7 @@ public class Limelight extends SubsystemBase {
      * Translation (X,Y,Z) 
      * Rotation(Roll,Pitch,Yaw)
      * 
+     * @param targetSpace if the bot pose should be send in targetSpace.
      * @return the robot pose
      */
     public Optional<Pose3d> getPose3d() {
