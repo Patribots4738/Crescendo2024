@@ -39,7 +39,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Trigger hasGamePieceTrigger() {
-        return new Trigger(() -> (intake.getOutputCurrent() <= 7.0));
+        return new Trigger(() -> (intake.getOutputCurrent() > IntakeConstants.HAS_PIECE_CURRENT_THRESHOLD));
     }
         
 }

@@ -287,6 +287,8 @@ public final class Constants {
 
         public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
         public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
+
+        public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
     }
 
     public static final class FieldConstants {
