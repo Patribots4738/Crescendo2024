@@ -17,8 +17,8 @@ public class Climb extends SubsystemBase implements Logged {
     private final Neo rightMotor;
     
     public Climb() {
-        leftMotor = new Neo(14);
-        rightMotor = new Neo(15);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
 
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
