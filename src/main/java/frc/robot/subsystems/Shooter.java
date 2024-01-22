@@ -51,34 +51,12 @@ public class Shooter extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    public Command shoot(Pose2d position, boolean shootingAtSpeaker) {
-        SpeedAnglePair pair = calculateSpeed(position, shootingAtSpeaker);
-        return runOnce(() -> motorLeft.setTargetVelocity(1));
+    public void setTargetVelocity(double calc) {
+        motorLeft.getPIDController().setTargetVelocity(calc);
     }
 
-    public Command stop() {
-        return runOnce(() -> motorLeft.setTargetVelocity(0));
-    }
-
-    public SpeedAnglePair calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
-        // Constants have blue alliance positions at index 0
-        // and red alliance positions at index 1
-        int positionIndex = FieldConstants.ALLIANCE == Optional.ofNullable(Alliance.Blue) ? 0 : 1;
-
-        // Get our position relative to the desired field element
-        if (shootingAtSpeaker) {
-            robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
-        } else {
-            robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
-        }
-
-        double distance = Units.metersToFeet(robotPose.getTranslation().getNorm());
-        int lowerIndex = (int) (Math.floor(distance / ShooterConstants.MEASUREMENT_INTERVAL_FEET) * ShooterConstants.MEASUREMENT_INTERVAL_FEET);
-        int upperIndex = (int) (Math.ceil(distance / ShooterConstants.MEASUREMENT_INTERVAL_FEET) * ShooterConstants.MEASUREMENT_INTERVAL_FEET);
- 
-        SpeedAnglePair lowerPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(lowerIndex);
-        SpeedAnglePair upperPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(upperIndex);
-
-        return lowerPair.interpolate(upperPair, (distance - lowerIndex) / (upperIndex - lowerIndex));
+    public void setTargetVelocity() {
+        motorLeft.getPIDController().setTargetVelocity(0);
     }
 }
+
