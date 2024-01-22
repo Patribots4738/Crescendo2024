@@ -217,6 +217,15 @@ public class Neo extends CANSparkMax {
 
         pidController.setOutputRange(minOutput, maxOutput, slotID);
     }
+
+    public void setPositionConversionFactor(double factor) {
+        encoder.setPositionConversionFactor(factor);
+    }
+
+    public void setVelocityConversionFactor(double factor) {
+        encoder.setVelocityConversionFactor(factor);
+    }
+
     /**
      * Gets the proportional gain constant for PIDFF controller.
      * @return The proportional gain constant for PIDFF controller.
