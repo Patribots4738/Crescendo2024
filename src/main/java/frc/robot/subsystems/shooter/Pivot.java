@@ -1,29 +1,40 @@
-package frc.robot.subsystems.Shooter;
+package frc.robot.subsystems.shooter;
 
-public class Pivot {
-    pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
-    configMotor();
-}
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
-public void configMotor() {
-        pivot.setSmartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT);
-        // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Neo;
+import frc.robot.util.Constants.ShooterConstants;
+
+public class Pivot extends SubsystemBase {
+    private Neo pivot;
+    
+    public Pivot() {
+        this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
+
+        configMotor();
+    }
+
+
+    public void configMotor() {
+        pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
         pivot.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         pivot.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         pivot.setInverted(false);
 
-        Pivot.setPID(
-                ShooterConstants.SHOOTER_P,
-                ShooterConstants.SHOOTER_I,
-                ShooterConstants.SHOOTER_D,
-                ShooterConstants.SHOOTER_MIN_OUTPUT,
-                ShooterConstants.SHOOTER_MAX_OUTPUT);
+        pivot.setPID(
+                ShooterConstants.PIVOT_P,
+                ShooterConstants.PIVOT_I,
+                ShooterConstants.PIVOT_D,
+                ShooterConstants.PIVOT_MIN_OUTPUT,
+                ShooterConstants.PIVOT_MAX_OUTPUT);
 
 
         //sets brake mode
         pivot.setBrakeMode();
     }
     
-public void setAngle(double angle) {
-    pivot.setTargetPosition(angle);
+    public void setAngle(double angle) {
+        pivot.setTargetPosition(angle);
+    }
 }
