@@ -114,6 +114,13 @@ public final class Constants {
         public static final double ELEVATOR_DEADBAND = .3;
         public static final double OUTTAKE_TIME = .2;
 
+        public static final int CLAW_CURRENT_LIMIT = 7;
+
+        public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
+        public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;
+
+        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0/25.0;
+
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; //amps
         
         public static final double TRAP_P = 0.01;
@@ -267,10 +274,9 @@ public final class Constants {
         // % speeds of the motor
         public static final double INTAKE_SPEED = 0.5;
         public static final double OUTTAKE_SPEED = -0.5;
-	public static final double STOP_SPEED = 0;
+	    public static final double STOP_SPEED = 0;
 
-        public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
-        public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
+        public static final int INTAKE_CURRENT_LIMIT_AMPS = 7;
     }
 
     public static final class FieldConstants {

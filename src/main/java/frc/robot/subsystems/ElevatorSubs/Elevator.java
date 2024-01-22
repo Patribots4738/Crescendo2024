@@ -35,12 +35,12 @@ public class Elevator extends SubsystemBase {
         rightElevator.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         rightElevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         leftElevator.addFollower(rightElevator, true);
-
+        leftElevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         leftElevator.setPID(
             TrapConstants.TRAP_P,
             TrapConstants.TRAP_I,
             TrapConstants.TRAP_D, 
-            0, 0);
+            TrapConstants.TRAP_ELEVATOR_MIN_OUTPUT,  TrapConstants.TRAP_ELEVATOR_MAX_OUTPUT);
     }
 
     @Override
@@ -53,8 +53,10 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean isAtTargetPosition() {
-        return MathUtil.applyDeadband(Math.abs(this.getPosition() - leftElevator.getTargetPosition()),
-                TrapConstants.ELEVATOR_DEADBAND) == 0;
+        return MathUtil.applyDeadband(
+            Math.abs(
+                this.getPosition() - leftElevator.getTargetPosition()),
+            TrapConstants.ELEVATOR_DEADBAND) == 0;
     }
 
     public void setPosition(double pos) {

@@ -4,14 +4,13 @@
 
 package frc.robot.subsystems.ElevatorSubs;
 
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
-import frc.robot.util.Constants.FieldConstants.ChainPosition;
-import monologue.Logged;
 
 public class Claw extends SubsystemBase {
     private final Neo claw;
@@ -45,6 +44,11 @@ public class Claw extends SubsystemBase {
 
     public void configMotors() {
         // needs motor configs
+        claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
+        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
+        claw.setInverted(false);
+        claw.setBrakeMode();
     }
 
     public boolean getHasGamePiece() {

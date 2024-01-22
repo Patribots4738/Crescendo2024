@@ -16,7 +16,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void configMotor() {
-        intake.setSmartCurrentLimit(IntakeConstants.INTAKE_STALL_CURRENT_LIMIT_AMPS, IntakeConstants.INTAKE_FREE_CURRENT_LIMIT_AMPS);
+        intake.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
         intake.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         intake.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
