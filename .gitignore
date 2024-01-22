@@ -176,3 +176,6 @@ logs/
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
+
+# Choreo trajectories to stop branches from losing their sync-ness
+*.traj
