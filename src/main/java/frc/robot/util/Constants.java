@@ -104,9 +104,19 @@ public final class Constants {
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
 
+        public static final double PIVOT_P = 0.01;
+        public static final double PIVOT_I = 0;
+        public static final double PIVOT_D = 0;
+
+        public static final int SHOOTER_CURRENT_LIMIT = 15;
+        public static final int PIVOT_CURRENT_LIMIT = 15; 
+
         // These are in %
         public static final double SHOOTER_MIN_OUTPUT = -1;
         public static final double SHOOTER_MAX_OUTPUT = 1;
+
+        public static final double PIVOT_MIN_OUTPUT = -1;
+        public static final double PIVOT_MAX_OUTPUT = 1;
         
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
