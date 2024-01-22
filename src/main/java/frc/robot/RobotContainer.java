@@ -46,6 +46,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        triggerWheel = new Trigger();
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -112,7 +113,7 @@ public class RobotContainer implements Logged {
         driver.y().onTrue(intake.outCommand());
 
         driver.x().onTrue(intake.stopCommand());
-
+        
     }
 
     public Command getAutonomousCommand() {
