@@ -32,6 +32,7 @@ import frc.robot.Robot;
  * and each class has its own constants.
  * Be sure to keep it organized! And PLEASE do not forget units.
  * If possible, include them in the name of the variable,
+ * If possible, include them in the name of the variable,
  * or in a comment next to it.
  */
 public final class Constants {
@@ -86,20 +87,19 @@ public final class Constants {
 
         public static final class ClimbConstants {
 
-                public static final int LEFT_CLIMB_CAN_ID = 17;
-                public static final int RIGHT_CLIMB_CAN_ID = 18;
+                public static final int LEFT_CLIMB_CAN_ID = 16;
+                public static final int RIGHT_CLIMB_CAN_ID = 17;
 
-                public static final double HIGH_LIMIT = 3.0;
-                public static final double ROCK_BOTTOM = 0.0;
-                public static final double ALMOST_HIGH_LIMIT = 2.5;
-        }
+        public static final double HIGH_LIMIT = 3.0;
+        public static final double ROCK_BOTTOM = 0.0;
+        public static final double ALMOST_HIGH_LIMIT = 2.5;
+    }
+
 
         public static final class ShooterConstants {
                 public static final int LEFT_SHOOTER_CAN_ID = 11;
                 public static final int RIGHT_SHOOTER_CAN_ID = 12;
                 public static final int SHOOTER_PIVOT_CAN_ID = 13;
-
-                public static final int PIVOT_MOTOR_CURRENT_LIMIT = 20; // amps
 
                 public static final double SHOOTER_P = 0.01;
                 public static final double SHOOTER_I = 0;
@@ -294,16 +294,17 @@ public final class Constants {
                 public static ArrayList<CANSparkBase> motors = new ArrayList<>();
         }
 
-        public static final class IntakeConstants {
-                public static final int INTAKE_CAN_ID = 10;
-                public static final int TRIGGER_WHEEL_CAN_ID = 11;
+    public static final class IntakeConstants {
+        public static final int INTAKE_CAN_ID = 10;
+        public static final int TRIGGER_WHEEL_CAN_ID = 11;
+        
+        // % speeds of the motor
+        public static final double INTAKE_SPEED = 0.5;
+        public static final double OUTTAKE_SPEED = -0.5;
+	public static final double STOP_SPEED = 0;
 
-                // % speeds of the motor
-                public static final double INTAKE_SPEED = 0.5;
-                public static final double OUTTAKE_SPEED = -0.5;
-                public static final double STOP_SPEED = 0;
-                public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
-                public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
+        public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
+        public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
 
                 public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
