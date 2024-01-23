@@ -1,27 +1,40 @@
 package frc.robot.commands.handoff;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.TriggerWheel;
+import frc.robot.subsystems.ElevatorSubs.Claw;
+import frc.robot.subsystems.ElevatorSubs.Elevator;
+import frc.robot.subsystems.shooter.Pivot;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class Handoff {
     private final Command emptyCommand = Commands.runOnce(() -> System.out.println(""));
-    private NotePosition notePosition;
-    private TriggerWheel trigger;
-    private Elevator elevator;
+    private NotePosition currentNotePos;
+
     private Intake intake;
+    private TriggerWheel trigger;
+    
+    private Elevator elevator;
+    private Claw claw;
+
+    private Pivot pivot;
+    private Shooter shooter;
+
 
     public Handoff() {
         intake = new Intake();
         trigger = new TriggerWheel();
-        elevator = new Elevator();
 
-        this.notePosition = trigger.getHasPiece().getAsBoolean() 
+        elevator = new Elevator();
+        claw = new Claw();
+
+        pivot = new Pivot();
+        shooter = new Shooter();
+
+        this.currentNotePos = trigger.hasPiece().getAsBoolean() 
                                 ? NotePosition.TRIGGER 
                                 : NotePosition.NONE;
     }
@@ -29,15 +42,15 @@ public class Handoff {
     /**
      * @return
      */
-    public NotePosition getNotePosition(){
-        return this.notePosition;
+    public NotePosition getCurrentNotePos(){
+        return this.currentNotePos;
     }
 
     /**
      * @param notePosition
      */
-    public void setNotePosition(NotePosition notePosition) {
-        this.notePosition = notePosition;
+    public void setCurrentNotePos(NotePosition notePosition) {
+        this.currentNotePos = notePosition;
     }
 
     public void triggerReady() {
@@ -45,15 +58,15 @@ public class Handoff {
     }
 
     public Trigger readyToShoot() {
-        return new Trigger(trigger.getHasPiece());
+        return new Trigger(trigger.hasPiece());
     }
 
     public Command triggerToShooter() {
-        return Commands.either(trigger.shootToPivot(), emptyCommand, this.readyToShoot());
+        return Commands.either(trigger.toShooter(), emptyCommand, this.readyToShoot());
     }
 
     public Command triggerToElevator() {
-        return Commands.either(trigger.shootToElevator(), emptyCommand, this.readyToShoot());
+        return Commands.either(trigger.toTrap(), emptyCommand, this.readyToShoot());
     }
 
 }
