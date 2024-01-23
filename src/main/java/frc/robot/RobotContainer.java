@@ -27,13 +27,14 @@ public class RobotContainer implements Logged {
     @SuppressWarnings("unused")
     private final PatriBoxController operator;
 
-    private final Swerve swerve;
+    private Swerve swerve;
     private final Intake intake;
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
 
     private final Limelight limelight;
     private final Climb climb;
+    private TriggerWheel triggerWheel;
     
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -46,7 +47,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
-        triggerWheel = new Trigger();
+        triggerWheel = new TriggerWheel();
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
