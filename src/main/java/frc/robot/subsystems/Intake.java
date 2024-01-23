@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
         return runOnce(() -> intake.set(IntakeConstants.OUTTAKE_SPEED));
     }
 
-    public Command stopCommand() {
+    public Command stop() {
         return runOnce(() -> intake.set(IntakeConstants.STOP_SPEED));
     }
 

@@ -113,7 +113,7 @@ public class RobotContainer implements Logged {
 
         driver.y().onTrue(intake.outCommand());
 
-        driver.x().onTrue(intake.stopCommand());
+        driver.x().onTrue(intake.stop());
         
     }
 

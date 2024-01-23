@@ -9,6 +9,7 @@ import java.util.function.BooleanSupplier;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
@@ -58,6 +59,10 @@ public class Elevator extends SubsystemBase {
 
     public void setPosition(double pos) {
         leftElevator.setTargetPosition(pos);
+    }
+
+    public Command stop() {
+        return runOnce(() -> leftElevator.set(0));
     }
 
 }

@@ -59,8 +59,8 @@ public class Claw extends SubsystemBase {
         return Commands.runOnce(() -> claw.setTargetVelocity(1));
     }
 
-    public void stop() {
-        claw.setTargetVelocity(0);
+    public Command stop() {
+        return Commands.runOnce(() -> claw.setTargetVelocity(0));
     }
 
 }

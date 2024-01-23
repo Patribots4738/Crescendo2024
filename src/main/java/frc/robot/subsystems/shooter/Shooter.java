@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
@@ -44,8 +46,8 @@ public class Shooter extends SubsystemBase {
         motorLeft.setTargetVelocity(speed);
     }
 
-    public void stop() {
-        motorLeft.setTargetVelocity(0);
+    public Command stop() {
+        return Commands.run(() -> motorLeft.setTargetVelocity(0));
     }
 
     //TODO: Implement a way to get the RPM of the shooter
