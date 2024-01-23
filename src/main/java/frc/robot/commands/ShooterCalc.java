@@ -17,43 +17,54 @@ public class ShooterCalc {
 
   private Pivot pivot;
   private Shooter shooter;
-  private BooleanSupplier stopAiming;
+  private BooleanSupplier aiming;
 
   public ShooterCalc() {
     this.pivot = new Pivot();
     this.shooter = new Shooter();
-    this.stopAiming = (() -> false);
+    this.aiming = (() -> false);
   }
 
+  // Sets needed speed and angle for shooter/pivot relative to speaker or amp based on robot pose
   public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
     return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()))
             .alongWith(Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed())));
   }
 
+  // If we are currently aiming, toggle aiming to false, cancelling repeated calls to prepareFireComman
+  // If we are not currently aiming, toggle aiming to true, 
+  // and repeatedly run prepareFireCommand until aiming is toggled to false
+  // Allows for toggling on and off of aiming with single button
   public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Swerve swerve) {
-    if (stopAiming.getAsBoolean()) {
-      return Commands.runOnce(() -> toggleStopAiming());
+    if (aiming.getAsBoolean()) {
+      return Commands.runOnce(() -> toggleAiming());
     }
-    return Commands.runOnce(() -> toggleStopAiming())
-            .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())).repeatedly()
-            .until(stopAiming);
+    return Commands.runOnce(() -> toggleAiming())
+            .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose()))
+            .repeatedly()
+            .until(() -> !aiming.getAsBoolean());
   }
 
+  // Sets shooter up to speed without regard to pivot angle
   public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
     return Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed()));
   }
 
+  // Sets pivot angle without regard to shooter speed
   public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
     return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()));
   }
 
-  private void toggleStopAiming() {
-    this.stopAiming = (() -> !stopAiming.getAsBoolean());
+  // Toggles the aiming BooleanSupplier
+  private void toggleAiming() {
+    this.aiming = (() -> !aiming.getAsBoolean());
   }
 
+  // Gets a SpeedAnglePair by interpolating values from a map of already 
+  // known required speeds and angles for certain poses
   private SpeedAnglePair calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
         // Constants have blue alliance positions at index 0
         // and red alliance positions at index 1
