@@ -31,6 +31,7 @@ public class RobotContainer implements Logged {
     private final Intake intake;
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
+    private final TriggerWheel triggerWheel;
 
     private final Limelight limelight;
     private final Climb climb;
@@ -48,6 +49,7 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         driverUI = new DriverUI();
         triggerWheel = new TriggerWheel();
+<<<<<<< HEAD
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -63,6 +65,8 @@ public class RobotContainer implements Logged {
                         DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
             }
         }, limelight));
+=======
+>>>>>>> Trigger
 
         swerve.setDefaultCommand(new Drive(
             swerve,
