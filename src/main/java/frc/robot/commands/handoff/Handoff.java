@@ -24,15 +24,20 @@ public class Handoff {
     private Shooter shooter;
 
 
-    public Handoff() {
-        intake = new Intake();
-        trigger = new TriggerWheel();
-
-        elevator = new Elevator();
-        claw = new Claw();
-
-        pivot = new Pivot();
-        shooter = new Shooter();
+    public Handoff(
+            Intake intake, 
+            TriggerWheel trigger, 
+            Elevator elevator, 
+            Claw claw, 
+            Pivot pivot, 
+            Shooter shooter) 
+        {
+        this.intake = intake;
+        this.trigger = trigger;
+        this.elevator = elevator;
+        this.claw = claw;
+        this.pivot = pivot;
+        this.shooter = shooter;
 
         this.currentNotePos = trigger.hasPiece().getAsBoolean() 
                                 ? NotePosition.TRIGGER 
