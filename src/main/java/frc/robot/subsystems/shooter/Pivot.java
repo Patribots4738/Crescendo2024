@@ -39,4 +39,12 @@ public class Pivot extends SubsystemBase {
         // and we want to set the position between 1.0 and -1.0
         pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE);
     }
+
+
+    public boolean atDesiredAngle() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'atDesiredAngle'");
+    }
+
+    //TODO: Implement a way to get the angle desired angle of the pivot
 }

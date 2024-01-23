@@ -55,8 +55,8 @@ public class Claw extends SubsystemBase {
         return this.hasGamePiece;
     }
 
-    public void expel() {
-        claw.setTargetVelocity(1);
+    public Command expel() {
+        return Commands.runOnce(() -> claw.setTargetVelocity(1));
     }
 
     public void stop() {

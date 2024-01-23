@@ -47,4 +47,10 @@ public class Shooter extends SubsystemBase {
     public void stop() {
         motorLeft.setTargetVelocity(0);
     }
+
+    //TODO: Implement a way to get the RPM of the shooter
+    public boolean atDesiredRPM() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'atDesiredRPM'");
+    }
 }

@@ -11,6 +11,7 @@ public class Intake extends SubsystemBase {
     private final Neo intake;
 
     public Intake() {
+        // TODO: is this correct? because the top and bottom motors are seperate
         intake = new Neo(IntakeConstants.INTAKE_CAN_ID);
         configMotor();
     }
@@ -26,10 +27,12 @@ public class Intake extends SubsystemBase {
         intake.setBrakeMode();
     }
 
+    // TODO: is this correct? because the top and bottom motors are seperate
     public Command inCommand() {
         return runOnce(() -> intake.set(IntakeConstants.INTAKE_SPEED));
     }
 
+    // TODO: is this correct? because the top and bottom motors are seperate
     public Command outCommand() {
         return runOnce(() -> intake.set(IntakeConstants.OUTTAKE_SPEED));
     }
