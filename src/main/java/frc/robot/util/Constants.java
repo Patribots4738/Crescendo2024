@@ -13,7 +13,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import java.util.Optional;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -130,7 +129,7 @@ public final class Constants {
     public static final class AutoConstants {
 
         // The below values need to be tuned for each new robot.
-        // They are curently set to the values suggested by Choreo
+        // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 4.377; 
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.344; 
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
