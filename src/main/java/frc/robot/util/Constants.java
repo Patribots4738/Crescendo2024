@@ -13,7 +13,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import java.util.Optional;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;

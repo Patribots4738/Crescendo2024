@@ -4,12 +4,7 @@
 
 package frc.robot.commands;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ElevatorSubs.Claw;
 import frc.robot.subsystems.ElevatorSubs.Elevator;
 
 public class ElevatorCommand extends Command {
