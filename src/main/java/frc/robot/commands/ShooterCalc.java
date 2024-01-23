@@ -41,9 +41,9 @@ public class ShooterCalc {
       return Commands.runOnce(() -> toggleAiming());
     }
     return Commands.runOnce(() -> toggleAiming())
-            .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose()))
-            .repeatedly()
-            .until(() -> !aiming.getAsBoolean());
+            .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())
+                      .repeatedly()
+                      .until(() -> !aiming.getAsBoolean()));
   }
 
   // Sets shooter up to speed without regard to pivot angle
