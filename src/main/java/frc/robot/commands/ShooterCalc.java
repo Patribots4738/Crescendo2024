@@ -19,9 +19,9 @@ public class ShooterCalc {
   private Shooter shooter;
   private BooleanSupplier aiming;
 
-  public ShooterCalc() {
-    this.pivot = new Pivot();
-    this.shooter = new Shooter();
+  public ShooterCalc(Shooter shooter, Pivot pivot) {
+    this.pivot = pivot;
+    this.shooter = shooter;
     this.aiming = (() -> false);
   }
 
