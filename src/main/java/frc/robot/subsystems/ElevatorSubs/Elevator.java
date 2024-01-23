@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.ElevatorSubs;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
@@ -47,8 +49,8 @@ public class Elevator extends SubsystemBase {
         return leftElevator.getPosition();
     }
 
-    public boolean isAtTargetPosition() {
-        return MathUtil.applyDeadband(
+    public BooleanSupplier isAtTargetPosition() {
+        return () -> MathUtil.applyDeadband(
             Math.abs(
                 this.getPosition() - leftElevator.getTargetPosition()),
             TrapConstants.ELEVATOR_DEADBAND) == 0;

@@ -2,13 +2,16 @@ package frc.robot.commands.handoff;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Intake;
+import frc.robot.commands.ElevatorCommand;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.ElevatorSubs.Claw;
 import frc.robot.subsystems.ElevatorSubs.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.Constants.TrapConstants;
 
 public class Handoff {
     private final Command emptyCommand = Commands.runOnce(() -> System.out.println(""));
@@ -24,7 +27,6 @@ public class Handoff {
     //TODO: Use the commands for the subsystems instead of the subsystems themselves
     private Pivot pivot;
     private Shooter shooter;
-
 
     public Handoff(
             Intake intake, 
@@ -56,7 +58,9 @@ public class Handoff {
             shoot = 
                 indexer.toShooter()
                     .andThen(intake.inCommand()) // TODO: is this correct? because the top and bottom motors are seperate
-                    .andThen(claw.expel());
+                    .andThen(claw.expel()).andThen(
+                        //TODO: STOP MOTORS
+                    );
 
             this.notePosition = NotePosition.SHOOTER;
             //TODO: Then once we are done shooting, we want the variable to be set to NONE
@@ -66,7 +70,25 @@ public class Handoff {
     }
 
     public Command clawToTrap() {
-        return emptyCommand;
+        Command shoot = emptyCommand;
+
+        if ( this.notePosition == NotePosition.CLAW ) {
+            // maybe make setPosition a command
+
+            //TODO: find if there is a better way to do this
+            shoot = Commands.runOnce(
+                        () -> elevator.setPosition(TrapConstants.TRAP_POS)
+            ).andThen(
+                Commands.waitUntil(elevator.isAtTargetPosition())
+            ).andThen(
+                claw.expel()
+            ).andThen(new WaitCommand(1)).andThen(//TODO: STOP MOTORS 
+            );
+
+            this.notePosition = NotePosition.CLAW;
+
+        }
+        return shoot;
     }
 
     // public void triggerReady() {

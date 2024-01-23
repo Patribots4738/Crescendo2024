@@ -155,6 +155,10 @@ public final class Constants {
                 public static final double TRAP_P = 0.01;
                 public static final double TRAP_I = 0;
                 public static final double TRAP_D = 0;
+
+                //TODO: set these values
+                public static final double TRAP_POS = 0;
+                public static final double RESET_POS = 0;
         }
 
         public static final class AutoConstants {
