@@ -25,17 +25,37 @@ public class ShooterCalc {
     this.aiming = (() -> false);
   }
 
-  // Sets needed speed and angle for shooter/pivot relative to speaker or amp based on robot pose
+  /**
+   * The function prepares a fire command by calculating the speed and angle for the robot's shooter
+   * based on the robot's pose and whether it should shoot at the speaker.
+   * 
+   * @param shootAtSpeaker A BooleanSupplier that returns true if the robot should shoot at the
+   * speaker, and false otherwise.
+   * @param robotPose The `robotPose` parameter represents the current pose (position and orientation)
+   * of the robot. It is of type `Pose2d`.
+   * @return The method is returning a Command object.
+   */
   public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
     return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()))
             .alongWith(Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed())));
   }
 
-  // If we are currently aiming, toggle aiming to false, cancelling repeated calls to prepareFireComman
-  // If we are not currently aiming, toggle aiming to true, 
-  // and repeatedly run prepareFireCommand until aiming is toggled to false
-  // Allows for toggling on and off of aiming with single button
+  /**
+   * The function prepares a command to fire at a moving target while continuously aiming until
+   * instructed to stop.
+   * 
+   * If we are currently aiming, toggle aiming to false, cancelling repeated calls to prepareFireComman
+   * If we are not currently aiming, toggle aiming to true, 
+   * and repeatedly run prepareFireCommand until aiming is toggled to false
+   * Allows for toggling on and off of aiming with single button
+   * 
+   * @param shootAtSpeaker A BooleanSupplier that determines whether the robot should shoot at the
+   * speaker.
+   * @param swerve The "swerve" parameter is an instance of the Swerve class. It is used to access the
+   * current pose (position and orientation) of the swerve mechanism.
+   * @return The method is returning a Command object.
+   */
   public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Swerve swerve) {
     if (aiming.getAsBoolean()) {
       return Commands.runOnce(() -> toggleAiming());
@@ -46,13 +66,34 @@ public class ShooterCalc {
             .until(() -> !aiming.getAsBoolean());
   }
 
-  // Sets shooter up to speed without regard to pivot angle
+  /**
+   * The function prepares a shooter command by calculating the speed and angle based on the robot's
+   * pose and whether it should shoot at the speaker, and then sets the shooter's speed accordingly.
+   * 
+   * Sets shooter up to speed without regard to pivot angle
+   *
+   * @param shootAtSpeaker A BooleanSupplier that returns true if the robot should shoot at the
+   * speaker, and false otherwise.
+   * @param robotPose The robotPose parameter represents the current pose (position and orientation) of
+   * the robot. It is used in the calculateSpeed method to determine the speed at which the shooter
+   * should be set.
+   * @return The method is returning a Command object.
+   */
   public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
     return Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed()));
   }
 
-  // Sets pivot angle without regard to shooter speed
+  /**
+   * The function prepares a pivot command based on whether the robot should shoot at the speaker and
+   * the current robot pose.
+   * 
+   * @param shootAtSpeaker A BooleanSupplier that returns true if the robot should shoot at the
+   * speaker, and false otherwise.
+   * @param robotPose The `robotPose` parameter represents the current pose (position and orientation)
+   * of the robot. It is of type `Pose2d`.
+   * @return The method is returning a Command object.
+   */
   public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
     return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()));

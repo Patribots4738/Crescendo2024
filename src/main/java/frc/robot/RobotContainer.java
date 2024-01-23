@@ -27,22 +27,42 @@ public class RobotContainer implements Logged {
     @SuppressWarnings("unused")
     private final PatriBoxController operator;
 
-    private final Swerve swerve;
+    private Swerve swerve;
     private final Intake intake;
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
 
+    private final Limelight limelight;
     private final Climb climb;
+    private TriggerWheel triggerWheel;
     
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
 
+        limelight = new Limelight();
+        swerve = new Swerve();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        triggerWheel = new TriggerWheel();
+
+        limelight.setDefaultCommand(Commands.run(() -> {
+            // Create an "Optional" object that contains the estimated pose of the robot
+            // This can be present (sees tag) or not present (does not see tag)
+            Optional<Pose2d> result = limelight.getPose2d();
+            // The skew of the tag represents how confident the camera is
+            // If the result of the estimatedRobotPose exists, 
+            // and the skew of the tag is less than 3 degrees, 
+            // then we can confirm that the estimated position is realistic
+            if (result.isPresent()) {
+                swerve.getPoseEstimator().addVisionMeasurement(
+                        result.get(),
+                        DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
+            }
+        }, limelight));
 
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -50,7 +70,7 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX(),
             () -> !driver.leftBumper().getAsBoolean(),
-            () -> (driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Blue)))
+            () -> (driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))
         ));
 
         incinerateMotors();
@@ -85,7 +105,7 @@ public class RobotContainer implements Logged {
             ), swerve)
         );
 
-        driver.leftBumper().whileTrue(Commands.run(swerve::getSetWheelsX));
+        driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
       
@@ -94,7 +114,7 @@ public class RobotContainer implements Logged {
         driver.y().onTrue(intake.outCommand());
 
         driver.x().onTrue(intake.stopCommand());
-
+        
     }
 
     public Command getAutonomousCommand() {

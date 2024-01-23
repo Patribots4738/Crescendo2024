@@ -17,8 +17,8 @@ public class Climb extends SubsystemBase implements Logged {
     private final Neo rightMotor;
     
     public Climb() {
-        leftMotor = new Neo(14);
-        rightMotor = new Neo(15);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
 
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
@@ -36,7 +36,7 @@ public class Climb extends SubsystemBase implements Logged {
     
        if (chainPosition == ChainPosition.LEFT) {
             return runOnce(() -> this.setPosition(ClimbConstants.ALMOST_HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-       } 
+       }
        else if (chainPosition == ChainPosition.RIGHT) {
             return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.ALMOST_HIGH_LIMIT));
        }
@@ -45,7 +45,7 @@ public class Climb extends SubsystemBase implements Logged {
        }
        
     }
-    
+
     public Command toBottom() {
 
         // This mimics the behavior of an asProxy command
@@ -53,12 +53,13 @@ public class Climb extends SubsystemBase implements Logged {
         // therefore it is more advantagous to use this
         // becuase we can't have two super.runOnce's 
         // as they would require this subsystem twice
+        // this is very bad and need fix :D
         ParallelRaceGroup group = new ParallelRaceGroup();
         group.addCommands(Commands.runOnce(() -> rightMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
         group.addCommands(Commands.runOnce(() -> leftMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
         group.addRequirements(this);
         
-        return group;
+        return group.andThen();
     }
     
 }
