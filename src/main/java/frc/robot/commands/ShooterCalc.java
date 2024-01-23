@@ -42,7 +42,7 @@ public class ShooterCalc {
   }
 
   /**
-   * The function prepares a command to fire at a moving target while continuously aiming until
+   * The function prepares a command to fire at a stationary target while moving and continuously aiming until
    * instructed to stop.
    * 
    * If we are currently aiming, toggle aiming to false, cancelling repeated calls to prepareFireComman
