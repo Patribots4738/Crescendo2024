@@ -117,6 +117,8 @@ public final class Constants {
                 public static final double PIVOT_MIN_OUTPUT = -1;
                 public static final double PIVOT_MAX_OUTPUT = 1;
 
+                public static final double PIVOT_MAX_ANGLE = 180.0;
+
                 public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
                 /**
                  * The distances are in feet, the speeds are in RPM, and the angles are in
