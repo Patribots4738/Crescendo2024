@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -11,27 +7,51 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.SpeedAnglePair;
 
-public class ShooterCalc extends Command {
+public class ShooterCalc {
 
-  public Command prepareShooter(BooleanSupplier supp, Pose2d robotPose, Pivot pivot, Shooter shooter) {
-    SpeedAnglePair pair = (supp.getAsBoolean()) 
-            ? getSpeaker(robotPose) 
-            : getAmp(robotPose);
+  private Pivot pivot;
+  private Shooter shooter;
+  private BooleanSupplier stopAiming;
+
+  public ShooterCalc() {
+    this.pivot = new Pivot();
+    this.shooter = new Shooter();
+    this.stopAiming = (() -> false);
+  }
+
+  public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
+    SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
     return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()))
             .alongWith(Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed())));
   }
 
-  private SpeedAnglePair getSpeaker(Pose2d robotPose) {
-    return calculateSpeed(robotPose, true);
+  public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Swerve swerve) {
+    if (stopAiming.getAsBoolean()) {
+      return Commands.runOnce(() -> toggleStopAiming());
+    }
+    return Commands.runOnce(() -> toggleStopAiming())
+            .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())).repeatedly()
+            .until(stopAiming);
   }
 
-  private SpeedAnglePair getAmp(Pose2d robotPose) {
-    return calculateSpeed(robotPose, false);
+  public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
+    SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+    return Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed()));
+  }
+
+  public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
+    SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+    return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()));
+  }
+
+  private void toggleStopAiming() {
+    this.stopAiming = (() -> !stopAiming.getAsBoolean());
   }
 
   private SpeedAnglePair calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
@@ -40,7 +60,7 @@ public class ShooterCalc extends Command {
         int positionIndex = FieldConstants.ALLIANCE == Optional.ofNullable(Alliance.Blue) ? 0 : 1;
 
         // Get our position relative to the desired field element
-        if (shootingAtSpeaker) {
+        if (shootingAtSpeaker) { 
             robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
         } else {
             robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
