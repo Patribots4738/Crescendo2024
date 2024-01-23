@@ -31,6 +31,7 @@ public class RobotContainer implements Logged {
     private final Intake intake;
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
+    private final TriggerWheel triggerWheel;
 
     private final Climb climb;
     
@@ -43,7 +44,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
-        triggerWheel = new Trigger();
+        triggerWheel = new TriggerWheel();
 
         swerve.setDefaultCommand(new Drive(
             swerve,
