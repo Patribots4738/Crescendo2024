@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Limelight extends SubsystemBase {
 
     private NetworkTable table;
-    private NetworkTableEntry btPose;
+    private NetworkTableEntry botPose;
     
     public Limelight() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
