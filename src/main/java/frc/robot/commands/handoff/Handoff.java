@@ -68,7 +68,7 @@ public class Handoff {
     }
 
     // TODO: We assume that the note is already in the claw when we want to shoot
-    public Command clawToShooter(){
+    public Command noteToShoot(){
         // this.notePosition = NotePosition.CLAW; ^^^
         Command shoot = emptyCommand;
         this.shooterCalc.prepareFireMovingCommand(() -> true, swerve);
@@ -78,27 +78,28 @@ public class Handoff {
                 indexer.toShooter()
                     .andThen(intake.inCommand()) // TODO: is this correct? because the top and bottom motors are seperate
                     .andThen(claw.expel())
+                    .andThen(() -> this.notePosition = NotePosition.SHOOTER)
+                    .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?
+                    .andThen(() -> this.notePosition = NotePosition.NONE)
                     .andThen(stopAllMotors());
-
-            this.notePosition = NotePosition.SHOOTER;
-            //TODO: Then once we are done shooting, we want the variable to be set to NONE
         }
 
         return shoot;
     }
 
-    public Command clawToTrap() {
+    public Command noteToTrap() {
         Command shoot = emptyCommand;
 
         if ( this.notePosition == NotePosition.CLAW ) {
             // maybe make setPosition a command ORR Make the Elevator Command 
-            shoot = Commands.runOnce(
-                        () -> elevator.setPosition(TrapConstants.TRAP_POS)
-            ).andThen(
-                Commands.waitUntil(elevator.isAtTargetPosition())
-            ).andThen(claw.expel())
-            .andThen(new WaitCommand(1))
-            .andThen(stopAllMotors());
+            shoot = 
+            Commands.runOnce( 
+                () -> elevator.setPosition(TrapConstants.TRAP_POS) )
+                .andThen(
+                    Commands.waitUntil(elevator.isAtTargetPosition())
+                ).andThen(claw.expel())
+                .andThen(new WaitCommand(1))
+                .andThen(stopAllMotors());
 
             this.notePosition = NotePosition.CLAW;
 
