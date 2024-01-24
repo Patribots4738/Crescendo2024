@@ -25,6 +25,8 @@ public class ShooterCalc {
     this.aiming = (() -> false);
   }
 
+
+
   /**
    * The function prepares a fire command by calculating the speed and angle for the robot's shooter
    * based on the robot's pose and whether it should shoot at the speaker.
@@ -119,6 +121,10 @@ public class ShooterCalc {
     return shooter.stop();
   }
 
+  public Command pivotStopCommand() {
+    return pivot.stop();
+  }
+
   public void pivotSetAngle(double angle) {
     pivot.setAngle(angle);
   }
@@ -159,4 +165,23 @@ public class ShooterCalc {
 
         return lowerPair.interpolate(upperPair, (distance - lowerIndex) / (upperIndex - lowerIndex));
     }
+
+
+
+public boolean pivotAtDesiredAngle() {
+    return pivot.isAtDesiredAngle();
+}
+
+
+
+public boolean shooterAtDesiredRPM() {
+  return shooter.atDesiredRPM();
+}
+
+public Command stopMotors() {
+  return Commands.parallel(
+      shooterStopCommand(),
+      pivotStopCommand()
+  );
+}
 }
