@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
@@ -61,8 +62,9 @@ public class Elevator extends SubsystemBase {
         leftElevator.setTargetPosition(pos);
     }
 
-    public Command stop() {
-        return runOnce(() -> leftElevator.set(0));
+    public Command setPositionCommand(double pos) {
+        return runOnce(() -> this.setPosition(pos))
+            .andThen(Commands.waitUntil(this.isAtTargetPosition()));
     }
 
 }
