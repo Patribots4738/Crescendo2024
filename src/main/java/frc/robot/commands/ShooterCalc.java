@@ -17,12 +17,12 @@ public class ShooterCalc {
 
   private Pivot pivot;
   private Shooter shooter;
-  private BooleanSupplier aiming;
+  private boolean aiming;
 
   public ShooterCalc(Shooter shooter, Pivot pivot) {
     this.pivot = pivot;
     this.shooter = shooter;
-    this.aiming = (() -> false);
+    this.aiming = false;
   }
 
 
@@ -39,8 +39,8 @@ public class ShooterCalc {
    */
   public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> pivotSetAngle(pair.getAngle()))
-            .alongWith(Commands.runOnce(() -> shooterSetSpeed(pair.getSpeed())));
+    return pivot.setAngleCommand(pair.getAngle())
+            .alongWith(shooter.setSpeedCommand(pair.getSpeed()));
   }
 
   /**
@@ -59,13 +59,13 @@ public class ShooterCalc {
    * @return The method is returning a Command object.
    */
   public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Swerve swerve) {
-    if (aiming.getAsBoolean()) {
+    if (aiming) {
       return Commands.runOnce(() -> toggleAiming());
     }
     return Commands.runOnce(() -> toggleAiming())
             .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())
                       .repeatedly()
-                      .until(() -> !aiming.getAsBoolean()));
+                      .until(() -> !aiming));
   }
 
   /**
@@ -83,7 +83,7 @@ public class ShooterCalc {
    */
   public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> shooterSetSpeed(pair.getSpeed()));
+    return shooter.setSpeedCommand(pair.getSpeed());
   }
 
   /**
@@ -98,48 +98,42 @@ public class ShooterCalc {
    */
   public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> pivotSetAngle(pair.getAngle()));
+    return pivot.setAngleCommand(pair.getAngle());
   }
 
+  /**
+   * The function is a command that resets the shooter to a speed of 0 and an angle constant and 
+   * once it has reached its desired states it sets the shooter to a negative speed to pass the 
+   * piece back to handoff
+   * 
+   * @return The method is returning a Command object.
+   */
   public Command sendBackCommand() {
-    return Commands.runOnce(() -> pivotSetRestAngle())
-              .andThen(Commands.waitUntil(() -> pivot.isAtDesiredAngle()))
-              .andThen(() -> shooterSetSpeed(ShooterConstants.SHOOTER_BACK_SPEED));
+    return resetShooter()
+              .andThen(Commands.waitUntil(() -> pivot.atDesiredAngle().getAsBoolean() && shooter.atDesiredRPM().getAsBoolean()))
+              .andThen(shooter.setSpeedCommand(ShooterConstants.SHOOTER_BACK_SPEED));
   }
 
+  /**
+   * Makes aiming false so that we stop any aiming loop currently happening, and then sets the
+   * shooter to a speed of 0 and the pivot angle to a predetermined constant
+   * 
+   * @return The method is returning a Command object.
+   */
   public Command resetShooter() {
       return Commands.runOnce(() -> stopAiming())
-              .andThen(shooterStopCommand()
-                        .alongWith(Commands.runOnce(() -> pivotSetRestAngle())));
+              .andThen(shooter.stop()
+                        .alongWith(pivot.setRestAngleCommand()));
   }
 
-  public void shooterSetSpeed(double speed) {
-    shooter.setSpeed(speed);
-  }
-
-  public Command shooterStopCommand() {
-    return shooter.stop();
-  }
-
-  public Command pivotStopCommand() {
-    return pivot.stop();
-  }
-
-  public void pivotSetAngle(double angle) {
-    pivot.setAngle(angle);
-  }
-
-  public void pivotSetRestAngle() {
-    pivot.setRestAngle();
-  }
-
-  // Toggles the aiming BooleanSupplier
+  // Toggles the aiming boolean
   private void toggleAiming() {
-    this.aiming = (() -> !aiming.getAsBoolean());
+    this.aiming = !aiming;
   }
 
+  // Sets the aiming boolean to false
   private void stopAiming() {
-    this.aiming = (() -> false);
+    this.aiming = false;
   }
 
   // Gets a SpeedAnglePair by interpolating values from a map of already 
@@ -168,20 +162,18 @@ public class ShooterCalc {
 
 
 
-public boolean pivotAtDesiredAngle() {
-    return pivot.isAtDesiredAngle();
-}
+  public boolean pivotAtDesiredAngle() {
+      return pivot.atDesiredAngle().getAsBoolean();
+  }
 
+  public boolean shooterAtDesiredRPM() {
+    return shooter.atDesiredRPM().getAsBoolean();
+  }
 
-
-public boolean shooterAtDesiredRPM() {
-  return shooter.atDesiredRPM();
-}
-
-public Command stopMotors() {
-  return Commands.parallel(
-      shooterStopCommand(),
-      pivotStopCommand()
-  );
-}
+  public Command stopMotors() {
+    return Commands.parallel(
+        shooter.stop(),
+        pivot.stop()
+    );
+  }
 }
