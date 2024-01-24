@@ -6,7 +6,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Constants.TrapConstants;
 
 public class Pivot extends SubsystemBase {
     private Neo pivot;

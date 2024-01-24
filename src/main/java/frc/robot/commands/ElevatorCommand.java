@@ -12,7 +12,7 @@ public class ElevatorCommand extends Command {
   private final Elevator elevator;
   double targetPosition;
 
-  //TODO: this need to be modified to control the Claw and ELevator, not just the elevator to move up and down.
+  //TODO: this need to be modified to control the Claw and Elevator, not just the elevator to move up and down.
   public ElevatorCommand (Elevator elevator, double targetPosition) {
         this.elevator = elevator;
         addRequirements(elevator);
