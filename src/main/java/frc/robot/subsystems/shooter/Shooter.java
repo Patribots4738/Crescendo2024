@@ -48,7 +48,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command stop() {
-        return Commands.run(() -> motorLeft.setTargetVelocity(0));
+        return Commands.runOnce(() -> motorLeft.setTargetVelocity(0));
     }
 
     //TODO: Implement a way to get the RPM of the shooter

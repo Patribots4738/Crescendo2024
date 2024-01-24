@@ -107,16 +107,16 @@ public class ShooterCalc {
 
   public Command resetShooter() {
       return Commands.runOnce(() -> stopAiming())
-              .andThen(Commands.runOnce(() -> shooterStop()))
-                        .alongWith(Commands.runOnce(() -> pivotSetRestAngle()));
+              .andThen(shooterStopCommand()
+                        .alongWith(Commands.runOnce(() -> pivotSetRestAngle())));
   }
 
   public void shooterSetSpeed(double speed) {
     shooter.setSpeed(speed);
   }
 
-  public void shooterStop() {
-    shooter.stop();
+  public Command shooterStopCommand() {
+    return shooter.stop();
   }
 
   public void pivotSetAngle(double angle) {
