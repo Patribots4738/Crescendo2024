@@ -63,13 +63,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command setPositionCommand(double pos) {
-        return Commands.runOnce(() -> this.setPosition(pos))
+        return runOnce(() -> this.setPosition(pos))
             .andThen(Commands.waitUntil(this.isAtTargetPosition()));
-    }
-
-    public Command stop() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stop'");
     }
 
 }
