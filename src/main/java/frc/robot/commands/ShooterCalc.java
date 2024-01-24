@@ -105,6 +105,12 @@ public class ShooterCalc {
               .andThen(() -> shooterSetSpeed(ShooterConstants.SHOOTER_BACK_SPEED));
   }
 
+  public Command resetShooter() {
+      return Commands.runOnce(() -> stopAiming())
+              .andThen(Commands.runOnce(() -> shooterStop()))
+                        .alongWith(Commands.runOnce(() -> pivotSetRestAngle()));
+  }
+
   public void shooterSetSpeed(double speed) {
     shooter.setSpeed(speed);
   }
@@ -124,6 +130,10 @@ public class ShooterCalc {
   // Toggles the aiming BooleanSupplier
   private void toggleAiming() {
     this.aiming = (() -> !aiming.getAsBoolean());
+  }
+
+  private void stopAiming() {
+    this.aiming = (() -> false);
   }
 
   // Gets a SpeedAnglePair by interpolating values from a map of already 
