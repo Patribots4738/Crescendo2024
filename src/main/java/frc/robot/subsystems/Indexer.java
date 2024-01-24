@@ -3,21 +3,23 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.BooleanSupplier;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo;
-import java.util.Optional;
 
 public class Indexer extends SubsystemBase {
     private final Neo triggerWheel;
-    private Optional<Boolean> whichWay;
-    private BooleanSupplier hasPiece;
+    private MotorRotation whichWay;
 
     public Indexer() {
         triggerWheel = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID);
-        whichWay = Optional.empty();
-        hasPiece = () -> false; 
+        whichWay = MotorRotation.STOP;
         configMotor();
+    }
+
+    enum MotorRotation {
+        CLOCKWISE,
+        COUNTER_CLOCKWISE,
+        STOP
     }
 
     public void configMotor() {
@@ -30,18 +32,18 @@ public class Indexer extends SubsystemBase {
         //sets brake mode
         triggerWheel.setBrakeMode();
     }    
-
-    public Optional<Boolean> whichWay(){ 
+  
+    public MotorRotation getWhichWay() {
         return whichWay;
     }
 
     public Command toShooter() {
-        whichWay = Optional.ofNullable(true);
+        whichWay = MotorRotation.CLOCKWISE;
         return runOnce(() -> triggerWheel.set(IntakeConstants.SHOOTER_TRIGGER_WHEEL_SPEED));
     }
 
     public Command toTrap() {
-        whichWay = Optional.ofNullable(false);
+        whichWay = MotorRotation.COUNTER_CLOCKWISE;
         return runOnce(() -> triggerWheel.set(IntakeConstants.TRAP_TRIGGER_WHEEL_SPEED));
     }
         
