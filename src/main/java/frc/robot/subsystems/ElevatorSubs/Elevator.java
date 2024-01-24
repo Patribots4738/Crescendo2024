@@ -67,4 +67,8 @@ public class Elevator extends SubsystemBase {
             .andThen(Commands.waitUntil(this.isAtTargetPosition()));
     }
 
+    public Command stop() {
+        return runOnce(() -> leftElevator.stopMotor());
+    }
+
 }

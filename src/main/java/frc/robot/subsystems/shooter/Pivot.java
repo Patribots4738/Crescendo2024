@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
@@ -47,5 +48,9 @@ public class Pivot extends SubsystemBase {
             Math.abs(
                 pivot.getPosition() - pivot.getTargetPosition()),
             ShooterConstants.PIVOT_DEADBAND) == 0;
+    }
+
+    public Command stop() {
+        return runOnce(() -> pivot.stopMotor());
     }
 }
