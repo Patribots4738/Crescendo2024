@@ -45,7 +45,7 @@ public class Pivot extends SubsystemBase {
         this.setAngle(ShooterConstants.PIVOT_REST_ANGLE);
     }
 
-    public boolean isAtTargetPosition() {
+    public boolean isAtDesiredAngle() {
         return MathUtil.applyDeadband(
             Math.abs(
                 pivot.getPosition() - pivot.getTargetPosition()),

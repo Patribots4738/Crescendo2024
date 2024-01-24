@@ -101,7 +101,7 @@ public class ShooterCalc {
 
   public Command sendBackCommand() {
     return Commands.runOnce(() -> pivotSetRestAngle())
-              .andThen(Commands.waitUntil(() -> pivot.isAtTargetPosition()))
+              .andThen(Commands.waitUntil(() -> pivot.isAtDesiredAngle()))
               .andThen(() -> shooterSetSpeed(ShooterConstants.SHOOTER_BACK_SPEED));
   }
 

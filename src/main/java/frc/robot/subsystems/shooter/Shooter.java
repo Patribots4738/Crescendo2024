@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -52,7 +53,9 @@ public class Shooter extends SubsystemBase {
 
     //TODO: Implement a way to get the RPM of the shooter
     public boolean atDesiredRPM() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'atDesiredRPM'");
+        return MathUtil.applyDeadband(
+            Math.abs(
+                motorLeft.getVelocity() - motorLeft.getTargetVelocity()),
+            ShooterConstants.SHOOTER_DEADBAND) == 0;
     }
 }

@@ -114,6 +114,7 @@ public final class Constants {
                 public static final double SHOOTER_BACK_SPEED = -0.5;
 
                 public static final double PIVOT_DEADBAND = 0.3;
+                public static final double SHOOTER_DEADBAND = 0.03;
 
                 // These are in %
                 public static final double SHOOTER_MIN_OUTPUT = -1;
