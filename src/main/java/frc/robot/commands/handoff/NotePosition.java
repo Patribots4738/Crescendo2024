@@ -2,8 +2,8 @@ package frc.robot.commands.handoff;
 
 public enum NotePosition {
     SHOOTER,
-    ELEVATOR,
+    CLAW,
     INTAKE,
-    TRIGGER,
+    INDEXER,
     NONE    
 }

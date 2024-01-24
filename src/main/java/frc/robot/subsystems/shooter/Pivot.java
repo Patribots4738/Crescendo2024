@@ -41,7 +41,6 @@ public class Pivot extends SubsystemBase {
         // and we want to set the position between 1.0 and -1.0
         pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE);
     }
-
     public void setRestAngle() {
         this.setAngle(ShooterConstants.PIVOT_REST_ANGLE);
     }
