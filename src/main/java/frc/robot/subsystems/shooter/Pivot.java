@@ -68,10 +68,23 @@ public class Pivot extends SubsystemBase {
         this.setAngle(ShooterConstants.PIVOT_REST_ANGLE);
     }
 
+    /**
+     * The function is a command that sets the rotation of the pivot to
+     * a default resting position
+     * 
+     * @return The method is returning a Command object.
+    */
     public Command setRestAngleCommand() {
         return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE);
     }
 
+    /**
+     * Determines if the pivot rotation is at its target with a small
+     * tolerance
+     * 
+     * @return The method is returning a BooleanSupplier that returns true
+     * if the pivot is at its target rotation and false otherwise
+    */
     public BooleanSupplier atDesiredAngle() {
         return () ->
             (MathUtil.applyDeadband(
@@ -80,6 +93,11 @@ public class Pivot extends SubsystemBase {
                 ShooterConstants.PIVOT_DEADBAND) == 0);
     }
 
+    /**
+     * The function is a command that stops the motor
+     * 
+     * @return The method is returning a Command object.
+    */
     public Command stop() {
         return runOnce(() -> pivot.stopMotor());
     }
