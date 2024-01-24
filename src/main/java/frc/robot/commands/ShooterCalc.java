@@ -17,12 +17,12 @@ public class ShooterCalc {
 
   private Pivot pivot;
   private Shooter shooter;
-  private BooleanSupplier aiming;
+  private boolean aiming;
 
   public ShooterCalc(Shooter shooter, Pivot pivot) {
     this.pivot = pivot;
     this.shooter = shooter;
-    this.aiming = (() -> false);
+    this.aiming = false;
   }
 
   /**
@@ -37,8 +37,8 @@ public class ShooterCalc {
    */
   public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> pivotSetAngle(pair.getAngle()))
-            .alongWith(Commands.runOnce(() -> shooterSetSpeed(pair.getSpeed())));
+    return pivot.setAngleCommand(pair.getAngle())
+            .alongWith(shooter.setSpeedCommand(pair.getSpeed()));
   }
 
   /**
@@ -57,13 +57,13 @@ public class ShooterCalc {
    * @return The method is returning a Command object.
    */
   public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Swerve swerve) {
-    if (aiming.getAsBoolean()) {
+    if (aiming) {
       return Commands.runOnce(() -> toggleAiming());
     }
     return Commands.runOnce(() -> toggleAiming())
             .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())
                       .repeatedly()
-                      .until(() -> !aiming.getAsBoolean()));
+                      .until(() -> !aiming));
   }
 
   /**
@@ -81,7 +81,7 @@ public class ShooterCalc {
    */
   public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> shooterSetSpeed(pair.getSpeed()));
+    return shooter.setSpeedCommand(pair.getSpeed());
   }
 
   /**
@@ -96,44 +96,28 @@ public class ShooterCalc {
    */
   public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> pivotSetAngle(pair.getAngle()));
+    return pivot.setAngleCommand(pair.getAngle());
   }
 
   public Command sendBackCommand() {
-    return Commands.runOnce(() -> pivotSetRestAngle())
-              .andThen(Commands.waitUntil(() -> pivot.isAtDesiredAngle()))
-              .andThen(() -> shooterSetSpeed(ShooterConstants.SHOOTER_BACK_SPEED));
+    return pivot.setRestAngleCommand()
+              .andThen(Commands.waitUntil(pivot.isAtDesiredAngle()))
+              .andThen(shooter.setSpeedCommand(ShooterConstants.SHOOTER_BACK_SPEED));
   }
 
   public Command resetShooter() {
       return Commands.runOnce(() -> stopAiming())
-              .andThen(shooterStopCommand()
-                        .alongWith(Commands.runOnce(() -> pivotSetRestAngle())));
-  }
-
-  public void shooterSetSpeed(double speed) {
-    shooter.setSpeed(speed);
-  }
-
-  public Command shooterStopCommand() {
-    return shooter.stop();
-  }
-
-  public void pivotSetAngle(double angle) {
-    pivot.setAngle(angle);
-  }
-
-  public void pivotSetRestAngle() {
-    pivot.setRestAngle();
+              .andThen(shooter.stop()
+                        .alongWith(pivot.setRestAngleCommand()));
   }
 
   // Toggles the aiming BooleanSupplier
   private void toggleAiming() {
-    this.aiming = (() -> !aiming.getAsBoolean());
+    this.aiming = !aiming;
   }
 
   private void stopAiming() {
-    this.aiming = (() -> false);
+    this.aiming = false;
   }
 
   // Gets a SpeedAnglePair by interpolating values from a map of already 
