@@ -155,6 +155,10 @@ public final class Constants {
                 // TODO: set these values
                 public static final double TRAP_POS = 0;
                 public static final double RESET_POS = 0;
+                public static final double INTAKE_TIME = 0;
+                public static final double CLAW_OUTTAKE = 0;
+                public static final double CLAW_INTAKE = 0;
+                public static final double TRAP_PLACE_POS = 0;
         }
 
         public static final class ClimbConstants {

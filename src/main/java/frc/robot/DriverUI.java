@@ -21,7 +21,7 @@ public class DriverUI implements Logged {
     @Log.NT
     public static Field2d field = new Field2d();
 
-    public static double currentTimestamp = Timer.getFPGATimestamp();
+    public static double currentTimestamp = 0;
     public static double previousTimestmap = 0;
 
 }

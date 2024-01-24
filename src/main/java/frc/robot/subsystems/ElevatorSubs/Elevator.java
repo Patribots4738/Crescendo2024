@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
@@ -63,7 +64,12 @@ public class Elevator extends SubsystemBase {
 
     public Command setPositionCommand(double pos) {
         return Commands.runOnce(() -> this.setPosition(pos))
-            .andThen(Commands.waitUntil(() -> this.isAtTargetPosition()));
+            .andThen(Commands.waitUntil(this.isAtTargetPosition()));
+    }
+
+    public Command stop() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'stop'");
     }
 
 }

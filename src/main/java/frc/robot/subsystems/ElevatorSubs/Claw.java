@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
-import frc.robot.DriverUI;
 import frc.robot.util.Constants.TrapConstants;
 
 public class Claw extends SubsystemBase {
@@ -34,13 +33,16 @@ public class Claw extends SubsystemBase {
     public Command placeCommand() {
         return runOnce(this::expel)
                 .andThen(
-                    Commands.waitSeconds(TrapConstants.OUTTAKE_TIME))
-                .andThen(
+                    Commands.waitSeconds(TrapConstants.OUTTAKE_TIME)
+                ).andThen(
                     runOnce(this::stop)
-                )
-                .andThen(
-                    runOnce(() -> this.hasGamePiece = false)
+                ).andThen(
+                    setHasGamePieceCommand(false)
                 );
+    }
+
+    public Command setHasGamePieceCommand(boolean hasGamePiece) {
+        return Commands.runOnce(() -> this.hasGamePiece = hasGamePiece);
     }
 
     public Command backToHandoffCommand() {
@@ -84,9 +86,8 @@ public class Claw extends SubsystemBase {
         return this.hasGamePiece;
     }
 
-    public void expel() {
-        claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE);
-
+    public Command expel() {
+        return Commands.runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE));
     }
 
     public Command stop() {

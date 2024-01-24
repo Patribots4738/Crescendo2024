@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ElevatorSubs.Claw;
 import frc.robot.subsystems.ElevatorSubs.Elevator;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.util.Constants.TrapConstants;
