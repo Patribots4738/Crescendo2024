@@ -76,7 +76,7 @@ public class Handoff {
             // run the indexer and intake to make sure the note gets to the shooter
             shoot = 
                 indexer.toShooter()
-                    .andThen(intake.inCommand()) // TODO: is this correct? because the top and bottom motors are separate
+                    .andThen(intake.inCommand())
                     .andThen(claw.expel())
                     .andThen(() -> this.notePosition = NotePosition.SHOOTER)
                     .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?

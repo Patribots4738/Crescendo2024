@@ -84,17 +84,6 @@ public final class Constants {
                 public static final boolean GYRO_REVERSED = true;
         }
 
-        public static final class ClimbConstants {
-
-                public static final int LEFT_CLIMB_CAN_ID = 16;
-                public static final int RIGHT_CLIMB_CAN_ID = 17;
-
-        public static final double HIGH_LIMIT = 3.0;
-        public static final double ROCK_BOTTOM = 0.0;
-        public static final double ALMOST_HIGH_LIMIT = 2.5;
-    }
-
-
         public static final class ShooterConstants {
                 public static final int LEFT_SHOOTER_CAN_ID = 11;
                 public static final int RIGHT_SHOOTER_CAN_ID = 12;
@@ -163,15 +152,25 @@ public final class Constants {
                 public static final double TRAP_I = 0;
                 public static final double TRAP_D = 0;
 
-                //TODO: set these values
+                // TODO: set these values
                 public static final double TRAP_POS = 0;
                 public static final double RESET_POS = 0;
+        }
+
+        public static final class ClimbConstants {
+
+                public static final int LEFT_CLIMB_CAN_ID = 17;
+                public static final int RIGHT_CLIMB_CAN_ID = 18;
+
+                public static final double HIGH_LIMIT = 3.0;
+                public static final double ROCK_BOTTOM = 0.0;
+                public static final double ALMOST_HIGH_LIMIT = 2.5;
         }
 
         public static final class AutoConstants {
 
                 // The below values need to be tuned for each new robot.
-                // They are curently set to the values suggested by Choreo
+                // They are currently set to the values suggested by Choreo
                 public static final double MAX_SPEED_METERS_PER_SECOND = 4.377;
                 public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.344;
                 public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
@@ -306,17 +305,18 @@ public final class Constants {
                 public static ArrayList<CANSparkBase> motors = new ArrayList<>();
         }
 
-    public static final class IntakeConstants {
-        public static final int INTAKE_CAN_ID = 10;
-        public static final int TRIGGER_WHEEL_CAN_ID = 11;
-        
-        // % speeds of the motor
-        public static final double INTAKE_SPEED = 0.5;
-        public static final double OUTTAKE_SPEED = -0.5;
-	public static final double STOP_SPEED = 0;
+        public static final class IntakeConstants {
+                public static final int TOP_INTAKE_CAN_ID = 19;
+                public static final int BOTTOM_INTAKE_CAN_ID = 20;
+                public static final int TRIGGER_WHEEL_CAN_ID = 21;
 
-        public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
-        public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
+                // % speeds of the motor
+                public static final double INTAKE_SPEED = 0.5;
+                public static final double OUTTAKE_SPEED = -0.5;
+                public static final double STOP_SPEED = 0;
+
+                public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
+                public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
 
                 public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
@@ -372,12 +372,12 @@ public final class Constants {
                 };
 
                 // Speaker Positions: Blue alliance left
-        // @formatter:off
-        //
-        //  0             1
-        //
-        //
-        // @formatter:on
+                // @formatter:off
+                //
+                //  0             1
+                //
+                //
+                // @formatter:on
                 public static Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
                                 // All points are in meters and radians
                                 // All relative to the blue origin
