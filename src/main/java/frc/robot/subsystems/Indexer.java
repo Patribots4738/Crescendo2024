@@ -8,12 +8,12 @@ import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo;
 import java.util.Optional;
 
-public class TriggerWheel extends SubsystemBase {
+public class Indexer extends SubsystemBase {
     private final Neo triggerWheel;
     private Optional<Boolean> whichWay;
     private BooleanSupplier hasPiece;
 
-    public TriggerWheel() {
+    public Indexer() {
         triggerWheel = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID);
         whichWay = Optional.empty();
         hasPiece = () -> false; 
