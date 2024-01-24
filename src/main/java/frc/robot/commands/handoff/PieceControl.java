@@ -7,31 +7,36 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
-import frc.robot.commands.ElevatorCommand;
+import frc.robot.subsystems.ElevatorSubs.Claw;
+import frc.robot.subsystems.ElevatorSubs.Elevator;
+import frc.robot.util.Constants.TrapConstants;
 import frc.robot.commands.ShooterCalc;
 
-public class Handoff {
+public class PieceControl {
     private final Command emptyCommand = null;
     private NotePosition notePosition = NotePosition.NONE;
 
     private Intake intake;
     private Indexer indexer;
-    
-    private ElevatorCommand elevatorCommand;
+
+    private Elevator elevator;
+    private Claw claw;
+
     private ShooterCalc shooterCalc;
 
     private Swerve swerve;
 
-    public Handoff(
-            Intake intake, 
+    public PieceControl(
+            Intake intake,
             Indexer indexer,
-            ElevatorCommand elevatorCommand,
+            Elevator elevator,
+            Claw claw,
             ShooterCalc shooterCalc,
-            Swerve swerve) 
-        {
+            Swerve swerve) {
         this.intake = intake;
         this.indexer = indexer;
-        this.elevatorCommand = elevatorCommand;
+        this.elevator = elevator;
+        this.claw = claw;
         this.shooterCalc = shooterCalc;
         this.swerve = swerve;
     }
@@ -42,24 +47,23 @@ public class Handoff {
 
     public Command stopAllMotors() {
         return Commands.parallel(
-            intake.stop(),
-            indexer.stop(),
-            shooterCalc.stopMotors(),
-            elevatorCommand.stopMotors()
-        );
+                intake.stop(),
+                indexer.stop(),
+                shooterCalc.stopMotors(),
+                elevator.stop(),
+                claw.stop());
     }
 
     // TODO: We assume that the note is already in the claw when we want to shoot
-    public Command noteToShoot(){
+    public Command noteToShoot() {
         // this.notePosition = NotePosition.CLAW; ^^^
         Command shoot = emptyCommand;
         this.shooterCalc.prepareFireMovingCommand(() -> true, swerve);
-        if ( this.readyToShoot().getAsBoolean() ) {
+        if (this.readyToShoot().getAsBoolean()) {
             // run the indexer and intake to make sure the note gets to the shooter
-            shoot = 
-                indexer.toShooter()
+            shoot = indexer.toShooter()
                     .andThen(intake.inCommand())
-                    .andThen(elevatorCommand.outtake())
+                    .andThen(claw.outtake())
                     .andThen(() -> this.notePosition = NotePosition.SHOOTER)
                     .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?
                     .andThen(() -> this.notePosition = NotePosition.NONE)
@@ -73,12 +77,14 @@ public class Handoff {
     public Command noteToTrap() {
         Command shoot = emptyCommand;
 
-        if ( this.notePosition == NotePosition.CLAW ) {
-            // maybe make setPosition a command ORR Make the Elevator Command 
-            shoot = 
-                elevatorCommand.placeTrapCommand()
-                .andThen(new WaitCommand(1))
-                .andThen(stopAllMotors());
+        if (this.notePosition == NotePosition.CLAW) {
+            // maybe make setPosition a command ORR Make the Elevator Command
+            shoot = Commands.runOnce(
+                    () -> this.elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS)).andThen(
+                            Commands.waitUntil(elevator.isAtTargetPosition()))
+                    .andThen(claw.placeCommand())
+                    .andThen(new WaitCommand(1))
+                    .andThen(stopAllMotors());
 
             this.notePosition = NotePosition.CLAW;
 
