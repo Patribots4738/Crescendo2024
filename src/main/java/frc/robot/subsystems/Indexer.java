@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo;
 
@@ -33,7 +32,7 @@ public class Indexer extends SubsystemBase {
         //sets brake mode
         triggerWheel.setBrakeMode();
     }    
-
+  
     public MotorRotation getWhichWay() {
         return whichWay;
     }
@@ -48,8 +47,16 @@ public class Indexer extends SubsystemBase {
         return runOnce(() -> triggerWheel.set(IntakeConstants.TRAP_TRIGGER_WHEEL_SPEED));
     }
         
-    public Command stop() {
-        whichWay = MotorRotation.STOP;
+    public Command stopCommand() {
+        whichWay = Optional.empty();
         return runOnce(() -> triggerWheel.set(IntakeConstants.STOP_SPEED));
+    }
+    
+    public BooleanSupplier hasPiece() {
+        return this.hasPiece;
+    }
+
+    public void setHasPiece(boolean hasPiece) {
+        this.hasPiece = () -> hasPiece;
     }
 }
