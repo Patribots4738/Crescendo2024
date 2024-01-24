@@ -48,7 +48,7 @@ public class Indexer extends SubsystemBase {
         return setSpeedCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_SPEED);
     }
 
-    public Command stopCommand() {
+    public Command stop() {
         return setSpeedCommand(IntakeConstants.STOP_SPEED);
     }
 }
