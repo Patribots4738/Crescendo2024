@@ -10,6 +10,7 @@ import frc.robot.subsystems.ElevatorSubs.Elevator;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.util.Constants.TrapConstants;
 
+// TODO: convert to placement? 
 public class ElevatorCommand {
     /** Creates a new Elevator. */
     private final Elevator elevator;

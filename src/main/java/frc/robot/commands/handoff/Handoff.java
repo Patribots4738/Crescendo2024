@@ -61,6 +61,7 @@ public class Handoff {
         return Commands.parallel(
             intake.stop(),
             indexer.stop(),
+            // TODO: make this a command
             Commands.runOnce(() -> elevator.setPosition(0)),
             claw.stop(),
             shooter.stop()
