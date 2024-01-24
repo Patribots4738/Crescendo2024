@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter;
 
 import java.util.function.BooleanSupplier;
 
-import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
@@ -40,14 +39,31 @@ public class Pivot extends SubsystemBase {
         pivot.setBrakeMode();
     }
     
+    /**
+     * The function takes an angle in degrees and converts it into a position 
+     * for the pivot motor to rotate to
+     * 
+     * @param double The angle to set the shooter to
+    */
     public void setAngle(double angle) {
         pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE);
     }
 
+    /**
+     * The function takes an angle in degrees and returns a command that sets 
+     * the pivot to the angle converted to a position
+     * 
+     * @param double The angle to set the shooter to
+     * 
+     * @return The method is returning a Command object.
+    */
     public Command setAngleCommand(double angle) {
         return Commands.runOnce(() -> setAngle(angle));
     }
 
+    /**
+     * The function sets the pivot angle to the rest angle constant
+    */
     public void setRestAngle() {
         this.setAngle(ShooterConstants.PIVOT_REST_ANGLE);
     }
@@ -56,7 +72,7 @@ public class Pivot extends SubsystemBase {
         return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE);
     }
 
-    public BooleanSupplier isAtDesiredAngle() {
+    public BooleanSupplier atDesiredAngle() {
         return () ->
             (MathUtil.applyDeadband(
                 Math.abs(

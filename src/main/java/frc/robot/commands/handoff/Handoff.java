@@ -54,7 +54,7 @@ public class Handoff {
     }
 
     public Trigger readyToShoot() {
-        return new Trigger(() -> pivot.isAtDesiredAngle().getAsBoolean() && shooter.atDesiredRPM().getAsBoolean());
+        return new Trigger(() -> pivot.atDesiredAngle().getAsBoolean() && shooter.atDesiredRPM().getAsBoolean());
     }
 
     public Command stopAllMotors() {
