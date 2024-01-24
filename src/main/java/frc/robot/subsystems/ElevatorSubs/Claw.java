@@ -10,11 +10,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
+import frc.robot.DriverUI;
 import frc.robot.util.Constants.TrapConstants;
 
 public class Claw extends SubsystemBase {
     private final Neo claw;
     private boolean hasGamePiece = false;
+    private boolean hadGamePieceLast = false;
+    private double startIntakingTimestamp = 0;
 
     /** Creates a new Claw. */
     public Claw() {
@@ -25,6 +28,7 @@ public class Claw extends SubsystemBase {
     @Override
     public void periodic() {
         this.hasGamePiece = hasGamePiece();
+        this.hadGamePieceLast = this.hasGamePiece;
     }
 
     public Command placeCommand() {
@@ -33,12 +37,37 @@ public class Claw extends SubsystemBase {
                     Commands.waitSeconds(TrapConstants.OUTTAKE_TIME))
                 .andThen(
                     runOnce(this::stop)
+                )
+                .andThen(
+                    runOnce(() -> this.hasGamePiece = false)
                 );
     }
 
+    public Command backToHandoffCommand() {
+        return runOnce(this::back)
+            .andThen(
+                Commands.waitSeconds(TrapConstants.INTAKE_TIME))
+            .andThen(
+                runOnce(this::stop));
+    }
 
     public boolean hasGamePiece() {
         // needs logic
+        
+        // if appliedoutput <= desired/2 and 
+        // current this loop and last loop > constant
+        // desired speed > constant 
+        // we've been intaking over .25 seconds (make constant);
+        // if (hasGamePiece) {
+        //     this.hasGamePiece = claw.getTargetVelocity() > 0;
+        // }
+        // else {
+        //     this.hasGamePiece = 
+        //         (-0.25 < claw.getAppliedOutput() && claw.getAppliedOutput() < 0) && 
+        //         (current > 15 && claw.getOutputCurrent() > 15) &&
+        //         (desiredSpeed > 0.45) &&
+        //         (DriverUI.currentTimestamp - startedIntakingTimestamp > 0.25);
+        // }
         return false;
     }
 
@@ -56,11 +85,15 @@ public class Claw extends SubsystemBase {
     }
 
     public void expel() {
-        claw.setTargetVelocity(1);
+        claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE);
     }
 
     public void stop() {
         claw.setTargetVelocity(0);
+    }
+
+    public void back() {
+        claw.setTargetVelocity(TrapConstants.CLAW_INTAKE);
     }
 
 }

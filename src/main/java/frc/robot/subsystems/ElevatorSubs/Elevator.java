@@ -63,4 +63,9 @@ public class Elevator extends SubsystemBase {
         leftElevator.setTargetPosition(pos);
     }
 
+
+    public Command setPositionCommand(double pos) {
+        return Commands.runOnce(() -> this.setPosition(pos))
+            .andThen(Commands.waitUntil(() -> this.isAtTargetPosition()));
+    }
 }
