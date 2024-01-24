@@ -26,8 +26,8 @@ public class Claw extends SubsystemBase {
 
     @Override
     public void periodic() {
-        this.hasGamePiece = hasGamePiece();
         this.hadGamePieceLast = this.hasGamePiece;
+        this.hasGamePiece = hasGamePiece();
     }
 
     public Command placeCommand() {
