@@ -86,10 +86,11 @@ public class Claw extends SubsystemBase {
 
     public void expel() {
         claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE);
+
     }
 
-    public void stop() {
-        claw.setTargetVelocity(0);
+    public Command stop() {
+        return Commands.runOnce(() -> claw.setTargetVelocity(0));
     }
 
     public void back() {

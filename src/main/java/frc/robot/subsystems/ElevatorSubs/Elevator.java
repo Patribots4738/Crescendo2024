@@ -4,17 +4,15 @@
 
 package frc.robot.subsystems.ElevatorSubs;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
-import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.TrapConstants;
-import frc.robot.util.Constants.FieldConstants.ChainPosition;
-import monologue.Logged;
 
 public class Elevator extends SubsystemBase {
     private final Neo leftElevator;
@@ -52,8 +50,8 @@ public class Elevator extends SubsystemBase {
         return leftElevator.getPosition();
     }
 
-    public boolean isAtTargetPosition() {
-        return MathUtil.applyDeadband(
+    public BooleanSupplier isAtTargetPosition() {
+        return () -> MathUtil.applyDeadband(
             Math.abs(
                 this.getPosition() - leftElevator.getTargetPosition()),
             TrapConstants.ELEVATOR_DEADBAND) == 0;
@@ -63,9 +61,9 @@ public class Elevator extends SubsystemBase {
         leftElevator.setTargetPosition(pos);
     }
 
-
     public Command setPositionCommand(double pos) {
         return Commands.runOnce(() -> this.setPosition(pos))
             .andThen(Commands.waitUntil(() -> this.isAtTargetPosition()));
     }
+
 }

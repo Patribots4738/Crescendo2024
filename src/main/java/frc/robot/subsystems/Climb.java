@@ -36,7 +36,7 @@ public class Climb extends SubsystemBase implements Logged {
     
        if (chainPosition == ChainPosition.LEFT) {
             return runOnce(() -> this.setPosition(ClimbConstants.ALMOST_HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-       } 
+       }
        else if (chainPosition == ChainPosition.RIGHT) {
             return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.ALMOST_HIGH_LIMIT));
        }
