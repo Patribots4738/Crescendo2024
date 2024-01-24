@@ -36,13 +36,7 @@ public class Claw extends SubsystemBase {
                     Commands.waitSeconds(TrapConstants.OUTTAKE_TIME)
                 ).andThen(
                     runOnce(this::stop)
-                ).andThen(
-                    setHasGamePieceCommand(false)
                 );
-    }
-
-    public Command setHasGamePieceCommand(boolean hasGamePiece) {
-        return Commands.runOnce(() -> this.hasGamePiece = hasGamePiece);
     }
 
     public Command backToHandoffCommand() {
@@ -54,7 +48,7 @@ public class Claw extends SubsystemBase {
     }
 
     public boolean hasGamePiece() {
-        // needs logic
+        // TODO: needs logic
         
         // if appliedoutput <= desired/2 and 
         // current this loop and last loop > constant
@@ -94,8 +88,8 @@ public class Claw extends SubsystemBase {
         return Commands.runOnce(() -> claw.setTargetVelocity(0));
     }
 
-    public void back() {
-        claw.setTargetVelocity(TrapConstants.CLAW_INTAKE);
+    public Command back() {
+        return runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_INTAKE));
     }
 
 }
