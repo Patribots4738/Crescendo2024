@@ -81,7 +81,8 @@ public class Handoff {
                     .andThen(() -> this.notePosition = NotePosition.SHOOTER)
                     .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?
                     .andThen(() -> this.notePosition = NotePosition.NONE)
-                    .andThen(stopAllMotors());
+                    .andThen(stopAllMotors())
+                    .andThen(() -> this.shooterCalc.resetShooter());
         }
 
         return shoot;
