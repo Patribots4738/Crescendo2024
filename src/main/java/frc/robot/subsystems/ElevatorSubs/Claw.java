@@ -26,12 +26,12 @@ public class Claw extends SubsystemBase {
 
     @Override
     public void periodic() {
-        this.hasGamePiece = hasGamePiece();
         this.hadGamePieceLast = this.hasGamePiece;
+        this.hasGamePiece = hasGamePiece();
     }
 
     public Command placeCommand() {
-        return runOnce(this::expel)
+        return runOnce(this::outtake)
                 .andThen(
                     Commands.waitSeconds(TrapConstants.OUTTAKE_TIME)
                 ).andThen(
@@ -39,8 +39,8 @@ public class Claw extends SubsystemBase {
                 );
     }
 
-    public Command backToHandoffCommand() {
-        return runOnce(this::back)
+    public Command intakeFromHandoff() {
+        return runOnce(this::intake)
             .andThen(
                 Commands.waitSeconds(TrapConstants.INTAKE_TIME))
             .andThen(
@@ -80,7 +80,7 @@ public class Claw extends SubsystemBase {
         return this.hasGamePiece;
     }
 
-    public Command expel() {
+    public Command outtake() {
         return Commands.runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE));
     }
 
@@ -88,7 +88,7 @@ public class Claw extends SubsystemBase {
         return Commands.runOnce(() -> claw.setTargetVelocity(0));
     }
 
-    public Command back() {
+    public Command intake() {
         return runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_INTAKE));
     }
 

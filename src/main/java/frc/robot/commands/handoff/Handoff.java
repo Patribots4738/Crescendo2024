@@ -7,12 +7,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
+import frc.robot.commands.ElevatorCommand;
 import frc.robot.commands.ShooterCalc;
-import frc.robot.subsystems.ElevatorSubs.Claw;
-import frc.robot.subsystems.ElevatorSubs.Elevator;
-import frc.robot.subsystems.shooter.Pivot;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.util.Constants.TrapConstants;
 
 public class Handoff {
     private final Command emptyCommand = null;
@@ -21,50 +17,35 @@ public class Handoff {
     private Intake intake;
     private Indexer indexer;
     
-    // TODO: Use the commands for the subsystems instead of the subsystems themselves
-    private Elevator elevator;
-    private Claw claw;
-
-    //TODO: Use the commands for the subsystems instead of the subsystems themselves
-    private Pivot pivot;
-    private Shooter shooter;
-
+    private ElevatorCommand elevatorCommand;
     private ShooterCalc shooterCalc;
 
     private Swerve swerve;
 
     public Handoff(
             Intake intake, 
-            Indexer indexer, 
-            Elevator elevator, 
-            Claw claw, 
-            Pivot pivot, 
-            Shooter shooter,
+            Indexer indexer,
+            ElevatorCommand elevatorCommand,
             ShooterCalc shooterCalc,
             Swerve swerve) 
         {
         this.intake = intake;
         this.indexer = indexer;
-        this.elevator = elevator;
-        this.claw = claw;
-        this.pivot = pivot;
-        this.shooter = shooter;
+        this.elevatorCommand = elevatorCommand;
         this.shooterCalc = shooterCalc;
         this.swerve = swerve;
     }
 
     public Trigger readyToShoot() {
-        return new Trigger(() -> pivot.atDesiredAngle().getAsBoolean() && shooter.atDesiredRPM().getAsBoolean());
+        return new Trigger(() -> shooterCalc.pivotAtDesiredAngle() && shooterCalc.shooterAtDesiredRPM());
     }
 
     public Command stopAllMotors() {
         return Commands.parallel(
             intake.stop(),
             indexer.stop(),
-            // TODO: make this a command
-            Commands.runOnce(() -> elevator.setPosition(0)),
-            claw.stop(),
-            shooter.stop()
+            shooterCalc.stopMotors(),
+            elevatorCommand.stopMotors()
         );
     }
 
@@ -78,7 +59,7 @@ public class Handoff {
             shoot = 
                 indexer.toShooter()
                     .andThen(intake.inCommand())
-                    .andThen(claw.expel())
+                    .andThen(elevatorCommand.outtake())
                     .andThen(() -> this.notePosition = NotePosition.SHOOTER)
                     .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?
                     .andThen(() -> this.notePosition = NotePosition.NONE)
@@ -95,11 +76,7 @@ public class Handoff {
         if ( this.notePosition == NotePosition.CLAW ) {
             // maybe make setPosition a command ORR Make the Elevator Command 
             shoot = 
-            Commands.runOnce( 
-                () -> elevator.setPosition(TrapConstants.TRAP_POS) )
-                .andThen(
-                    Commands.waitUntil(elevator.isAtTargetPosition())
-                ).andThen(claw.expel())
+                elevatorCommand.placeTrapCommand()
                 .andThen(new WaitCommand(1))
                 .andThen(stopAllMotors());
 

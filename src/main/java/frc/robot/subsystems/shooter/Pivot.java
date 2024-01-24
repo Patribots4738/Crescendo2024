@@ -79,4 +79,8 @@ public class Pivot extends SubsystemBase {
                     pivot.getPosition() - pivot.getTargetPosition()),
                 ShooterConstants.PIVOT_DEADBAND) == 0);
     }
+
+    public Command stop() {
+        return runOnce(() -> pivot.stopMotor());
+    }
 }

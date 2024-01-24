@@ -24,29 +24,34 @@ public class ElevatorCommand {
 
     public Command placeTrapCommand() {
         return Commands.runOnce(
-            () -> this.elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS))
-                .andThen(
-                    () -> claw.placeCommand());
+                () -> this.elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS)).andThen(
+                        Commands.waitUntil(elevator.isAtTargetPosition()))
+                .andThen(claw.placeCommand());
     }
 
-
-    public Command clawToHandoffCommand() {
-        return (claw.backToHandoffCommand());
+    public Command intakeFromHandoff() {
+        return (claw.intakeFromHandoff());
     }
 
     public void setTargetPosition(double pos) {
         this.elevator.setPosition(pos);
     }
 
-    public void outtake() {
-        this.claw.expel();
+    public Command outtake() {
+        return this.claw.outtake();
     }
 
-    public void intake() {
-        this.claw.back();
+    public Command intake() {
+        return this.claw.intake();
     }
 
-    public void stopClaw() {
-        this.claw.stop();
+    public Command stopClaw() {
+        return this.claw.stop();
+    }
+
+    public Command stopMotors() {
+        return Commands.parallel(
+                elevator.stop(),
+                claw.stop());
     }
 }
