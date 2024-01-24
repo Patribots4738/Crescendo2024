@@ -37,8 +37,8 @@ public class ShooterCalc {
    */
   public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()))
-            .alongWith(Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed())));
+    return Commands.runOnce(() -> pivotSetAngle(pair.getAngle()))
+            .alongWith(Commands.runOnce(() -> shooterSetSpeed(pair.getSpeed())));
   }
 
   /**
@@ -81,7 +81,7 @@ public class ShooterCalc {
    */
   public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> shooter.setSpeed(pair.getSpeed()));
+    return Commands.runOnce(() -> shooterSetSpeed(pair.getSpeed()));
   }
 
   /**
@@ -96,7 +96,29 @@ public class ShooterCalc {
    */
   public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
     SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-    return Commands.runOnce(() -> pivot.setAngle(pair.getAngle()));
+    return Commands.runOnce(() -> pivotSetAngle(pair.getAngle()));
+  }
+
+  public Command sendBackCommand() {
+    return Commands.runOnce(() -> pivotSetRestAngle())
+              .andThen(Commands.waitUntil(() -> pivot.isAtTargetPosition()))
+              .andThen(() -> shooterSetSpeed(ShooterConstants.SHOOTER_BACK_SPEED));
+  }
+
+  public void shooterSetSpeed(double speed) {
+    shooter.setSpeed(speed);
+  }
+
+  public void shooterStop() {
+    shooter.stop();
+  }
+
+  public void pivotSetAngle(double angle) {
+    pivot.setAngle(angle);
+  }
+
+  public void pivotSetRestAngle() {
+    pivot.setRestAngle();
   }
 
   // Toggles the aiming BooleanSupplier

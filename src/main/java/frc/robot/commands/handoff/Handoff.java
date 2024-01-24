@@ -16,22 +16,20 @@ public class Handoff {
 
     private Intake intake;
     private TriggerWheel trigger;
-    
+
     private Elevator elevator;
     private Claw claw;
 
     private Pivot pivot;
     private Shooter shooter;
 
-
     public Handoff(
-            Intake intake, 
-            TriggerWheel trigger, 
-            Elevator elevator, 
-            Claw claw, 
-            Pivot pivot, 
-            Shooter shooter) 
-        {
+            Intake intake,
+            TriggerWheel trigger,
+            Elevator elevator,
+            Claw claw,
+            Pivot pivot,
+            Shooter shooter) {
         this.intake = intake;
         this.trigger = trigger;
         this.elevator = elevator;
@@ -39,15 +37,15 @@ public class Handoff {
         this.pivot = pivot;
         this.shooter = shooter;
 
-        this.currentNotePos = trigger.hasPiece().getAsBoolean() 
-                                ? NotePosition.TRIGGER 
-                                : NotePosition.NONE;
+        this.currentNotePos = trigger.hasPiece().getAsBoolean()
+                ? NotePosition.TRIGGER
+                : NotePosition.NONE;
     }
-    
+
     /**
      * @return
      */
-    public NotePosition getCurrentNotePos(){
+    public NotePosition getCurrentNotePos() {
         return this.currentNotePos;
     }
 

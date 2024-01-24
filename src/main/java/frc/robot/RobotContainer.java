@@ -42,7 +42,6 @@ public class RobotContainer implements Logged {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         limelight = new Limelight();
-        swerve = new Swerve();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
