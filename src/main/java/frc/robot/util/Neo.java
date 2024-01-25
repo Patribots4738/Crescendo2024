@@ -30,16 +30,16 @@ public class Neo extends CANSparkMax {
     private double targetVelocity = 0;
     
     /**
-     * Creates a new NEOS motor
-     * @param id CANID of the SparkMax the NEOS is connected to.
+     * Creates a new Neo motor
+     * @param id CANID of the SparkMax the Neo is connected to.
      */
     public Neo(int id) {
         this(id, false);
     }
 
     /**
-     * Creates a new NEOS motor
-     * @param id CANID of the SparkMax the NEOS is connected to.
+     * Creates a new Neo motor
+     * @param id CANID of the SparkMax the Neo is connected to.
      * @param mode The idle mode of the motor. If true, the motor will brake when not powered. If false, the motor will coast when not powered.
      */
     public Neo(int id, CANSparkBase.IdleMode mode) {
@@ -47,8 +47,8 @@ public class Neo extends CANSparkMax {
     }
 
     /**
-     * Creates a new NEOS motor
-     * @param id CANID of the SparkMax the NEOS is connected to.
+     * Creates a new Neo motor
+     * @param id CANID of the SparkMax the Neo is connected to.
      * @param reversed Whether the motor is reversed or not.
      * @param mode The idle mode of the motor. If true, the motor will brake when not powered. If false, the motor will coast when not powered.
      */
@@ -69,8 +69,8 @@ public class Neo extends CANSparkMax {
     }
 
     /**
-     * Creates a new NEOS motor
-     * @param id CANID of the SparkMax the NEOS is connected to.
+     * Creates a new Neo motor
+     * @param id CANID of the SparkMax the Neo is connected to.
      * @param reversed Whether the motor is reversed or not.
      */
     public Neo(int id, boolean reversed) {
@@ -79,7 +79,7 @@ public class Neo extends CANSparkMax {
 
     /**
      * Sets the target position for the NEO.
-     * @param position Position to set the NEOS to in rotations.
+     * @param position Position to set the Neo to in rotations.
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
     public void setTargetPosition(double position, double arbitraryFeedForward, int slot) {
@@ -101,7 +101,7 @@ public class Neo extends CANSparkMax {
 
     /**
      * Sets the target velocity for the NEO.
-     * @param velocity Velocity to set the NEOS to in rotations per minute.
+     * @param velocity Velocity to set the Neo to in rotations per minute.
      */
     public void setTargetVelocity(double velocity) {
         setTargetVelocity(velocity, 0, 0);
@@ -109,7 +109,7 @@ public class Neo extends CANSparkMax {
 
     /**
      * Sets the target velocity for the NEO.
-     * @param velocity Velocity to set the NEOS to in rotations per minute.
+     * @param velocity Velocity to set the Neo to in rotations per minute.
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
     public void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
@@ -153,8 +153,8 @@ public class Neo extends CANSparkMax {
     }
 
     /**
-     * Gets the position of the NEOS in rotations.
-     * @return The position of the NEOS in rotations relative to the last 0 position.
+     * Gets the position of the Neo in rotations.
+     * @return The position of the Neo in rotations relative to the last 0 position.
      */
     public double getPosition() {
         double pos;
@@ -172,8 +172,8 @@ public class Neo extends CANSparkMax {
     }
 
     /**
-     * Gets the velocity of the NEOS in rotations per minute.
-     * @return The instantaneous velocity of the NEOS in rotations per minute.
+     * Gets the velocity of the Neo in rotations per minute.
+     * @return The instantaneous velocity of the Neo in rotations per minute.
      */
     public double getVelocity() {
         if (shouldCache) {
@@ -189,16 +189,16 @@ public class Neo extends CANSparkMax {
     }
 
     /**
-     * Gets the target position of the NEOS in rotations.
-     * @return The target position of the NEOS in rotations.
+     * Gets the target position of the Neo in rotations.
+     * @return The target position of the Neo in rotations.
      */
     public double getTargetPosition() {
         return targetPosition;
     }
 
     /**
-     * Gets the target velocity of the NEOS in rotations per minute.
-     * @return The target velocity of the NEOS in rotations per minute.
+     * Gets the target velocity of the Neo in rotations per minute.
+     * @return The target velocity of the Neo in rotations per minute.
      */
     public double getTargetVelocity() {
         return targetVelocity;
