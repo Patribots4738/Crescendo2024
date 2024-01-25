@@ -22,6 +22,6 @@ public class DriverUI implements Logged {
     public static Field2d field = new Field2d();
 
     public static double currentTimestamp = 0;
-    public static double previousTimestmap = 0;
+    public static double previousTimestamp = 0;
 
 }

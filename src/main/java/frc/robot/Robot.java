@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
         Monologue.updateAll();
         CommandScheduler.getInstance().run();
 
-        DriverUI.previousTimestmap = DriverUI.currentTimestamp;
+        DriverUI.previousTimestamp = DriverUI.currentTimestamp;
         DriverUI.currentTimestamp = Timer.getFPGATimestamp();
     }
 
