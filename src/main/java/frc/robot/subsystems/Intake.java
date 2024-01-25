@@ -20,7 +20,6 @@ public class Intake extends SubsystemBase {
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
         intake.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         intake.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-        intake.setInverted(false);
 
         //sets brake mode
         intake.setBrakeMode();
