@@ -8,18 +8,12 @@ import frc.robot.util.Neo;
 
 public class Indexer extends SubsystemBase {
     private final Neo triggerWheel;
-    private MotorRotation whichWay;
+    private double desiredSpeed;
 
     public Indexer() {
         triggerWheel = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID);
-        whichWay = MotorRotation.STOP;
+        desiredSpeed = 0;
         configMotor();
-    }
-
-    enum MotorRotation {
-        CLOCKWISE,
-        COUNTER_CLOCKWISE,
-        STOP
     }
 
     public void configMotor() {
@@ -32,31 +26,29 @@ public class Indexer extends SubsystemBase {
         //sets brake mode
         triggerWheel.setBrakeMode();
     }    
-  
-    public MotorRotation getWhichWay() {
-        return whichWay;
+
+    public double getDesiredSpeed() {
+        return desiredSpeed;
+    }
+
+    public void setDesiredSpeed(double speed) {
+        desiredSpeed = speed;
+        triggerWheel.set(speed);
+    }
+    
+    public Command setSpeedCommand(double speed) {
+        return runOnce(() -> setDesiredSpeed(speed));
     }
 
     public Command toShooter() {
-        whichWay = MotorRotation.CLOCKWISE;
-        return runOnce(() -> triggerWheel.set(IntakeConstants.SHOOTER_TRIGGER_WHEEL_SPEED));
+        return setSpeedCommand(IntakeConstants.SHOOTER_TRIGGER_WHEEL_SPEED);
     }
 
     public Command toTrap() {
-        whichWay = MotorRotation.COUNTER_CLOCKWISE;
-        return runOnce(() -> triggerWheel.set(IntakeConstants.TRAP_TRIGGER_WHEEL_SPEED));
-    }
-        
-    public Command stopCommand() {
-        whichWay = Optional.empty();
-        return runOnce(() -> triggerWheel.set(IntakeConstants.STOP_SPEED));
-    }
-    
-    public BooleanSupplier hasPiece() {
-        return this.hasPiece;
+        return setSpeedCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_SPEED);
     }
 
-    public void setHasPiece(boolean hasPiece) {
-        this.hasPiece = () -> hasPiece;
+    public Command stop() {
+        return setSpeedCommand(IntakeConstants.STOP_SPEED);
     }
 }
