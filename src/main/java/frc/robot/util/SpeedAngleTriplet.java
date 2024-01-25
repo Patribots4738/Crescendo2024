@@ -20,6 +20,10 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
         super(new Pair<Double, Double>(leftSpeed, rightSpeed), angle);
     }
 
+    public SpeedAngleTriplet() {
+        super(new Pair<Double, Double>(0.0, 0.0), 0.0);
+    }
+
     /**
      * Returns the speed value for the left motor
      *
@@ -90,6 +94,6 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
      * @return an interpolator for SpeedAngleTriplet objects
      */
     public static Interpolator<SpeedAngleTriplet> getInterpolator() {
-        return new SpeedAngleTriplet(0.0, 0.0, 0.0);
+        return new SpeedAngleTriplet();
     }
 }
