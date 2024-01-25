@@ -74,6 +74,7 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
 
         prepareNamedCommands();
+
     }
 
     private void configureButtonBindings(){
@@ -136,4 +137,7 @@ public class RobotContainer implements Logged {
         Timer.delay(0.25);
     }
 
+    private void configureLED() {
+      
+    }
 }
