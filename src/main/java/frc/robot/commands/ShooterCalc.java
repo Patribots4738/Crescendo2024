@@ -148,14 +148,10 @@ public class ShooterCalc {
             robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
         }
 
-        double distance = Units.metersToFeet(robotPose.getTranslation().getNorm());
-        int lowerIndex = (int) Math.floor(distance / 5.0) * 5;
-        int upperIndex = (int) Math.ceil(distance / 5.0) * 5;
-
-        SpeedAnglePair lowerPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(lowerIndex);
-        SpeedAnglePair upperPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(upperIndex);
-
-        return lowerPair.interpolate(upperPair, (distance - lowerIndex) / (upperIndex - lowerIndex));
+        // Use the distance as our key for interpolation
+        double distanceFeet = Units.metersToFeet(robotPose.getTranslation().getNorm());
+        
+        return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
 
 
