@@ -25,8 +25,6 @@ public class ShooterCalc {
     this.aiming = false;
   }
 
-
-
   /**
    * The function prepares a fire command by calculating the speed and angle for the robot's shooter
    * based on the robot's pose and whether it should shoot at the speaker.

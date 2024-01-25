@@ -9,13 +9,14 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.DriverUI;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
 
 public class Claw extends SubsystemBase {
     private final Neo claw;
     private boolean hasGamePiece = false;
-    private boolean hadGamePieceLast = false;
+    private double current = 0;
     private double startIntakingTimestamp = 0;
 
     /** Creates a new Claw. */
@@ -26,8 +27,8 @@ public class Claw extends SubsystemBase {
 
     @Override
     public void periodic() {
-        this.hadGamePieceLast = this.hasGamePiece;
         this.hasGamePiece = hasGamePiece();
+        updateOutputCurrent();
     }
 
     public Command placeCommand() {
@@ -48,23 +49,23 @@ public class Claw extends SubsystemBase {
     }
 
     public boolean hasGamePiece() {
-        // TODO: needs logic
-        
         // if appliedoutput <= desired/2 and 
         // current this loop and last loop > constant
         // desired speed > constant 
         // we've been intaking over .25 seconds (make constant);
-        // if (hasGamePiece) {
-        //     this.hasGamePiece = claw.getTargetVelocity() > 0;
-        // }
-        // else {
-        //     this.hasGamePiece = 
-        //         (-0.25 < claw.getAppliedOutput() && claw.getAppliedOutput() < 0) && 
-        //         (current > 15 && claw.getOutputCurrent() > 15) &&
-        //         (desiredSpeed > 0.45) &&
-        //         (DriverUI.currentTimestamp - startedIntakingTimestamp > 0.25);
-        // }
-        return false;
+        if (hasGamePiece) {
+            this.hasGamePiece = claw.getTargetVelocity() > 0;
+        }
+        else {
+            this.hasGamePiece = 
+                (TrapConstants.CLAW_HAS_PIECE_LOWER_LIMIT < claw.getAppliedOutput() && 
+                    claw.getAppliedOutput() < TrapConstants.CLAW_HAS_PIECE_UPPER_LIMIT) && 
+                (current > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT && 
+                    claw.getOutputCurrent() > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT) &&
+                (claw.getTargetVelocity() > TrapConstants.CLAW_HAS_PIECE_MIN_TARGET_VELO) &&
+                (DriverUI.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
+        }
+        return hasGamePiece;
     }
 
     public void configMotors() {
@@ -74,6 +75,10 @@ public class Claw extends SubsystemBase {
         claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         claw.setInverted(false);
         claw.setBrakeMode();
+    }
+
+    public void updateOutputCurrent() {
+        current = claw.getOutputCurrent();
     }
 
     public boolean getHasGamePiece() {
@@ -89,6 +94,7 @@ public class Claw extends SubsystemBase {
     }
 
     public Command intake() {
+        startIntakingTimestamp = DriverUI.currentTimestamp;
         return runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_INTAKE));
     }
 

@@ -159,6 +159,15 @@ public final class Constants {
                 public static final double CLAW_OUTTAKE = 0;
                 public static final double CLAW_INTAKE = 0;
                 public static final double TRAP_PLACE_POS = 0;
+
+                public static final double CLAW_HAS_PIECE_UPPER_LIMIT = 0;
+                public static final double CLAW_HAS_PIECE_LOWER_LIMIT = -0.25;
+
+                public static final double CLAW_HAS_PIECE_MIN_TIMESTAMP = 0.25;
+
+                public static final double CLAW_HAS_PIECE_MIN_CURRENT = 15;
+
+                public static final double CLAW_HAS_PIECE_MIN_TARGET_VELO = 0.45;
         }
 
         public static final class ClimbConstants {
