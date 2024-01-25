@@ -46,7 +46,12 @@ public class Pivot extends SubsystemBase {
      * @param double The angle to set the shooter to
     */
     public void setAngle(double angle) {
-        pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE);
+        pivot.setTargetPosition(
+            /**
+             * TODO: Make gear ratio constant and put it here
+             */
+            (angle / ShooterConstants.PIVOT_MAX_ANGLE)
+        );
     }
 
     /**
