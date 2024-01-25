@@ -17,15 +17,16 @@ public class Indexer extends SubsystemBase {
     }
 
     public void configMotor() {
-        // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces      
-        triggerWheel.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS, IntakeConstants.TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS);
+        // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
+        triggerWheel.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS,
+                IntakeConstants.TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS);
         triggerWheel.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         triggerWheel.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         triggerWheel.setInverted(false);
 
-        //sets brake mode
+        // sets brake mode
         triggerWheel.setBrakeMode();
-    }    
+    }
 
     public double getDesiredSpeed() {
         return desiredSpeed;
@@ -35,7 +36,7 @@ public class Indexer extends SubsystemBase {
         desiredSpeed = speed;
         triggerWheel.set(speed);
     }
-    
+
     public Command setSpeedCommand(double speed) {
         return runOnce(() -> setDesiredSpeed(speed));
     }

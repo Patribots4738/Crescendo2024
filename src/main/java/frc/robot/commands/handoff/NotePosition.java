@@ -5,5 +5,5 @@ public enum NotePosition {
     CLAW,
     INTAKE,
     INDEXER,
-    NONE    
+    NONE
 }

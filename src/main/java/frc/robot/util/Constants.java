@@ -125,7 +125,7 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5,  SpeedAngleTriplet.of(0.0, 0.4, 10.0));
+                put(5, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
                 put(10, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
                 put(15, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
                 put(20, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
@@ -137,7 +137,8 @@ public final class Constants {
                 InverseInterpolator.forDouble(),
                 SpeedAngleTriplet.getInterpolator()) {
             {
-                for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
+                for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP
+                        .entrySet()) {
                     INTERPOLATION_MAP.put(entry.getKey().doubleValue(), entry.getValue());
                 }
             }

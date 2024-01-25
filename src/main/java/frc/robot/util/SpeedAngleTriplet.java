@@ -9,7 +9,7 @@ import edu.wpi.first.math.interpolation.Interpolator;
  * Extends the Pair class to store the speed and angle as a pair.
  */
 public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implements Interpolator<SpeedAngleTriplet> {
-    
+
     /**
      * Constructor that initializes the speed and angle with the given values.
      *
@@ -60,27 +60,28 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
     }
 
     /**
-     * Interpolates between this SpeedAngleTriplet and another SpeedAngleTriplet based on a given parameter.
+     * Interpolates between this SpeedAngleTriplet and another SpeedAngleTriplet
+     * based on a given parameter.
      * This class serves as the lower bound for the interpolation.
      *
      * @param other the other SpeedAngleTriplet to interpolate with
-     * @param t the interpolation parameter (between 0.0 and 1.0)
+     * @param t     the interpolation parameter (between 0.0 and 1.0)
      * @return the interpolated SpeedAngleTriplet
      */
     public SpeedAngleTriplet interpolate(SpeedAngleTriplet other, double t) {
         return SpeedAngleTriplet.of(
-            MathUtil.interpolate(this.getLeftSpeed(), other.getLeftSpeed(), t),
-            MathUtil.interpolate(this.getRightSpeed(), other.getRightSpeed(), t),
-            MathUtil.interpolate(this.getAngle(), other.getAngle(), t)
-        );
+                MathUtil.interpolate(this.getLeftSpeed(), other.getLeftSpeed(), t),
+                MathUtil.interpolate(this.getRightSpeed(), other.getRightSpeed(), t),
+                MathUtil.interpolate(this.getAngle(), other.getAngle(), t));
     }
 
     /**
-     * Interpolates between two SpeedAngleTriplet objects based on a given parameter.
+     * Interpolates between two SpeedAngleTriplet objects based on a given
+     * parameter.
      *
      * @param lower the lower SpeedAngleTriplet
      * @param upper the upper SpeedAngleTriplet
-     * @param t the interpolation parameter (between 0.0 and 1.0)
+     * @param t     the interpolation parameter (between 0.0 and 1.0)
      * @return the interpolated SpeedAngleTriplet
      */
     @Override

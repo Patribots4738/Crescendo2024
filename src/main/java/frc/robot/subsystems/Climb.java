@@ -15,7 +15,7 @@ public class Climb extends SubsystemBase implements Logged {
 
     private final Neo leftMotor;
     private final Neo rightMotor;
-    
+
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
         rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
@@ -25,7 +25,7 @@ public class Climb extends SubsystemBase implements Logged {
 
         leftMotor.setInverted(true);
         rightMotor.setInverted(false);
-    }    
+    }
 
     public void setPosition(double pos1, double pos2) {
         leftMotor.setPosition(pos1);
@@ -33,17 +33,15 @@ public class Climb extends SubsystemBase implements Logged {
     }
 
     public Command toTop(ChainPosition chainPosition) {
-    
-       if (chainPosition == ChainPosition.LEFT) {
+
+        if (chainPosition == ChainPosition.LEFT) {
             return runOnce(() -> this.setPosition(ClimbConstants.ALMOST_HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-       }
-       else if (chainPosition == ChainPosition.RIGHT) {
+        } else if (chainPosition == ChainPosition.RIGHT) {
             return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.ALMOST_HIGH_LIMIT));
-       }
-       else {
+        } else {
             return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-       }
-       
+        }
+
     }
 
     public Command toBottom() {
@@ -51,15 +49,15 @@ public class Climb extends SubsystemBase implements Logged {
         // This mimics the behavior of an asProxy command
         // without the inclusion of the wrapper that asProxy brings along with it.
         // therefore it is more advantagous to use this
-        // becuase we can't have two super.runOnce's 
+        // becuase we can't have two super.runOnce's
         // as they would require this subsystem twice
         // this is very bad and need fix :D
         ParallelRaceGroup group = new ParallelRaceGroup();
         group.addCommands(Commands.runOnce(() -> rightMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
         group.addCommands(Commands.runOnce(() -> leftMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
         group.addRequirements(this);
-        
+
         return group.andThen();
     }
-    
+
 }

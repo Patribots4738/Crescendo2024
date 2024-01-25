@@ -13,13 +13,12 @@ import frc.robot.util.Constants.ShooterConstants;
 
 public class Pivot extends SubsystemBase {
     private Neo pivot;
-    
+
     public Pivot() {
         this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
 
         configMotor();
     }
-
 
     public void configMotor() {
         pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
@@ -34,41 +33,39 @@ public class Pivot extends SubsystemBase {
                 ShooterConstants.PIVOT_MIN_OUTPUT,
                 ShooterConstants.PIVOT_MAX_OUTPUT);
 
-
-        //sets brake mode
+        // sets brake mode
         pivot.setBrakeMode();
     }
-    
+
     /**
-     * The function takes an angle in degrees and converts it into a position 
+     * The function takes an angle in degrees and converts it into a position
      * for the pivot motor to rotate to
      * 
      * @param double The angle to set the shooter to
-    */
+     */
     public void setAngle(double angle) {
         pivot.setTargetPosition(
-            /**
-             * TODO: Make gear ratio constant and put it here
-             */
-            (angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES)
-        );
+                /**
+                 * TODO: Make gear ratio constant and put it here
+                 */
+                (angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES));
     }
 
     /**
-     * The function takes an angle in degrees and returns a command that sets 
+     * The function takes an angle in degrees and returns a command that sets
      * the pivot to the angle converted to a position
      * 
      * @param double The angle to set the shooter to
      * 
      * @return The method is returning a Command object.
-    */
+     */
     public Command setAngleCommand(double angle) {
         return Commands.runOnce(() -> setAngle(angle));
     }
 
     /**
      * The function sets the pivot angle to the rest angle constant
-    */
+     */
     public void setRestAngle() {
         this.setAngle(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
     }
@@ -78,7 +75,7 @@ public class Pivot extends SubsystemBase {
      * a default resting position
      * 
      * @return The method is returning a Command object.
-    */
+     */
     public Command setRestAngleCommand() {
         return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
     }
@@ -88,13 +85,12 @@ public class Pivot extends SubsystemBase {
      * tolerance
      * 
      * @return The method is returning a BooleanSupplier that returns true
-     * if the pivot is at its target rotation and false otherwise
-    */
+     *         if the pivot is at its target rotation and false otherwise
+     */
     public BooleanSupplier atDesiredAngle() {
-        return () ->
-            (MathUtil.applyDeadband(
+        return () -> (MathUtil.applyDeadband(
                 Math.abs(
-                    pivot.getPosition() - pivot.getTargetPosition()),
+                        pivot.getPosition() - pivot.getTargetPosition()),
                 ShooterConstants.PIVOT_DEADBAND) == 0);
     }
 
@@ -102,7 +98,7 @@ public class Pivot extends SubsystemBase {
      * The function is a command that stops the motor
      * 
      * @return The method is returning a Command object.
-    */
+     */
     public Command stop() {
         return runOnce(() -> pivot.stopMotor());
     }

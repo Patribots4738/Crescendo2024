@@ -34,36 +34,34 @@ public class Claw extends SubsystemBase {
     public Command placeCommand() {
         return runOnce(this::outtake)
                 .andThen(
-                    Commands.waitSeconds(TrapConstants.OUTTAKE_TIME)
-                ).andThen(
-                    runOnce(this::stop)
-                );
+                        Commands.waitSeconds(TrapConstants.OUTTAKE_TIME))
+                .andThen(
+                        runOnce(this::stop));
     }
 
     public Command intakeFromHandoff() {
         return runOnce(this::intake)
-            .andThen(
-                Commands.waitSeconds(TrapConstants.INTAKE_TIME))
-            .andThen(
-                runOnce(this::stop));
+                .andThen(
+                        Commands.waitSeconds(TrapConstants.INTAKE_TIME))
+                .andThen(
+                        runOnce(this::stop));
     }
 
     public boolean hasGamePiece() {
-        // if appliedoutput <= desired/2 and 
+        // if appliedoutput <= desired/2 and
         // current this loop and last loop > constant
-        // desired speed > constant 
+        // desired speed > constant
         // we've been intaking over .25 seconds (make constant);
         if (hasGamePiece) {
             this.hasGamePiece = claw.getTargetVelocity() > 0;
-        }
-        else {
-            this.hasGamePiece = 
-                (TrapConstants.CLAW_HAS_PIECE_LOWER_LIMIT < claw.getAppliedOutput() && 
-                    claw.getAppliedOutput() < TrapConstants.CLAW_HAS_PIECE_UPPER_LIMIT) && 
-                (current > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT && 
-                    claw.getOutputCurrent() > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT) &&
-                (claw.getTargetVelocity() > TrapConstants.CLAW_HAS_PIECE_MIN_TARGET_VELO) &&
-                (DriverUI.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
+        } else {
+            this.hasGamePiece = (TrapConstants.CLAW_HAS_PIECE_LOWER_LIMIT < claw.getAppliedOutput() &&
+                    claw.getAppliedOutput() < TrapConstants.CLAW_HAS_PIECE_UPPER_LIMIT) &&
+                    (current > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT &&
+                            claw.getOutputCurrent() > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT)
+                    &&
+                    (claw.getTargetVelocity() > TrapConstants.CLAW_HAS_PIECE_MIN_TARGET_VELO) &&
+                    (DriverUI.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
         }
         return hasGamePiece;
     }

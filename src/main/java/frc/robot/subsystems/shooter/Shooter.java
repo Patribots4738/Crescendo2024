@@ -56,7 +56,7 @@ public class Shooter extends SubsystemBase {
      * the speed provided
      * 
      * @param speed A double representing the speed the motors should be set to
-    */
+     */
     public void setSpeed(double speed) {
         motorLeft.setTargetVelocity(speed);
         motorRight.setTargetVelocity(speed);
@@ -69,12 +69,12 @@ public class Shooter extends SubsystemBase {
 
     /**
      * The function is a command that sets the motor speed for both motors
-     * to the speed  provided
+     * to the speed provided
      * 
      * @param speed A double representing the speed the motors should be set to
      * 
      * @return The method is returning a Command object.
-    */
+     */
     public Command setSpeedCommand(double speed) {
         return Commands.runOnce(() -> setSpeed(speed));
     }
@@ -87,26 +87,25 @@ public class Shooter extends SubsystemBase {
      * The function is a command that stops both motors
      * 
      * @return The method is returning a Command object.
-    */
+     */
     public Command stop() {
         return Commands.runOnce(() -> motorLeft.stopMotor());
     }
 
-    //TODO: Implement a way to get the RPM of the shooter
+    // TODO: Implement a way to get the RPM of the shooter
     /**
      * The function is a BooleanSupplier that represents the the condition of
      * the velocity of the motor being equal to its targetVelocity
      * 
      * 
-     * @return The method is returning a BooleanSupplier that returns true if 
-     * the current velocity of the motors is at the target velocity with a 
-     * small tolerance
-    */
+     * @return The method is returning a BooleanSupplier that returns true if
+     *         the current velocity of the motors is at the target velocity with a
+     *         small tolerance
+     */
     public BooleanSupplier atDesiredRPM() {
-        return () ->
-            (MathUtil.applyDeadband(
+        return () -> (MathUtil.applyDeadband(
                 Math.abs(
-                    motorLeft.getVelocity() - motorLeft.getTargetVelocity()),
+                        motorLeft.getVelocity() - motorLeft.getTargetVelocity()),
                 ShooterConstants.SHOOTER_DEADBAND) == 0);
     }
 }

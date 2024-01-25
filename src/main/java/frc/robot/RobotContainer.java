@@ -35,7 +35,7 @@ public class RobotContainer implements Logged {
     private final Limelight limelight;
     private final Climb climb;
     private Indexer triggerWheel;
-    
+
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
@@ -47,14 +47,14 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         driverUI = new DriverUI();
         triggerWheel = new Indexer();
-      
+
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
             // This can be present (sees tag) or not present (does not see tag)
             Optional<Pose2d> result = limelight.getPose2d();
             // The skew of the tag represents how confident the camera is
-            // If the result of the estimatedRobotPose exists, 
-            // and the skew of the tag is less than 3 degrees, 
+            // If the result of the estimatedRobotPose exists,
+            // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
             if (result.isPresent()) {
                 swerve.getPoseEstimator().addVisionMeasurement(
@@ -64,13 +64,13 @@ public class RobotContainer implements Logged {
         }, limelight));
 
         swerve.setDefaultCommand(new Drive(
-            swerve,
-            driver::getLeftY,
-            driver::getLeftX,
-            () -> -driver.getRightX(),
-            () -> !driver.leftBumper().getAsBoolean(),
-            () -> (driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))
-        ));
+                swerve,
+                driver::getLeftY,
+                driver::getLeftX,
+                () -> -driver.getRightX(),
+                () -> !driver.leftBumper().getAsBoolean(),
+                () -> (driver.leftBumper().getAsBoolean()
+                        && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))));
 
         incinerateMotors();
         configureButtonBindings();
@@ -78,7 +78,7 @@ public class RobotContainer implements Logged {
         prepareNamedCommands();
     }
 
-    private void configureButtonBindings(){
+    private void configureButtonBindings() {
         configureDriverBindings();
         configureOperatorBindings();
     }
@@ -94,33 +94,33 @@ public class RobotContainer implements Logged {
         // reset the orientation of the robot
         // to be facing away from the driver station
         driver.start().or(driver.back()).onTrue(
-            Commands.runOnce(() -> swerve.resetOdometry(
-                new Pose2d(
-                    swerve.getPose().getTranslation(), 
-                    Rotation2d.fromDegrees(
-                        FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red)) 
-                        ? 0 
-                        : 180))
-            ), swerve)
-        );
+                Commands.runOnce(() -> swerve.resetOdometry(
+                        new Pose2d(
+                                swerve.getPose().getTranslation(),
+                                Rotation2d.fromDegrees(
+                                        FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red))
+                                                ? 0
+                                                : 180))),
+                        swerve));
 
         driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
-      
+
         driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
 
         driver.y().onTrue(intake.outCommand());
 
         driver.x().onTrue(intake.stop());
-        
+
     }
 
     public Command getAutonomousCommand() {
         return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
     }
 
-    public void onDisabled() {}
+    public void onDisabled() {
+    }
 
     public void onEnabled() {
     }

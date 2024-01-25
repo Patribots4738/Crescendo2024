@@ -41,7 +41,7 @@ public class ShooterCalc {
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
         SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-        
+
         return pivot.setAngleCommand(triplet.getAngle())
                 .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
     }
@@ -177,7 +177,7 @@ public class ShooterCalc {
 
         // Use the distance as our key for interpolation
         double distanceFeet = Units.metersToFeet(robotPose.getTranslation().getNorm());
-        
+
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
 
