@@ -7,6 +7,7 @@ package frc.robot.subsystems.shooter;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,7 +38,12 @@ public class Shooter extends SubsystemBase {
                 ShooterConstants.SHOOTER_MIN_OUTPUT,
                 ShooterConstants.SHOOTER_MAX_OUTPUT);
 
-        motorLeft.addFollower(motorRight, true);
+        motorRight.setPID(
+                ShooterConstants.SHOOTER_P,
+                ShooterConstants.SHOOTER_I,
+                ShooterConstants.SHOOTER_D,
+                ShooterConstants.SHOOTER_MIN_OUTPUT,
+                ShooterConstants.SHOOTER_MAX_OUTPUT);
     }
 
     @Override
@@ -53,6 +59,12 @@ public class Shooter extends SubsystemBase {
     */
     public void setSpeed(double speed) {
         motorLeft.setTargetVelocity(speed);
+        motorRight.setTargetVelocity(speed);
+    }
+
+    public void setSpeedPair(Pair<Double, Double> speeds) {
+        motorLeft.setTargetVelocity(speeds.getFirst());
+        motorRight.setTargetVelocity(speeds.getSecond());
     }
 
     /**
@@ -65,6 +77,10 @@ public class Shooter extends SubsystemBase {
     */
     public Command setSpeedCommand(double speed) {
         return Commands.runOnce(() -> setSpeed(speed));
+    }
+
+    public Command setSpeedCommand(Pair<Double, Double> speeds) {
+        return runOnce(() -> setSpeedPair(speeds));
     }
 
     /**
