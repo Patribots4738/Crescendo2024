@@ -17,14 +17,14 @@ public class Climb extends SubsystemBase implements Logged {
     private final Neo rightMotor;
     
     public Climb() {
-        leftMotor = new Neo(14);
-        rightMotor = new Neo(15);
+        leftMotor = new Neo(14, true);
+        rightMotor = new Neo(15, false);
 
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
 
-        leftMotor.setInverted(true);
-        rightMotor.setInverted(false);
+        // leftMotor.setInverted(true);
+        // rightMotor.setInverted(false);
     }    
 
     public void setPosition(double pos1, double pos2) {

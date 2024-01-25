@@ -11,7 +11,7 @@ public class Intake extends SubsystemBase {
     private final Neo intake;
 
     public Intake() {
-        intake = new Neo(IntakeConstants.INTAKE_CAN_ID);
+        intake = new Neo(IntakeConstants.INTAKE_CAN_ID, false);
         configMotor();
     }
 
@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase {
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
         intake.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         intake.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-        intake.setInverted(false);
+        // intake.setInverted(false);
 
         //sets brake mode
         intake.setBrakeMode();
