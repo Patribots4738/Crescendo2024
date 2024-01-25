@@ -21,6 +21,8 @@ public class Neo extends CANSparkMax {
     public final RelativeEncoder encoder;
     public final SparkPIDController pidController;
 
+    private int reversedMultiplier = 1;
+
     private List<Neo> followers = new ArrayList<>();
 
     private ControlLoopType controlType = ControlLoopType.PERCENT;
@@ -52,6 +54,7 @@ public class Neo extends CANSparkMax {
      */
     public Neo(int id, boolean reversed, CANSparkBase.IdleMode mode) {
         super(id, CANSparkLowLevel.MotorType.kBrushless);
+        this.reversedMultiplier = reversed ? -1 : 1;
 
         // restoreFactoryDefaults();
         // Timer.delay(0.050);
@@ -61,7 +64,6 @@ public class Neo extends CANSparkMax {
         setCANTimeout(50);
 
         register();
-
         encoder = getEncoder();
         pidController = getPIDController();
     }
@@ -81,6 +83,7 @@ public class Neo extends CANSparkMax {
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
     public void setTargetPosition(double position, double arbitraryFeedForward, int slot) {
+        position *= reversedMultiplier;
         if (!FieldConstants.IS_SIMULATION) {
             pidController.setReference(position, ControlType.kPosition, slot, arbitraryFeedForward, SparkPIDController.ArbFFUnits.kVoltage);
         }
@@ -110,6 +113,7 @@ public class Neo extends CANSparkMax {
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
     public void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
+        velocity *= reversedMultiplier;
         if (velocity == 0) {
             setVoltage(0);
         } else {
@@ -120,6 +124,7 @@ public class Neo extends CANSparkMax {
     }
 
     public void set(double percent) {
+        percent *= reversedMultiplier;
         setVoltage(percent * RobotController.getBatteryVoltage());
         controlType = ControlLoopType.PERCENT;
     }
@@ -135,6 +140,7 @@ public class Neo extends CANSparkMax {
         }
 
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
+
             setVoltage(pidController.getP() * (targetPosition - getPosition()));
         }
     }
@@ -178,6 +184,7 @@ public class Neo extends CANSparkMax {
     }
 
     public void setPosition(double position) {
+        position *=  reversedMultiplier;
         encoder.setPosition(position);
     }
 
