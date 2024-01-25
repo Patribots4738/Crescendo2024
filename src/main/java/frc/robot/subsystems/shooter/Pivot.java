@@ -50,7 +50,7 @@ public class Pivot extends SubsystemBase {
             /**
              * TODO: Make gear ratio constant and put it here
              */
-            (angle / ShooterConstants.PIVOT_MAX_ANGLE)
+            (angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES)
         );
     }
 
@@ -70,7 +70,7 @@ public class Pivot extends SubsystemBase {
      * The function sets the pivot angle to the rest angle constant
     */
     public void setRestAngle() {
-        this.setAngle(ShooterConstants.PIVOT_REST_ANGLE);
+        this.setAngle(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
     }
 
     /**
@@ -80,7 +80,7 @@ public class Pivot extends SubsystemBase {
      * @return The method is returning a Command object.
     */
     public Command setRestAngleCommand() {
-        return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE);
+        return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
     }
 
     /**
