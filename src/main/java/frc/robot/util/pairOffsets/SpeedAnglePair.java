@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.pairOffsets;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;

@@ -24,6 +24,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import frc.robot.util.pairOffsets.MotorSpeedOffset;
+import frc.robot.util.pairOffsets.OffsetMotor;
+import frc.robot.util.pairOffsets.SpeedAnglePair;
 
 /**
  * Welcome to the home of the many many variables :D

@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.pairOffsets;
 
 public enum OffsetMotor {
     TOP,

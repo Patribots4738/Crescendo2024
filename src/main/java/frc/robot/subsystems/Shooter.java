@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
-import frc.robot.util.SpeedAnglePair;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.pairOffsets.SpeedAnglePair;
 
 public class Shooter extends SubsystemBase {
     /** Creates a new shooter. */
