@@ -113,11 +113,12 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAnglePair> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAnglePair>() {
             {
-                put(5, SpeedAnglePair.of(0.4, 10.0));
-                put(10, SpeedAnglePair.of(0.4, 10.0));
-                put(15, SpeedAnglePair.of(0.4, 10.0));
-                put(20, SpeedAnglePair.of(0.4, 10.0));
-                put(25, SpeedAnglePair.of(0.4, 10.0));
+                //TODO: dictate the OffsetMotor for each of these as well as the offset
+                put(5, SpeedAnglePair.of(new MotorSpeedOffset(0.4, 0, OffsetMotor.NONE), 10.0));
+                put(10, SpeedAnglePair.of(new MotorSpeedOffset(0.4, 0, OffsetMotor.NONE), 10.0));
+                put(15, SpeedAnglePair.of(new MotorSpeedOffset(0.4, 0, OffsetMotor.NONE), 10.0));
+                put(20, SpeedAnglePair.of(new MotorSpeedOffset(0.4, 0, OffsetMotor.NONE), 10.0));
+                put(25, SpeedAnglePair.of(new MotorSpeedOffset(0.4, 0, OffsetMotor.NONE), 10.0));
             }
         };
     }

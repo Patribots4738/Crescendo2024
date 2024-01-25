@@ -79,6 +79,8 @@ public class Shooter extends SubsystemBase {
         SpeedAnglePair lowerPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(lowerIndex);
         SpeedAnglePair upperPair = ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.get(upperIndex);
 
-        return lowerPair.interpolate(upperPair, (distance - lowerIndex) / (upperIndex - lowerIndex));
+        SpeedAnglePair[] calculatedPairOffsets = lowerPair.getPairOffset(upperPair);
+
+        return calculatedPairOffsets[0].interpolate(calculatedPairOffsets[1], (distance - lowerIndex) / (upperIndex - lowerIndex));
     }
 }
