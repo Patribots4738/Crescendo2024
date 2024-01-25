@@ -12,7 +12,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.SpeedAnglePair;
+import frc.robot.util.SpeedAngleTriplet;
 
 public class ShooterCalc {
 
@@ -40,9 +40,10 @@ public class ShooterCalc {
      * @return The method is returning a Command object.
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
-        SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-        return pivot.setAngleCommand(pair.getAngle())
-                .alongWith(shooter.setSpeedCommand(pair.getSpeed()));
+        SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+        
+        return pivot.setAngleCommand(triplet.getAngle())
+                .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
     }
 
     /**
@@ -94,8 +95,8 @@ public class ShooterCalc {
      * @return The method is returning a Command object.
      */
     public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
-        SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-        return shooter.setSpeedCommand(pair.getSpeed());
+        SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+        return shooter.setSpeedCommand(triplet.getSpeeds());
     }
 
     /**
@@ -112,8 +113,8 @@ public class ShooterCalc {
      * @return The method is returning a Command object.
      */
     public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
-        SpeedAnglePair pair = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-        return pivot.setAngleCommand(pair.getAngle());
+        SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+        return pivot.setAngleCommand(triplet.getAngle());
     }
 
     /**
@@ -160,9 +161,9 @@ public class ShooterCalc {
         this.aiming = true;
     }
 
-    // Gets a SpeedAnglePair by interpolating values from a map of already
+    // Gets a SpeedAngleTriplet by interpolating values from a map of already
     // known required speeds and angles for certain poses
-    private SpeedAnglePair calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
+    private SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
         // Constants have blue alliance positions at index 0
         // and red alliance positions at index 1
         int positionIndex = FieldConstants.ALLIANCE == Optional.ofNullable(Alliance.Blue) ? 0 : 1;
