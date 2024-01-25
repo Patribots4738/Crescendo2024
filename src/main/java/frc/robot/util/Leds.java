@@ -11,8 +11,6 @@ public class Leds {
 
     private Swerve swerve;
 
-    private int rainbowFirstPixelHue;
-
     public Leds(Swerve swerve) {
         this.led = new AddressableLED(9);
         ledBuffer = new AddressableLEDBuffer(0);
@@ -38,6 +36,7 @@ public class Leds {
 
     }
 
+    private int rainbowFirstPixelHue;
     private void rainbow() {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             final int hue = (rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
@@ -47,12 +46,18 @@ public class Leds {
         rainbowFirstPixelHue %= 180;
     }
 
+    // https://www.desmos.com/calculator/s5ylo1v9lt
+    private int greenNGoldOffset = 0;
     private void greenNGold() {
+        // We know that the hue for green is roughly 120
+        // and the hue for gold is roughly 150
+        // We need to make an equation that takes a number and oscilates it around another point.
+        // Sounds like a sin wave to me. Let's do it!
         for (int i = 0; i < ledBuffer.getLength(); i++) {
-            for (int j = 0; j < ledBuffer.getLength(); j++) {
-                final int hue = 0;
-                ledBuffer.setHSV(j, hue, 50, 100);
-            }
+            final int hue = 135 + (int) (15 * Math.sin(Math.PI * ((i + greenNGoldOffset*ledBuffer.getLength()) / ledBuffer.getLength())));
+            ledBuffer.setHSV(i, hue, 255, 255);
         }
+        greenNGoldOffset += 1;
+        greenNGoldOffset %= 10;
     }
 }
