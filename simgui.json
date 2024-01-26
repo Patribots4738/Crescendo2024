@@ -11,8 +11,16 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Robot/autoChooser": "String Chooser",
       "/Robot/driverUI/autoChooser": "String Chooser",
       "/Robot/driverUI/field": "Field2d"
+    },
+    "windows": {
+      "/Robot/autoChooser": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
