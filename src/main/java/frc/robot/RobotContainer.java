@@ -3,12 +3,14 @@ package frc.robot;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
@@ -19,6 +21,7 @@ import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
+import monologue.Annotations.Log;
 import monologue.Logged;
 
 public class RobotContainer implements Logged {
@@ -75,6 +78,7 @@ public class RobotContainer implements Logged {
         incinerateMotors();
         configureButtonBindings();
 
+        setupAutoChooser();
         registerNamedCommands();
     }
 
@@ -117,7 +121,13 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return autoPathStorage.generateCenterLineComplete(5, 5, true);
+        return autoChooser.getSelected();
+    }
+
+    @Log.NT
+    public static SendableChooser<Command> autoChooser = new SendableChooser<>();
+    private void setupAutoChooser() {
+        autoChooser.addOption("C1-5", autoPathStorage.generateCenterLineComplete(5, 5, true));
     }
 
     public void onDisabled() {}
