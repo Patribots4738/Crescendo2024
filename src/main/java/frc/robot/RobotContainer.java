@@ -127,6 +127,8 @@ public class RobotContainer implements Logged {
     @Log.NT
     public static SendableChooser<Command> autoChooser = new SendableChooser<>();
     private void setupAutoChooser() {
+        // TODO: Autos currently start at C1-5, we need to integrate the other paths
+        // with the center line schenanigans to make full autos
         autoChooser.addOption("C1-5", autoPathStorage.generateCenterLineComplete(5, 5, true));
     }
 
