@@ -6,6 +6,7 @@ import com.revrobotics.*;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 
@@ -59,13 +60,15 @@ public class Neo extends CANSparkMax {
     public Neo(int id, boolean reversed, CANSparkBase.IdleMode mode) {
         super(id, CANSparkLowLevel.MotorType.kBrushless);
 
-        // restoreFactoryDefaults();
-        // Timer.delay(0.050);
+        restoreFactoryDefaults();
+        Timer.delay(0.050);
 
-        // If a parameter set fails, this will add more time to alleviate any bus
-        // traffic
+        // If a parameter set fails, this will add more time 
+        // to alleviate any bus traffic
         // default is 20ms
         setCANTimeout(50);
+
+        setIdleMode(mode);
 
         register();
 
