@@ -20,6 +20,10 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
         super(new Pair<Double, Double>(leftSpeed, rightSpeed), angle);
     }
 
+    public SpeedAngleTriplet(Pair<Double, Double> speeds, Double angle) {
+        super(speeds, angle);
+    }
+
     public SpeedAngleTriplet() {
         super(new Pair<Double, Double>(0.0, 0.0), 0.0);
     }
