@@ -3,7 +3,6 @@ package frc.robot;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,6 +12,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
+import frc.robot.commands.autonomous.AutoPathStorage;
 import frc.robot.subsystems.*;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
@@ -32,6 +32,7 @@ public class RobotContainer implements Logged {
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
     private final Limelight limelight;
+    private final AutoPathStorage autoPathStorage;
 
     private final Climb climb;
     
@@ -45,6 +46,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        autoPathStorage = new AutoPathStorage(driver.b());
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -73,7 +75,7 @@ public class RobotContainer implements Logged {
         incinerateMotors();
         configureButtonBindings();
 
-        prepareNamedCommands();
+        registerNamedCommands();
     }
 
     private void configureButtonBindings(){
@@ -115,7 +117,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
+        return autoPathStorage.generateFullPath(true, 1);
     }
 
     public void onDisabled() {}
@@ -123,7 +125,7 @@ public class RobotContainer implements Logged {
     public void onEnabled() {
     }
 
-    public void prepareNamedCommands() {
+    public void registerNamedCommands() {
         NamedCommands.registerCommand("Intake", intake.inCommand());
     }
 
