@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.*;
+import frc.robot.util.Leds;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
+import monologue.Monologue;
 
 public class RobotContainer implements Logged {
 
@@ -33,9 +35,12 @@ public class RobotContainer implements Logged {
     private final DriverUI driverUI;
     private final Limelight limelight;
 
+    private final Leds leds;
+
     private final Climb climb;
     
     public RobotContainer() {
+        
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
@@ -45,6 +50,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        leds = new Leds(swerve);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -74,7 +80,7 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
 
         prepareNamedCommands();
-
+        
     }
 
     private void configureButtonBindings(){
