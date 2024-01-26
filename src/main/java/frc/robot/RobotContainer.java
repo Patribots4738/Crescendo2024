@@ -117,13 +117,12 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return autoPathStorage.generateFullPath(false, 5, 5);
+        return autoPathStorage.generateCenterLineComplete(5, 5, false);
     }
 
     public void onDisabled() {}
 
-    public void onEnabled() {
-    }
+    public void onEnabled() {}
 
     public void registerNamedCommands() {
         NamedCommands.registerCommand("Intake", intake.inCommand());
