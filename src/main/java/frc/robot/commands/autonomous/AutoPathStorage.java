@@ -11,8 +11,10 @@ import java.util.function.BooleanSupplier;
 
 /**
  * This file represents all of the auto paths that we will have
- * They will be primarily comiled through PathPlannerTrajectory.importChoreoPaths, 
- * with each segment having its own method to make sure that the modularity stays clean
+ * They will be primarily comiled through
+ * PathPlannerTrajectory.importChoreoPaths,
+ * with each segment having its own method to make sure that the modularity
+ * stays clean
  */
 public class AutoPathStorage {
 
@@ -22,46 +24,34 @@ public class AutoPathStorage {
         this.intakeHasPieceSupplier = intakeHasPiece;
     }
 
-    public Command generateFullPath(boolean goingDown, int startingIndex) {
+    public Command generateFullPath(boolean goingDown, int startingIndex, int noteCount) {
         SequentialCommandGroup fullPath = new SequentialCommandGroup();
 
-        final int NOTE_COUNT = 5;
-        
-        if (goingDown) {
-            for (int i = startingIndex; i <= NOTE_COUNT; i++) {
+        String pathName = "C1-5";    
+        if (!goingDown){
+            startingIndex = Math.abs((startingIndex-6));
+            pathName = "C5-1";
+        }
 
-                int index = i * 2;
+        for (int i = startingIndex; i >= noteCount; i++) {
 
-                PathPlannerPath shootPiece = PathPlannerPath.fromChoreoTrajectory("C1-5S."+(index-1));
+            int index = (i * 2);
 
-                if (index == NOTE_COUNT*2) {
-                    fullPath.addCommands(AutoBuilder.followPath(shootPiece));
-                    return fullPath;
-                }
+            PathPlannerPath shootPiece = PathPlannerPath.fromChoreoTrajectory(pathName + "S." + (index - 1));
 
-                PathPlannerPath getNextPiece = PathPlannerPath.fromChoreoTrajectory("C1-5S."+(index));
-                PathPlannerPath skipShot = PathPlannerPath.fromChoreoTrajectory("C1-5."+i);
-                
-                fullPath.addCommands(
+            if (index == noteCount * 2) {
+                fullPath.addCommands(AutoBuilder.followPath(shootPiece));
+                return fullPath;
+            }   
+
+            PathPlannerPath getNextPiece = PathPlannerPath.fromChoreoTrajectory(pathName + "S." + (index));
+            PathPlannerPath skipShot = PathPlannerPath.fromChoreoTrajectory(pathName + "." + i);
+
+            fullPath.addCommands(
                     Commands.either(
-                        AutoBuilder.followPath(shootPiece).andThen(AutoBuilder.followPath(getNextPiece)), 
-                        AutoBuilder.followPath(skipShot), 
-                        intakeHasPieceSupplier)
-                    );
-            }
-        } else {
-            for (int i = startingIndex; i > 0; i--) {
-                PathPlannerPath shootPiece = PathPlannerPath.fromChoreoTrajectory("C5-1S."+(i-1)*2);
-                PathPlannerPath getNextPiece = PathPlannerPath.fromChoreoTrajectory("C5-1S."+(i*2));
-                PathPlannerPath skipShot = PathPlannerPath.fromChoreoTrajectory("C5-1."+i);
-                
-                fullPath.addCommands(
-                    Commands.either(
-                        AutoBuilder.followPath(shootPiece).andThen(AutoBuilder.followPath(getNextPiece)), 
-                        AutoBuilder.followPath(skipShot), 
-                        intakeHasPieceSupplier)
-                    );
-            }
+                            AutoBuilder.followPath(shootPiece).andThen(AutoBuilder.followPath(getNextPiece)),
+                            AutoBuilder.followPath(skipShot),
+                            intakeHasPieceSupplier));
         }
 
         return fullPath;

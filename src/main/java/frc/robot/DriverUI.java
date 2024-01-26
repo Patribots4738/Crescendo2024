@@ -9,8 +9,6 @@ import monologue.Annotations.Log;
 
 public class DriverUI implements Logged {
     
-    public DriverUI() {}
-    
     @Log.NT
     public static SendableChooser<PathPlannerTrajectory> autoChooser = new SendableChooser<>();
     
@@ -21,6 +19,14 @@ public class DriverUI implements Logged {
     public static Field2d field = new Field2d();
 
     public static double currentTimestamp = 0;
-    public static double previousTimestmap = 0;
+    public static double previousTimestamp = 0;
+
+    public DriverUI() {
+        addAutos();
+    }
+    
+    private void addAutos() {
+        // autoChooser.addOption()
+    }
 
 }

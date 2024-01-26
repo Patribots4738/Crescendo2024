@@ -117,7 +117,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return autoPathStorage.generateFullPath(true, 1);
+        return autoPathStorage.generateFullPath(false, 5, 5);
     }
 
     public void onDisabled() {}

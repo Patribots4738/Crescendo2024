@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
         Monologue.updateAll();
         CommandScheduler.getInstance().run();
 
-        DriverUI.previousTimestmap = DriverUI.currentTimestamp;
+        DriverUI.previousTimestamp = DriverUI.currentTimestamp;
         DriverUI.currentTimestamp = Timer.getFPGATimestamp();
     }
 
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        // Now while this may not necesarily be a constant...
+        // Now while this may not necessarily be a constant...
         // it needs to be updated.
         DriverStation.refreshData();
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
