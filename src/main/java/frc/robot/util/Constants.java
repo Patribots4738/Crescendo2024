@@ -288,8 +288,8 @@ public final class Constants {
         public static final double SNAP_TO_ANGLE_P = 0.0025;
 
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
-        public static final double FIELD_WIDTH_METERS = 16.53;
-        public static final double FIELD_HEIGHT_METERS = 8.278;
+        public static final double FIELD_WIDTH_METERS = 16.55445;
+        public static final double FIELD_HEIGHT_METERS = 8.2112312;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
