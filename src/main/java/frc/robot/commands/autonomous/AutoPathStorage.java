@@ -99,15 +99,15 @@ public class AutoPathStorage {
 
             int shootingIndex = (i * 2);
 
-            PathPlannerPath shootPiece = getPathFromCache(shootingPathName + (shootingIndex - 1));
+            PathPlannerPath shootPiece = pathCache.get(shootingPathName + (shootingIndex - 1));
             
             if (shootingIndex == noteCount * 2) {
                 fullPath.addCommands(AutoBuilder.followPath(shootPiece));
                 return fullPath;
             }
 
-            PathPlannerPath skipShot = getPathFromCache(skippingPathName + i);
-            PathPlannerPath getNextPiece = getPathFromCache(shootingPathName + (shootingIndex));
+            PathPlannerPath skipShot = pathCache.get(skippingPathName + i);
+            PathPlannerPath getNextPiece = pathCache.get(shootingPathName + (shootingIndex));
 
             fullPath.addCommands(
                     Commands.either(
@@ -116,9 +116,5 @@ public class AutoPathStorage {
                             hasPieceSupplier));
         }
         return fullPath;
-    }
-
-    private PathPlannerPath getPathFromCache(String pathName) {
-        return pathCache.get(pathName);
     }
 }
