@@ -53,11 +53,12 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot(Pose2d position, boolean shootingAtSpeaker) {
         SpeedAnglePair pair = calculateSpeed(position, shootingAtSpeaker);
-        return runOnce(() -> motorLeft.setTargetVelocity(1));
+        return runOnce(() -> motorLeft.setTargetPercent(1));
     }
-
+     //TODO: ask how line 54-56 will translate to a percent
+    //TODO: change terget velocity to target percent
     public Command stop() {
-        return runOnce(() -> motorLeft.setTargetVelocity(0));
+        return runOnce(() -> motorLeft.setTargetPercent(0));
     }
 
     public SpeedAnglePair calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {

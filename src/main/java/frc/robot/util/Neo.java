@@ -28,6 +28,7 @@ public class Neo extends CANSparkMax {
     private ControlLoopType controlType = ControlLoopType.PERCENT;
     private double targetPosition = 0;
     private double targetVelocity = 0;
+    private double targetPercent = 0;
     
     /**
      * Creates a new Neo motor
@@ -97,6 +98,21 @@ public class Neo extends CANSparkMax {
 
     public void setTargetPosition(double position) {
         setTargetPosition(position, 0, 0);
+    }
+
+    public void setTargetPercent(double percent) {
+        setTargetPercent(percent, 0);
+    }
+
+    public void setTargetPercent(double percent, int slot) {
+        percent *= reversedMultiplier;
+        if (percent == 0) {
+            setVoltage(0);
+        } else {
+            setTargetVelocity((Math.abs(percent * RobotController.getBatteryVoltage())));
+        }
+        targetPercent = percent;
+        controlType = ControlLoopType.PERCENT;
     }
 
     /**
