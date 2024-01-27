@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Neo;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
@@ -26,13 +27,12 @@ public class Intake extends SubsystemBase {
     }
 
     public void tick() {
-        motorLeft.tick();
-        motorRight.tick();
+        intake.tick();
     }
 
     @Override
     public void periodic() {
-        if (IntakeConstants.IS_SIMULATION) {
+        if (FieldConstants.IS_SIMULATION) {
             tick();
         }
     }

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.FieldConstants.ChainPosition;
 import monologue.Logged;
 
@@ -31,7 +32,7 @@ public class Climb extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        if (ClimbConstants.IS_SIMULATION) {
+        if (FieldConstants.IS_SIMULATION) {
             tick();
         }
     }
