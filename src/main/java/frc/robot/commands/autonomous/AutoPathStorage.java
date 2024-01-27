@@ -18,8 +18,8 @@ import java.util.function.BooleanSupplier;
  * This file represents all of the auto paths that we will have
  * They will be primarily comiled through
  * PathPlannerTrajectory.importChoreoPaths,
- * with each segment having its own method to make sure that the modularity
- * stays clean
+ * with each segment having its own method 
+ * to make sure that the modularity stays clean
  */
 public class AutoPathStorage {
 
