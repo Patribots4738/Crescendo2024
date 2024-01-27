@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.Leds;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -23,11 +24,14 @@ public class Robot extends TimedRobot {
     private Command autonomousCommand;
 
     private RobotContainer robotContainer;
+    private Leds leds;
 
     @Override
     public void robotInit() { 
         robotContainer = new RobotContainer();
         Monologue.setupMonologue(robotContainer, "Robot", false, false);
+
+        //leds = new Leds(null);
     }
 
     /**

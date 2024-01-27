@@ -14,7 +14,7 @@ public class Leds {
     public Leds(Swerve swerve) {
         this.led = new AddressableLED(9);
         ledBuffer = new AddressableLEDBuffer(0);
-
+        
         led.setLength(ledBuffer.getLength());
         
         led.setData(ledBuffer);
@@ -48,7 +48,7 @@ public class Leds {
 
     // https://www.desmos.com/calculator/s5ylo1v9lt
     private int greenNGoldOffset = 0;
-    private void greenNGold() {
+    public void greenNGold() {
         // We know that the hue for green is roughly 120
         // and the hue for gold is roughly 150
         // We need to make an equation that takes a number and oscilates it around another point.

@@ -81,6 +81,9 @@ public class RobotContainer implements Logged {
 
         prepareNamedCommands();
         
+    //      if (swerve.isAligned()) {
+    //     leds.greenNGold();
+    //    }
     }
 
     private void configureButtonBindings(){
