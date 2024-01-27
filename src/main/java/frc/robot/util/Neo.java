@@ -126,7 +126,7 @@ public class Neo extends CANSparkMax{
      * @param velocity Velocity to set the Neo to in rotations per minute.
      */
     public void setTargetVelocity(double velocity) {
-        setTargetVelocity(velocity, 0, 0);
+        setTargetVelocity(velocity, 0);
     }
 
     /**
