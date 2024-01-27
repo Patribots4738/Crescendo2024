@@ -24,11 +24,11 @@ import monologue.Logged;
 public class RobotContainer implements Logged {
 
     private final PatriBoxController driver;
-    @SuppressWarnings("unused")
     private final PatriBoxController operator;
 
     private final Swerve swerve;
     private final Intake intake;
+    
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
     private final Limelight limelight;
