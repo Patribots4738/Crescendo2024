@@ -24,7 +24,7 @@ ___
   - Auto alignment and shooting for notes
   - Field-centric swerve drive
   - Modular autonomous routines
-  - LED lights that
+  - LED lights that tell drive team whether or not the robot is in the right place to start autonomous and makes the robot look pretty!
 
 ## Major Package Functions
   - [`robot/subsystems`](src/main/java/frc/robot/subsystems)
