@@ -17,7 +17,7 @@ import java.util.List;
  * Original source published at https://github.com/FRC3005/Rapid-React-2022-Public/tree/d499655448ed592c85f9cfbbd78336d8841f46e2
  */
 
-public class Neo extends CANSparkMax{
+public class Neo extends CANSparkMax {
     public final RelativeEncoder encoder;
     public final SparkPIDController pidController;
 
@@ -30,6 +30,7 @@ public class Neo extends CANSparkMax{
     private double targetVelocity = 0;
     private double targetPercent = 0;
     
+    private boolean isFlex;
     /**
      * Creates a new Neo motor
      * @param id CANID of the SparkMax the Neo is connected to.
