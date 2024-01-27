@@ -17,7 +17,7 @@ import java.util.List;
  * Original source published at https://github.com/FRC3005/Rapid-React-2022-Public/tree/d499655448ed592c85f9cfbbd78336d8841f46e2
  */
 
-public class Neo extends CANSparkMax {
+public class Neo extends CANSparkMax{
     public final RelativeEncoder encoder;
     public final SparkPIDController pidController;
 
@@ -134,7 +134,7 @@ public class Neo extends CANSparkMax {
      * @param velocity Velocity to set the Neo to in rotations per minute.
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
-    public void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
+    public void setTargetVelocity(double velocity, int slot) {
         velocity *= reversedMultiplier;
         if (velocity == 0) {
             setVoltage(0);
