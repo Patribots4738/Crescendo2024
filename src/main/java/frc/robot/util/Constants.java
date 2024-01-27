@@ -186,6 +186,19 @@ public final class Constants {
                 Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH),
                 new ReplanningConfig());
 
+        // In choreo, there is one path, "C1-5S", 
+        // that shoots every piece.
+        // There is a setting that splits the trajectories
+        // by each stop point, and the auto generated
+        // name by default is (PATH_NAME + "." + index)
+        // so this represents that "." :>
+        private static final String PATH_EXTENSION = ".";
+
+        public static final String SHOOTING_DOWN_PATH_NAME = "C1-5S" + PATH_EXTENSION;
+        public static final String SHOOTING_UP_PATH_NAME   = "C5-1S" + PATH_EXTENSION;
+
+        public static final String SKIPPING_DOWN_PATH_NAME = "C1-5"  + PATH_EXTENSION;
+        public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
     }
 
     public static final class ModuleConstants {
