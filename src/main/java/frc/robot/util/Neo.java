@@ -100,14 +100,14 @@ public class Neo extends CANSparkMax {
         setTargetPosition(position, 0, 0);
     }
 
-    // Creates method to set the target percent of the volatge for the NEO.
+    // Creates method to set the target percent of the speed output for the NEO.
     public void setTargetPercent(double percent) {
         setTargetPercent(percent, 0);
     }
 
     /**
-     * Sets the target percent of voltage for the NEO.
-     * @param percent Percent of battery voltage
+     * Sets the target percent of speed output for the NEO.
+     * @param percent Percent of NEO output speed.
      * @param slot The PID slot.
      */
     public void setTargetPercent(double percent, int slot) {
