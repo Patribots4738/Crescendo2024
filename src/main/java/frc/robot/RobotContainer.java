@@ -2,7 +2,9 @@ package frc.robot;
 
 import java.util.Optional;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -48,7 +50,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
-        autoPathStorage = new AutoPathStorage(driver.b());
+        autoPathStorage = new AutoPathStorage(() -> true);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -120,15 +122,16 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return autoChooser.getSelected().repeatedly();
     }
 
     @Log.NT
     public static SendableChooser<Command> autoChooser = new SendableChooser<>();
+    PathPlannerPath starting = PathPlannerPath.fromChoreoTrajectory("S W3-1S C1");
     private void setupAutoChooser() {
         // TODO: Autos currently start at C1-5, we need to integrate the other paths
         // with the center line schenanigans to make full autos
-        autoChooser.addOption("C1-5", autoPathStorage.generateCenterLineComplete(5, 5, true));
+        autoChooser.addOption("C1-5", AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false)));
     }
 
     public void onDisabled() {}
