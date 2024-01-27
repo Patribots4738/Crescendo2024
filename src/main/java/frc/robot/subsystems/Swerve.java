@@ -144,12 +144,6 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public void logPositions() {
 
-        if (FieldConstants.IS_SIMULATION) {
-            for (MAXSwerveModule mod : swerveModules) {
-                mod.tick();
-            }
-        }
-
         swerveMeasuredStates = new SwerveModuleState[] {
             frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
         };

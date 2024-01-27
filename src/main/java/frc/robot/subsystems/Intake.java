@@ -26,17 +26,6 @@ public class Intake extends SubsystemBase {
         intake.setBrakeMode();
     }
 
-    public void tick() {
-        intake.tick();
-    }
-
-    @Override
-    public void periodic() {
-        if (FieldConstants.IS_SIMULATION) {
-            tick();
-        }
-    }
-
     public Command inCommand() {
         return runOnce(() -> intake.set(IntakeConstants.INTAKE_SPEED));
     }

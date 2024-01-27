@@ -46,18 +46,6 @@ public class Shooter extends SubsystemBase {
 
     }
 
-    public void tick() {
-        motorLeft.tick();
-        motorRight.tick();
-    }
-
-    @Override
-    public void periodic() {
-        if (FieldConstants.IS_SIMULATION) {
-            tick();
-        }
-    }
-
     public Command shoot(Pose2d position, boolean shootingAtSpeaker) {
         SpeedAnglePair pair = calculateSpeed(position, shootingAtSpeaker);
         return runOnce(() -> motorLeft.setTargetPercent(1));
