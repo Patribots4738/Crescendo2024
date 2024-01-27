@@ -310,9 +310,9 @@ public class Neo extends CANSparkMax {
     public enum StatusFrame {
         APPLIED_FAULTS_FOLLOWER(PeriodicFrame.kStatus0, 10),
         VELO_TEMP_VOLTAGE_CURRENT(PeriodicFrame.kStatus1, 20),
-        POSITION(PeriodicFrame.kStatus2, 20),
-        ANALOG_VOLTAGE_VELO_POS(PeriodicFrame.kStatus3, 50),
-        ALTERNATE_VELO_POS(PeriodicFrame.kStatus4, 20),
+        ENCODER_POSITION(PeriodicFrame.kStatus2, 20),
+        ALL_ANALOG_ENCODER(PeriodicFrame.kStatus3, 50),
+        ALL_ALTERNATE_ENCODER(PeriodicFrame.kStatus4, 20),
         ABSOLUTE_ENCODER_POS(PeriodicFrame.kStatus5, 200),
         ABSOLUTE_ENCODER_VELO(PeriodicFrame.kStatus6, 200);
 
@@ -346,31 +346,55 @@ public class Neo extends CANSparkMax {
         this.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
-    public enum NeoType {
+    public enum TelemtryPreference {
         ABSOLUTE_ENCODER,
         RELATIVE_ENCODER,
         NO_TELEMETRY,
         NO_ENCODER
     }
+    
+    /**
+     * Set the telemetry preference of the Neo
+     * This will disable the telemtry status frames 
+     * which is found at https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
+     * @param type the enum to represent the telemetry preference
+     *             this will tell the motor to only send 
+     *             that type of telemtry
+     */
+    public void setTelemetryPreference(TelemtryPreference type) {
+        final int maxDelay = NeoMotorConstants.MAX_PERIODIC_STATUS_TIME_MS;
+        final int minDelay = NeoMotorConstants.FAST_PERIODIC_STATUS_TIME_MS;
 
-    public void setType(NeoType type) {
+        // No matter what preference, we don't use analog or external encoders.
+        changeStatusFrame(StatusFrame.ALL_ALTERNATE_ENCODER, maxDelay);
+        changeStatusFrame(StatusFrame.ALL_ANALOG_ENCODER, maxDelay);
+
         switch(type) {
-            
+            // Disable all telemetry that is unrelated to the encoder
             case NO_ENCODER: 
-                this.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-                this.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-            break;
-            
+                changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
+                changeStatusFrame(StatusFrame.ALL_ANALOG_ENCODER, maxDelay);
+                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
+                break;
+            // Disable all telemetry that is unrelated to absolute encoders
             case ABSOLUTE_ENCODER:
-                this.
-                this.
-            break;
-
+                changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, maxDelay);
+                changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
+                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, minDelay);
+                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, minDelay);
+                break;
+            // Disable all telemetry that is unrelated to the relative encoder
             case RELATIVE_ENCODER: 
-            break;
-
+                changeStatusFrame(StatusFrame.ALL_ANALOG_ENCODER, maxDelay);
+                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
+                break;
+            // Disable everything
             case NO_TELEMETRY:
-            break;
+                changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, maxDelay);
+                changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
+                changeStatusFrame(StatusFrame.ALL_ANALOG_ENCODER, maxDelay);
+                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
+                break;
         }
     }
 }

@@ -262,6 +262,9 @@ public final class Constants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
+        public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
+        public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
+
         public static ArrayList<CANSparkBase> motors = new ArrayList<>();
     }
 
