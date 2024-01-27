@@ -347,8 +347,8 @@ public class Neo extends CANSparkMax {
     }
 
     public enum TelemtryPreference {
-        ABSOLUTE_ENCODER,
-        RELATIVE_ENCODER,
+        ONLY_ABSOLUTE_ENCODER,
+        ONLY_RELATIVE_ENCODER,
         NO_TELEMETRY,
         NO_ENCODER
     }
@@ -377,14 +377,14 @@ public class Neo extends CANSparkMax {
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
                 break;
             // Disable all telemetry that is unrelated to absolute encoders
-            case ABSOLUTE_ENCODER:
+            case ONLY_ABSOLUTE_ENCODER:
                 changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, maxDelay);
                 changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, minDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, minDelay);
                 break;
             // Disable all telemetry that is unrelated to the relative encoder
-            case RELATIVE_ENCODER: 
+            case ONLY_RELATIVE_ENCODER: 
                 changeStatusFrame(StatusFrame.ALL_ANALOG_ENCODER, maxDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
                 break;
