@@ -25,6 +25,18 @@ public class Intake extends SubsystemBase {
         intake.setBrakeMode();
     }
 
+    public void tick() {
+        motorLeft.tick();
+        motorRight.tick();
+    }
+
+    @Override
+    public void periodic() {
+        if (IntakeConstants.IS_SIMULATION) {
+            tick();
+        }
+    }
+
     public Command inCommand() {
         return runOnce(() -> intake.set(IntakeConstants.INTAKE_SPEED));
     }

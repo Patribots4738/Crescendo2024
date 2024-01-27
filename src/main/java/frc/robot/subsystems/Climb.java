@@ -24,6 +24,18 @@ public class Climb extends SubsystemBase implements Logged {
         rightMotor.setIdleMode(IdleMode.kBrake);
     }    
 
+    public void tick() {
+        leftMotor.tick();
+        rightMotor.tick();
+    }
+
+    @Override
+    public void periodic() {
+        if (ClimbConstants.IS_SIMULATION) {
+            tick();
+        }
+    }
+
     public void setPosition(double pos1, double pos2) {
         leftMotor.setPosition(pos1);
         rightMotor.setPosition(pos2);
