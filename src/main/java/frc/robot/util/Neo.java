@@ -345,4 +345,32 @@ public class Neo extends CANSparkMax {
     public void setCoastMode() {
         this.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
+
+    public enum NeoType {
+        ABSOLUTE_ENCODER,
+        RELATIVE_ENCODER,
+        NO_TELEMETRY,
+        NO_ENCODER
+    }
+
+    public void setType(NeoType type) {
+        switch(type) {
+            
+            case NO_ENCODER: 
+                this.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+                this.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
+            break;
+            
+            case ABSOLUTE_ENCODER:
+                this.
+                this.
+            break;
+
+            case RELATIVE_ENCODER: 
+            break;
+
+            case NO_TELEMETRY:
+            break;
+        }
+    }
 }
