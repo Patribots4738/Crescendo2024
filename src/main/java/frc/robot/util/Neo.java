@@ -109,7 +109,7 @@ public class Neo extends CANSparkMax {
         if (percent == 0) {
             setVoltage(0);
         } else {
-            setTargetVelocity((Math.abs(percent * RobotController.getBatteryVoltage())));
+            pidController.setReference(percent, ControlType.kDutyCycle);
         }
         targetPercent = percent;
         controlType = ControlLoopType.PERCENT;

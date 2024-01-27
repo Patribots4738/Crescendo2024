@@ -55,8 +55,7 @@ public class Shooter extends SubsystemBase {
         SpeedAnglePair pair = calculateSpeed(position, shootingAtSpeaker);
         return runOnce(() -> motorLeft.setTargetPercent(1));
     }
-     //TODO: ask how line 54-56 will translate to a percent
-    //TODO: change terget velocity to target percent
+    //TODO: change target velocity to target percent
     public Command stop() {
         return runOnce(() -> motorLeft.setTargetPercent(0));
     }
