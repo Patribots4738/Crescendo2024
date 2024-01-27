@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
 
-public class MAXSwerveModule extends Flex{
+public class MAXSwerveModule {
     private final Neo drivingSpark;
     private final Neo turningSpark;
 

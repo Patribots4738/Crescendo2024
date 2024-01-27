@@ -30,7 +30,6 @@ public class Neo extends CANSparkMax {
     private double targetVelocity = 0;
     private double targetPercent = 0;
     
-    private boolean isFlex;
     /**
      * Creates a new Neo motor
      * @param id CANID of the SparkMax the Neo is connected to.

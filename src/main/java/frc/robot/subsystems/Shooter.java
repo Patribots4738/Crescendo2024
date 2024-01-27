@@ -46,9 +46,16 @@ public class Shooter extends SubsystemBase {
 
     }
 
+    public void tick() {
+        motorLeft.tick();
+        motorRight.tick();
+    }
+
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
+        if (FieldConstants.IS_SIMULATION) {
+            tick();
+        }
     }
 
     public Command shoot(Pose2d position, boolean shootingAtSpeaker) {
