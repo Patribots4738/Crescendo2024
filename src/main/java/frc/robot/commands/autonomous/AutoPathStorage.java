@@ -23,17 +23,22 @@ import java.util.function.BooleanSupplier;
  */
 public class AutoPathStorage {
 
-    // This suplier is used to determine whether or not the robot has a piece
-    // Could be a sensor, motor current, or something else
     private final BooleanSupplier hasPieceSupplier;
     private final Map<String, PathPlannerPath> pathCache = new HashMap<>();
 
+    /**
+     * Creates a new AutoPathStorage object.
+     * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
+     *                         This could be a sensor, motor current, or other system.
+     */
     public AutoPathStorage(BooleanSupplier hasPieceSupplier) {
         this.hasPieceSupplier = hasPieceSupplier;
         preloadPaths();
     }
 
     private void preloadPaths() {
+        // To keep the code clean, this for loop goes through 
+        // All of C1-5, C5-1, C1-5S, and C5-1S
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
 
             int shootingIndex = (i * 2);
