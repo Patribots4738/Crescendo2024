@@ -264,8 +264,8 @@ public final class Constants {
 
         public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
-
-        public static ArrayList<CANSparkBase> motors = new ArrayList<>();
+      
+        public static ArrayList<Neo> motors = new ArrayList<>();
     }
 
     public static final class IntakeConstants {

@@ -126,7 +126,7 @@ public class Neo extends CANSparkMax {
      * @param velocity Velocity to set the Neo to in rotations per minute.
      */
     public void setTargetVelocity(double velocity) {
-        setTargetVelocity(velocity, 0, 0);
+        setTargetVelocity(velocity, 0);
     }
 
     /**
@@ -134,7 +134,7 @@ public class Neo extends CANSparkMax {
      * @param velocity Velocity to set the Neo to in rotations per minute.
      * @param arbitraryFeedForward Arbitrary feed forward to add to the motor output.
      */
-    public void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
+    public void setTargetVelocity(double velocity, int slot) {
         velocity *= reversedMultiplier;
         if (velocity == 0) {
             setVoltage(0);
