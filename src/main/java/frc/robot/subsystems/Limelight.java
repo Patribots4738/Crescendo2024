@@ -55,7 +55,7 @@ public class Limelight extends SubsystemBase {
         if (hasTarget(botPoseArray)) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(arrayToPose3d(botPoseArray));
+            return Optional.of(arrayToPose3d(botPoseArray));
         }
     }
 
@@ -76,7 +76,7 @@ public class Limelight extends SubsystemBase {
         if (hasTarget(botPoseArray)) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(
+            return Optional.of(
                     new Pose2d(new Translation2d(botPoseArray[0], botPoseArray[1]), new Rotation2d(botPoseArray[5])));
         }
     }

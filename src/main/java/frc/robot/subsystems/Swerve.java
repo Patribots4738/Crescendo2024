@@ -116,12 +116,12 @@ public class Swerve extends SubsystemBase implements Logged {
         AutoBuilder.configureHolonomic(
                 this::getPose,
                 this::resetOdometry,
-                this::getRobotRelativeSpeeds,
+                this::getRobotRelativeVelocity,
                 this::drive,
                 AutoConstants.HPFC,
                 () -> {
                     Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-                    return alliance.isPresent() && alliance.get() == Alliance.Red;
+                    return alliance.isPresent() && alliance.get().equals(Alliance.Red);
                 },
                 this);
 
@@ -202,8 +202,8 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
 
-        xSpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        ySpeed *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+        xSpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+        ySpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
         rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * speedMultiplier);
 
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
@@ -216,8 +216,12 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(swerveModuleStates);
     }
 
-    public ChassisSpeeds getRobotRelativeSpeeds() {
+    public ChassisSpeeds getRobotRelativeVelocity() {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
+    }
+
+    public ChassisSpeeds getFieldRelativeVelocity() {
+        return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelativeVelocity(), getPose().getRotation());
     }
 
     /**
