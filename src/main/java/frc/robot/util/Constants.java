@@ -125,21 +125,20 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(10, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(15, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(20, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(25, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
+                put(5,  SpeedAngleTriplet.of(1000.0, 1200.0, 60.0));
+                put(10, SpeedAngleTriplet.of(1000.0, 1200.0, 60.0));
+                put(15, SpeedAngleTriplet.of(1000.0, 1200.0, 60.0));
+                put(20, SpeedAngleTriplet.of(1000.0, 1200.0, 60.0));
+                put(25, SpeedAngleTriplet.of(1000.0, 1200.0, 60.0));
             }
         };
 
-        public static InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<Double, SpeedAngleTriplet>(
+        public static final InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(),
                 SpeedAngleTriplet.getInterpolator()) {
             {
-                for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP
-                        .entrySet()) {
-                    INTERPOLATION_MAP.put(entry.getKey().doubleValue(), entry.getValue());
+                for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
+                    put(entry.getKey().doubleValue(), entry.getValue());
                 }
             }
         };
@@ -400,21 +399,21 @@ public final class Constants {
 
         // Speaker Positions: Blue alliance left
         // @formatter:off
-                //
-                //  0             1
-                //
-                //
-                // @formatter:on
-        public static Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
+        //
+        //  0             1
+        //
+        //
+        // @formatter:on
+        private static final Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Speaker
-                new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)),
+                new Pose2d(0, 5.547, Rotation2d.fromDegrees(180)),
                 // Red Speaker
                 new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(180)),
         };
 
-        public static Pose2d[] AMP_POSITIONS = new Pose2d[] {
+        private static final Pose2d[] AMP_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Speaker
@@ -422,6 +421,14 @@ public final class Constants {
                 // Red Speaker
                 new Pose2d(14.706, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
         };
+
+        public static Pose2d GET_SPEAKER_POSITION() {
+            return SPEAKER_POSITIONS[ALLIANCE.isPresent() && ALLIANCE.get().equals(Alliance.Red) ? 1 : 0];
+        } 
+
+        public static Pose2d GET_AMP_POSITION() {
+            return AMP_POSITIONS[ALLIANCE.isPresent() && ALLIANCE.get().equals(Alliance.Red) ? 1 : 0];
+        }
 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
