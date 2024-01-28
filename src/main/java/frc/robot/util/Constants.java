@@ -345,9 +345,9 @@ public final class Constants {
         public static Pose2d[] AMP_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
-                // Blue Speaker
+                // Blue Amp
                 new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
-                // Red Speaker
+                // Red Amp
                 new Pose2d(14.706, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
         };
 
