@@ -28,10 +28,10 @@ ___
 
 ## Major Package Functions
   - [`robot/subsystems`](src/main/java/frc/robot/subsystems)
-   - Contains all subsystems used in the robot, such as [`Intake.java`](src/main/java/frc/robot/subsystems/Intake.java) which can detect if we have a game piece, and [`Climber.java`](src/main/java/frc/robot/subsystems/Climber.java) which can conform to the chain to keep the robot level.
+    - Contains all subsystems used in the robot, such as [`Intake.java`](src/main/java/frc/robot/subsystems/Intake.java) which can detect if we have a game piece, and [`Climber.java`](src/main/java/frc/robot/subsystems/Climber.java) which can conform to the chain to keep the robot level.
 
    - [`robot/commands`](src/main/java/frc/robot/commands)
-   -  Contains all the commands that control the robot.
+     -  Contains all the commands that control the robot.
  
   - [`robot/util`](src/main/java/frc/robot/util)
 
