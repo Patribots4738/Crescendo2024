@@ -71,11 +71,13 @@ public class ShooterCalc implements Logged {
         currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
         robotPoseAngled = new Pose2d(robotPose.getTranslation(), currentAngleToSpeaker);
 
-        Translation2d velocityTranslation = new Translation2d( 
+        Translation2d velocityTranslation = new Translation2d(
                 Math.cos(currentAngleToSpeaker.getRadians())
                         * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()),
-                Math.signum(robotVelocity.vyMetersPerSecond) * Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond) - Math.sin(currentAngleToSpeaker.getRadians())
-                        * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()));
+                Math.signum(robotVelocity.vyMetersPerSecond)
+                        * Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond)
+                        - Math.sin(currentAngleToSpeaker.getRadians())
+                                * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()));
 
         double desiredMPSForNote = Math.hypot(velocityTranslation.getX(), velocityTranslation.getY());
 
