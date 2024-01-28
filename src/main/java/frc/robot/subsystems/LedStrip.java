@@ -19,16 +19,6 @@ public class LedStrip extends SubsystemBase {
 
     private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;
-    public static final HashMap<Integer, Command> patternMap = new HashMap<>() {{
-        put(0, "OFF");
-        put(1, "GREENNGOLD");
-        put(2, "CIRCUS");
-        put(3, "LOADING");
-        put(4, "LPI");
-        put(5, "BLUE_ALLIANCE");
-        put(6, "RED_ALLIANCE");
-        put(7, "FLASH");
-    }};
 
     private int currentPatternIndex;
     private final Supplier<Pose2d> poseSupplier;
@@ -54,7 +44,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     private void runPattern(int index) {
-        String pattern = patternMap.get(index);
+        String pattern = LEDConstants.patternMap.get(index);
         switch (pattern) {
             case "OFF"       -> turnOff();
             case "GREENGOLD" -> greenNGold();
@@ -72,7 +62,7 @@ public class LedStrip extends SubsystemBase {
 
     public void incrementPatternIndex() {
         currentPatternIndex ++;
-        currentPatternIndex %= patternMap.size();
+        currentPatternIndex %= LEDConstants.patternMap.size();
     }
 
     public int getCurrentPattern() {

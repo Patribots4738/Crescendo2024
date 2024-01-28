@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 
 /**
@@ -272,6 +273,16 @@ public final class Constants {
             new Pose2d(3, 3, new Rotation2d(Units.degreesToRadians(160))),
         };
 
+        public static final HashMap<Integer, Command> patternMap = new HashMap<>() {{
+            put(0, "OFF");
+            put(1, "GREENNGOLD");
+            put(2, "CIRCUS");
+            put(3, "LOADING");
+            put(4, "LPI");
+            put(5, "BLUE_ALLIANCE");
+            put(6, "RED_ALLIANCE");
+            put(7, "FLASH");
+        }};
     }
 
     public static final class NeoMotorConstants {
