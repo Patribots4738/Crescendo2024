@@ -22,9 +22,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
+import frc.robot.subsystems.LedStrip;
 
 /**
  * Welcome to the home of the many many variables :D
@@ -272,18 +275,30 @@ public final class Constants {
             new Pose2d(2, 2, new Rotation2d()),
             new Pose2d(3, 3, new Rotation2d(Units.degreesToRadians(160))),
         };
+        public static final Integer patternMap = null;
 
-        public static final HashMap<Integer, Command> patternMap = new HashMap<>() {{
-            put(0, "OFF");
-            put(1, "GREENNGOLD");
-            put(2, "CIRCUS");
-            put(3, "LOADING");
-            put(4, "LPI");
-            put(5, "BLUE_ALLIANCE");
-            put(6, "RED_ALLIANCE");
-            put(7, "FLASH");
-        }};
-    }
+        // public static int LED_RED = (0, 255, 255);
+        // public static int LED_ORANGE = (30, 255, 255);
+        // public static int LED_GOLD = (0, 255, 255);
+        // public static int LED_GREEN = (0, 255, 255);
+        // public static int LED_BLUE = (0, 255, 255);
+        // public static int LED_PURPLE = (285, 255, 255);
+        // public static int LED_WHITE = (0, 0, 0);
+        // public static int LED_VOID = (0, 0, 0);
+        // public static int LED_PINK = (0, 0, 0);
+
+
+        //public
+
+    //    public final HashMap<Integer, Commands> patternMap = new HashMap<>() {
+    //         patternMap.put(0, Commands.runOnce(() -> turnOff()));
+    //         patternMap.put(1, Commands.runOnce(() -> greenNGold()));
+    //         patternMap.put(2, Commands.runOnce(() -> circus()));
+    //         patternMap.put(3, Commands.runOnce(() -> loading()));
+    //         patternMap.put(4, Commands.runOnce(() -> LPI(poseSupplier.get())));
+    //         patternMap.put(5, Commands.runOnce(() -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)))));
+    //         patternMap.put(6, Commands.runOnce(() -> FLASH()));
+        };
 
     public static final class NeoMotorConstants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;

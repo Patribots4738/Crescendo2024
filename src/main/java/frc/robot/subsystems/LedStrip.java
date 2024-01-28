@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.LEDConstants;
 
@@ -22,6 +23,8 @@ public class LedStrip extends SubsystemBase {
 
     private int currentPatternIndex;
     private final Supplier<Pose2d> poseSupplier;
+
+    public final HashMap<Integer, Command> patternMap = new HashMap<>();
     
     public LedStrip(Supplier<Pose2d> poseSupplier) {
         this.poseSupplier = poseSupplier;
@@ -35,26 +38,27 @@ public class LedStrip extends SubsystemBase {
 
         configureLED();
 
-        greenNGold();
+        patternMap.put(0, Commands.runOnce(() -> turnOff()));
+            patternMap.put(1, Commands.runOnce(() -> greenNGold()));
+            patternMap.put(2, Commands.runOnce(() -> circus()));
+            patternMap.put(3, Commands.runOnce(() -> loading()));
+            patternMap.put(4, Commands.runOnce(() -> LPI(poseSupplier.get())));
+            patternMap.put(5, Commands.runOnce(() -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)))));
+            patternMap.put(6, Commands.runOnce(() -> flash()));
     }
 
-    @Override
-    public void periodic() {
-        runPattern(currentPatternIndex);
-    }
-
-    private void runPattern(int index) {
-        String pattern = LEDConstants.patternMap.get(index);
-        switch (pattern) {
-            case "OFF"       -> turnOff();
-            case "GREENGOLD" -> greenNGold();
-            case "CiRCUS"    -> circus();
-            case "LOADING"   -> loading();
-            case "LPI"       -> LPI(poseSupplier.get());
-            case "ALLIANCE"  -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
-            case "FLASH"     -> flash();
+   private void runPattern(int index) {
+        switch (currentPatternIndex) {
+            case (0) -> turnOff();
+            case (1) -> greenNGold();
+            case (2) -> circus();
+            case (3) -> loading();
+            case (4) -> LPI(poseSupplier.get());
+            case (5) -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
+            case (6) -> flash();
         }
     }
+    
 
     public void setCurrentPattern(int index) {
         this.currentPatternIndex = index;
@@ -62,7 +66,7 @@ public class LedStrip extends SubsystemBase {
 
     public void incrementPatternIndex() {
         currentPatternIndex ++;
-        currentPatternIndex %= LEDConstants.patternMap.size();
+        currentPatternIndex %= patternMap.size();
     }
 
     public int getCurrentPattern() {
@@ -143,8 +147,11 @@ public class LedStrip extends SubsystemBase {
 
     public void LPI (Pose2d currentRobotPosition) {
         // Loop through all of the startingPositions in the array
+        //closest position is point B
+        //current position in point A
         Pose2d closestPosition = new Pose2d();
-        
+
+
         double closestDistance = getDistance(currentRobotPosition, closestPosition);
         
         for (Pose2d startingPosition : LEDConstants.startingPositions) {
@@ -152,18 +159,24 @@ public class LedStrip extends SubsystemBase {
             double currentDistance = getDistance(currentRobotPosition, startingPosition);
             
             if (currentDistance < closestDistance) {
-                closestPosition = startingPosition;
-                closestDistance = currentDistance;
+                closestPosition = startingPosition; 
+                closestDistance = currentDistance; 
             }
+   } 
         }
         // Find the color to represent our distance
-
         // Set our leds to that color using interpolate()
-    }
 
-    private double getDistance(Pose2d pointA, Pose2d pointB) { 
-        return pointA.relativeTo(pointB).getTranslation().getNorm();
-    }
+   
+      private double getDistance(Pose2d currentRobotPosition, Pose2d closestPosition) { 
+        return currentRobotPosition.relativeTo(closestPosition).getTranslation().getNorm(); 
+        } 
+   
+
+    // private double getDistance(Pose2d currentRobotPosition, Pose2d closestPosition) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'getDistance'");
+    //} **ask creator what this is**
 
     /**
      * Interpolate between two colors
