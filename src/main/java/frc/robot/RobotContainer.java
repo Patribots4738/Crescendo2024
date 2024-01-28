@@ -13,7 +13,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
+import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.shooter.Pivot;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
@@ -36,6 +39,10 @@ public class RobotContainer implements Logged {
     private final Climb climb;
     private Indexer triggerWheel;
 
+    private Shooter shooter;
+    private Pivot pivot;
+    private ShooterCalc shooterCalc;
+
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
@@ -47,6 +54,9 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         driverUI = new DriverUI();
         triggerWheel = new Indexer();
+        shooter = new Shooter();
+        pivot = new Pivot();
+        shooterCalc = new ShooterCalc(shooter, pivot);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -69,8 +79,7 @@ public class RobotContainer implements Logged {
                 driver::getLeftX,
                 () -> -driver.getRightX(),
                 () -> !driver.leftBumper().getAsBoolean(),
-                () -> (driver.leftBumper().getAsBoolean()
-                        && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))));
+                () -> ((FieldConstants.ALLIANCE.isPresent() && FieldConstants.ALLIANCE.get().equals(Alliance.Red)))));
 
         incinerateMotors();
         configureButtonBindings();
@@ -138,4 +147,7 @@ public class RobotContainer implements Logged {
         Timer.delay(0.25);
     }
 
+    public void logPeriodicThing() {
+        shooterCalc.calculateAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity());
+    }
 }

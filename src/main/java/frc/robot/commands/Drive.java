@@ -63,7 +63,7 @@ public class Drive extends Command {
     public void execute() {
         double x = xSupplier.getAsDouble();
         double y = ySupplier.getAsDouble();
-        if (shouldMirror.getAsBoolean()) {
+        if (shouldMirror.getAsBoolean() || !fieldRelativeSupplier.getAsBoolean()) {
             x *= -1;
             y *= -1;
         }
