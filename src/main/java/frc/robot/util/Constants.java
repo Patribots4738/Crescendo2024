@@ -277,6 +277,10 @@ public final class Constants {
         };
         public static final Integer patternMap = null;
 
+        public static final double OUTER_ZONE = 2.262;
+        public static final double INNER_ZONE = 1.131;
+        public static final double RIN_STAR_BIN = 0.1;
+
         // public static int LED_RED = (0, 255, 255);
         // public static int LED_ORANGE = (30, 255, 255);
         // public static int LED_GOLD = (0, 255, 255);

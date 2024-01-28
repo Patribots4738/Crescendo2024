@@ -161,39 +161,36 @@ public class LedStrip extends SubsystemBase {
             if (currentDistance < closestDistance) {
                 closestPosition = startingPosition; 
                 closestDistance = currentDistance; 
-            }
-   } 
+                }
+            } 
         }
         // Find the color to represent our distance
         // Set our leds to that color using interpolate()
-
    
       private double getDistance(Pose2d currentRobotPosition, Pose2d closestPosition) { 
         return currentRobotPosition.relativeTo(closestPosition).getTranslation().getNorm(); 
-        } 
-   
+      }
+    
+      //https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
+      private void setZone() { 
 
-    // private double getDistance(Pose2d currentRobotPosition, Pose2d closestPosition) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'getDistance'");
-    //} **ask creator what this is**
-
-    /**
-     * Interpolate between two colors
-     * 
-     * @param color1 The first color
-     * @param color2 The second color
-     * @param t      The interpolation t (0, 1)
-     */
-    private static Color interpolate(Color color1, Color color2, double t) {
-        if (t > 1d) {
-            t = 1d;
-        } else if (t < 0d) {
-            t = 0d;
+    if (this.getDistance(null, null) > LEDConstants.OUTER_ZONE) {
+        turnOff();
+        } else if (this.getDistance(null, null) > LEDConstants.INNER_ZONE && this.getDistance(null, null) < LEDConstants.OUTER_ZONE) {
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+                ledBuffer.setHSV(i, 255, 0, 0); //red
+            }
+        } else if (this.getDistance(null, null) > LEDConstants.RIN_STAR_BIN && this.getDistance(null, null) < LEDConstants.INNER_ZONE) {
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+                
+                ledBuffer.setHSV(i, 60, 100, 100); //yellow
+            }
+        } else if (this.getDistance(null, null) < LEDConstants.RIN_STAR_BIN) {
+                
+            for (int i = 0; i < ledBuffer.getLength(); i++) { 
+                ledBuffer.setHSV(i, 120, 100, 100); //green
+            }
         }
-        int red = (int) (color1.red * (1 - t) + color2.red * t);
-        int green = (int) (color1.green * (1 - t) + color2.green * t);
-        int blue = (int) (color1.blue * (1 - t) + color2.blue * t);
-        return new Color(red, green, blue);
-    }
+      }
+
 }
