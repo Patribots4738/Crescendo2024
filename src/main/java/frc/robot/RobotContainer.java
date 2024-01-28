@@ -129,7 +129,7 @@ public class RobotContainer implements Logged {
 
     private void configureLedBindeing() {
 
-        driver.b().onTrue(Leds.changled());
+        driver.b().onTrue(Leds.changeled());
     }
 
     public Command getAutonomousCommand() {

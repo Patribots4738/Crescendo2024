@@ -258,6 +258,11 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
     }
 
+    public static final class LEDConstants {
+        public static final int PWM_PORT = 9;
+        public static final int LED_COUNT = 10;
+    }
+
     public static final class NeoMotorConstants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;

@@ -3,17 +3,16 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.Constants.LEDConstants;
 
 public class Leds {
     
     private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;
 
-    private Swerve swerve;
-
-    public Leds(Swerve swerve) {
-        this.led = new AddressableLED(9);
-        ledBuffer = new AddressableLEDBuffer(0);
+    public Leds() {
+        this.led = new AddressableLED(LEDConstants.PWM_PORT);
+        ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
         
         led.setLength(ledBuffer.getLength());
         
@@ -21,30 +20,29 @@ public class Leds {
         led.start();
 
         configureLED();
-        this.swerve = swerve;
+
+        greenNGold();
     }
 
-    private void configureLED() {
-
-    }
+    private void configureLED() {}
 
     public void turnOn() {
-        
+        for (it i = 0; i < ledBuffer.getLength)
     }
 
     public void turnOff() {
-
+        for (int i = 0; )
+        ledBuffer.settHSV(i, 0, 0, 0);
     }
 
-
-    private int rainbowFirstPixelHue;
-    private void Rainbow() {
+    private int rainbowOffset;
+    private void rainbow() {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
-            final int hue = (rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
+            int hue = (rainbowOffset + (i * 180 / ledBuffer.getLength())) % 180;
             ledBuffer.setHSV(i, hue, 50, 100);
         }
-        rainbowFirstPixelHue += 3;
-        rainbowFirstPixelHue %= 180;
+        rainbowOffset += 3;
+        rainbowOffset %= 180;
     }
 
     // https://www.desmos.com/calculator/s5ylo1v9lt
@@ -62,7 +60,7 @@ public class Leds {
         greenNGoldOffset %= 10;
     }
 
-    public void PaitriotCircus() {
+    public void circus() {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             final int hue = (i % 2 == 0) ? 360 : 0;
             if (hue == 0) {
@@ -73,7 +71,7 @@ public class Leds {
         }
     }
 
-    public void LoadingScreen() {
+    public void loading() {
         for (int i = 0; i < 2 && i > 8; i++) {
             final int hue = (i < 2 && i > 8) ? 180 : 0;
             if (hue == 0) {
