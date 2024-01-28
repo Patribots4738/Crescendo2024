@@ -1,20 +1,24 @@
 package frc.robot.commands;
 
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 import frc.robot.util.SpeedAngleTriplet;
 
-public class ShooterCalc {
+public class ShooterCalc implements Logged {
 
     private Pivot pivot;
     private Shooter shooter;
@@ -44,6 +48,48 @@ public class ShooterCalc {
 
         return pivot.setAngleCommand(triplet.getAngle())
                 .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
+    }
+
+    @Log.NT
+    Rotation2d currentAngleToSpeaker;
+    @Log.NT
+    Pose2d robotPoseAngled;
+    @Log.NT
+    Pose2d robotPoseSurely;
+
+    /**
+     * Calculates the angle to the speaker based on the robot's pose and velocity.
+     * This is to shoot while driving, but would also work while stationary.
+     * 
+     * @param robotPose     The current pose of the robot.
+     * @param robotVelocity The velocity of the robot.
+     * 
+     * @return              The angle to the speaker in the form of a Rotation2d object.
+     */
+    public Rotation2d calculateSWDAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+        currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
+        robotPoseAngled = new Pose2d(robotPose.getTranslation(), currentAngleToSpeaker);
+
+        Translation2d velocityTranslation = new Translation2d( 
+                Math.cos(currentAngleToSpeaker.getRadians())
+                        * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()),
+                Math.signum(robotVelocity.vyMetersPerSecond) * Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond) - Math.sin(currentAngleToSpeaker.getRadians())
+                        * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()));
+
+        double desiredMPSForNote = Math.hypot(velocityTranslation.getX(), velocityTranslation.getY());
+
+        robotPoseSurely = new Pose2d(robotPose.getTranslation(), new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY()).unaryMinus());
+
+        return new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY());
+    }
+
+    public double rpmToVelocity(Pair<Double, Double> speeds) {
+        return 12;
+    }
+
+    public double velocityToRPM(double velocity) {
+        return 1;
     }
 
     /**
@@ -164,15 +210,11 @@ public class ShooterCalc {
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
     // known required speeds and angles for certain poses
     private SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
-        // Constants have blue alliance positions at index 0
-        // and red alliance positions at index 1
-        int positionIndex = FieldConstants.ALLIANCE == Optional.ofNullable(Alliance.Blue) ? 0 : 1;
-
         // Get our position relative to the desired field element
         if (shootingAtSpeaker) {
-            robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
+            robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
         } else {
-            robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
+            robotPose.relativeTo(FieldConstants.GET_AMP_POSITION());
         }
 
         // Use the distance as our key for interpolation

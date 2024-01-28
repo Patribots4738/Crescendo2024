@@ -148,6 +148,6 @@ public class RobotContainer implements Logged {
     }
 
     public void logPeriodicThing() {
-        shooterCalc.calculateAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity());
+        shooterCalc.calculateSWDAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity());
     }
 }
