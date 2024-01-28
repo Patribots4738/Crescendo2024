@@ -125,5 +125,7 @@ public class Robot extends TimedRobot {
     @Override
     public void simulationPeriodic() {
         REVPhysicsSim.getInstance().run();
+        FieldConstants.ALLIANCE = DriverStation.getAlliance();
+        robotContainer.logPeriodicThing();
     }
 }
