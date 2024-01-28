@@ -28,6 +28,7 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     @SuppressWarnings("unused")
     private final PatriBoxController operator;
+    private final PatriBoxController ledController;
 
     private final Swerve swerve;
     private final Intake intake;
@@ -43,6 +44,7 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
+        ledController = new PatriBoxController(3, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
 
         limelight = new Limelight();
@@ -89,6 +91,7 @@ public class RobotContainer implements Logged {
     private void configureButtonBindings(){
         configureDriverBindings();
         configureOperatorBindings();
+        configureLedBindeing();
     }
 
     private void configureOperatorBindings() {
@@ -122,6 +125,11 @@ public class RobotContainer implements Logged {
 
         driver.x().onTrue(intake.stopCommand());
 
+    }
+
+    private void configureLedBindeing() {
+
+        driver.b().onTrue(Leds.changled());
     }
 
     public Command getAutonomousCommand() {

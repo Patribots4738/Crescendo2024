@@ -36,8 +36,9 @@ public class Leds {
 
     }
 
+
     private int rainbowFirstPixelHue;
-    private void rainbow() {
+    private void Rainbow() {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             final int hue = (rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
             ledBuffer.setHSV(i, hue, 50, 100);
@@ -60,4 +61,27 @@ public class Leds {
         greenNGoldOffset += 1;
         greenNGoldOffset %= 10;
     }
+
+    public void PaitriotCircus() {
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            final int hue = (i % 2 == 0) ? 360 : 0;
+            if (hue == 0) {
+                ledBuffer.setHSV(i, 360, 0, 255);
+            } else {
+            ledBuffer.setHSV(i, hue, 255, 255);
+            }
+        }
+    }
+
+    public void LoadingScreen() {
+        for (int i = 0; i < 2 && i > 8; i++) {
+            final int hue = (i < 2 && i > 8) ? 180 : 0;
+            if (hue == 0) {
+                ledBuffer.setHSV(i, 0, 0, 0);
+            } else {
+                ledBuffer.setHSV(i, hue, 255, 255);
+            }
+        }
+    }
 }
+
