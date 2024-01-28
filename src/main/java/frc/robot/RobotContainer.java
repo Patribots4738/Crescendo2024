@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.*;
-import frc.robot.util.Leds;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
@@ -28,7 +27,7 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     @SuppressWarnings("unused")
     private final PatriBoxController operator;
-    private final PatriBoxController ledController;
+    private final PatriBoxController ledXboxController;
 
     private final Swerve swerve;
     private final Intake intake;
@@ -36,7 +35,7 @@ public class RobotContainer implements Logged {
     private final DriverUI driverUI;
     private final Limelight limelight;
 
-    private final Leds leds;
+    private final LedStrip ledStrip;
 
     private final Climb climb;
     
@@ -44,7 +43,7 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
-        ledController = new PatriBoxController(3, OIConstants.OPERATOR_DEADBAND);
+        ledXboxController = new PatriBoxController(3, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
 
         limelight = new Limelight();
@@ -52,7 +51,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
-        leds = new Leds(swerve);
+        ledStrip = new LedStrip(swerve::getPose);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -128,8 +127,8 @@ public class RobotContainer implements Logged {
     }
 
     private void configureLedBindeing() {
-
-        driver.b().onTrue(Leds.changeled());
+        ledXboxController.b().onTrue(Commands.runOnce(() -> ledStrip.incrementPatternIndex()));
+    
     }
 
     public Command getAutonomousCommand() {
