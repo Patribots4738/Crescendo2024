@@ -36,7 +36,7 @@ public class AutoPathStorage {
         preloadPaths();
     }
 
-    private void preloadPaths() {
+    public void preloadPaths() {
         // To keep the code clean, this for loop goes through 
         // All of C1-5, C5-1, C1-5S, and C5-1S
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
