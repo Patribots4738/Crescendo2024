@@ -16,26 +16,21 @@ import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
 
 public class Elevator extends SubsystemBase {
-    private final Neo leftElevator;
-    private final Neo rightElevator;
+    private final Neo elevator;
+
 
     /** Creates a new Elevator. */
     public Elevator() {
-        leftElevator = new Neo(TrapConstants.LEFT_ELEVATOR_CAN_ID);
-        rightElevator = new Neo(TrapConstants.RIGHT_ELEVATOR_CAN_ID);
+        elevator = new Neo(TrapConstants.LEFT_ELEVATOR_CAN_ID);
         configMotors();
     }
 
     public void configMotors() {
-        leftElevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        leftElevator.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        leftElevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-        rightElevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        rightElevator.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        rightElevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-        leftElevator.addFollower(rightElevator, true);
-        leftElevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
-        leftElevator.setPID(
+        elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
+        elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+        elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
+        elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
+        elevator.setPID(
                 TrapConstants.TRAP_P,
                 TrapConstants.TRAP_I,
                 TrapConstants.TRAP_D,
@@ -48,18 +43,18 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getPosition() {
-        return leftElevator.getPosition();
+        return elevator.getPosition();
     }
 
     public BooleanSupplier isAtTargetPosition() {
         return () -> MathUtil.applyDeadband(
                 Math.abs(
-                        this.getPosition() - leftElevator.getTargetPosition()),
+                        this.getPosition() - elevator.getTargetPosition()),
                 TrapConstants.ELEVATOR_DEADBAND) == 0;
     }
 
     public void setPosition(double pos) {
-        leftElevator.setTargetPosition(pos);
+        elevator.setTargetPosition(pos);
     }
 
     public Command setPositionCommand(double pos) {
@@ -68,7 +63,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command stop() {
-        return runOnce(() -> leftElevator.stopMotor());
+        return runOnce(() -> elevator.stopMotor());
     }
 
 }
