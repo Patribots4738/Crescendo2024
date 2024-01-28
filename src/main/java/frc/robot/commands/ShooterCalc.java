@@ -78,7 +78,7 @@ public class ShooterCalc implements Logged {
                         * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()));
 
         double desiredMPSForNote = Math.hypot(velocityTranslation.getX(), velocityTranslation.getY());
-
+ 
         robotPoseSurely = new Pose2d(robotPose.getTranslation(), new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY()).unaryMinus());
 
         return new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY());
