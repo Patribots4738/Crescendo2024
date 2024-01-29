@@ -6,6 +6,9 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,6 +17,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.LEDConstants;
 
 public class LedStrip extends SubsystemBase {
@@ -42,7 +46,7 @@ public class LedStrip extends SubsystemBase {
             patternMap.put(1, Commands.runOnce(() -> greenNGold()));
             patternMap.put(2, Commands.runOnce(() -> circus()));
             patternMap.put(3, Commands.runOnce(() -> loading()));
-            patternMap.put(4, Commands.runOnce(() -> LPI(poseSupplier.get())));
+            patternMap.put(4, Commands.runOnce(() -> LPI(poseSupplier.get().getTranslation())));
             patternMap.put(5, Commands.runOnce(() -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)))));
             patternMap.put(6, Commands.runOnce(() -> flash()));
     }
@@ -53,7 +57,7 @@ public class LedStrip extends SubsystemBase {
             case (1) -> greenNGold();
             case (2) -> circus();
             case (3) -> loading();
-            case (4) -> LPI(poseSupplier.get());
+            case (4) -> LPI(poseSupplier.get().getTranslation());
             case (5) -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
             case (6) -> flash();
         }
@@ -145,52 +149,54 @@ public class LedStrip extends SubsystemBase {
         allianceOffset %= 10;
     }
 
-    public void LPI (Pose2d currentRobotPosition) {
+    public void LPI (Translation2d currentRobotPosition) {
         // Loop through all of the startingPositions in the array
         //closest position is point B
         //current position in point A
-        Pose2d closestPosition = new Pose2d();
+        Translation2d closestPosition = new Translation2d();
 
-
-        double closestDistance = getDistance(currentRobotPosition, closestPosition);
+        double closestDistance = currentRobotPosition.getDistance(closestPosition);
         
         for (Pose2d startingPosition : LEDConstants.startingPositions) {
             
-            double currentDistance = getDistance(currentRobotPosition, startingPosition);
+            double currentDistance = currentRobotPosition.getDistance(startingPosition.getTranslation());
             
             if (currentDistance < closestDistance) {
-                closestPosition = startingPosition; 
+                closestPosition = startingPosition.getTranslation(); 
                 closestDistance = currentDistance; 
-                }
-            } 
+            }
         }
-        // Find the color to represent our distance
-        // Set our leds to that color using interpolate()
-   
-      private double getDistance(Pose2d currentRobotPosition, Pose2d closestPosition) { 
-        return currentRobotPosition.relativeTo(closestPosition).getTranslation().getNorm(); 
-      }
+
+        setZone(closestDistance);
+    }
     
-      //https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
-      private void setZone() { 
+    // Find the color to represent our distance
+    // Set our leds to that color using interpolate()
+    
+    //https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
+    private void setZone(double distance) {
+        if (distance > LEDConstants.OUTER_ZONE) {
+            turnOff();
+        } else if (distance > LEDConstants.INNER_ZONE
+                && distance < LEDConstants.OUTER_ZONE) {
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+                ledBuffer.setHSV(i, 255, 0, 0); // red
+            }
+        } else if (distance > LEDConstants.RIN_STAR_BIN
+                && distance < LEDConstants.INNER_ZONE) {
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
 
-    if (this.getDistance(null, null) > LEDConstants.OUTER_ZONE) {
-        turnOff();
-        } else if (this.getDistance(null, null) > LEDConstants.INNER_ZONE && this.getDistance(null, null) < LEDConstants.OUTER_ZONE) {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                ledBuffer.setHSV(i, 255, 0, 0); //red
+                ledBuffer.setHSV(i, 60, 100, 100); // yellow
             }
-        } else if (this.getDistance(null, null) > LEDConstants.RIN_STAR_BIN && this.getDistance(null, null) < LEDConstants.INNER_ZONE) {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
+        } else if (distance < LEDConstants.RIN_STAR_BIN) {
+
+            for (Translation2d wheelTranslation : DriveConstants.WHEEL_POSITION_ARRAY) {
                 
-                ledBuffer.setHSV(i, 60, 100, 100); //yellow
             }
-        } else if (this.getDistance(null, null) < LEDConstants.RIN_STAR_BIN) {
-                
-            for (int i = 0; i < ledBuffer.getLength(); i++) { 
-                ledBuffer.setHSV(i, 120, 100, 100); //green
+
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+                ledBuffer.setHSV(i, 120, 100, 100); // green
             }
         }
-      }
-
+    }
 }

@@ -22,12 +22,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
-import frc.robot.subsystems.LedStrip;
 
 /**
  * Welcome to the home of the many many variables :D
@@ -57,12 +53,22 @@ public final class Constants {
         public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
         public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
 
+        // Front positive, left positive
+        public static final Translation2d FRONT_LEFT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2);
+        public static final Translation2d FRONT_RIGHT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+        public static final Translation2d REAR_LEFT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2);
+        public static final Translation2d REAR_RIGHT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+
+        public static final Translation2d[] WHEEL_POSITION_ARRAY = new Translation2d[] {
+            FRONT_LEFT_WHEEL_POSITION,
+            FRONT_RIGHT_WHEEL_POSITION,
+            REAR_LEFT_WHEEL_POSITION,
+            REAR_RIGHT_WHEEL_POSITION
+        };
+
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                // Front Positive, Left Positive
-                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // Front Left
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // Front Right
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // Rear Left
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
+                WHEEL_POSITION_ARRAY
+        );
 
         // Angular offsets of the modules relative to the chassis in radians
         // add 90 degrees to change the X and Y axis
