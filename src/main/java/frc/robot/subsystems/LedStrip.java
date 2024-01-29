@@ -26,7 +26,7 @@ public class LedStrip extends SubsystemBase {
     private final Supplier<Pose2d> poseSupplier;
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
-    
+
     public LedStrip(Supplier<Pose2d> poseSupplier) {
         this.poseSupplier = poseSupplier;
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
@@ -50,17 +50,17 @@ public class LedStrip extends SubsystemBase {
     }
 
     private Command runPattern(int index) {
-        Command selectedPattern = 
-            switch (currentPatternIndex) {
-                case (0) -> turnOff();
-                case (1) -> greenNGold();
-                case (2) -> circus();
-                case (3) -> loading();
-                case (4) -> LPI(poseSupplier.get());
-                case (5) -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
-                case (6) -> flash();
-                default -> runOnce(() -> {});
-            };
+        Command selectedPattern = switch (currentPatternIndex) {
+            case (0) -> turnOff();
+            case (1) -> greenNGold();
+            case (2) -> circus();
+            case (3) -> loading();
+            case (4) -> LPI(poseSupplier.get());
+            case (5) -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
+            case (6) -> flash();
+            default -> runOnce(() -> {
+            });
+        };
         return selectedPattern;
     }
 
@@ -82,7 +82,8 @@ public class LedStrip extends SubsystemBase {
     }
 
     private Command configureLED() {
-        return runOnce(() -> {});
+        return runOnce(() -> {
+        });
     }
 
     public Command turnOff() {
@@ -94,6 +95,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     private int rainbowOffset;
+
     private Command rainbow() {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
@@ -194,8 +196,7 @@ public class LedStrip extends SubsystemBase {
                 }
             }
         });
-
-    }
+    };
     // Find the color to represent our distance
     // Set our leds to that color using interpolate()
 
@@ -203,29 +204,28 @@ public class LedStrip extends SubsystemBase {
         return () -> currentRobotPosition.relativeTo(closestPosition).getTranslation().getNorm();
     }
 
-    // private double getDistance(Pose2d currentRobotPosition, Pose2d
-    // closestPosition) {
-    // // TODO Auto-generated method stub
-    // throw new UnsupportedOperationException("Unimplemented method
-    // 'getDistance'");
-    // } **ask creator what this is**
+    // https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
+    private void setZone() {
 
-    /**
-     * Interpolate between two colors
-     * 
-     * @param color1 The first color
-     * @param color2 The second color
-     * @param t      The interpolation t (0, 1)
-     */
-    private static Color interpolate(Color color1, Color color2, double t) {
-        if (t > 1d) {
-            t = 1d;
-        } else if (t < 0d) {
-            t = 0d;
+        if (this.getDistance(null, null).getAsDouble() > LEDConstants.OUTER_ZONE) {
+            turnOff();
+        } else if (this.getDistance(null, null).getAsDouble() > LEDConstants.INNER_ZONE
+                && this.getDistance(null, null).getAsDouble() < LEDConstants.OUTER_ZONE) {
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+                ledBuffer.setHSV(i, 255, 0, 0); // red
+            }
+        } else if (this.getDistance(null, null).getAsDouble() > LEDConstants.RIN_STAR_BIN
+                && this.getDistance(null, null).getAsDouble() < LEDConstants.INNER_ZONE) {
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+
+                ledBuffer.setHSV(i, 60, 100, 100); // yellow
+            }
+        } else if (this.getDistance(null, null).getAsDouble() < LEDConstants.RIN_STAR_BIN) {
+
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+                ledBuffer.setHSV(i, 120, 100, 100); // green
+            }
         }
-        int red = (int) (color1.red * (1 - t) + color2.red * t);
-        int green = (int) (color1.green * (1 - t) + color2.green * t);
-        int blue = (int) (color1.blue * (1 - t) + color2.blue * t);
-        return new Color(red, green, blue);
     }
+
 }
