@@ -16,6 +16,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
+import frc.robot.util.Constants;
 import frc.robot.util.SpeedAngleTriplet;
 
 public class ShooterCalc implements Logged {
@@ -86,12 +87,28 @@ public class ShooterCalc implements Logged {
         return new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY());
     }
 
+    public void calculateTraj(double height, Pose2d robotPose, double velocity, double t) {
+        // TODO: impliment math from https://www.desmos.com/3d/68dee4cf42 
+    }
+
+    // TODO: I think is the correct implimentation? (for use in alex's equation)
+    // TODO: These should both probally work off of the current speed, not the desired speed.
+    // this is averaging the speeds to make a rough estimate the speed of the note (or the edge of the wheels)
+    // V= 2π * ⋅D/2 * ⋅RPM/60
     public double rpmToVelocity(Pair<Double, Double> speeds) {
-        return 12;
+        double pair1 = speeds.getFirst();
+        double pair2 = speeds.getSecond();
+        double averageDiff = Math.abs(pair1-pair2) / 2.0;
+        double rpm = Math.min(pair1, pair2) + averageDiff;
+
+        double vel = (2.0*Math.PI) * (ShooterConstants.WHEEL_DIAMETER/2.0) * (rpm / 60.0);
+        return vel;
     }
 
     public double velocityToRPM(double velocity) {
-        return 1;
+        // ((V/(2pi)) / (D/2)) * 60 = RPM
+        double rpm = ((velocity/(2.0*Math.PI)) / (ShooterConstants.WHEEL_DIAMETER/2.0)) * 60.0;
+        return rpm;
     }
 
     /**
