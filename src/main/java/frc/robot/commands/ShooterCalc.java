@@ -91,10 +91,19 @@ public class ShooterCalc implements Logged {
         // TODO: impliment math from https://www.desmos.com/3d/68dee4cf42 
     }
 
-    // TODO: I think is the correct implimentation? (for use in alex's equation)
-    // TODO: These should both probally work off of the current speed, not the desired speed.
-    // this is averaging the speeds to make a rough estimate the speed of the note (or the edge of the wheels)
-    // V= 2π * ⋅D/2 * ⋅RPM/60
+    /**
+     * TODO: These should both probably work off of the current speed, not the desired speed.
+     * This method is averaging the speeds to make a rough estimate of the speed of the note (or the edge of the wheels).
+     * The formula used is V = 2π * D/2 * RPM/60.
+     * First, it converts from Rotations per Minute to Rotations per Second.
+     * Then, it converts from Rotations per Second to Radians per Second.
+     * Finally, it multiplies by the radius of the wheel contacting it.
+     * As v = rw (w = omega | angular velocity of wheel).
+     * 
+     * Converts RPM (Revolutions Per Minute) to velocity in meters per second.
+     * @param speeds a pair of RPM values representing the speeds of two shooter wheels
+     * @return the velocity in meters per second
+     */
     public double rpmToVelocity(Pair<Double, Double> speeds) {
         double pair1 = speeds.getFirst();
         double pair2 = speeds.getSecond();
@@ -105,8 +114,15 @@ public class ShooterCalc implements Logged {
         return vel;
     }
 
+
+    /**
+     * Converts the velocity of the shooter wheel to RPM (Rotations Per Minute).
+     * Equation: ((V/(2π)) / (D/2)) * 60 = RPM
+     * 
+     * @param velocity the velocity of the shooter wheel in meters per second
+     * @return the RPM (Rotations Per Minute) of the shooter wheel
+     */
     public double velocityToRPM(double velocity) {
-        // ((V/(2pi)) / (D/2)) * 60 = RPM
         double rpm = ((velocity/(2.0*Math.PI)) / (ShooterConstants.WHEEL_DIAMETER_METERS/2.0)) * 60.0;
         return rpm;
     }
