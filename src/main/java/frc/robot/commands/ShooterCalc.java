@@ -101,13 +101,13 @@ public class ShooterCalc implements Logged {
         double averageDiff = Math.abs(pair1-pair2) / 2.0;
         double rpm = Math.min(pair1, pair2) + averageDiff;
 
-        double vel = (2.0*Math.PI) * (ShooterConstants.WHEEL_DIAMETER/2.0) * (rpm / 60.0);
+        double vel = (2.0*Math.PI) * (ShooterConstants.WHEEL_DIAMETER_METERS/2.0) * (rpm / 60.0);
         return vel;
     }
 
     public double velocityToRPM(double velocity) {
         // ((V/(2pi)) / (D/2)) * 60 = RPM
-        double rpm = ((velocity/(2.0*Math.PI)) / (ShooterConstants.WHEEL_DIAMETER/2.0)) * 60.0;
+        double rpm = ((velocity/(2.0*Math.PI)) / (ShooterConstants.WHEEL_DIAMETER_METERS/2.0)) * 60.0;
         return rpm;
     }
 

@@ -143,7 +143,7 @@ public final class Constants {
             }
         };
 
-        public static final double WHEEL_DIAMETER = 0.0508; // meters!!!
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
 
     }
 
