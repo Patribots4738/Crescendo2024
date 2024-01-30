@@ -1,13 +1,12 @@
 ---
-name: NEW FEATURE
-about: Suggest an idea for this project
+name: Feature Request
+about: Suggest an idea for the robot
 title: ''
 labels: enhancement
 assignees: ''
 
 ---
-## Story
+## User Story
 
-
-## AC
+## Acceptance Criteria
 - [ ] 
