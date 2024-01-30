@@ -1,13 +1,13 @@
 ---
-name: BUG
-about: Create a report to help us improve
+name: Bug Report
+about: Report a bug with the robot code - or another company screwing us over
 title: ''
 labels: bug, enhancement, help wanted
 assignees: ''
 
 ---
-## Story
+## Bug + Desired Behavior
 
 
-## Expected behavior / AC
-- [ ] 
+## Possible Solutions
+- 
