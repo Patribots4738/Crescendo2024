@@ -13,6 +13,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase;
 import java.util.Optional;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -287,28 +288,13 @@ public final class Constants {
         public static final double INNER_ZONE = 1.131;
         public static final double RIN_STAR_BIN = 0.1;
 
-        // public static int LED_RED = (0, 255, 255);
-        // public static int LED_ORANGE = (30, 255, 255);
-        // public static int LED_GOLD = (0, 255, 255);
-        // public static int LED_GREEN = (0, 255, 255);
-        // public static int LED_BLUE = (0, 255, 255);
-        // public static int LED_PURPLE = (285, 255, 255);
-        // public static int LED_WHITE = (0, 0, 0);
-        // public static int LED_VOID = (0, 0, 0);
-        // public static int LED_PINK = (0, 0, 0);
+        public static final int LPI_ROTATIONAL_DEADBAND = 1;
 
-
-        //public
-
-    //    public final HashMap<Integer, Commands> patternMap = new HashMap<>() {
-    //         patternMap.put(0, Commands.runOnce(() -> turnOff()));
-    //         patternMap.put(1, Commands.runOnce(() -> greenNGold()));
-    //         patternMap.put(2, Commands.runOnce(() -> circus()));
-    //         patternMap.put(3, Commands.runOnce(() -> loading()));
-    //         patternMap.put(4, Commands.runOnce(() -> LPI(poseSupplier.get())));
-    //         patternMap.put(5, Commands.runOnce(() -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)))));
-    //         patternMap.put(6, Commands.runOnce(() -> FLASH()));
-        };
+        public static final Pair<Integer, Integer> LEFT_WHEEL_LED_RANGE = new Pair<Integer, Integer>(
+                0,
+                10
+        );
+    }
 
     public static final class NeoMotorConstants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;

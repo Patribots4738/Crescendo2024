@@ -5,16 +5,15 @@ import java.util.Optional;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.LEDConstants;
 
 public class LedStrip extends SubsystemBase {
@@ -39,13 +38,27 @@ public class LedStrip extends SubsystemBase {
 
         configureLED();
 
-        patternMap.put(0, Commands.runOnce(() -> turnOff()));
-            patternMap.put(1, Commands.runOnce(() -> greenNGold()));
-            patternMap.put(2, Commands.runOnce(() -> circus()));
-            patternMap.put(3, Commands.runOnce(() -> loading()));
-            patternMap.put(4, Commands.runOnce(() -> LPI(poseSupplier.get().getTranslation())));
-            patternMap.put(5, Commands.runOnce(() -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)))));
-            patternMap.put(6, Commands.runOnce(() -> flash()));
+        patternMap.put(0, turnOff());
+        patternMap.put(1, greenNGold());
+        patternMap.put(2, circus());
+        patternMap.put(3, loading());
+        patternMap.put(5, alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red))));
+        patternMap.put(6, flash());
+    }
+
+    public AddressableLEDBuffer getBuffer() {
+        return ledBuffer;
+    }
+    
+    @Override
+    public void periodic() {
+        runPattern(currentPatternIndex).schedule();
+        
+        // tickBellyPanPattern();
+        // tickArmPattern();
+        // tickIntakePattern();
+        // tickShooterPattern();
+        // tickClimberPattern();
     }
 
     private Command runPattern(int index) {
@@ -54,7 +67,6 @@ public class LedStrip extends SubsystemBase {
             case (1) -> greenNGold();
             case (2) -> circus();
             case (3) -> loading();
-            case (4) -> LPI(poseSupplier.get().getTranslation());
             case (5) -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
             case (6) -> flash();
             default -> runOnce(() -> {
@@ -76,7 +88,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public IntSupplier getCurrentPattern() {
+    public IntSupplier getCurrentPatternSupplier() {
         return () -> currentPatternIndex;
     }
 
@@ -85,36 +97,45 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public Command turnOff() {
-        return runOnce(() -> {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                ledBuffer.setHSV(i, 0, 0, 0);
-            }
-        });
+    public void setLED(int startIndex, int endIndex, Color color) {
+        for (int i = startIndex; i < endIndex; i++) {
+            ledBuffer.setLED(i, color);
+        }
     }
 
-    private int rainbowOffset;
+    public void setLED(int index, Color color) {
+        ledBuffer.setLED(index, color);
+    }
 
+    public void setLED(Pair<Integer, Integer> range, Color color) {
+        setLED(range.getFirst(), range.getSecond(), color);
+    }
+
+    public void setLED(Color color) {
+        setLED(0, ledBuffer.getLength(), color);
+    }
+    public Command turnOff() {
+        return runOnce(() -> setLED(Color.kBlack));
+    }
+
+    private int rainbowOffset = 0;
     private Command rainbow() {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
                 int hue = (this.rainbowOffset + (i * 180 / ledBuffer.getLength())) % 180;
-                ledBuffer.setHSV(i, hue, 50, 100);
+                setLED(i, Color.fromHSV(hue / 2, 255, 255));
             }
             this.rainbowOffset += 3;
             this.rainbowOffset %= 180;
         });
     }
 
-    // https://www.desmos.com/calculator/s5ylo1v9lt
     private int greenNGoldOffset = 0;
-
     public Command greenNGold() {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final int hue = 135 + (int) (15 * Math
-                        .sin(Math.PI * ((i + this.greenNGoldOffset * ledBuffer.getLength()) / ledBuffer.getLength())));
-                ledBuffer.setHSV(i, hue, 255, 255);
+                final int hue = 135 + (int) (15 * Math.sin(Math.PI * ((i + this.greenNGoldOffset * ledBuffer.getLength()) / ledBuffer.getLength())));
+                setLED(i, Color.fromHSV(hue/2, 255, 255));
             }
             this.greenNGoldOffset += 1;
             this.greenNGoldOffset %= 10;
@@ -124,26 +145,17 @@ public class LedStrip extends SubsystemBase {
     public Command circus() {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final int hue = (i % 2 == 0) ? 360 : 0;
-                if (hue == 0) {
-                    ledBuffer.setHSV(i, 360, 0, 255);
-                } else {
-                    ledBuffer.setHSV(i, hue, 255, 255);
-                }
+                final Color color = (i % 2 == 0) ? Color.kFirstRed : Color.kWhite;
+                setLED(i, color);
             }
         });
-
     }
 
     public Command loading() {
         return runOnce(() -> {
             for (int i = 0; i < 2 && i > 8; i++) {
-                final int hue = (i < 2 && i > 8) ? 180 : 0;
-                if (hue == 0) {
-                    ledBuffer.setHSV(i, 0, 0, 0);
-                } else {
-                    ledBuffer.setHSV(i, hue, 255, 255);
-                }
+                final Color color = (i < 2 && i > 8) ? Color.kFirstBlue : Color.kBlack;
+                setLED(i, color);
             }
         });
     }
@@ -151,84 +163,29 @@ public class LedStrip extends SubsystemBase {
     public Command flash() {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final int hue = (i % 2 == 0) ? 30 : 0;
-                if (hue == 0) {
-                    ledBuffer.setHSV(i, 0, 0, 0);
-                } else {
-                    ledBuffer.setHSV(i, hue, 255, 255);
-                }
+                final Color color = (i % 2 == 0) ? Color.kOrange : Color.kBlack;
+                setLED(i, color);
             }
         });
     }
 
     private int allianceOffset = 0;
-
     public Command alliance(boolean isRedAlliance) {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final int hue = 135 + (int) (15
-                        * Math.sin(
-                                Math.PI * ((i + this.allianceOffset * ledBuffer.getLength()) / ledBuffer.getLength())));
-                ledBuffer.setHSV(i, hue, 255, 255);
+                final int hue = 135 + (int) 
+                    (15 * 
+                        Math.sin(
+                            Math.PI 
+                            * ((i + this.allianceOffset 
+                                * ledBuffer.getLength()) 
+                            / ledBuffer.getLength())
+                        )
+                    );
+                setLED(i, Color.fromHSV(hue/2, 255, 255));
             }
             this.allianceOffset += 1;
             this.allianceOffset %= 10;
         });
-    }
-
-    public Command LPI (Translation2d currentRobotPosition) {
-        return runOnce(() -> {
-            // Loop through all of the startingPositions in the array
-            //closest position is point B
-            //current position in point A
-            Translation2d closestPosition = new Translation2d();
-
-            double closestDistance = currentRobotPosition.getDistance(closestPosition);
-            
-            for (Pose2d startingPosition : LEDConstants.startingPositions) {
-                
-                double currentDistance = currentRobotPosition.getDistance(startingPosition.getTranslation());
-                
-                if (currentDistance < closestDistance) {
-                    closestPosition = startingPosition.getTranslation(); 
-                    closestDistance = currentDistance; 
-                }
-            }
-
-            setZone(closestDistance);
-        });
-    }
-    
-    // Find the color to represent our distance
-    // Set our leds to that color using interpolate()
-    
-    //https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
-    private void setZone(double distance) {
-        if (distance > LEDConstants.OUTER_ZONE) {
-            turnOff();
-        } else if (distance > LEDConstants.INNER_ZONE
-                && distance < LEDConstants.OUTER_ZONE) {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                ledBuffer.setHSV(i, 255, 0, 0); // red
-                ledBuffer.setHSV(i, 255, 0, 0); // red
-            }
-        } else if (distance > LEDConstants.RIN_STAR_BIN
-                && distance < LEDConstants.INNER_ZONE) {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-
-                ledBuffer.setHSV(i, 60, 100, 100); // yellow
-
-                ledBuffer.setHSV(i, 60, 100, 100); // yellow
-            }
-        } else if (distance < LEDConstants.RIN_STAR_BIN) {
-
-            for (Translation2d wheelTranslation : DriveConstants.WHEEL_POSITION_ARRAY) {
-                
-            }
-
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                ledBuffer.setHSV(i, 120, 100, 100); // green
-            }
-        }
     }
 }
