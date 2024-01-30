@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 ## Story
-[...]
+
 
 ## Expected behavior / AC
-- [ ] [...]
+- [ ] 
