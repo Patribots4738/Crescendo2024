@@ -275,6 +275,13 @@ public class Swerve extends SubsystemBase implements Logged {
         return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
     }
 
+
+    /**
+     * Returns an array of SwerveModulePosition objects representing the positions of all swerve modules.
+     * This is the position of the driving encoder and the turning encoder
+     *
+     * @return an array of SwerveModulePosition objects representing the positions of all swerve modules
+     */
     public SwerveModulePosition[] getModulePositions() {
 
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
