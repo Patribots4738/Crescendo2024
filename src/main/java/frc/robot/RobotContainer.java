@@ -213,7 +213,8 @@ public class RobotContainer implements Logged {
     private void setupAutoChooser() {
         // TODO: Autos currently start at C1-5, we need to integrate the other paths
         // with the center line schenanigans to make full autos
-        autoChooser.addOption("C1-5", AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false)));
+        autoChooser.setDefaultOption("Do Nothing", Commands.none());
+        autoChooser.addOption("W3-1 C1-5", AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false)));
     }
 
     public void onDisabled() {
