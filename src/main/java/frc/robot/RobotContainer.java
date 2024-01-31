@@ -12,8 +12,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Drive;
+import frc.robot.commands.PieceControl;
+import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Claw;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.shooter.Pivot;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
@@ -36,6 +43,14 @@ public class RobotContainer implements Logged {
     private final Climb climb;
     private Indexer triggerWheel;
 
+    private ShooterCalc shooterCalc;
+    private Shooter shooter;
+    private Pivot pivot;
+    private Elevator elevator;
+    private Claw claw;
+
+    private PieceControl pieceControl;
+
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
@@ -47,6 +62,22 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         driverUI = new DriverUI();
         triggerWheel = new Indexer();
+        shooter = new Shooter();
+        elevator = new Elevator();
+        claw = new Claw();
+
+        pivot = new Pivot();
+
+        pieceControl = new PieceControl(
+            intake, 
+            triggerWheel, 
+            elevator, 
+            claw, 
+            shooterCalc, 
+            swerve
+        );
+
+        shooterCalc = new ShooterCalc(shooter, pivot);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -85,7 +116,38 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings() {
         operator.y().onTrue((climb.toTop(PoseCalculations.getChainPosition(swerve.getPose()))));
+        
         operator.a().onTrue((climb.toBottom()));
+
+        operator.b().onTrue(
+            pieceControl.preapareToFire(operator.leftBumper())
+        );
+
+        operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
+            pieceControl.preapareToFire(operator.x())
+        );
+
+        operator.leftBumper().and(operator.rightBumper()).onTrue(
+            pieceControl.noteToShoot()
+        );
+
+        operator.rightBumper().and(operator.leftBumper().negate()).onTrue(
+            pieceControl.noteToTrap()
+        );
+
+        operator.leftTrigger(OIConstants.OPERATOR_DEADBAND).and(
+            intake.hasGamePieceTrigger().negate()
+        ).onTrue(
+            intake.inCommand()
+        );
+
+        operator.rightTrigger(OIConstants.OPERATOR_DEADBAND).onTrue(
+            intake.outCommand()
+        );
+
+        operator.x().onTrue(
+            intake.stop()
+        );
     }
 
     private void configureDriverBindings() {
@@ -106,13 +168,6 @@ public class RobotContainer implements Logged {
         driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
-
-        driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
-
-        driver.y().onTrue(intake.outCommand());
-
-        driver.x().onTrue(intake.stop());
-
     }
 
     public Command getAutonomousCommand() {

@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -65,7 +67,6 @@ public class PieceControl {
     public Command noteToShoot() {
         // this.notePosition = NotePosition.CLAW; ^^^
         Command shoot = emptyCommand;
-        this.shooterCalc.prepareFireMovingCommand(() -> true, swerve);
         if (this.readyToShoot().getAsBoolean()) {
             // run the indexer and intake to make sure the note gets to the shooter
             shoot = indexer.toShooter()
@@ -79,6 +80,10 @@ public class PieceControl {
         }
 
         return shoot;
+    }
+
+    public Command preapareToFire(BooleanSupplier shootAtSpeaker) {
+        return shooterCalc.prepareFireMovingCommand(shootAtSpeaker, swerve);
     }
 
     public Command noteToTrap() {
@@ -97,6 +102,10 @@ public class PieceControl {
 
         }
         return shoot;
+    }
+
+    public Command goHomeElevator() {
+        return this.elevator.setPositionCommand(TrapConstants.RESET_POS);
     }
 
 }
