@@ -12,7 +12,10 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
@@ -188,6 +191,9 @@ public final class Constants {
         public static final double HIGH_LIMIT = 3.0;
         public static final double ROCK_BOTTOM = 0.0;
         public static final double ALMOST_HIGH_LIMIT = 2.5;
+
+        public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
+        public static final double EXTENSION_LIMIT_METERS = Units.feetToMeters(3.65);
     }
 
     public static final class AutoConstants {
@@ -364,6 +370,7 @@ public final class Constants {
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.5410515;
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
+        public static final double CHAIN_HEIGHT_METERS = 8.2112312;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
@@ -384,7 +391,7 @@ public final class Constants {
         //      1      4
         //  0              3
         // @formatter:on
-        public static Pose2d[] CHAIN_POSITIONS = new Pose2d[] {
+        public static final Pose2d[] CHAIN_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Stage
@@ -397,6 +404,15 @@ public final class Constants {
                 new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
         };
 
+        public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
+            new Pose3d(CHAIN_POSITIONS[0]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[1]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[2]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[3]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[4]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[5]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+        };
+
         // Speaker Positions: Blue alliance left
         // @formatter:off
                 //
@@ -404,7 +420,7 @@ public final class Constants {
                 //
                 //
                 // @formatter:on
-        public static Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
+        public static final Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Speaker
@@ -423,17 +439,11 @@ public final class Constants {
         };
 
         // TODO: make real constants
-        public static Pose2d L_POSE = new Pose2d();
-        public static Pose2d R_POSE = new Pose2d();
-        public static Pose2d M_POSE = new Pose2d();
+        public static final Pose2d L_POSE = new Pose2d();
+        public static final Pose2d R_POSE = new Pose2d();
+        public static final Pose2d M_POSE = new Pose2d();
 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
-
-        public static enum ChainPosition {
-            LEFT,
-            RIGHT,
-            CENTER
-        }
     }
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,7 +13,6 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.FieldConstants.ChainPosition;
 import monologue.Logged;
 
 public class Climb extends SubsystemBase implements Logged {
@@ -56,15 +56,9 @@ public class Climb extends SubsystemBase implements Logged {
         );
     }
 
-    public Command toTop(ChainPosition chainPosition) {
+    public Command toTop(Pair<Double, Double> chainHeights) {
 
-        if (chainPosition == ChainPosition.LEFT) {
-            return runOnce(() -> this.setPosition(ClimbConstants.ALMOST_HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-        } else if (chainPosition == ChainPosition.RIGHT) {
-            return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.ALMOST_HIGH_LIMIT));
-        } else {
-            return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-        }
+        return runOnce(() -> setPosition(chainHeights.getFirst(), chainHeights.getSecond()));
 
     }
 
