@@ -130,14 +130,13 @@ public final class Constants {
 
         public static InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<Double, SpeedAngleTriplet>(
                 InverseInterpolator.forDouble(),
-                SpeedAngleTriplet.getInterpolator()) {
-            {
-                for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP
-                        .entrySet()) {
-                    INTERPOLATION_MAP.put(entry.getKey().doubleValue(), entry.getValue());
-                }
+                SpeedAngleTriplet.getInterpolator()) {};
+
+        static {
+            for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
+                INTERPOLATION_MAP.put(entry.getKey().doubleValue(), entry.getValue());
             }
-        };
+        }
 
     }
 
