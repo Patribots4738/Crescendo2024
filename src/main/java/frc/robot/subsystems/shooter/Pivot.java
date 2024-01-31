@@ -48,11 +48,6 @@ public class Pivot extends SubsystemBase implements Logged {
             0,0,0,
             new Rotation3d(0, -pivot.getPosition(), 0)
         );
-        
-        RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            0,0,0,
-            new Rotation3d(0, -pivot.getTargetPosition(), 0)
-        );
     }
 
     /**
@@ -67,6 +62,11 @@ public class Pivot extends SubsystemBase implements Logged {
                  * TODO: Make gear ratio constant and put it here
                  */
                 (angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES));
+
+        RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
+            0,0,0,
+            new Rotation3d(0, -angle, 0)
+        );
     }
 
     /**
