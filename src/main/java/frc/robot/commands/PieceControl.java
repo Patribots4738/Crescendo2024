@@ -13,7 +13,6 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.Constants.TrapConstants;
 
 public class PieceControl {
-    private final Command emptyCommand = null;
     private NotePosition notePosition = NotePosition.NONE;
 
     private Intake intake;
@@ -70,7 +69,7 @@ public class PieceControl {
     // TODO: Possibly split this into two commands where one sends to shooter without waiting
     public Command noteToShoot() {
         // this.notePosition = NotePosition.CLAW; ^^^
-        Command shoot = emptyCommand;
+        Command shoot = Commands.none();
         if (this.readyToShoot().getAsBoolean()) {
             // run the indexer and intake to make sure the note gets to the shooter
             shoot = indexer.toShooter()
@@ -88,14 +87,14 @@ public class PieceControl {
 
     public Command noteToTarget(BooleanSupplier toAmp) {
 
-        Command shoot = emptyCommand;
+        Command shoot = Commands.none();
 
         if (this.notePosition == NotePosition.CLAW) {
             // maybe make setPosition a command ORR Make the Elevator Command
             shoot = Commands.runOnce(
                     () -> this.elevator.setPositionCommand(toAmp.getAsBoolean() ? TrapConstants.TRAP_PLACE_POS : TrapConstants.TRAP_PLACE_POS))
                                             .andThen(
-Commands.waitUntil(elevator.isAtTargetPosition()))
+            Commands.waitUntil(elevator.isAtTargetPosition()))
                     .andThen(claw.placeCommand())
                     .andThen(new WaitCommand(1))
                     .andThen(stopAllMotors());
