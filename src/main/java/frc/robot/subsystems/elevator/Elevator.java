@@ -43,11 +43,11 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+        RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
             0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 0, 
             new Rotation3d()
         );
-        RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
+        RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
             0, elevator.getPosition(), 0,
             new Rotation3d()
         );
