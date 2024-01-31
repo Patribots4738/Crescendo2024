@@ -34,11 +34,11 @@ public class Climb extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
-            0, leftMotor.getPosition(), 0,
+            0, 0, leftMotor.getPosition(),
             new Rotation3d()
         );
         RobotContainer.components3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
-            0, rightMotor.getPosition(), 0,
+            0, 0, rightMotor.getPosition(),
             new Rotation3d()
         );
     }
