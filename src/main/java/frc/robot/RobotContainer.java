@@ -35,6 +35,10 @@ public class RobotContainer implements Logged {
     private final Limelight limelight;
     private final Climb climb;
     private Indexer triggerWheel;
+    private Pivot pivot;
+    private Shooter shooter;
+
+    private ShooterCalc shooterCalc;    
 
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -47,6 +51,10 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         driverUI = new DriverUI();
         triggerWheel = new Indexer();
+        pivot = new Pivot();
+        shooter = new Shooter();
+
+        shooterCalc = new ShooterCalc(shooter, pivot);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -126,7 +134,15 @@ public class RobotContainer implements Logged {
     }
 
     public void prepareNamedCommands() {
-        NamedCommands.registerCommand("Intake", intake.inCommand());
+        NamedCommands.registerCommand("intake", intake.inCommand());
+        NamedCommands.registerCommand("Shoot", shooterCalc.prepareFire());
+        NamedCommands.registerCommand("shootWhileDriving", shooterCalc.prepareFireMovingCommand());
+        NamedCommands.registerCommand("placeAMP", placeAMP.placeAMP());
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFire());
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFire());
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFire());
+
+
     }
 
     private void incinerateMotors() {
