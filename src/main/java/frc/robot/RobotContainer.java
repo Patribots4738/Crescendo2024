@@ -12,8 +12,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Drive;
+import frc.robot.commands.PieceControl;
+import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Claw;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.shooter.Pivot;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
@@ -35,6 +42,14 @@ public class RobotContainer implements Logged {
     private final Limelight limelight;
     private final Climb climb;
     private Indexer triggerWheel;
+    private Pivot pivot;
+    private Shooter shooter;
+    private Claw claw;
+    private Elevator elevator;
+
+    private ShooterCalc shooterCalc;
+    
+    private PieceControl pieceControl;
 
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -47,6 +62,23 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         driverUI = new DriverUI();
         triggerWheel = new Indexer();
+
+        shooter = new Shooter();
+        elevator = new Elevator();
+        claw = new Claw();
+
+        pivot = new Pivot();
+      
+        shooterCalc = new ShooterCalc(shooter, pivot);
+
+        pieceControl = new PieceControl(
+            intake, 
+            triggerWheel, 
+            elevator, 
+            claw, 
+            shooterCalc, 
+            swerve
+        );
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -85,7 +117,38 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings() {
         operator.y().onTrue((climb.toTop(PoseCalculations.getChainPosition(swerve.getPose()))));
+        
         operator.a().onTrue((climb.toBottom()));
+
+        operator.b().onTrue(
+            pieceControl.prepareToFire(operator.leftBumper())
+        );
+
+        operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
+            pieceControl.prepareToFire(operator.x())
+        );
+
+        operator.leftBumper().and(operator.rightBumper()).onTrue(
+            pieceControl.noteToShoot()
+        );
+
+        operator.rightBumper().and(operator.leftBumper().negate()).onTrue(
+            pieceControl.noteToTarget(() -> true)
+        );
+
+        operator.leftTrigger(OIConstants.OPERATOR_DEADBAND).and(
+            intake.hasGamePieceTrigger().negate()
+        ).onTrue(
+            intake.inCommand()
+        );
+
+        operator.rightTrigger(OIConstants.OPERATOR_DEADBAND).onTrue(
+            intake.outCommand()
+        );
+
+        operator.x().onTrue(
+            intake.stop()
+        );
     }
 
     private void configureDriverBindings() {
@@ -106,13 +169,6 @@ public class RobotContainer implements Logged {
         driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
-
-        driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
-
-        driver.y().onTrue(intake.outCommand());
-
-        driver.x().onTrue(intake.stop());
-
     }
 
     public Command getAutonomousCommand() {
@@ -126,7 +182,13 @@ public class RobotContainer implements Logged {
     }
 
     public void prepareNamedCommands() {
-        NamedCommands.registerCommand("Intake", intake.inCommand());
+        // TODO: prepare to shoot while driving (w1 - c1)
+        NamedCommands.registerCommand("intake", intake.inCommand());
+        NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
     }
 
     private void incinerateMotors() {

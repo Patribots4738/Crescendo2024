@@ -423,6 +423,11 @@ public final class Constants {
                 new Pose2d(14.706, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
         };
 
+        // TODO: make real constants
+        public static Pose2d L_POSE = new Pose2d();
+        public static Pose2d R_POSE = new Pose2d();
+        public static Pose2d M_POSE = new Pose2d();
+
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static enum ChainPosition {
