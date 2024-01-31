@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -27,6 +28,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
+import monologue.Annotations.Log;
 
 public class RobotContainer implements Logged {
 
@@ -46,10 +48,13 @@ public class RobotContainer implements Logged {
     private Shooter shooter;
     private Claw claw;
     private Elevator elevator;
-
     private ShooterCalc shooterCalc;
-    
     private PieceControl pieceControl;
+
+    @Log.NT
+    public static Pose3d[] components3d = new Pose3d[5];
+    @Log.NT
+    public static Pose3d[] desiredComponents3d = new Pose3d[5];
 
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
