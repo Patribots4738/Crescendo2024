@@ -5,13 +5,18 @@ import java.util.function.BooleanSupplier;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import monologue.Logged;
 
-public class Pivot extends SubsystemBase {
+public class Pivot extends SubsystemBase implements Logged {
     private Neo pivot;
 
     public Pivot() {
@@ -37,6 +42,14 @@ public class Pivot extends SubsystemBase {
         pivot.setBrakeMode();
     }
 
+    @Override
+    public void periodic() {
+        RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
+            0,0,0,
+            new Rotation3d(0, -pivot.getPosition(), 0)
+        );
+    }
+
     /**
      * The function takes an angle in degrees and converts it into a position
      * for the pivot motor to rotate to
@@ -49,6 +62,11 @@ public class Pivot extends SubsystemBase {
                  * TODO: Make gear ratio constant and put it here
                  */
                 (angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES));
+
+        RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
+            0,0,0,
+            new Rotation3d(0, -angle, 0)
+        );
     }
 
     /**

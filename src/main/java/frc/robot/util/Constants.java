@@ -152,6 +152,8 @@ public final class Constants {
         public static final int CLAW_CAN_ID = 16;
         public static final double ELEVATOR_DEADBAND = .3;
         public static final double OUTTAKE_TIME = .2;
+        public static final double CLAW_POSITION_MULTIPLIER = 2;
+
 
         public static final int CLAW_CURRENT_LIMIT = 7;
 
@@ -435,5 +437,13 @@ public final class Constants {
             RIGHT,
             CENTER
         }
+    }
+
+    public static final class NTConstants {
+        public static final int PIVOT_INDEX = 0;
+        public static final int CLAW_INDEX = 1;
+        public static final int ELEVATOR_INDEX = 2;
+        public static final int LEFT_CLIMB_INDEX = 3;
+        public static final int RIGHT_CLIMB_INDEX = 4;
     }
 }

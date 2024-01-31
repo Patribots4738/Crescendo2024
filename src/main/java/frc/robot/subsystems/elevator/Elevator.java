@@ -9,10 +9,14 @@ import java.util.function.BooleanSupplier;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
 
 public class Elevator extends SubsystemBase {
@@ -39,7 +43,14 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
+        RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
+            0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 0, 
+            new Rotation3d()
+        );
+        RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+            0, elevator.getPosition(), 0,
+            new Rotation3d()
+        );
     }
 
     public double getPosition() {
@@ -55,6 +66,14 @@ public class Elevator extends SubsystemBase {
 
     public void setPosition(double pos) {
         elevator.setTargetPosition(pos);
+        RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+            0, pos, 0,
+            new Rotation3d()
+        );
+        RobotContainer.desiredComponents3d[NTConstants.CLAW_INDEX] = new Pose3d(
+            0, pos*TrapConstants.CLAW_POSITION_MULTIPLIER, 0,
+            new Rotation3d()
+        );
     }
 
     public Command setPositionCommand(double pos) {
