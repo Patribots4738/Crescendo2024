@@ -85,6 +85,7 @@ public class PieceControl {
     }
 
     public Command noteToTarget(BooleanSupplier toAmp) {
+
         Command shoot = emptyCommand;
 
         if (this.notePosition == NotePosition.CLAW) {
@@ -101,6 +102,10 @@ Commands.waitUntil(elevator.isAtTargetPosition()))
 
         }
         return shoot;
+    }
+
+    public Command goHomeElevator() {
+        return this.elevator.setPositionCommand(TrapConstants.RESET_POS);
     }
 
 }
