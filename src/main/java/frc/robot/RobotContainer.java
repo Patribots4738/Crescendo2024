@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -33,13 +34,14 @@ import monologue.Annotations.Log;
 public class RobotContainer implements Logged {
 
     private final PatriBoxController driver;
-    @SuppressWarnings("unused")
     private final PatriBoxController operator;
 
     private Swerve swerve;
     private final Intake intake;
+    
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
+    private final Limelight limelight;
 
     private final Limelight limelight;
     private final Climb climb;
@@ -174,6 +176,26 @@ public class RobotContainer implements Logged {
         driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
+      
+        driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
+
+        driver.y().onTrue(intake.outCommand());
+
+        driver.x().onTrue(intake.stopCommand());
+        
+        driver.rightStick().whileTrue(
+            Commands.sequence(
+                swerve.getDriveCommand(
+                    () -> {
+                        return ChassisSpeeds.fromFieldRelativeSpeeds(
+                            driver.getLeftY(),
+                            driver.getLeftX(),
+                            swerve.getAlignmentSpeeds(Rotation2d.fromRadians(360)),
+                            swerve.getPose().getRotation());
+                    }, true)
+            )
+        );
+
     }
 
     public Command getAutonomousCommand() {

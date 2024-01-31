@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.Neo;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
 import monologue.Monologue;
 
 /**
@@ -125,5 +127,9 @@ public class Robot extends TimedRobot {
     @Override
     public void simulationPeriodic() {
         REVPhysicsSim.getInstance().run();
+
+        for (Neo neo : NeoMotorConstants.motors) {
+            neo.tick();
+        }
     }
 }

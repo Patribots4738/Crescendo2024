@@ -34,7 +34,6 @@ import frc.robot.Robot;
  * and each class has its own constants.
  * Be sure to keep it organized! And PLEASE do not forget units.
  * If possible, include them in the name of the variable,
- * If possible, include them in the name of the variable,
  * or in a comment next to it.
  */
 public final class Constants {
@@ -87,6 +86,16 @@ public final class Constants {
         public static final boolean GYRO_REVERSED = true;
     }
 
+    public static final class ClimbConstants {
+
+        public static final int LEFT_CLIMB_CAN_ID = 16;
+        public static final int RIGHT_CLIMB_CAN_ID = 17;
+
+        public static final double HIGH_LIMIT = 3.0;
+        public static final double ROCK_BOTTOM = 0.0;
+        public static final double ALMOST_HIGH_LIMIT = 2.5;
+    }
+
     public static final class ShooterConstants {
         public static final int LEFT_SHOOTER_CAN_ID = 11;
         public static final int RIGHT_SHOOTER_CAN_ID = 12;
@@ -120,6 +129,8 @@ public final class Constants {
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
         /**
+         * The distances are in feet, the speeds are in RPM, and the angles are in
+         * degrees.
          * The distances are in feet, the speeds are in RPM, and the angles are in
          * degrees.
          */
@@ -331,7 +342,10 @@ public final class Constants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
-        public static ArrayList<CANSparkBase> motors = new ArrayList<>();
+        public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
+        public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
+      
+        public static ArrayList<Neo> motors = new ArrayList<>();
     }
 
     public static final class IntakeConstants {
@@ -365,8 +379,8 @@ public final class Constants {
         public static final double SNAP_TO_ANGLE_P = 0.0025;
 
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
-        public static final double FIELD_WIDTH_METERS = 16.53;
-        public static final double FIELD_HEIGHT_METERS = 8.278;
+        public static final double FIELD_WIDTH_METERS = 16.5410515;
+        public static final double FIELD_HEIGHT_METERS = 8.2112312;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
@@ -419,9 +433,9 @@ public final class Constants {
         public static Pose2d[] AMP_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
-                // Blue Speaker
+                // Blue Amp
                 new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
-                // Red Speaker
+                // Red Amp
                 new Pose2d(14.706, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
         };
 
@@ -438,7 +452,6 @@ public final class Constants {
             CENTER
         }
     }
-
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
         public static final int CLAW_INDEX = 1;
