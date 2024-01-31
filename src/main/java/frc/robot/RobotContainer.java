@@ -112,14 +112,7 @@ public class RobotContainer implements Logged {
         driver.y().onTrue(intake.outCommand());
 
         driver.x().onTrue(intake.stopCommand());
-
-        // driver.rightStick().whileTrue(
-        //     Command.findSnapSpeed(
-        //         swerve.getPose().getRotation()
-
-        //     )
-        // );
-
+        
         driver.rightStick().whileTrue(
             Commands.sequence(
                 swerve.getDriveCommand(
