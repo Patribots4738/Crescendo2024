@@ -55,6 +55,10 @@ public class PieceControl {
         return new Trigger(() -> shooterCalc.pivotAtDesiredAngle() && shooterCalc.shooterAtDesiredRPM());
     }
 
+    public Command prepareToFire(BooleanSupplier shootAtSpeaker) {
+        return shooterCalc.prepareFireMovingCommand(shootAtSpeaker, swerve);
+    }
+
     public Command stopAllMotors() {
         return Commands.parallel(
                 intake.stop(),
@@ -72,7 +76,7 @@ public class PieceControl {
         if (this.readyToShoot().getAsBoolean()) {
             // run the indexer and intake to make sure the note gets to the shooter
             shoot = indexer.toShooter()
-                    .andThen(Commands.waitUntil(() -> shooterCalc.shooterAtDesiredRPM() && shooterCalc.pivotAtDesiredAngle()))
+                    .andThen(Commands.waitUntil(readyToShoot()))
                     .andThen(claw.intake())
                     .andThen(() -> this.notePosition = NotePosition.SHOOTER)
                     .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?

@@ -51,14 +51,6 @@ public class RobotContainer implements Logged {
     
     private PieceControl pieceControl;
 
-    private ShooterCalc shooterCalc;
-    private Shooter shooter;
-    private Pivot pivot;
-    private Elevator elevator;
-    private Claw claw;
-
-    private PieceControl pieceControl;
-
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
@@ -129,11 +121,11 @@ public class RobotContainer implements Logged {
         operator.a().onTrue((climb.toBottom()));
 
         operator.b().onTrue(
-            pieceControl.preapareToFire(operator.leftBumper())
+            pieceControl.prepareToFire(operator.leftBumper())
         );
 
         operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
-            pieceControl.preapareToFire(operator.x())
+            pieceControl.prepareToFire(operator.x())
         );
 
         operator.leftBumper().and(operator.rightBumper()).onTrue(
@@ -141,7 +133,7 @@ public class RobotContainer implements Logged {
         );
 
         operator.rightBumper().and(operator.leftBumper().negate()).onTrue(
-            pieceControl.noteToTrap()
+            pieceControl.noteToTarget(() -> true)
         );
 
         operator.leftTrigger(OIConstants.OPERATOR_DEADBAND).and(
