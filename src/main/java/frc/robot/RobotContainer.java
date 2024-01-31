@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
@@ -41,8 +40,6 @@ public class RobotContainer implements Logged {
     
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
-    private final Limelight limelight;
-
     private final Limelight limelight;
     private final Climb climb;
     private Indexer triggerWheel;
@@ -181,7 +178,7 @@ public class RobotContainer implements Logged {
 
         driver.y().onTrue(intake.outCommand());
 
-        driver.x().onTrue(intake.stopCommand());
+        driver.x().onTrue(intake.stop());
         
         driver.rightStick().whileTrue(
             Commands.sequence(

@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.util;
 
 import java.util.ArrayList;
@@ -11,9 +7,7 @@ import java.util.Map;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-import com.revrobotics.CANSparkBase;
 import java.util.Optional;
-
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -84,16 +78,6 @@ public final class Constants {
 
         public static final int PIGEON_CAN_ID = 29;
         public static final boolean GYRO_REVERSED = true;
-    }
-
-    public static final class ClimbConstants {
-
-        public static final int LEFT_CLIMB_CAN_ID = 16;
-        public static final int RIGHT_CLIMB_CAN_ID = 17;
-
-        public static final double HIGH_LIMIT = 3.0;
-        public static final double ROCK_BOTTOM = 0.0;
-        public static final double ALMOST_HIGH_LIMIT = 2.5;
     }
 
     public static final class ShooterConstants {
