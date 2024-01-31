@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -126,6 +127,24 @@ public class ShooterCalc implements Logged {
         double rpm = ((velocity/(2.0*Math.PI)) / (ShooterConstants.WHEEL_DIAMETER_METERS/2.0)) * 60.0;
         return rpm;
     }
+
+    /* public double trajectoryEquation(double x, Pose2d pose, double angle, double velocity, double height) {
+        double result1 = ((pose.getX() + 0.92 - x) * Math.tan(angle));
+        double result2Half1 = (9.8*(Math.pow((pose.getX() + 0.92 - x), 2)));
+        double result2Half2 = (2*(Math.pow(velocity, 2))*(Math.pow(Math.cos(angle), 2)));
+        return result1 - (result2Half1 / result2Half2) + height;
+    }
+
+    private double heightEquation(double x) {
+        // TODO: DO this 
+        return 0.0;
+    }
+
+    public Pose3d calculateNoteTraj(double t) {
+        return new Pose3d();
+    } */
+
+
 
     /**
      * The function prepares a command to fire at a stationary target while moving
