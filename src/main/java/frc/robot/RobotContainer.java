@@ -42,13 +42,13 @@ public class RobotContainer implements Logged {
     private final Limelight limelight;
     private final Climb climb;
     private Indexer triggerWheel;
+    private Pivot pivot;
+    private Shooter shooter;
+    private Claw claw;
+    private Elevator elevator;
 
     private ShooterCalc shooterCalc;
-    private Shooter shooter;
-    private Pivot pivot;
-    private Elevator elevator;
-    private Claw claw;
-
+    
     private PieceControl pieceControl;
 
     public RobotContainer() {
@@ -62,11 +62,14 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         driverUI = new DriverUI();
         triggerWheel = new Indexer();
+
         shooter = new Shooter();
         elevator = new Elevator();
         claw = new Claw();
 
         pivot = new Pivot();
+      
+        shooterCalc = new ShooterCalc(shooter, pivot);
 
         pieceControl = new PieceControl(
             intake, 
@@ -76,8 +79,6 @@ public class RobotContainer implements Logged {
             shooterCalc, 
             swerve
         );
-
-        shooterCalc = new ShooterCalc(shooter, pivot);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -120,11 +121,11 @@ public class RobotContainer implements Logged {
         operator.a().onTrue((climb.toBottom()));
 
         operator.b().onTrue(
-            pieceControl.preapareToFire(operator.leftBumper())
+            pieceControl.prepareToFire(operator.leftBumper())
         );
 
         operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
-            pieceControl.preapareToFire(operator.x())
+            pieceControl.prepareToFire(operator.x())
         );
 
         operator.leftBumper().and(operator.rightBumper()).onTrue(
@@ -132,7 +133,7 @@ public class RobotContainer implements Logged {
         );
 
         operator.rightBumper().and(operator.leftBumper().negate()).onTrue(
-            pieceControl.noteToTrap()
+            pieceControl.noteToTarget(() -> true)
         );
 
         operator.leftTrigger(OIConstants.OPERATOR_DEADBAND).and(
@@ -181,7 +182,13 @@ public class RobotContainer implements Logged {
     }
 
     public void prepareNamedCommands() {
-        NamedCommands.registerCommand("Intake", intake.inCommand());
+        // TODO: prepare to shoot while driving (w1 - c1)
+        NamedCommands.registerCommand("intake", intake.inCommand());
+        NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
     }
 
     private void incinerateMotors() {

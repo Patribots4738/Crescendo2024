@@ -11,6 +11,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.TrapConstants;
 
 public class PieceControl {
@@ -54,6 +55,10 @@ public class PieceControl {
         return new Trigger(() -> shooterCalc.pivotAtDesiredAngle() && shooterCalc.shooterAtDesiredRPM());
     }
 
+    public Command prepareToFire(BooleanSupplier shootAtSpeaker) {
+        return shooterCalc.prepareFireMovingCommand(shootAtSpeaker, swerve);
+    }
+
     public Command stopAllMotors() {
         return Commands.parallel(
                 intake.stop(),
@@ -64,14 +69,15 @@ public class PieceControl {
     }
 
     // TODO: We assume that the note is already in the claw when we want to shoot
+    // TODO: Possibly split this into two commands where one sends to shooter without waiting
     public Command noteToShoot() {
         // this.notePosition = NotePosition.CLAW; ^^^
         Command shoot = emptyCommand;
         if (this.readyToShoot().getAsBoolean()) {
             // run the indexer and intake to make sure the note gets to the shooter
             shoot = indexer.toShooter()
-                    .andThen(intake.inCommand())
-                    .andThen(claw.outtake())
+                    .andThen(Commands.waitUntil(readyToShoot()))
+                    .andThen(claw.intake())
                     .andThen(() -> this.notePosition = NotePosition.SHOOTER)
                     .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?
                     .andThen(() -> this.notePosition = NotePosition.NONE)
@@ -82,18 +88,16 @@ public class PieceControl {
         return shoot;
     }
 
-    public Command preapareToFire(BooleanSupplier shootAtSpeaker) {
-        return shooterCalc.prepareFireMovingCommand(shootAtSpeaker, swerve);
-    }
+    public Command noteToTarget(BooleanSupplier toAmp) {
 
-    public Command noteToTrap() {
         Command shoot = emptyCommand;
 
         if (this.notePosition == NotePosition.CLAW) {
             // maybe make setPosition a command ORR Make the Elevator Command
             shoot = Commands.runOnce(
-                    () -> this.elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS)).andThen(
-                            Commands.waitUntil(elevator.isAtTargetPosition()))
+                    () -> this.elevator.setPositionCommand(toAmp.getAsBoolean() ? TrapConstants.TRAP_PLACE_POS : TrapConstants.TRAP_PLACE_POS))
+                                            .andThen(
+Commands.waitUntil(elevator.isAtTargetPosition()))
                     .andThen(claw.placeCommand())
                     .andThen(new WaitCommand(1))
                     .andThen(stopAllMotors());
