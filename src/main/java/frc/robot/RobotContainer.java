@@ -136,11 +136,11 @@ public class RobotContainer implements Logged {
     public void prepareNamedCommands() {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("Shoot", shooterCalc.prepareFire());
-        NamedCommands.registerCommand("shootWhileDriving", shooterCalc.prepareFireMovingCommand());
+        NamedCommands.registerCommand("shootWhileDriving", shooterCalc.prepareFireMovingCommand(swerve.getPose()));
         NamedCommands.registerCommand("placeAMP", placeAMP.placeAMP());
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFire());
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFire());
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFire());
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFire(new Pose2d()));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFire(new Pose2d()));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFire(new Pose2d()));
 
 
     }
