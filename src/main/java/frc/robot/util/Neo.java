@@ -10,7 +10,6 @@ import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
@@ -57,7 +56,9 @@ public class Neo extends CANSparkMax {
      * Creates a new Neo motor
      * @param id CANID of the SparkMax the Neo is connected to.
      * @param reversed Whether the motor is reversed or not.
-     * @param mode The idle mode of the motor. If true, the motor will brake when not powered. If false, the motor will coast when not powered.
+     * @param mode     The idle mode of the motor. If true, the motor will brake
+     *                 when not powered. If false, the motor will coast when not
+     *                 powered.
      */
     public Neo(int id, boolean reversed, CANSparkBase.IdleMode mode) {
         super(id, CANSparkLowLevel.MotorType.kBrushless);
@@ -66,9 +67,12 @@ public class Neo extends CANSparkMax {
         restoreFactoryDefaults();
         Timer.delay(0.050);
 
-        // If a parameter set fails, this will add more time to alleviate any bus traffic
+        // If a parameter set fails, this will add more time 
+        // to alleviate any bus traffic
         // default is 20ms
         setCANTimeout(50);
+
+        setIdleMode(mode);
 
         register();
         encoder = getEncoder();

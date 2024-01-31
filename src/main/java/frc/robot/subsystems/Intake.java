@@ -5,42 +5,41 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Neo;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
-    private final Neo intake;
+    private final Neo intakeMotor;
 
     public Intake() {
-        intake = new Neo(IntakeConstants.INTAKE_CAN_ID);
-        configMotor();
+        intakeMotor = new Neo(IntakeConstants.TOP_INTAKE_CAN_ID);
+        configMotors();
     }
 
-    public void configMotor() {
-        intake.setSmartCurrentLimit(IntakeConstants.INTAKE_STALL_CURRENT_LIMIT_AMPS, IntakeConstants.INTAKE_FREE_CURRENT_LIMIT_AMPS);
+    public void configMotors() {
+        intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
-        intake.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        intake.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
+        intakeMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
+        intakeMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
+    }
 
-        //sets brake mode
-        intake.setBrakeMode();
+    public Command setCommand(double desiredSpeed) {
+        return runOnce(() -> intakeMotor.set(desiredSpeed));
     }
 
     public Command inCommand() {
-        return runOnce(() -> intake.set(IntakeConstants.INTAKE_SPEED));
+        return setCommand(IntakeConstants.INTAKE_SPEED);
     }
 
     public Command outCommand() {
-        return runOnce(() -> intake.set(IntakeConstants.OUTTAKE_SPEED));
+        return setCommand(IntakeConstants.OUTTAKE_SPEED);
     }
 
-    public Command stopCommand() {
-        return runOnce(() -> intake.set(IntakeConstants.STOP_SPEED));
+    public Command stop() {
+        return setCommand(IntakeConstants.STOP_SPEED);
     }
 
     public Trigger hasGamePieceTrigger() {
-        return new Trigger(() -> (intake.getOutputCurrent() > IntakeConstants.HAS_PIECE_CURRENT_THRESHOLD));
+        return new Trigger(() -> intakeMotor.getOutputCurrent() > IntakeConstants.HAS_PIECE_CURRENT_THRESHOLD);
     }
-        
-}
 
+}
