@@ -7,6 +7,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -111,6 +112,19 @@ public class RobotContainer implements Logged {
         driver.y().onTrue(intake.outCommand());
 
         driver.x().onTrue(intake.stopCommand());
+        
+        driver.rightStick().whileTrue(
+            Commands.sequence(
+                swerve.getDriveCommand(
+                    () -> {
+                        return ChassisSpeeds.fromFieldRelativeSpeeds(
+                            driver.getLeftY(),
+                            driver.getLeftX(),
+                            swerve.getAlignmentSpeeds(Rotation2d.fromRadians(360)),
+                            swerve.getPose().getRotation());
+                    }, true)
+            )
+        );
 
     }
 
