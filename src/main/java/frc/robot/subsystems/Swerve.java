@@ -338,7 +338,18 @@ public class Swerve extends SubsystemBase implements Logged {
         }, () -> false, () -> false);
     }
 
-    public void setGyroAngle() {
-        gyro.setYaw(0);
+    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, boolean fieldRelative) {
+        return new Drive(this, speeds, () -> fieldRelative, () -> false);
     }
+
+    public double getAlignmentSpeeds(Rotation2d desiredAngle) {
+        return AutoConstants.HDC.getThetaController().calculate(
+            getPose().getRotation().getRadians(),
+            desiredAngle.getRadians());
+    }
+
+    public Command resetHDC() {
+        return runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians()));
+    }
+
 }
