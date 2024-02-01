@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -23,8 +24,8 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
-import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
@@ -103,9 +104,8 @@ public class RobotContainer implements Logged {
                 driver::getLeftX,
                 () -> -driver.getRightX(),
                 () -> !driver.leftBumper().getAsBoolean(),
-                () -> (driver.leftBumper().getAsBoolean()
-                        && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))));
-
+                () -> (!driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red)))));
+        
         incinerateMotors();
         configureButtonBindings();
 
@@ -125,33 +125,33 @@ public class RobotContainer implements Logged {
         operator.povDown().onTrue(climb.toBottomCommand());
 
         operator.b().onTrue(
-                pieceControl.prepareToFire(operator.leftBumper())
+            pieceControl.prepareToFire(operator.leftBumper())
         );
 
         operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
-                pieceControl.prepareToFire(operator.x())
+            pieceControl.prepareToFire(operator.x())
         );
 
         operator.leftBumper().and(operator.rightBumper()).onTrue(
-                pieceControl.noteToShoot()
+            pieceControl.noteToShoot()
         );
 
         operator.rightBumper().and(operator.leftBumper().negate()).onTrue(
-                pieceControl.noteToTarget(() -> true)
+            pieceControl.noteToTarget(() -> true)
         );
 
         operator.leftTrigger(OIConstants.OPERATOR_DEADBAND).and(
-                intake.hasGamePieceTrigger().negate()
+            intake.hasGamePieceTrigger().negate()
         ).onTrue(
-                        intake.inCommand()
+            intake.inCommand()
         );
 
         operator.rightTrigger(OIConstants.OPERATOR_DEADBAND).onTrue(
-                intake.outCommand()
+            intake.outCommand()
         );
 
         operator.x().onTrue(
-                intake.stop()
+            intake.stop()
         );
     }
 
@@ -161,19 +161,19 @@ public class RobotContainer implements Logged {
         // reset the orientation of the robot
         // to be facing away from the driver station
         driver.start().or(driver.back()).onTrue(
-                Commands.runOnce(() -> swerve.resetOdometry(
-                        new Pose2d(
-                                swerve.getPose().getTranslation(),
-                                Rotation2d.fromDegrees(
-                                        FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red))
-                                                ? 0
-                                                : 180))),
-                        swerve));
+            Commands.runOnce(() -> swerve.resetOdometry(
+                new Pose2d(
+                    swerve.getPose().getTranslation(),
+                    Rotation2d.fromDegrees(
+                    FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red))
+                        ? 0
+                        : 180))),
+                swerve));
 
         driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
-        driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
-
+        driver.leftStick().onTrue(swerve.toggleSpeed());
+      
         driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
 
         driver.y().onTrue(intake.outCommand());
@@ -181,15 +181,15 @@ public class RobotContainer implements Logged {
         driver.x().onTrue(intake.stop());
 
         driver.rightStick().whileTrue(
-                Commands.sequence(
-                        swerve.getDriveCommand(
-                                () -> {
-                                    return ChassisSpeeds.fromFieldRelativeSpeeds(
-                                            driver.getLeftY(),
-                                            driver.getLeftX(),
-                                            swerve.getAlignmentSpeeds(Rotation2d.fromRadians(360)),
-                                            swerve.getPose().getRotation());
-                                }, true)));
+            Commands.sequence(
+                swerve.getDriveCommand(
+                    () -> {
+                        return ChassisSpeeds.fromFieldRelativeSpeeds(
+                            driver.getLeftY(),
+                            driver.getLeftX(),
+                            swerve.getAlignmentSpeeds(Rotation2d.fromRadians(360)),
+                            swerve.getPose().getRotation());
+                        }, true)));
 
     }
 
@@ -226,10 +226,19 @@ public class RobotContainer implements Logged {
     }
 
     private void initializeArrays() {
-        for (int i = 0; i < components3d.length; i++) {
+        Pose3d initialShooterPose = new Pose3d(
+                NTConstants.PIVOT_OFFSET.getX(),
+                0,
+                NTConstants.PIVOT_OFFSET.getY(),
+            new Rotation3d()
+        );
+
+        components3d[0] = initialShooterPose;
+        desiredComponents3d[0] = initialShooterPose;
+
+        for (int i = 1; i < components3d.length; i++) {
             components3d[i] = new Pose3d();
             desiredComponents3d[i] = new Pose3d();
         }
     }
-
 }

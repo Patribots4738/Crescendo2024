@@ -29,17 +29,15 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     @Override
+    // This is inverted because for some reason when you
+    // go forward on the controller, it returns a negative value
     public double getLeftY() {
-        return getLeftAxis().getY();
+        return -getLeftAxis().getY();
     }
 
     public Translation2d getLeftAxis() {
         Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
                 MathUtil.applyDeadband(super.getLeftY(), deadband));
-
-        if (FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Blue))) {
-            driverLeftAxis = driverLeftAxis.unaryMinus();
-        }
 
         return driverLeftAxis;
     }
