@@ -30,6 +30,7 @@ public class Pivot extends SubsystemBase implements Logged {
     public void configMotor() {
         pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
         pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+        // TODO: figure out conversion factor along with todo below
         // pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
         pivot.setPID(
@@ -49,7 +50,7 @@ public class Pivot extends SubsystemBase implements Logged {
             NTConstants.PIVOT_OFFSET_METERS.getX(),
             0,
             NTConstants.PIVOT_OFFSET_METERS.getY(),
-            new Rotation3d(0, -pivot.getPosition()-Math.PI/2, 0)
+            new Rotation3d(0, -pivot.getPosition(), 0)
         );
     }
 
@@ -60,14 +61,15 @@ public class Pivot extends SubsystemBase implements Logged {
      * @param double The angle to set the shooter to
      */
     public void setAngle(double angle) {
-
-        pivot.setTargetPosition(angle / 360);
+        // TODO: angle of pivot seems wrong in sim but i am not exactly sure how to fix it here
+        // also change this 180 guy to something better
+        pivot.setTargetPosition(angle / 180);
 
         RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
             NTConstants.PIVOT_OFFSET_METERS.getX(),
             0,
             NTConstants.PIVOT_OFFSET_METERS.getY(),
-            new Rotation3d(0, -Units.degreesToRadians(angle)-Math.PI/2, 0)
+            new Rotation3d(0, -Units.degreesToRadians(angle), 0)
         );
     }
 

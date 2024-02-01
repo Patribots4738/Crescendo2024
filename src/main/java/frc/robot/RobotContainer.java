@@ -123,9 +123,6 @@ public class RobotContainer implements Logged {
 
         operator.a().onTrue((climb.toBottom()));
 
-        // operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
-        //         pieceControl.prepareToFire(operator.x()));
-
         operator.leftBumper().and(operator.rightBumper()).onTrue(
                 pieceControl.noteToShoot());
 
@@ -166,8 +163,7 @@ public class RobotContainer implements Logged {
 
         driver.y().onTrue(intake.outCommand());
 
-        driver.leftBumper().onTrue(
-                shooterCalc.prepareFireMovingCommand(() -> true, swerve));
+        driver.leftBumper().toggleOnTrue(shooterCalc.prepareFireCommand(() -> true, swerve::getPose));
 
         driver.x().onTrue(intake.stop());
 

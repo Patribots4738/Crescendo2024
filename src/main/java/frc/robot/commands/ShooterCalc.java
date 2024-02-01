@@ -38,6 +38,10 @@ public class ShooterCalc implements Logged{
         this.aiming = false;
     }
 
+    public boolean getAiming() {
+        return aiming;
+    }
+
     /**
      * The function prepares a fire command by calculating the speed and angle for
      * the robot's shooter
@@ -52,105 +56,17 @@ public class ShooterCalc implements Logged{
      * @return The method is returning a Command object.
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
-        return Commands.runOnce(() -> {
+        return Commands.run(() -> {
                 SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
 
                 desiredAngle = triplet.getAngle();
                 desiredRSpeed = triplet.getRightSpeed();
 
-                System.out.println(aiming);
+                // System.out.println(aiming);
         
                 pivot.setAngle(desiredAngle);
                 shooter.setSpeed(triplet.getSpeeds());
             }, pivot, shooter);
-    }
-
-    /**
-     * The function prepares a command to fire at a stationary target while moving
-     * and continuously aiming until
-     * instructed to stop.
-     * 
-     * If we are currently aiming, toggle aiming to false, cancelling repeated calls
-     * to prepareFireCommand
-     * If we are not currently aiming, toggle aiming to true,
-     * and repeatedly run prepareFireCommand until aiming is toggled to false
-     * Allows for toggling on and off of aiming with single button
-     * 
-     * @param shootAtSpeaker A BooleanSupplier that determines whether the robot
-     *                       should shoot at the
-     *                       speaker.
-     * @param swerve         The "swerve" parameter is an instance of the Swerve
-     *                       class. It is used to access the
-     *                       current pose (position and orientation) of the swerve
-     *                       mechanism.
-     * @return The method is returning a Command object.
-     */
-    public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Swerve swerve) {
-        return 
-            aiming
-            ?
-                Commands.runOnce(() -> {
-                    stopAiming();
-                    System.out.println("stop");
-                })
-            :
-                Commands.runOnce(() -> {
-
-                    if (!aiming)
-                        startAiming();
-
-                    SpeedAngleTriplet triplet = calculateSpeed(swerve.getPose(), shootAtSpeaker.getAsBoolean());
-
-                    desiredAngle = triplet.getAngle();
-                    desiredRSpeed = triplet.getRightSpeed();
-            
-                    pivot.setAngle(desiredAngle);
-                    shooter.setSpeed(triplet.getSpeeds());
-                    
-                }, pivot, shooter).repeatedly().until(() -> !aiming);
-
-    }
-
-    /**
-     * The function prepares a shooter command by calculating the speed and angle
-     * based on the robot's
-     * pose and whether it should shoot at the speaker, and then sets the shooter's
-     * speed accordingly.
-     * 
-     * Sets shooter up to speed without regard to pivot angle
-     *
-     * @param shootAtSpeaker A BooleanSupplier that returns true if the robot should
-     *                       shoot at the
-     *                       speaker, and false otherwise.
-     * @param robotPose      The robotPose parameter represents the current pose
-     *                       (position and orientation) of
-     *                       the robot. It is used in the calculateSpeed method to
-     *                       determine the speed at which the shooter
-     *                       should be set.
-     * @return The method is returning a Command object.
-     */
-    public Command prepareShooterCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
-        SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-        return shooter.setSpeedCommand(triplet.getSpeeds());
-    }
-
-    /**
-     * The function prepares a pivot command based on whether the robot should shoot
-     * at the speaker and
-     * the current robot pose.
-     * 
-     * @param shootAtSpeaker A BooleanSupplier that returns true if the robot should
-     *                       shoot at the
-     *                       speaker, and false otherwise.
-     * @param robotPose      The `robotPose` parameter represents the current pose
-     *                       (position and orientation)
-     *                       of the robot. It is of type `Pose2d`.
-     * @return The method is returning a Command object.
-     */
-    public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
-        SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-        
-        return pivot.setAngleCommand(triplet.getAngle());
     }
 
     /**
@@ -177,24 +93,8 @@ public class ShooterCalc implements Logged{
      * @return The method is returning a Command object.
      */
     public Command resetShooter() {
-        return Commands.runOnce(() -> stopAiming())
-                .andThen(shooter.stop()
-                        .alongWith(pivot.setRestAngleCommand()));
-    }
-
-    // Toggles the aiming boolean
-    public void toggleAiming() {
-        this.aiming = !aiming;
-    }
-
-    // Sets the aiming boolean to false
-    private void stopAiming() {
-        this.aiming = false;
-    }
-
-    // Sets the aiming boolean to true
-    private void startAiming() {
-        this.aiming = true;
+        return shooter.stop()
+                .alongWith(pivot.setRestAngleCommand());
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
