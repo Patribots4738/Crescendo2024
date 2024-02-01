@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -9,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -27,6 +29,7 @@ import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -115,6 +118,8 @@ public class RobotContainer implements Logged {
     }
 
     private void configureButtonBindings() {
+                
+        
         configureDriverBindings();
         configureOperatorBindings();
     }
@@ -124,9 +129,7 @@ public class RobotContainer implements Logged {
         
         operator.a().onTrue((climb.toBottom()));
 
-        operator.b().onTrue(
-            pieceControl.prepareToFire(operator.leftBumper())
-        );
+        
 
         operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
             pieceControl.prepareToFire(operator.x())
@@ -178,6 +181,13 @@ public class RobotContainer implements Logged {
 
         driver.y().onTrue(intake.outCommand());
 
+        driver.b().onTrue(
+            Commands.runOnce(() -> {
+                System.out.println("First print " + swerve.getPose().toString());
+                shooterCalc.prepareFireCommand(() -> true, swerve.getPose());
+            })
+        );
+
         driver.x().onTrue(intake.stop());
         
         driver.rightStick().whileTrue(
@@ -210,9 +220,9 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
+        // NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
+        // NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
+        // NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
     }
 
     private void incinerateMotors() {
@@ -222,6 +232,12 @@ public class RobotContainer implements Logged {
             Timer.delay(0.005);
         }
         Timer.delay(0.25);
+    }
+
+    public void logME() {
+        // if (driver.b().getAsBoolean()) {
+        //     shooterCalc.prepareFireCommand(() -> true, swerve.getPose());
+        // }    
     }
 
 }

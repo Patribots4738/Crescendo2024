@@ -34,6 +34,7 @@ import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -134,12 +135,10 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-
         poseEstimator.updateWithTime(DriverUI.currentTimestamp, gyro.getRotation2d(), getModulePositions());
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
-
     }
 
     public void logPositions() {
@@ -172,7 +171,6 @@ public class Swerve extends SubsystemBase implements Logged {
                                         * DriveConstants.ROBOT_LENGTH_METERS / 2.0,
                                 Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
-
                 new Rotation3d(0, 0, getPose().getRotation().getRadians()));
 
     }

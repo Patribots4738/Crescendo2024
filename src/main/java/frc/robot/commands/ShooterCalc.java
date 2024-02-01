@@ -2,8 +2,10 @@ package frc.robot.commands;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,13 +14,23 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 import frc.robot.util.SpeedAngleTriplet;
 
-public class ShooterCalc {
+public class ShooterCalc implements Logged{
 
     private Pivot pivot;
     private Shooter shooter;
     private boolean aiming;
+
+
+    @Log.NT
+    double desiredRSpeed, distance;
+
+    @Log.NT
+    double desiredAngle = 0;
+    
 
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.pivot = pivot;
@@ -38,12 +50,18 @@ public class ShooterCalc {
      *                       (position and orientation)
      *                       of the robot. It is of type `Pose2d`.
      * @return The method is returning a Command object.
-     */
-    public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
+     */ //WORKING?
+    public void prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
         SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
 
-        return pivot.setAngleCommand(triplet.getAngle())
-                .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
+        desiredAngle = triplet.getAngle();
+        desiredRSpeed = triplet.getRightSpeed();
+
+        // System.out.println("uh yeah");
+        
+        Commands.print(robotPose.toString()).andThen(
+                pivot.setAngleCommand(triplet.getAngle())
+                .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()))).schedule();
     }
 
     /**
@@ -71,9 +89,9 @@ public class ShooterCalc {
             return Commands.runOnce(() -> toggleAiming());
         }
         return Commands.runOnce(() -> toggleAiming())
-                .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())
+                // .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())
                         .repeatedly()
-                        .until(() -> !aiming));
+                        .until(() -> !aiming);
     }
 
     /**
@@ -114,6 +132,7 @@ public class ShooterCalc {
      */
     public Command preparePivotCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
         SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+        
         return pivot.setAngleCommand(triplet.getAngle());
     }
 
@@ -163,20 +182,22 @@ public class ShooterCalc {
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
     // known required speeds and angles for certain poses
-    private SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
+    public SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
         // Constants have blue alliance positions at index 0
         // and red alliance positions at index 1
         int positionIndex = FieldConstants.ALLIANCE == Optional.ofNullable(Alliance.Blue) ? 0 : 1;
 
         // Get our position relative to the desired field element
         if (shootingAtSpeaker) {
-            robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
+            robotPose = robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
         } else {
-            robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
+            robotPose = robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
         }
 
         // Use the distance as our key for interpolation
         double distanceFeet = Units.metersToFeet(robotPose.getTranslation().getNorm());
+
+        this.distance = robotPose.getX();
 
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }

@@ -120,23 +120,21 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(10, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(15, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(20, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(25, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
+                put(5, SpeedAngleTriplet.of(0.0, 0.4, 60d));
+                put(10, SpeedAngleTriplet.of(0.0, 0.6, 50d));
+                put(15, SpeedAngleTriplet.of(0.0, 0.8, 40d));
+                put(20, SpeedAngleTriplet.of(0.0, 1.0, 30d));
+                put(25, SpeedAngleTriplet.of(0.0, 1.2, 20d));
             }
         };
 
         public static InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<Double, SpeedAngleTriplet>(
                 InverseInterpolator.forDouble(),
-                SpeedAngleTriplet.getInterpolator()) {};
-
-        static {
+                SpeedAngleTriplet.getInterpolator()) {{
             for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
-                INTERPOLATION_MAP.put(entry.getKey().doubleValue(), entry.getValue());
+                put(entry.getKey().doubleValue(), entry.getValue());
             }
-        }
+        }};
 
     }
 

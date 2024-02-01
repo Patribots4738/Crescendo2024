@@ -53,7 +53,7 @@ public class PieceControl {
     }
 
     public Command prepareToFire(BooleanSupplier shootAtSpeaker) {
-        return shooterCalc.prepareFireMovingCommand(shootAtSpeaker, swerve);
+        return Commands.runOnce(() -> shooterCalc.prepareFireCommand(shootAtSpeaker, swerve.getPose()));
     }
 
     public Command stopAllMotors() {

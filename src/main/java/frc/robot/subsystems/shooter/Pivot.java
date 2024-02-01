@@ -45,8 +45,8 @@ public class Pivot extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            0,0,0,
-            new Rotation3d(0, -pivot.getPosition(), 0)
+            0.114,0,0.21,
+            new Rotation3d(0, -pivot.getPosition()-Math.PI/2, 0)
         );
     }
 
@@ -57,14 +57,15 @@ public class Pivot extends SubsystemBase implements Logged {
      * @param double The angle to set the shooter to
      */
     public void setAngle(double angle) {
+        
         pivot.setTargetPosition(
                 /**
                  * TODO: Make gear ratio constant and put it here
                  */
-                (angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES));
+                (-angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES));
 
         RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            0,0,0,
+            0.112,0,-0.21,
             new Rotation3d(0, -angle, 0)
         );
     }
@@ -78,7 +79,8 @@ public class Pivot extends SubsystemBase implements Logged {
      * @return The method is returning a Command object.
      */
     public Command setAngleCommand(double angle) {
-        return Commands.runOnce(() -> setAngle(angle));
+
+        return runOnce(() -> setAngle(angle));
     }
 
     /**
