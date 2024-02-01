@@ -105,9 +105,8 @@ public class RobotContainer implements Logged {
                 driver::getLeftX,
                 () -> -driver.getRightX(),
                 () -> !driver.leftBumper().getAsBoolean(),
-                () -> (driver.leftBumper().getAsBoolean()
-                        && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))));
-
+                () -> (!driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red)))));
+        
         incinerateMotors();
         configureButtonBindings();
 
@@ -172,7 +171,7 @@ public class RobotContainer implements Logged {
 
         driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
-        driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
+        driver.leftStick().onTrue(swerve.toggleSpeed());
       
         driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
 
