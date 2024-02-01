@@ -51,17 +51,17 @@ public class ShooterCalc implements Logged{
      *                       of the robot. It is of type `Pose2d`.
      * @return The method is returning a Command object.
      */ //WORKING?
-    public void prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
-        SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+    public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
+        return Commands.runOnce( () -> {
+                SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
 
-        desiredAngle = triplet.getAngle();
-        desiredRSpeed = triplet.getRightSpeed();
-
-        // System.out.println("uh yeah");
+                desiredAngle = triplet.getAngle();
+                desiredRSpeed = triplet.getRightSpeed();
         
-        Commands.print(robotPose.toString()).andThen(
-                pivot.setAngleCommand(triplet.getAngle())
-                .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()))).schedule();
+                pivot.setAngle(triplet.getAngle());
+                shooter.setSpeedPair(triplet.getSpeeds());
+            }
+        );
     }
 
     /**
