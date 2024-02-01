@@ -188,12 +188,17 @@ public final class Constants {
         public static final int LEFT_CLIMB_CAN_ID = 17;
         public static final int RIGHT_CLIMB_CAN_ID = 18;
 
-        public static final double HIGH_LIMIT = 3.0;
-        public static final double ROCK_BOTTOM = 0.0;
-        public static final double ALMOST_HIGH_LIMIT = 2.5;
+        public static final double CLIMB_POSITION_CONVERSION_FACTOR = 0.1;
+        public static final int CLIMB_CURRENT_LIMIT = 40;
 
-        public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
+        public static final PIDConstants CLIMB_PID = new PIDConstants(0.5, 0, 0);
+
         public static final double EXTENSION_LIMIT_METERS = Units.feetToMeters(3.65);
+        
+        public static final double TOP_LIMIT = 0.5125;
+        public static final double BOTTOM_LIMIT = 0.0;
+        
+        public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
     }
 
     public static final class AutoConstants {

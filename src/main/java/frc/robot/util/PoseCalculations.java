@@ -12,7 +12,7 @@ import monologue.Logged;
 
 public class PoseCalculations implements Logged {
 
-    public static Pair<Double, Double> getChainPosition(Pose2d position) {
+    public static Pair<Double, Double> getChainIntercepts(Pose2d position) {
         Pose2d closestChainPose;
 
         double minDifference = 10000;
@@ -42,7 +42,7 @@ public class PoseCalculations implements Logged {
         double leftIntercept = getChainIntercept(relativePosition.getY() + ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
         double rightIntercept = getChainIntercept(relativePosition.getY() - ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
 
-        return Pair.of(leftIntercept, rightIntercept);
+        return Pair.of(leftIntercept - 0.6, rightIntercept - 0.6);
     }
 
     /**
@@ -56,7 +56,7 @@ public class PoseCalculations implements Logged {
      * 
      * @return The height of the chain at that location
      */
-    public static double getChainIntercept(double x) {
+    private static double getChainIntercept(double x) {
         // The ds here turn the integers into doubles
         // so that integer divion does not occur.
         double calculation = 3d / 10d * Math.pow(x, 2) + 0.725;
