@@ -101,13 +101,8 @@ public class ShooterCalc implements Logged {
      * @return the velocity in meters per second
      */
     public double rpmToVelocity(Pair<Double, Double> speeds) {
-        double pair1 = speeds.getFirst();
-        double pair2 = speeds.getSecond();
-        double averageDiff = Math.abs(pair1-pair2) / 2.0;
-        double rpm = Math.min(pair1, pair2) + averageDiff;
-
-        double vel = (2.0*Math.PI) * (ShooterConstants.WHEEL_DIAMETER_METERS/2.0) * (rpm / 60.0);
-        return vel;
+        double rpm = (speeds.getFirst() + speeds.getSecond()) / 2.0;
+        return (Math.PI) * (ShooterConstants.WHEEL_DIAMETER_METERS) * (rpm / 60.0);
     }
 
 
