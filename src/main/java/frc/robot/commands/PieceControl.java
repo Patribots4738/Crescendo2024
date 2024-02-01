@@ -52,9 +52,9 @@ public class PieceControl {
         return new Trigger(() -> shooterCalc.pivotAtDesiredAngle() && shooterCalc.shooterAtDesiredRPM());
     }
 
-    public Command prepareToFire(BooleanSupplier shootAtSpeaker) {
-        return Commands.runOnce(() -> shooterCalc.prepareFireCommand(shootAtSpeaker, swerve.getPose()));
-    }
+    // public Command prepareToFire(BooleanSupplier shootAtSpeaker) {
+    //     return Commands.runOnce(() -> shooterCalc.prepareFireCommand(shootAtSpeaker, swerve.getPose()));
+    // }
 
     public Command stopAllMotors() {
         return Commands.parallel(

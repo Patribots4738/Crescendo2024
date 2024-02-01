@@ -50,18 +50,19 @@ public class ShooterCalc implements Logged{
      *                       (position and orientation)
      *                       of the robot. It is of type `Pose2d`.
      * @return The method is returning a Command object.
-     */ //WORKING?
-    public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
-        return Commands.runOnce( () -> {
-                SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
+     */
+    public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
+        return Commands.runOnce(() -> {
+                SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
 
                 desiredAngle = triplet.getAngle();
                 desiredRSpeed = triplet.getRightSpeed();
+
+                System.out.println(aiming);
         
-                pivot.setAngle(triplet.getAngle());
-                shooter.setSpeedPair(triplet.getSpeeds());
-            }
-        );
+                pivot.setAngle(desiredAngle);
+                shooter.setSpeed(triplet.getSpeeds());
+            }, pivot, shooter);
     }
 
     /**
@@ -85,13 +86,29 @@ public class ShooterCalc implements Logged{
      * @return The method is returning a Command object.
      */
     public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Swerve swerve) {
-        if (aiming) {
-            return Commands.runOnce(() -> toggleAiming());
-        }
-        return Commands.runOnce(() -> toggleAiming())
-                // .andThen(prepareFireCommand(shootAtSpeaker, swerve.getPose())
-                        .repeatedly()
-                        .until(() -> !aiming);
+        return 
+            aiming
+            ?
+                Commands.runOnce(() -> {
+                    stopAiming();
+                    System.out.println("stop");
+                })
+            :
+                Commands.runOnce(() -> {
+
+                    if (!aiming)
+                        startAiming();
+
+                    SpeedAngleTriplet triplet = calculateSpeed(swerve.getPose(), shootAtSpeaker.getAsBoolean());
+
+                    desiredAngle = triplet.getAngle();
+                    desiredRSpeed = triplet.getRightSpeed();
+            
+                    pivot.setAngle(desiredAngle);
+                    shooter.setSpeed(triplet.getSpeeds());
+                    
+                }, pivot, shooter).repeatedly().until(() -> !aiming);
+
     }
 
     /**
@@ -166,7 +183,7 @@ public class ShooterCalc implements Logged{
     }
 
     // Toggles the aiming boolean
-    private void toggleAiming() {
+    public void toggleAiming() {
         this.aiming = !aiming;
     }
 

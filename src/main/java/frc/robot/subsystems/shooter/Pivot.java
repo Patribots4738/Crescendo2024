@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,6 +15,7 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 
 public class Pivot extends SubsystemBase implements Logged {
@@ -27,9 +29,8 @@ public class Pivot extends SubsystemBase implements Logged {
 
     public void configMotor() {
         pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
-        pivot.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        pivot.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-        pivot.setInverted(false);
+        pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+        // pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
         pivot.setPID(
                 ShooterConstants.PIVOT_P,
@@ -45,7 +46,9 @@ public class Pivot extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            0.114,0,0.21,
+            NTConstants.PIVOT_OFFSET_METERS.getX(),
+            0,
+            NTConstants.PIVOT_OFFSET_METERS.getY(),
             new Rotation3d(0, -pivot.getPosition()-Math.PI/2, 0)
         );
     }
@@ -57,16 +60,14 @@ public class Pivot extends SubsystemBase implements Logged {
      * @param double The angle to set the shooter to
      */
     public void setAngle(double angle) {
-        
-        pivot.setTargetPosition(
-                /**
-                 * TODO: Make gear ratio constant and put it here
-                 */
-                (-angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES));
+
+        pivot.setTargetPosition(angle / 360);
 
         RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            0.112,0,-0.21,
-            new Rotation3d(0, -angle, 0)
+            NTConstants.PIVOT_OFFSET_METERS.getX(),
+            0,
+            NTConstants.PIVOT_OFFSET_METERS.getY(),
+            new Rotation3d(0, -Units.degreesToRadians(angle)-Math.PI/2, 0)
         );
     }
 

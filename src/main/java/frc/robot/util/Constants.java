@@ -85,6 +85,9 @@ public final class Constants {
         public static final int RIGHT_SHOOTER_CAN_ID = 12;
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
+        public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1/360;
+
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
@@ -439,5 +442,7 @@ public final class Constants {
         public static final int ELEVATOR_INDEX = 2;
         public static final int LEFT_CLIMB_INDEX = 3;
         public static final int RIGHT_CLIMB_INDEX = 4;
+
+        public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
     }
 }

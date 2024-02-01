@@ -58,7 +58,7 @@ public class Shooter extends SubsystemBase {
         motorRight.setTargetVelocity(speed);
     }
 
-    public void setSpeedPair(Pair<Double, Double> speeds) {
+    public void setSpeed(Pair<Double, Double> speeds) {
         motorLeft.setTargetVelocity(speeds.getFirst());
         motorRight.setTargetVelocity(speeds.getSecond());
     }
@@ -76,7 +76,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setSpeedCommand(Pair<Double, Double> speeds) {
-        return runOnce(() -> setSpeedPair(speeds));
+        return runOnce(() -> setSpeed(speeds));
     }
 
     /**

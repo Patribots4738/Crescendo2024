@@ -553,7 +553,7 @@ public class Neo extends CANSparkMax {
         this.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
-    public enum TelemtryPreference {
+    public enum TelemetryPreference {
         ONLY_ABSOLUTE_ENCODER,
         ONLY_RELATIVE_ENCODER,
         NO_TELEMETRY,
@@ -568,7 +568,7 @@ public class Neo extends CANSparkMax {
      *             this will tell the motor to only send 
      *             that type of telemtry
      */
-    public void setTelemetryPreference(TelemtryPreference type) {
+    public void setTelemetryPreference(TelemetryPreference type) {
         final int maxDelay = NeoMotorConstants.MAX_PERIODIC_STATUS_TIME_MS;
         final int minDelay = NeoMotorConstants.FAST_PERIODIC_STATUS_TIME_MS;
 

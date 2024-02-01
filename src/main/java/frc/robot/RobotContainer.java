@@ -123,8 +123,8 @@ public class RobotContainer implements Logged {
 
         operator.a().onTrue((climb.toBottom()));
 
-        operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
-                pieceControl.prepareToFire(operator.x()));
+        // operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
+        //         pieceControl.prepareToFire(operator.x()));
 
         operator.leftBumper().and(operator.rightBumper()).onTrue(
                 pieceControl.noteToShoot());
@@ -158,7 +158,7 @@ public class RobotContainer implements Logged {
                                                 : 180))),
                         swerve));
 
-        driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
+        driver.b().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
         driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
 
@@ -166,9 +166,8 @@ public class RobotContainer implements Logged {
 
         driver.y().onTrue(intake.outCommand());
 
-        driver.b().onTrue(
-            Commands.runOnce(() -> System.out.println("First print " + swerve.getPose().toString()))
-                .andThen(shooterCalc.prepareFireCommand(() -> true, swerve.getPose())));
+        driver.leftBumper().onTrue(
+                shooterCalc.prepareFireMovingCommand(() -> true, swerve));
 
         driver.x().onTrue(intake.stop());
 
