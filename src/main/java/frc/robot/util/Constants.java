@@ -86,7 +86,7 @@ public final class Constants {
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
         public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
-        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1/360;
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1;
 
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
@@ -101,8 +101,8 @@ public final class Constants {
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
-        public static final double PIVOT_DEADBAND = 0.3;
-        public static final double SHOOTER_DEADBAND = 0.03;
+        public static final double PIVOT_DEADBAND = 1.125;
+        public static final double SHOOTER_DEADBAND = 0.3;
 
         // These are in %
         public static final double SHOOTER_MIN_OUTPUT = -1;
@@ -112,7 +112,7 @@ public final class Constants {
         public static final double PIVOT_MAX_OUTPUT = 1;
 
         public static final double PIVOT_MAX_ANGLE_DEGREES = 360.0;
-        public static final double PIVOT_REST_ANGLE_DEGREES = 10.0;
+        public static final double PIVOT_REST_ANGLE_DEGREES = 0;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
         /**
@@ -128,6 +128,7 @@ public final class Constants {
                 put(15, SpeedAngleTriplet.of(0.0, 0.8, 40d));
                 put(20, SpeedAngleTriplet.of(0.0, 1.0, 30d));
                 put(25, SpeedAngleTriplet.of(0.0, 1.2, 20d));
+                put(30, SpeedAngleTriplet.of(0.0, 1.4, 10d));
             }
         };
 

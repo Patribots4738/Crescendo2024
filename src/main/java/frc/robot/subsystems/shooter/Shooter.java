@@ -1,8 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import java.util.function.BooleanSupplier;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -79,6 +76,10 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> setSpeed(speeds));
     }
 
+    public Pair<Double, Double> getSpeed() {
+        return new Pair<Double, Double>(motorLeft.getVelocity(), motorRight.getVelocity());
+    }
+
     /**
      * The function is a command that stops both motors
      * 
@@ -86,22 +87,5 @@ public class Shooter extends SubsystemBase {
      */
     public Command stop() {
         return Commands.runOnce(() -> motorLeft.stopMotor());
-    }
-
-    // TODO: Implement a way to get the RPM of the shooter
-    /**
-     * The function is a BooleanSupplier that represents the the condition of
-     * the velocity of the motor being equal to its targetVelocity
-     * 
-     * 
-     * @return The method is returning a BooleanSupplier that returns true if
-     *         the current velocity of the motors is at the target velocity with a
-     *         small tolerance
-     */
-    public BooleanSupplier atDesiredRPM() {
-        return () -> (MathUtil.applyDeadband(
-                Math.abs(
-                        motorLeft.getVelocity() - motorLeft.getTargetVelocity()),
-                ShooterConstants.SHOOTER_DEADBAND) == 0);
     }
 }

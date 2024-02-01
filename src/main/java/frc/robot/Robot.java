@@ -52,7 +52,6 @@ public class Robot extends TimedRobot {
         DriverUI.previousTimestamp = DriverUI.currentTimestamp;
         DriverUI.currentTimestamp = Timer.getFPGATimestamp();
 
-        robotContainer.logME();
     }
 
     @Override

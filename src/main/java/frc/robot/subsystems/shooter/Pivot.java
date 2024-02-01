@@ -1,15 +1,9 @@
 package frc.robot.subsystems.shooter;
 
-import java.util.function.BooleanSupplier;
-
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
@@ -19,110 +13,99 @@ import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 
 public class Pivot extends SubsystemBase implements Logged {
-    private Neo pivot;
+	private Neo pivot;
 
-    public Pivot() {
-        this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
+	public Pivot() {
+		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
 
-        configMotor();
-    }
+		configMotor();
+	}
 
-    public void configMotor() {
-        pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
-        pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-        // TODO: figure out conversion factor along with todo below
-        // pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
+	public void configMotor() {
+		pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
+		pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+		pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
-        pivot.setPID(
-                ShooterConstants.PIVOT_P,
-                ShooterConstants.PIVOT_I,
-                ShooterConstants.PIVOT_D,
-                ShooterConstants.PIVOT_MIN_OUTPUT,
-                ShooterConstants.PIVOT_MAX_OUTPUT);
+		pivot.setPID(
+				ShooterConstants.PIVOT_P,
+				ShooterConstants.PIVOT_I,
+				ShooterConstants.PIVOT_D,
+				ShooterConstants.PIVOT_MIN_OUTPUT,
+				ShooterConstants.PIVOT_MAX_OUTPUT);
 
-        // sets brake mode
-        pivot.setBrakeMode();
-    }
+		// sets brake mode
+		pivot.setBrakeMode();
+	}
 
-    @Override
-    public void periodic() {
-        RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            NTConstants.PIVOT_OFFSET_METERS.getX(),
-            0,
-            NTConstants.PIVOT_OFFSET_METERS.getY(),
-            new Rotation3d(0, -pivot.getPosition(), 0)
-        );
-    }
+	@Override
+	public void periodic() {
+		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
+			NTConstants.PIVOT_OFFSET_METERS.getX(),
+			0,
+			NTConstants.PIVOT_OFFSET_METERS.getY(),
+			new Rotation3d(0, Units.degreesToRadians(-pivot.getPosition()), 0)
+		);
+	}
 
-    /**
-     * The function takes an angle in degrees and converts it into a position
-     * for the pivot motor to rotate to
-     * 
-     * @param double The angle to set the shooter to
-     */
-    public void setAngle(double angle) {
-        // TODO: angle of pivot seems wrong in sim but i am not exactly sure how to fix it here
-        // also change this 180 guy to something better
-        pivot.setTargetPosition(angle / 180);
+	/**
+	 * The function takes an angle in degrees and converts it into a position
+	 * for the pivot motor to rotate to
+	 * 
+	 * @param double The angle to set the shooter to
+	 */
+	public void setAngle(double angle) {
+		// TODO: angle of pivot seems wrong in sim but i am not exactly sure how to fix it here
+		// Also I'm not sure if position input is getting conversion factor applied
+		pivot.setTargetPosition(angle);
 
-        RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            NTConstants.PIVOT_OFFSET_METERS.getX(),
-            0,
-            NTConstants.PIVOT_OFFSET_METERS.getY(),
-            new Rotation3d(0, -Units.degreesToRadians(angle), 0)
-        );
-    }
+		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
+			NTConstants.PIVOT_OFFSET_METERS.getX(),
+			0,
+			NTConstants.PIVOT_OFFSET_METERS.getY(),
+			new Rotation3d(0, Units.degreesToRadians(angle), 0)
+		);
+	}
 
-    /**
-     * The function takes an angle in degrees and returns a command that sets
-     * the pivot to the angle converted to a position
-     * 
-     * @param double The angle to set the shooter to
-     * 
-     * @return The method is returning a Command object.
-     */
-    public Command setAngleCommand(double angle) {
+	/**
+	 * The function takes an angle in degrees and returns a command that sets
+	 * the pivot to the angle converted to a position
+	 * 
+	 * @param double The angle to set the shooter to
+	 * 
+	 * @return The method is returning a Command object.
+	 */
+	public Command setAngleCommand(double angle) {
 
-        return runOnce(() -> setAngle(angle));
-    }
+		return runOnce(() -> setAngle(angle));
+	}
 
-    /**
-     * The function sets the pivot angle to the rest angle constant
-     */
-    public void setRestAngle() {
-        this.setAngle(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
-    }
+	/**
+	 * The function sets the pivot angle to the rest angle constant
+	 */
+	public void setRestAngle() {
+		this.setAngle(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
+	}
 
-    /**
-     * The function is a command that sets the rotation of the pivot to
-     * a default resting position
-     * 
-     * @return The method is returning a Command object.
-     */
-    public Command setRestAngleCommand() {
-        return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
-    }
+	/**
+	 * The function is a command that sets the rotation of the pivot to
+	 * a default resting position
+	 * 
+	 * @return The method is returning a Command object.
+	 */
+	public Command setRestAngleCommand() {
+		return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
+	}
 
-    /**
-     * Determines if the pivot rotation is at its target with a small
-     * tolerance
-     * 
-     * @return The method is returning a BooleanSupplier that returns true
-     *         if the pivot is at its target rotation and false otherwise
-     */
-    public BooleanSupplier atDesiredAngle() {
-        return () -> (MathUtil.applyDeadband(
-                Math.abs(
-                        pivot.getPosition() - pivot.getTargetPosition()),
-                ShooterConstants.PIVOT_DEADBAND) == 0);
-    }
+	public double getAngle() {
+		return pivot.getPosition();
+	}
 
-    /**
-     * The function is a command that stops the motor
-     * 
-     * @return The method is returning a Command object.
-     */
-    public Command stop() {
-        return runOnce(() -> pivot.stopMotor());
-    }
+	/**
+	 * The function is a command that stops the motor
+	 * 
+	 * @return The method is returning a Command object.
+	 */
+	public Command stop() {
+		return runOnce(() -> pivot.stopMotor());
+	}
 }
