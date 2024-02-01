@@ -179,3 +179,6 @@ ctre_sim/
 
 # Choreo trajectories to stop branches from losing their sync-ness
 *.traj
+
+simgui.json
+simgui-ds.json
