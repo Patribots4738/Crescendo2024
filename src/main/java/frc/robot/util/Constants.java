@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 
@@ -271,7 +272,7 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int PWM_PORT = 9;
-        public static final int LED_COUNT = 10;
+        public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
 
         public static final Pose2d[] startingPositions = new Pose2d[] {
             new Pose2d(),
@@ -294,6 +295,28 @@ public final class Constants {
                 0,
                 10
         );
+
+        public static final int NORTH = 0;
+        public static final int NORTHEAST = 1;
+        public static final int EAST = 2;
+        public static final int SOUTHEAST = 3;
+        public static final int SOUTHWEST = 4;
+        public static final int SOUTH = 5;
+        public static final int WEST = 6;
+        public static final int NORTHWEST = 7;
+
+        public static final HashMap<Integer, Pair<Integer, Integer>> ARROW_MAP = new HashMap<Integer, Pair<Integer, Integer>>() 
+        {{
+            put(NORTH, Pair.of(1, 2));
+            put(NORTHEAST, Pair.of(3, 4));
+            put(EAST, Pair.of(5, 6));
+            put(SOUTHEAST, Pair.of(7, 8));
+            put(SOUTHWEST, Pair.of(9, 10));
+            put(SOUTH, Pair.of(11, 12));
+            put(WEST, Pair.of(13, 14));
+            put(NORTHWEST, Pair.of(15, 16));
+        }};
+
     }
 
     public static final class NeoMotorConstants {

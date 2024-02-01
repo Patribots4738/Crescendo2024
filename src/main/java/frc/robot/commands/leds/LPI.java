@@ -4,26 +4,40 @@
 
 package frc.robot.commands.leds;
 
+import java.lang.reflect.Array;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.DriverUI;
 import frc.robot.subsystems.LedStrip;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
 //https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
-public class LPI extends Command {
+public class LPI extends Command implements Logged{
     /** Creates a new LPI. */
     private final LedStrip ledStrip;
     private final Supplier<Pose2d> positionSupplier;
     private int activeRotationalLED = 0;
 
+    Pose2d closestPose;
+    Pose2d currentRobotPosition;
+    Translation2d currentRobotTranslation;
+    
+    @Log.NT
+    Pose2d cardinalMagnitude;
+
     public LPI(LedStrip ledStrip, Supplier<Pose2d> positionSupplier) {
-        addRequirements(ledStrip);
         this.ledStrip = ledStrip;
         this.positionSupplier = positionSupplier;
     }
@@ -34,14 +48,14 @@ public class LPI extends Command {
     }
 
     // Called every time the scheduler runs while the command is scheduled.
-    @Override
+    @Override  
     public void execute() {
+        closestPose = new Pose2d();
+        currentRobotPosition = positionSupplier.get();
+        currentRobotTranslation = currentRobotPosition.getTranslation();
         // Loop through all of the startingPositions in the array
         // closest position is point B
         // current position in point A
-        Pose2d closestPose = new Pose2d();
-        Pose2d currentRobotPosition = positionSupplier.get();
-        Translation2d currentRobotTranslation = currentRobotPosition.getTranslation();
 
         double closestDistance = currentRobotTranslation.getDistance(closestPose.getTranslation());
 
@@ -58,11 +72,35 @@ public class LPI extends Command {
         Rotation2d requiredRotation = closestPose.getRotation().minus(currentRobotPosition.getRotation());
 
         if (closestDistance > LEDConstants.RIN_STAR_BIN) {
-            ledStrip.setLED(getColorFromDistance(closestDistance));
+            
+            Translation2d desiredTranslation = closestPose.relativeTo(currentRobotPosition).getTranslation();
+
+            Rotation2d cardinalDirection = Rotation2d.fromRadians(Math.atan2(desiredTranslation.getY(), desiredTranslation.getX()));
+
+            cardinalMagnitude = new Pose2d(desiredTranslation, cardinalDirection);
+
+            int arrowIndex = (int) cardinalDirection.getDegrees()/45;
+            
+            ledStrip.setLED(
+                LEDConstants.ARROW_MAP.get((arrowIndex)).getFirst(), 
+                LEDConstants.ARROW_MAP.get((arrowIndex)).getSecond(), 
+                getColorFromDistance(closestDistance)
+            );
         } else if (MathUtil.applyDeadband(requiredRotation.getDegrees(), LEDConstants.LPI_ROTATIONAL_DEADBAND) != 0) {
-            ledStrip.setLED(activeRotationalLED, (activeRotationalLED + 2), Color.kGreen);
+            ledStrip.setLED(
+                activeRotationalLED,
+                activeRotationalLED + 2, 
+                Color.kGreen);
+
             activeRotationalLED = requiredRotation.getDegrees() > 0 ? activeRotationalLED + 1 : activeRotationalLED - 1;
             activeRotationalLED %= LEDConstants.LED_COUNT - 2;
+        } else {
+            // Flash the LEDs based on the current timestamp
+            ledStrip.setLED(
+                ((int) (DriverUI.currentTimestamp * 10) % 2 == 0) 
+                    ? Color.kGreen 
+                    : Color.kGold
+            );
         }
     }
 
@@ -78,23 +116,22 @@ public class LPI extends Command {
         if (distance > LEDConstants.OUTER_ZONE) {
             return Color.kRed;
         } else if (distance > LEDConstants.INNER_ZONE) {
-            return Color.kBlue;
+            return Color.kOrange;
         } else {
-            return Color.kPurple;
+            return Color.kGreen; 
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-            cancel();
-        }
+        cancel();
+        ledStrip.greenNGold();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        return FieldConstants.GAME_MODE.equals(GameMode.DISABLED);
     }
 }
