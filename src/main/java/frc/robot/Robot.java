@@ -127,6 +127,7 @@ public class Robot extends TimedRobot {
     @Override
     public void simulationPeriodic() {
         REVPhysicsSim.getInstance().run();
+        FieldConstants.ALLIANCE = DriverStation.getAlliance();
 
         for (Neo neo : NeoMotorConstants.motors) {
             neo.tick();
