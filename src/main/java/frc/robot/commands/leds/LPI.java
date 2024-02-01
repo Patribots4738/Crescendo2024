@@ -7,12 +7,14 @@ package frc.robot.commands.leds;
 import java.lang.reflect.Array;
 import java.util.function.Supplier;
 
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.DriverUI;
@@ -62,7 +64,7 @@ public class LPI extends Command implements Logged{
         for (Pose2d startingPosition : LEDConstants.startingPositions) {
 
             double currentDistance = currentRobotTranslation.getDistance(startingPosition.getTranslation());
-
+            //sets the closest staring position to the closest position
             if (currentDistance < closestDistance) {
                 closestPose = startingPosition;
                 closestDistance = currentDistance;
@@ -80,7 +82,7 @@ public class LPI extends Command implements Logged{
             cardinalMagnitude = new Pose2d(desiredTranslation, cardinalDirection);
 
             int arrowIndex = (int) cardinalDirection.getDegrees()/45;
-            
+            //sets the LED to corresponding arrow
             ledStrip.setLED(
                 LEDConstants.ARROW_MAP.get((arrowIndex)).getFirst(), 
                 LEDConstants.ARROW_MAP.get((arrowIndex)).getSecond(), 
@@ -106,9 +108,9 @@ public class LPI extends Command implements Logged{
 
     /**
      * Sets the color of the LED strip based on the given distance.
-     * If the distance is greater than LEDConstants.OUTER_ZONE, the LED strip is turned off.
-     * If the distance is greater than LEDConstants.INNER_ZONE, the LED strip is set to blue.
-     * If the distance is greater than LEDConstants.RIN_STAR_BIN, the LED strip is set to purple.
+     * If the distance is greater than LEDConstants.OUTER_ZONE, the LED strip is set to red.
+     * If the distance is greater than LEDConstants.INNER_ZONE, the LED strip is set to orange.
+     * If the distance is greater than LEDConstants.RIN_STAR_BIN, the LED strip is set to green.
      * 
      * @param distance the distance used to determine the LED color
      */
@@ -132,6 +134,6 @@ public class LPI extends Command implements Logged{
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return FieldConstants.GAME_MODE.equals(GameMode.DISABLED);
+        return !FieldConstants.GAME_MODE.equals(GameMode.DISABLED);
     }
 }
