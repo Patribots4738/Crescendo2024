@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
+import frc.robot.commands.NoteTrajectory;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.shooter.Pivot;
@@ -38,6 +40,7 @@ public class RobotContainer implements Logged {
     private final Limelight limelight;
     private final Climb climb;
     private Indexer triggerWheel;
+    NoteTrajectory noteTrajectory;
 
     private Shooter shooter;
     private Pivot pivot;
@@ -57,6 +60,7 @@ public class RobotContainer implements Logged {
         shooter = new Shooter();
         pivot = new Pivot();
         shooterCalc = new ShooterCalc(shooter, pivot);
+        noteTrajectory = new NoteTrajectory(swerve::getPose);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -122,6 +126,7 @@ public class RobotContainer implements Logged {
 
         driver.x().onTrue(intake.stop());
 
+
     }
 
     public Command getAutonomousCommand() {
@@ -132,6 +137,7 @@ public class RobotContainer implements Logged {
     }
 
     public void onEnabled() {
+        noteTrajectory.schedule();
     }
 
     public void prepareNamedCommands() {

@@ -4,7 +4,6 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -17,7 +16,6 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
-import frc.robot.util.Constants;
 import frc.robot.util.SpeedAngleTriplet;
 
 public class ShooterCalc implements Logged {
@@ -25,13 +23,13 @@ public class ShooterCalc implements Logged {
     private Pivot pivot;
     private Shooter shooter;
     private boolean aiming;
-
+    
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.pivot = pivot;
         this.shooter = shooter;
         this.aiming = false;
     }
-
+    
     /**
      * The function prepares a fire command by calculating the speed and angle for
      * the robot's shooter
@@ -47,17 +45,18 @@ public class ShooterCalc implements Logged {
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Pose2d robotPose) {
         SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
-
+        
         return pivot.setAngleCommand(triplet.getAngle())
-                .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
+        .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
     }
-
+    
     @Log.NT
     Rotation2d currentAngleToSpeaker;
     @Log.NT
     Pose2d robotPoseAngled;
     @Log.NT
     Pose2d robotPoseSurely;
+
 
     /**
      * Calculates the angle to the speaker based on the robot's pose and velocity.
@@ -86,10 +85,6 @@ public class ShooterCalc implements Logged {
         robotPoseSurely = new Pose2d(robotPose.getTranslation(), new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY()).unaryMinus());
 
         return new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY());
-    }
-
-    public void calculateTraj(double height, Pose2d robotPose, double velocity, double t) {
-        // TODO: impliment math from https://www.desmos.com/3d/68dee4cf42 
     }
 
     /**
@@ -127,24 +122,6 @@ public class ShooterCalc implements Logged {
         double rpm = ((velocity/(2.0*Math.PI)) / (ShooterConstants.WHEEL_DIAMETER_METERS/2.0)) * 60.0;
         return rpm;
     }
-
-    /* public double trajectoryEquation(double x, Pose2d pose, double angle, double velocity, double height) {
-        double result1 = ((pose.getX() + 0.92 - x) * Math.tan(angle));
-        double result2Half1 = (9.8*(Math.pow((pose.getX() + 0.92 - x), 2)));
-        double result2Half2 = (2*(Math.pow(velocity, 2))*(Math.pow(Math.cos(angle), 2)));
-        return result1 - (result2Half1 / result2Half2) + height;
-    }
-
-    private double heightEquation(double x) {
-        // TODO: DO this 
-        return 0.0;
-    }
-
-    public Pose3d calculateNoteTraj(double t) {
-        return new Pose3d();
-    } */
-
-
 
     /**
      * The function prepares a command to fire at a stationary target while moving
