@@ -195,6 +195,8 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
+
+        // TODO: reimplement these with new shootercalc logic
         // NamedCommands.registerCommand("prepareShooterL",
         // shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
         // NamedCommands.registerCommand("prepareShooterM",
