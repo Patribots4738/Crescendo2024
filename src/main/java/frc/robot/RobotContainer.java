@@ -124,9 +124,9 @@ public class RobotContainer implements Logged {
         
         operator.povDown().onTrue(climb.toBottomCommand());
 
-        driver.povLeft().onTrue(pieceControl.goHomeElevator());
+        operator.povLeft().onTrue(elevator.toBottomCommand());
 
-        driver.povRight().onTrue(pieceControl.placeTrapCommand());
+        operator.povRight().onTrue(pieceControl.placeTrapCommand());
 
         operator.b().onTrue(
             pieceControl.prepareToFire(operator.leftBumper())

@@ -149,7 +149,7 @@ public final class Constants {
         public static final int CLAW_CAN_ID = 16;
         public static final double ELEVATOR_DEADBAND = .3;
         public static final double OUTTAKE_TIME = .2;
-        public static final double CLAW_POSITION_MULTIPLIER = 2;
+        public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
 
         public static final int CLAW_CURRENT_LIMIT = 7;
@@ -161,15 +161,15 @@ public final class Constants {
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
 
-        public static final PIDConstants TRAP_PID = new PIDConstants(1, 0, 0);
+        public static final PIDConstants TRAP_PID = new PIDConstants(0.5, 0, 0);
 
         // TODO: set these values
-        public static final double TRAP_POS = 0;
         public static final double RESET_POS = 0;
         public static final double INTAKE_TIME = 0;
-        public static final double CLAW_OUTTAKE = 0;
-        public static final double CLAW_INTAKE = 0;
-        public static final double TRAP_PLACE_POS = 10;
+        public static final double CLAW_OUTTAKE = -1;
+        public static final double CLAW_INTAKE = 1;
+        public static final double TRAP_PLACE_POS = 0.48;
+        public static final double AMP_PLACE_POS = 0.48;
 
         public static final double CLAW_HAS_PIECE_UPPER_LIMIT = 0;
         public static final double CLAW_HAS_PIECE_LOWER_LIMIT = -0.25;

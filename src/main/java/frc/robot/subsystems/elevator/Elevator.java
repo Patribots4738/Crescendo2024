@@ -73,6 +73,22 @@ public class Elevator extends SubsystemBase {
                 .andThen(Commands.waitUntil(this.isAtTargetPosition()));
     }
 
+    private void toTop() {
+        this.setPosition(TrapConstants.TRAP_PLACE_POS);
+    }
+
+    private void toBottom() {
+        this.setPosition(TrapConstants.RESET_POS);
+    }
+
+    public Command toBottomCommand() {
+        return runOnce(this::toBottom);
+    }
+
+    public Command toTopCommand() {
+        return runOnce(this::toTop);
+    }
+
     public Command stop() {
         return runOnce(() -> elevator.stopMotor());
     }

@@ -105,17 +105,11 @@ public class PieceControl {
         return shoot;
     }
 
-    public Command goHomeElevator() {
-        return this.elevator.setPositionCommand(TrapConstants.RESET_POS);
-    }
-
     public Command placeTrapCommand() {
         return Commands.sequence(
-                this.elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
-                this.claw.placeCommand()
-                .withTimeout(1),
-                goHomeElevator(),
-                claw.stop());
+                elevator.toTopCommand(),
+                claw.placeCommand(),
+                Commands.waitSeconds(2));
     }
 
 }
