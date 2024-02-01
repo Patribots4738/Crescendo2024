@@ -158,9 +158,7 @@ public final class Constants {
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
 
-        public static final double TRAP_P = 0.01;
-        public static final double TRAP_I = 0;
-        public static final double TRAP_D = 0;
+        public static final PIDConstants TRAP_PID = new PIDConstants(1, 0, 0);
 
         // TODO: set these values
         public static final double TRAP_POS = 0;
@@ -168,7 +166,7 @@ public final class Constants {
         public static final double INTAKE_TIME = 0;
         public static final double CLAW_OUTTAKE = 0;
         public static final double CLAW_INTAKE = 0;
-        public static final double TRAP_PLACE_POS = 0;
+        public static final double TRAP_PLACE_POS = 10;
 
         public static final double CLAW_HAS_PIECE_UPPER_LIMIT = 0;
         public static final double CLAW_HAS_PIECE_LOWER_LIMIT = -0.25;
