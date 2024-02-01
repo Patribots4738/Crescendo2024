@@ -38,7 +38,7 @@ public class RobotContainer implements Logged {
 
     private Swerve swerve;
     private final Intake intake;
-    
+
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
     private final Limelight limelight;
@@ -53,6 +53,7 @@ public class RobotContainer implements Logged {
 
     @Log.NT
     public static Pose3d[] components3d = new Pose3d[5];
+
     @Log.NT
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
 
@@ -66,24 +67,21 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        
         triggerWheel = new Indexer();
-
         shooter = new Shooter();
         elevator = new Elevator();
         claw = new Claw();
-
         pivot = new Pivot();
-      
-        shooterCalc = new ShooterCalc(shooter, pivot);
 
+        shooterCalc = new ShooterCalc(shooter, pivot);
         pieceControl = new PieceControl(
-            intake, 
-            triggerWheel, 
-            elevator, 
-            claw, 
-            shooterCalc, 
-            swerve
-        );
+                intake,
+                triggerWheel,
+                elevator,
+                claw,
+                shooterCalc,
+                swerve);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -112,6 +110,7 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
 
         prepareNamedCommands();
+        initializeArrays();
     }
 
     private void configureButtonBindings() {
@@ -120,8 +119,10 @@ public class RobotContainer implements Logged {
     }
 
     private void configureOperatorBindings() {
+
+        operator.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        operator.a().onTrue((climb.toBottom()));
+        operator.povDown().onTrue(climb.toBottomCommand());
 
         operator.b().onTrue(
             pieceControl.prepareToFire(operator.leftBumper())
@@ -160,14 +161,14 @@ public class RobotContainer implements Logged {
         // reset the orientation of the robot
         // to be facing away from the driver station
         driver.start().or(driver.back()).onTrue(
-                Commands.runOnce(() -> swerve.resetOdometry(
-                        new Pose2d(
-                                swerve.getPose().getTranslation(),
-                                Rotation2d.fromDegrees(
-                                        FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red))
-                                                ? 0
-                                                : 180))),
-                        swerve));
+            Commands.runOnce(() -> swerve.resetOdometry(
+                new Pose2d(
+                    swerve.getPose().getTranslation(),
+                    Rotation2d.fromDegrees(
+                    FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red))
+                        ? 0
+                        : 180))),
+                swerve));
 
         driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
 
@@ -178,7 +179,7 @@ public class RobotContainer implements Logged {
         driver.y().onTrue(intake.outCommand());
 
         driver.x().onTrue(intake.stop());
-        
+
         driver.rightStick().whileTrue(
             Commands.sequence(
                 swerve.getDriveCommand(
@@ -188,9 +189,7 @@ public class RobotContainer implements Logged {
                             driver.getLeftX(),
                             swerve.getAlignmentSpeeds(Rotation2d.fromRadians(360)),
                             swerve.getPose().getRotation());
-                    }, true)
-            )
-        );
+                        }, true)));
 
     }
 
@@ -209,9 +208,12 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
+        NamedCommands.registerCommand("prepareShooterL",
+                shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM",
+                shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR",
+                shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
     }
 
     private void incinerateMotors() {
@@ -224,8 +226,7 @@ public class RobotContainer implements Logged {
     }
 
     private void initializeArrays() {
-
-            Pose3d initialShooterPose = new Pose3d(
+        Pose3d initialShooterPose = new Pose3d(
                 NTConstants.PIVOT_OFFSET.getX(),
                 0,
                 NTConstants.PIVOT_OFFSET.getY(),
