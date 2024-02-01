@@ -101,8 +101,17 @@ public class ShooterCalc implements Logged {
      * @return the velocity in meters per second
      */
     public double rpmToVelocity(Pair<Double, Double> speeds) {
-        double rpm = (speeds.getFirst() + speeds.getSecond()) / 2.0;
-        return (Math.PI) * (ShooterConstants.WHEEL_DIAMETER_METERS) * (rpm / 60.0);
+        
+        double rotationsPerMinute = (speeds.getFirst() + speeds.getSecond()) / 2.0;
+        double rotationsPerSecond = rotationsPerMinute / 60.0;
+        double radiansPerSecond = rotationsPerSecond * Math.PI;
+
+        double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
+
+        // Normally this is 1 radius * 2 pi
+        // but we are doing 2 radius * 1 pi
+        // because we are given a diameter
+        return diameter * radiansPerSecond;
     }
 
 
@@ -110,12 +119,20 @@ public class ShooterCalc implements Logged {
      * Converts the velocity of the shooter wheel to RPM (Rotations Per Minute).
      * Equation: ((V/(2π)) / (D/2)) * 60 = RPM
      * 
-     * @param velocity the velocity of the shooter wheel in meters per second
+     * @param noteVelocity the velocity of the shooter wheel in meters per second
      * @return the RPM (Rotations Per Minute) of the shooter wheel
      */
-    public double velocityToRPM(double velocity) {
-        double rpm = ((velocity/(2.0*Math.PI)) / (ShooterConstants.WHEEL_DIAMETER_METERS/2.0)) * 60.0;
-        return rpm;
+    public double velocityToRPM(double noteVelocity) {
+        double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
+    
+        // Convert velocity back to radians per second
+        double radiansPerSecond = noteVelocity / diameter;
+    
+        // Convert radians per second back to rotations per second
+        double rotationsPerSecond = radiansPerSecond / Math.PI;
+    
+        // Convert rotations per second back to rotations per minute
+        return rotationsPerSecond * 60.0;
     }
 
     /**
@@ -249,14 +266,29 @@ public class ShooterCalc implements Logged {
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
 
+    /**
+     * Checks if the pivot is at the desired angle.
+     * 
+     * @return true if the pivot is at the desired angle, false otherwise.
+     */
     public boolean pivotAtDesiredAngle() {
         return pivot.atDesiredAngle().getAsBoolean();
     }
 
+    /**
+     * Checks if the shooter is at the desired RPM.
+     * 
+     * @return true if the shooter is at the desired RPM, false otherwise
+     */
     public boolean shooterAtDesiredRPM() {
         return shooter.atDesiredRPM().getAsBoolean();
     }
 
+    /**
+     * Stops the motors of the shooter and pivot subsystems.
+     * 
+     * @return The command to stop the motors.
+     */
     public Command stopMotors() {
         return Commands.parallel(
                 shooter.stop(),
