@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -23,8 +24,8 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
-import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
@@ -119,7 +120,6 @@ public class RobotContainer implements Logged {
     }
 
     private void configureOperatorBindings() {
-        operator.y().onTrue((climb.toTop(PoseCalculations.getChainPosition(swerve.getPose()))));
         
         operator.a().onTrue((climb.toBottom()));
 
@@ -223,4 +223,21 @@ public class RobotContainer implements Logged {
         Timer.delay(0.25);
     }
 
+    private void initializeArrays() {
+
+            Pose3d initialShooterPose = new Pose3d(
+                NTConstants.PIVOT_OFFSET.getX(),
+                0,
+                NTConstants.PIVOT_OFFSET.getY(),
+            new Rotation3d()
+        );
+
+        components3d[0] = initialShooterPose;
+        desiredComponents3d[0] = initialShooterPose;
+
+        for (int i = 1; i < components3d.length; i++) {
+            components3d[i] = new Pose3d();
+            desiredComponents3d[i] = new Pose3d();
+        }
+    }
 }

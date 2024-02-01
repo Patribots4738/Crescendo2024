@@ -45,7 +45,9 @@ public class Pivot extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            0,0,0,
+            NTConstants.PIVOT_OFFSET.getX(),
+            0,
+            NTConstants.PIVOT_OFFSET.getY(),
             new Rotation3d(0, -pivot.getPosition(), 0)
         );
     }
@@ -64,7 +66,9 @@ public class Pivot extends SubsystemBase implements Logged {
                 (angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES));
 
         RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-            0,0,0,
+            NTConstants.PIVOT_OFFSET.getX(),
+            0,
+            NTConstants.PIVOT_OFFSET.getY(),
             new Rotation3d(0, -angle, 0)
         );
     }
