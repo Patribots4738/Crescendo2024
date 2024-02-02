@@ -29,9 +29,6 @@ public class Robot extends TimedRobot {
     public void robotInit() { 
         robotContainer = new RobotContainer();
         Monologue.setupMonologue(robotContainer, "Robot", false, false);
-        FieldConstants.GAME_MODE = GameMode.DISABLED;
-
-        //leds = new Leds(null);
     }
 
     /**

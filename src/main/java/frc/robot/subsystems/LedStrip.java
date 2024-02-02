@@ -2,8 +2,11 @@ package frc.robot.subsystems;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
+
+import com.google.gson.JsonElement;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,7 +45,7 @@ public class LedStrip extends SubsystemBase {
         patternMap.put(1, greenNGold());
         patternMap.put(2, circus());
         patternMap.put(3, loading());
-        patternMap.put(5, alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red))));
+        patternMap.put(5, alliance(() -> DriverStation.getAlliance().equals(Optional.of(Alliance.Red))));
         patternMap.put(6, flash());
     }
 
@@ -53,12 +56,6 @@ public class LedStrip extends SubsystemBase {
     @Override
     public void periodic() {
         runPattern(currentPatternIndex).schedule();
-        
-        // tickBellyPanPattern();
-        // tickArmPattern();
-        // tickIntakePattern();
-        // tickShooterPattern();
-        // tickClimberPattern();
     }
 
     private Command runPattern(int index) {
@@ -67,7 +64,7 @@ public class LedStrip extends SubsystemBase {
             case (1) -> greenNGold();
             case (2) -> circus();
             case (3) -> loading();
-            case (5) -> alliance(DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
+            case (5) -> alliance(() -> DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
             case (6) -> flash();
             default -> runOnce(() -> {
             });
@@ -170,7 +167,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     private int allianceOffset = 0;
-    public Command alliance(boolean isRedAlliance) {
+    public Command alliance(BooleanSupplier isRedAlliance) {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
                 final int hue = 135 + (int) 
