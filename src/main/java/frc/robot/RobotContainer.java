@@ -131,13 +131,17 @@ public class RobotContainer implements Logged {
     
     private void configureOperatorBindings() {
 
-        operator.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        operator.povUp()
+            .toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        operator.povDown().onTrue(climb.toBottomCommand());
+        operator.povDown()
+            .onTrue(climb.toBottomCommand());
 
-        operator.povLeft().onTrue(elevator.toBottomCommand());
+        operator.povLeft()
+            .onTrue(elevator.toBottomCommand());
 
-        operator.povRight().onTrue(pieceControl.placeTrapCommand());
+        operator.povRight()
+            .onTrue(pieceControl.placeTrapCommand());
 
         operator.leftBumper()
             .and(operator.rightBumper())
