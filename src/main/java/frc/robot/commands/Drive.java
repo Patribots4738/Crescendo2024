@@ -61,8 +61,10 @@ public class Drive extends Command {
 
     @Override
     public void execute() {
-        double x = xSupplier.getAsDouble();
-        double y = ySupplier.getAsDouble();
+        double x =  xSupplier.getAsDouble();
+        // The driver's right is negative 
+        // on the field's axis
+        double y = -ySupplier.getAsDouble();
         if (shouldMirror.getAsBoolean()) {
             x *= -1;
             y *= -1;

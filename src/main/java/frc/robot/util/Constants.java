@@ -8,17 +8,22 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import java.util.Optional;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 
@@ -50,12 +55,22 @@ public final class Constants {
         public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
         public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
 
+        // Front positive, left positive
+        public static final Translation2d FRONT_LEFT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2);
+        public static final Translation2d FRONT_RIGHT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+        public static final Translation2d REAR_LEFT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2);
+        public static final Translation2d REAR_RIGHT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+
+        public static final Translation2d[] WHEEL_POSITION_ARRAY = new Translation2d[] {
+            FRONT_LEFT_WHEEL_POSITION,
+            FRONT_RIGHT_WHEEL_POSITION,
+            REAR_LEFT_WHEEL_POSITION,
+            REAR_RIGHT_WHEEL_POSITION
+        };
+
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                // Front Positive, Left Positive
-                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // Front Left
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // Front Right
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // Rear Left
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // Rear Right
+                WHEEL_POSITION_ARRAY
+        );
 
         // Angular offsets of the modules relative to the chassis in radians
         // add 90 degrees to change the X and Y axis
@@ -188,9 +203,17 @@ public final class Constants {
         public static final int LEFT_CLIMB_CAN_ID = 17;
         public static final int RIGHT_CLIMB_CAN_ID = 18;
 
-        public static final double HIGH_LIMIT = 3.0;
-        public static final double ROCK_BOTTOM = 0.0;
-        public static final double ALMOST_HIGH_LIMIT = 2.5;
+        public static final double CLIMB_POSITION_CONVERSION_FACTOR = 0.1;
+        public static final int CLIMB_CURRENT_LIMIT = 40;
+
+        public static final PIDConstants CLIMB_PID = new PIDConstants(0.5, 0, 0);
+
+        public static final double EXTENSION_LIMIT_METERS = Units.feetToMeters(3.65);
+        
+        public static final double TOP_LIMIT = 0.5125;
+        public static final double BOTTOM_LIMIT = 0.0;
+        
+        public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
     }
 
     public static final class AutoConstants {
@@ -324,6 +347,55 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
     }
 
+    public static final class LEDConstants {
+        public static final int PWM_PORT = 9;
+        public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
+
+        public static final Pose2d[] startingPositions = new Pose2d[] {
+            new Pose2d(),
+            new Pose2d(1, 1, new Rotation2d(Units.degreesToRadians(120))),
+            new Pose2d(2, 1, Rotation2d.fromDegrees(10)),
+            new Pose2d(3, 1, Rotation2d.fromRadians(Math.PI)),
+            new Pose2d(new Translation2d(1, 2), new Rotation2d()),
+            new Pose2d(2, 2, new Rotation2d()),
+            new Pose2d(3, 3, new Rotation2d(Units.degreesToRadians(160))),
+        };
+        public static final Integer patternMap = null;
+
+        public static final double OUTER_ZONE = 2.262;
+        public static final double INNER_ZONE = 1.131;
+        public static final double RIN_STAR_BIN = 0.1;
+
+        public static final int LPI_ROTATIONAL_DEADBAND = 1;
+
+        public static final Pair<Integer, Integer> LEFT_WHEEL_LED_RANGE = new Pair<Integer, Integer>(
+                0,
+                10
+        );
+
+        public static final int NORTH = 0;
+        public static final int NORTHEAST = 1;
+        public static final int EAST = 2;
+        public static final int SOUTHEAST = 3;
+        public static final int SOUTHWEST = 4;
+        public static final int SOUTH = 5;
+        public static final int WEST = 6;
+        public static final int NORTHWEST = 7;
+
+        public static final HashMap<Integer, Pair<Integer, Integer>> ARROW_MAP = new HashMap<Integer, Pair<Integer, Integer>>() 
+        {{
+            put(NORTH, Pair.of(1, 2));
+            put(NORTHEAST, Pair.of(3, 4));
+            put(EAST, Pair.of(5, 6));
+            put(SOUTHEAST, Pair.of(7, 8));
+            put(SOUTHWEST, Pair.of(9, 10));
+            put(SOUTH, Pair.of(11, 12));
+            put(WEST, Pair.of(13, 14));
+            put(NORTHWEST, Pair.of(15, 16));
+        }};
+
+    }
+
     public static final class NeoMotorConstants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
@@ -367,6 +439,7 @@ public final class Constants {
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.5410515;
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
+        public static final double CHAIN_HEIGHT_METERS = 8.2112312;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
@@ -396,7 +469,7 @@ public final class Constants {
         //      1      4
         //  0              3
         // @formatter:on
-        public static Pose2d[] CHAIN_POSITIONS = new Pose2d[] {
+        public static final Pose2d[] CHAIN_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Stage
@@ -409,6 +482,15 @@ public final class Constants {
                 new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
         };
 
+        public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
+            new Pose3d(CHAIN_POSITIONS[0]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[1]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[2]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[3]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[4]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+            new Pose3d(CHAIN_POSITIONS[5]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
+        };
+
         // Speaker Positions: Blue alliance left
         // @formatter:off
                 //
@@ -416,7 +498,7 @@ public final class Constants {
                 //
                 //
                 // @formatter:on
-        public static Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
+        public static final Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Speaker
@@ -435,17 +517,11 @@ public final class Constants {
         };
 
         // TODO: make real constants
-        public static Pose2d L_POSE = new Pose2d();
-        public static Pose2d R_POSE = new Pose2d();
-        public static Pose2d M_POSE = new Pose2d();
+        public static final Pose2d L_POSE = new Pose2d();
+        public static final Pose2d R_POSE = new Pose2d();
+        public static final Pose2d M_POSE = new Pose2d();
 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
-
-        public static enum ChainPosition {
-            LEFT,
-            RIGHT,
-            CENTER
-        }
     }
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;

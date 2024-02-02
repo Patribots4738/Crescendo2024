@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
+import frc.robot.commands.leds.LPI;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
@@ -22,8 +24,13 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
-import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
+import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.OIConstants;
+import monologue.Logged;
+import monologue.Monologue;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
@@ -33,13 +40,14 @@ public class RobotContainer implements Logged {
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
-    
+
     private Swerve swerve;
     private final Intake intake;
-    
+
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
     private final Limelight limelight;
+    private final LedStrip ledStrip;
     private final Climb climb;
     private Indexer triggerWheel;
     private Pivot pivot;
@@ -51,12 +59,15 @@ public class RobotContainer implements Logged {
     
     @Log.NT
     public static Pose3d[] components3d = new Pose3d[5];
+
     @Log.NT
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
     
     public RobotContainer() {
+        
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
+        ledXboxController = new PatriBoxController(3, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
         limelight = new Limelight();
@@ -64,8 +75,8 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
-        
         shooter = new Shooter();
         elevator = new Elevator();
         claw = new Claw();
@@ -107,21 +118,26 @@ public class RobotContainer implements Logged {
                 && FieldConstants.ALLIANCE
                     .equals(Optional.ofNullable(Alliance.Blue)))));
         
+        ledStrip.setDefaultCommand(new LPI(ledStrip, swerve::getPose));
+      
         incinerateMotors();
         configureButtonBindings();
         
         prepareNamedCommands();
+        initializeArrays();
     }
     
     private void configureButtonBindings() {
         configureDriverBindings();
         configureOperatorBindings();
+        configureLedBindeing();
     }
     
     private void configureOperatorBindings() {
-        operator.y().onTrue((climb.toTop(PoseCalculations.getChainPosition(swerve.getPose()))));
+
+        operator.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        operator.a().onTrue((climb.toBottom()));
+        operator.povDown().onTrue(climb.toBottomCommand());
 
         operator.leftBumper()
             .and(operator.rightBumper())
@@ -185,12 +201,10 @@ public class RobotContainer implements Logged {
                         return ChassisSpeeds.fromFieldRelativeSpeeds(
                             driver.getLeftY(),
                             driver.getLeftX(),
-                            swerve.getAlignmentSpeeds(
-                                Rotation2d.fromDegrees(360)),
-                                swerve.getPose().getRotation());
+                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(360)),
+                            swerve.getPose().getRotation());
                     },
                 () -> true));
-        
     }
     
     public Command getAutonomousCommand() {
@@ -208,13 +222,9 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        
-        NamedCommands.registerCommand("prepareShooterL",
-        shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM",
-        shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR",
-        shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
     }
     
     private void incinerateMotors() {
@@ -225,5 +235,22 @@ public class RobotContainer implements Logged {
         }
         Timer.delay(0.25);
     }
-    
+
+    private void initializeArrays() {
+        Pose3d initialShooterPose = new Pose3d(
+                NTConstants.PIVOT_OFFSET.getX(),
+                0,
+                NTConstants.PIVOT_OFFSET.getY(),
+            new Rotation3d()
+        );
+
+        components3d[0] = initialShooterPose;
+        desiredComponents3d[0] = initialShooterPose;
+
+        for (int i = 1; i < components3d.length; i++) {
+            components3d[i] = new Pose3d();
+            desiredComponents3d[i] = new Pose3d();
+        }
+    }
 }
+

@@ -2,6 +2,7 @@
 
 package frc.robot.util;
 
+import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
@@ -351,6 +352,25 @@ public class Neo extends CANSparkMax {
     public void addFollower(Neo follower, boolean invert) {
         followers.add(follower);
         follower.follow(this, invert);
+    }
+
+    /**
+     * Sets the PID constants for the Neo motor controller.
+     * 
+     * @param constants the PID constants to set
+     */
+    public void setPID(PIDConstants constants) {
+        setPID(constants, 0);
+    }
+
+    /**
+     * Sets the PID constants for the Neo motor controller.
+     * 
+     * @param constants the PID constants to set
+     * @param slotID    the slot ID of the PID controller
+     */
+    public void setPID(PIDConstants constants, int slotID) {
+        setPID(constants.kP, constants.kI, constants.kD, -1, 1, slotID);
     }
 
     /**
