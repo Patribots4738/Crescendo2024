@@ -30,11 +30,7 @@ public class Elevator extends SubsystemBase {
         elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
-        elevator.setPID(
-                TrapConstants.TRAP_P,
-                TrapConstants.TRAP_I,
-                TrapConstants.TRAP_D,
-                TrapConstants.TRAP_ELEVATOR_MIN_OUTPUT, TrapConstants.TRAP_ELEVATOR_MAX_OUTPUT);
+        elevator.setPID(TrapConstants.TRAP_PID);
     }
 
     @Override
@@ -75,6 +71,22 @@ public class Elevator extends SubsystemBase {
     public Command setPositionCommand(double pos) {
         return runOnce(() -> this.setPosition(pos))
                 .andThen(Commands.waitUntil(this.isAtTargetPosition()));
+    }
+
+    private void toTop() {
+        this.setPosition(TrapConstants.TRAP_PLACE_POS);
+    }
+
+    private void toBottom() {
+        this.setPosition(TrapConstants.RESET_POS);
+    }
+
+    public Command toBottomCommand() {
+        return runOnce(this::toBottom);
+    }
+
+    public Command toTopCommand() {
+        return runOnce(this::toTop);
     }
 
     public Command stop() {

@@ -101,8 +101,11 @@ public class PieceControl {
         return shoot;
     }
 
-    public Command goHomeElevator() {
-        return this.elevator.setPositionCommand(TrapConstants.RESET_POS);
+    public Command placeTrapCommand() {
+        return Commands.sequence(
+                elevator.toTopCommand(),
+                claw.placeCommand(),
+                Commands.waitSeconds(2));
     }
 
 }
