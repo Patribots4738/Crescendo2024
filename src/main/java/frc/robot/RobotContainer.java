@@ -5,11 +5,12 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -214,7 +215,7 @@ public class RobotContainer implements Logged {
         // TODO: Autos currently start at C1-5, we need to integrate the other paths
         // with the center line schenanigans to make full autos
         autoChooser.setDefaultOption("Do Nothing", Commands.none());
-        autoChooser.addOption("W3-1 C1-5", swerve.resetOdometryCommand(starting::getPreviewStartingHolonomicPose).andThen(AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false))));
+        autoChooser.addOption("W3-1 C1-5", swerve.resetOdometryCommand(() -> starting.getPreviewStartingHolonomicPose().plus(new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180)))).andThen(AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false))));
     }
 
     public void onDisabled() {
