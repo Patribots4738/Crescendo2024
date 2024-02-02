@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
+import frc.robot.commands.leds.LPI;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
@@ -25,6 +26,11 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
+import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.OIConstants;
+import monologue.Logged;
+import monologue.Monologue;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
@@ -35,6 +41,7 @@ public class RobotContainer implements Logged {
 
     private final PatriBoxController driver;
     private final PatriBoxController operator;
+    private final PatriBoxController ledXboxController;
 
     private Swerve swerve;
     private final Intake intake;
@@ -42,6 +49,7 @@ public class RobotContainer implements Logged {
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
     private final Limelight limelight;
+    private final LedStrip ledStrip;
     private final Climb climb;
     private Indexer triggerWheel;
     private Pivot pivot;
@@ -58,8 +66,10 @@ public class RobotContainer implements Logged {
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
 
     public RobotContainer() {
+        
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
+        ledXboxController = new PatriBoxController(3, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
 
         limelight = new Limelight();
@@ -67,7 +77,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
-        
+        ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
         shooter = new Shooter();
         elevator = new Elevator();
@@ -106,6 +116,8 @@ public class RobotContainer implements Logged {
                 () -> !driver.leftBumper().getAsBoolean(),
                 () -> (!driver.leftBumper().getAsBoolean() && FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red)))));
         
+        ledStrip.setDefaultCommand(new LPI(ledStrip, swerve::getPose));
+      
         incinerateMotors();
         configureButtonBindings();
 
@@ -116,6 +128,7 @@ public class RobotContainer implements Logged {
     private void configureButtonBindings() {
         configureDriverBindings();
         configureOperatorBindings();
+        configureLedBindeing();
     }
 
     private void configureOperatorBindings() {
@@ -193,6 +206,11 @@ public class RobotContainer implements Logged {
 
     }
 
+    private void configureLedBindeing() {
+        ledXboxController.b().onTrue(Commands.runOnce(() -> ledStrip.incrementPatternIndex()));
+    
+    }
+
     public Command getAutonomousCommand() {
         return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
     }
@@ -242,3 +260,4 @@ public class RobotContainer implements Logged {
         }
     }
 }
+
