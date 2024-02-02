@@ -7,6 +7,7 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.util.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -45,26 +47,27 @@ public class NoteTrajectory implements Logged {
   Pose3d traj = new Pose3d();
 
   public NoteTrajectory() {
-    setVariables(new Pose2d());
+    setVariables(new Pose2d(), new SpeedAngleTriplet());
   }
 
-  private void setVariables(Pose2d initialPose2d) {
+  private void setVariables(Pose2d initialPose2d, SpeedAngleTriplet speedAngleTriplet) {
     x = () -> 0;
     y = () -> 0;
     x0 = () -> 0;
     y0 = () -> 0;
-    vx0 = () -> Rotation2d.fromDegrees(90-45).getSin() * 12.0;
-    vy0 = () -> Rotation2d.fromDegrees(90-45).getCos() * 12.0;
+    // TODO: Change the left and right values to not be the x and y components as they are the wrong axis
+    vx0 = () -> Rotation2d.fromDegrees(90-(speedAngleTriplet.getAngle())).getSin() * speedAngleTriplet.getLeftSpeed(); 
+    vy0 = () -> Rotation2d.fromDegrees(90-(speedAngleTriplet.getAngle())).getCos() * speedAngleTriplet.getRightSpeed();
     ax = () -> 0;
     ay = () -> -9.8;
     initialPose = () -> initialPose2d;
   }
 
-  public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose) {
+  public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, SpeedAngleTriplet speedAngleTriplet) {
     return Commands.runOnce(() -> {
         this.timer = new Timer();
         this.timer.start();
-        setVariables(pose.get());
+        setVariables(pose.get(), speedAngleTriplet);
       }).andThen(Commands.runOnce(() -> {
         x = kinematicEquation1(x0, vx0, ax, timer);
         y = kinematicEquation1(x0, vy0, ay, timer);

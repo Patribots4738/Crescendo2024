@@ -21,6 +21,7 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
+import frc.robot.util.SpeedAngleTriplet;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
@@ -128,7 +129,8 @@ public class RobotContainer implements Logged {
         
         driver.x().onTrue(intake.stop());
 
-        driver.a().onTrue(noteTrajectory.getNoteTrajectoryCommand(swerve::getPose));
+        // TODO: change the SpeedAnglePair to have the corresponding values from shooter calc
+        driver.a().onTrue(noteTrajectory.getNoteTrajectoryCommand(swerve::getPose, new SpeedAngleTriplet(12.0, 12.0, 45.0)));
 
     }
 
