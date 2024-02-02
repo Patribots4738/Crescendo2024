@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,69 +27,63 @@ import monologue.Annotations.Log;
  * @return An ArrayList of Pose3d objects representing the trajectory of the
  *         object.
  */
-public class NoteTrajectory extends Command implements Logged {
-  double x = 0, x0 = 0, vx0 = Rotation2d.fromDegrees(90 - 45).getSin() * 12.0, ax = 0;
-  double y = 0, y0 = 0, vy0 = Rotation2d.fromDegrees(90 - 45).getCos() * 12.0, ay = -9.8;
-  Timer timer;
+public class NoteTrajectory implements Logged {
+  DoubleSupplier x;
+  DoubleSupplier y;
+  DoubleSupplier x0;
+  DoubleSupplier y0;
+  DoubleSupplier vx0;
+  DoubleSupplier vy0;
+  DoubleSupplier ax;
+  DoubleSupplier ay;
 
-  Pose2d initialPose = new Pose2d();
+  Timer timer;
 
   @Log.NT
   Pose3d traj = new Pose3d();
 
-  // ArrayList<Pose3d> trajList = new ArrayList<Pose3d>();
-
-  /** Creates a new NoteTrajectory. */
-  public NoteTrajectory(Supplier<Pose2d> poseSupplier) {
-    this.initialPose = poseSupplier.get();
+  public NoteTrajectory() {
+    setVariables(new Pose2d());
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    this.timer = new Timer();
-    timer.restart();
+  private void setVariables(Pose2d initialPose2d) {
+    x = () -> 0;
+    y = () -> 0;
+    x0 = () -> 0;
+    y0 = () -> 0;
+    vx0 = () -> Rotation2d.fromDegrees(90-45).getSin() * 12.0;
+    vy0 = () -> Rotation2d.fromDegrees(90-45).getCos() * 12.0;
+    ax = () -> 0;
+    ay = () -> -9.8;
+
+    
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    Commands.runOnce(
-      () -> {
-        double t = timer.get();
-        x = kinematicEquation1(x0, vx0, ax, t);
-        y = kinematicEquation1(x0, vy0, ay, t);
+  public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose) {
+    return Commands.runOnce(() -> {
+        this.timer = new Timer();
+        this.timer.start();
+        setVariables(pose.get());
+      }).andThen(Commands.runOnce(() -> {
+        x = kinematicEquation1(x0, vx0, ax, timer);
+        y = kinematicEquation1(x0, vy0, ay, timer);
 
-        traj = getNotePose(initialPose, x, y);
-        // trajList.add(getNotePose(initialPose, x, y));
-        // traj = trajList.toArray(new Pose3d[1]);
-      }
-    ).until(() -> isFinished()).asProxy().schedule();   
+        traj = getNotePose(() -> pose.get(), x, y);
+      }).repeatedly().until(() -> ((y.getAsDouble() < y0.getAsDouble()) || timer.get() > 2.5)));
   }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return ((y < y0) && timer.get() > 1.5);
-  }
-
-  Pose3d getNotePose(Pose2d pose, double x, double y) {
+  Pose3d getNotePose(Supplier<Pose2d> pose, DoubleSupplier x, DoubleSupplier y) {
     return new Pose3d(
-        new Translation3d(x, 0, y).rotateBy(new Rotation3d(
+        new Translation3d(x.getAsDouble(), 0, y.getAsDouble()).rotateBy(new Rotation3d(
             0,
             0,
-            pose.getRotation().getRadians())),
+            pose.get().getRotation().getRadians())),
         new Rotation3d())
         .transformBy(
             new Transform3d(
                 new Translation3d(
-                    pose.getX(),
-                    pose.getY(),
+                    pose.get().getX(),
+                    pose.get().getY(),
                     0),
                 new Rotation3d()));
   }
@@ -103,8 +98,8 @@ public class NoteTrajectory extends Command implements Logged {
    * @param t  the time
    * @return the final position
    */
-  public double kinematicEquation1(double x0, double v0, double a, double t) {
-    double x = x0 + v0 * t + 0.5 * a * Math.pow(t, 2);
+  public DoubleSupplier kinematicEquation1(DoubleSupplier x0, DoubleSupplier v0, DoubleSupplier a, Timer t) {
+    DoubleSupplier x = () -> (x0.getAsDouble() + v0.getAsDouble() * t.get() + 0.5 * a.getAsDouble() * Math.pow(t.get(), 2));
     return x;
   }
 }

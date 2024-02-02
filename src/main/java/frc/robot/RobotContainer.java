@@ -40,11 +40,12 @@ public class RobotContainer implements Logged {
     private final Limelight limelight;
     private final Climb climb;
     private Indexer triggerWheel;
-    NoteTrajectory noteTrajectory;
 
     private Shooter shooter;
     private Pivot pivot;
     private ShooterCalc shooterCalc;
+
+    private NoteTrajectory noteTrajectory;
 
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -60,7 +61,8 @@ public class RobotContainer implements Logged {
         shooter = new Shooter();
         pivot = new Pivot();
         shooterCalc = new ShooterCalc(shooter, pivot);
-        noteTrajectory = new NoteTrajectory(swerve::getPose);
+
+        noteTrajectory = new NoteTrajectory();
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -123,9 +125,10 @@ public class RobotContainer implements Logged {
         driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
 
         driver.y().onTrue(intake.outCommand());
-
+        
         driver.x().onTrue(intake.stop());
 
+        driver.a().onTrue(noteTrajectory.getNoteTrajectoryCommand(swerve::getPose));
 
     }
 
@@ -137,7 +140,6 @@ public class RobotContainer implements Logged {
     }
 
     public void onEnabled() {
-        noteTrajectory.schedule();
     }
 
     public void prepareNamedCommands() {
