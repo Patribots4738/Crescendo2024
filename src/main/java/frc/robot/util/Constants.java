@@ -235,9 +235,9 @@ public final class Constants {
         public static final double Y_CORRECTION_I = 0;
         public static final double Y_CORRECTION_D = 0;
 
-        public static final double ROTATION_CORRECTION_P = .063;
+        public static final double ROTATION_CORRECTION_P = .63;
         public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0.00025;
+        public static final double ROTATION_CORRECTION_D = 0.0025;
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
