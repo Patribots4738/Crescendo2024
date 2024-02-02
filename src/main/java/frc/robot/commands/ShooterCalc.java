@@ -31,7 +31,7 @@ public class ShooterCalc implements Logged {
         this.pivot = pivot;
         this.shooter = shooter;
         this.aiming = false;
-        this.noteTrajectory = noteTrajectory;
+        this.noteTrajectory = new NoteTrajectory();
     }
     
     /**

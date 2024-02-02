@@ -5,9 +5,11 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -15,15 +17,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
 import frc.robot.commands.ShooterCalc;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.SpeedAngleTriplet;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.NeoMotorConstants;
-import frc.robot.util.Constants.OIConstants;
+import monologue.Annotations.Log;
 import monologue.Logged;
 
 public class RobotContainer implements Logged {
@@ -45,6 +53,12 @@ public class RobotContainer implements Logged {
     private Pivot pivot;
     private ShooterCalc shooterCalc;
 
+    @Log.NT
+    public static Pose3d[] components3d = new Pose3d[6];
+
+    @Log.NT
+    public static Pose3d[] desiredComponents3d = new Pose3d[6];
+    
     public RobotContainer() {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
@@ -87,6 +101,7 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
 
         prepareNamedCommands();
+        initializeArrays();
     }
 
     private void configureButtonBindings() {
@@ -154,5 +169,22 @@ public class RobotContainer implements Logged {
 
     public void logPeriodicThing() {
         shooterCalc.calculateSWDAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity());
+    }
+
+    private void initializeArrays() {
+        Pose3d initialShooterPose = new Pose3d(
+                NTConstants.PIVOT_OFFSET_METERS.getX(),
+                0,
+                NTConstants.PIVOT_OFFSET_METERS.getY(),
+            new Rotation3d()
+        );
+
+        components3d[0] = initialShooterPose;
+        desiredComponents3d[0] = initialShooterPose;
+
+        for (int i = 1; i < components3d.length; i++) {
+            components3d[i] = new Pose3d();
+            desiredComponents3d[i] = new Pose3d();
+        }
     }
 }
