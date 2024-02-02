@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -134,12 +135,10 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-
         poseEstimator.updateWithTime(DriverUI.currentTimestamp, gyro.getRotation2d(), getModulePositions());
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
-
     }
 
     public void logPositions() {
@@ -172,7 +171,6 @@ public class Swerve extends SubsystemBase implements Logged {
                                         * DriveConstants.ROBOT_LENGTH_METERS / 2.0,
                                 Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
-
                 new Rotation3d(0, 0, getPose().getRotation().getRadians()));
 
     }
@@ -268,6 +266,13 @@ public class Swerve extends SubsystemBase implements Logged {
         return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
     }
 
+
+    /**
+     * Returns an array of SwerveModulePosition objects representing the positions of all swerve modules.
+     * This is the position of the driving encoder and the turning encoder
+     *
+     * @return an array of SwerveModulePosition objects representing the positions of all swerve modules
+     */
     public SwerveModulePosition[] getModulePositions() {
 
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
@@ -338,8 +343,8 @@ public class Swerve extends SubsystemBase implements Logged {
         }, () -> false, () -> false);
     }
 
-    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, boolean fieldRelative) {
-        return new Drive(this, speeds, () -> fieldRelative, () -> false);
+    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
+        return new Drive(this, speeds, fieldRelative, () -> false);
     }
 
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {

@@ -11,6 +11,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
 import frc.robot.util.Constants.NeoMotorConstants;
 import monologue.Monologue;
 
@@ -51,11 +52,13 @@ public class Robot extends TimedRobot {
 
         DriverUI.previousTimestamp = DriverUI.currentTimestamp;
         DriverUI.currentTimestamp = Timer.getFPGATimestamp();
+
     }
 
     @Override
     public void disabledInit() {
         robotContainer.onDisabled();
+        FieldConstants.GAME_MODE = GameMode.DISABLED;
     }
 
     @Override
@@ -74,6 +77,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        FieldConstants.GAME_MODE = GameMode.AUTONOMOUS;
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null) {
@@ -95,6 +99,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        FieldConstants.GAME_MODE = GameMode.TELEOP;
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
     }
 
@@ -109,6 +114,7 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         // Cancels all running commands at the start of test mode.
+        FieldConstants.GAME_MODE = GameMode.TEST;
         CommandScheduler.getInstance().cancelAll();
     }
 
