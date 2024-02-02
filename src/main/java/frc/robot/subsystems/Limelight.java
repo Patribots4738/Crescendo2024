@@ -17,36 +17,34 @@ public class Limelight extends SubsystemBase {
 
     private NetworkTable table;
     private NetworkTableEntry botPose;
-    
+
     public Limelight() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
 
         botPose = table.getEntry("botpose");
     }
-    
+
     /**
      * @return ID of the primary in-view AprilTag
      */
     public double[] getTagID() {
         return table.getEntry("tid").getDoubleArray(new double[6]);
     }
-    
 
     public Pose3d arrayToPose3d(double[] entry) {
         return new Pose3d(
-            entry[0], 
-            entry[1], 
-            entry[2],
-            new Rotation3d(
-                Units.degreesToRadians(entry[3]),
-                Units.degreesToRadians(entry[4]),
-                Units.degreesToRadians(entry[5])
-            ));
+                entry[0],
+                entry[1],
+                entry[2],
+                new Rotation3d(
+                        Units.degreesToRadians(entry[3]),
+                        Units.degreesToRadians(entry[4]),
+                        Units.degreesToRadians(entry[5])));
     }
 
     /**
-     * Robot transform in field-space. 
-     * Translation (X,Y,Z) 
+     * Robot transform in field-space.
+     * Translation (X,Y,Z)
      * Rotation(Roll,Pitch,Yaw)
      * 
      * @return the robot pose
@@ -65,9 +63,9 @@ public class Limelight extends SubsystemBase {
     }
 
     /**
-     * Robot transform in field-space (blue driverstation WPILIB origin). 
-     * Translation (X,Y,Z) 
-     * Rotation(Roll,Pitch,Yaw), 
+     * Robot transform in field-space (blue driverstation WPILIB origin).
+     * Translation (X,Y,Z)
+     * Rotation(Roll,Pitch,Yaw),
      * total latency (cl+tl)
      * 
      * @return the robot pose with the blue driverstation WPILIB origin
@@ -77,7 +75,8 @@ public class Limelight extends SubsystemBase {
         if (hasTarget(botPoseArray)) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(new Pose2d(new Translation2d(botPoseArray[0], botPoseArray[1]), new Rotation2d(botPoseArray[5])));
+            return Optional.ofNullable(
+                    new Pose2d(new Translation2d(botPoseArray[0], botPoseArray[1]), new Rotation2d(botPoseArray[5])));
         }
     }
 
@@ -100,39 +99,45 @@ public class Limelight extends SubsystemBase {
     }
 
     /**
-     * 3D transform of the camera in the coordinate 
+     * 3D transform of the camera in the coordinate
      * system of the primary in-view AprilTag (array (6))
      * 
-     * or 
+     * or
      * 
      * the coordinate system of the robot (array (6))
      * 
-     * @param targetSpace is weather or not the camera pose is returned as a targetSpace
+     * @param targetSpace is weather or not the camera pose is returned as a
+     *                    targetSpace
      * @return the camera pose
      */
     public double[] getCameraPose(boolean targetSpace) {
-        return table.getEntry((targetSpace) ? "camerapose_targetspace" : "camerapose_robotspace").getDoubleArray(new double[6]);
+        return table.getEntry((targetSpace) ? "camerapose_targetspace" : "camerapose_robotspace")
+                .getDoubleArray(new double[6]);
     }
 
     /**
      * 3D transform of the primary in-view AprilTag
      * in the coordinate system of the Camera (array (6))
      * 
-     * or 
+     * or
      * 
      * the coordinate system of the Robot (array (6))
      * 
-     * @param cameraSpace is weather or not the target pose is returned as a cameraSpace
+     * @param cameraSpace is weather or not the target pose is returned as a
+     *                    cameraSpace
      * @return the target pose
      */
     public double[] getTargetPose(boolean cameraSpace) {
-        return table.getEntry((cameraSpace) ? "targetpose_cameraspace" : "targetpose_robotspace").getDoubleArray(new double[6]);
+        return table.getEntry((cameraSpace) ? "targetpose_cameraspace" : "targetpose_robotspace")
+                .getDoubleArray(new double[6]);
     }
-    
+
     public boolean containsTagID(boolean cameraSpace, int tagID) {
         double[] targetPose = getTargetPose(cameraSpace);
         for (double pose : targetPose) {
-            if (pose == tagID) { return true; }
+            if (pose == tagID) {
+                return true;
+            }
         }
         return false;
     }
@@ -153,17 +158,17 @@ public class Limelight extends SubsystemBase {
      *         capture latency.
      */
     public double getPipelineLatency() {
-        return table.getEntry("tl").getDouble(0)/1000.0;
+        return table.getEntry("tl").getDouble(0) / 1000.0;
     }
 
     /**
-     * Time between the end of the exposure of the middle row 
+     * Time between the end of the exposure of the middle row
      * of the sensor to the beginning of the tracking pipeline.
      * 
-     * @return Capture pipeline latency (s). 
+     * @return Capture pipeline latency (s).
      */
     public double getCaptureLatency() {
-        return table.getEntry("cl").getDouble(0)/1000.0;
+        return table.getEntry("cl").getDouble(0) / 1000.0;
     }
 
     /**
