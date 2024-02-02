@@ -51,7 +51,7 @@ public class ShooterCalc implements Logged {
         SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
         
         return pivot.setAngleCommand(triplet.getAngle())
-        .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
+            .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
     }
     
     @Log.NT
