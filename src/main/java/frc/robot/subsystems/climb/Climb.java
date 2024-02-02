@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.climb;
 
 import java.util.function.Supplier;
 
@@ -16,7 +16,7 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 
-public class Climb extends SubsystemBase implements Logged {
+public class Climb extends SubsystemBase implements Logged, ClimbIO {
 
     private final Neo leftMotor;
     private final Neo rightMotor;

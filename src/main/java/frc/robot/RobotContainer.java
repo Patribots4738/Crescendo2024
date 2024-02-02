@@ -17,8 +17,11 @@ import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.limelight.Limelight;
+import frc.robot.subsystems.limelight.LimelightHelpers;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
@@ -85,20 +88,20 @@ public class RobotContainer implements Logged {
             shooterCalc,
             swerve);
         
-        limelight.setDefaultCommand(Commands.run(() -> {
-            // Create an "Optional" object that contains the estimated pose of the robot
-            // This can be present (sees tag) or not present (does not see tag)
-            Optional<Pose2d> result = limelight.getPose2d();
-            // The skew of the tag represents how confident the camera is
-            // If the result of the estimatedRobotPose exists,
-            // and the skew of the tag is less than 3 degrees,
-            // then we can confirm that the estimated position is realistic
-            if (result.isPresent()) {
-                swerve.getPoseEstimator().addVisionMeasurement(
-                result.get(),
-                DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
-            }
-        }, limelight));
+            limelight.setDefaultCommand(Commands.run(() -> {
+                // Create an "Optional" object that contains the estimated pose of the robot
+                // This can be present (sees tag) or not present (does not see tag)
+                LimelightHelpers.Results result = limelight.getResults();
+                // The skew of the tag represents how confident the camera is
+                // If the result of the estimatedRobotPose exists,
+                // and the skew of the tag is less than 3 degrees,
+                // then we can confirm that the estimated position is realistic
+                if (result.valid) {
+                    swerve.getPoseEstimator().addVisionMeasurement(
+                            result.getBotPose2d(),
+                            DriverUI.currentTimestamp - limelight.getLatencyDiffSeconds());
+                }
+            }, limelight));
         
         swerve.setDefaultCommand(new Drive(
             swerve,
