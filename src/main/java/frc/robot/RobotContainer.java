@@ -141,9 +141,6 @@ public class RobotContainer implements Logged {
 
         operator.povRight().onTrue(pieceControl.placeTrapCommand());
 
-        operator.b().onTrue(
-            pieceControl.prepareToFire(operator.leftBumper())
-        );
         operator.leftBumper()
             .and(operator.rightBumper())
             .onTrue(pieceControl.noteToShoot());
