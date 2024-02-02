@@ -203,48 +203,35 @@ public final class Constants {
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 1.6;// 7;
-        public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0;
-
-        public static final double Y_CORRECTION_P = 1.6;// 6.03;
-        public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0;
-
-        public static final double ROTATION_CORRECTION_P = .063;
-        public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0.00025;
-
-        // Constraint for the motion-profiled robot angle controller
+        public static final PIDConstants X_PID =          new PIDConstants(4, 0, .01);
+        public static final PIDConstants HPFC_THETA_PID = new PIDConstants(2.8, 0, 0.011);
+        
+        public static final PIDConstants Y_PID = new PIDConstants(1.6, 0, 0);
+        public static final PIDConstants HDC_THETA_PID = new PIDConstants(0.63, 0, 0.0025);
+        
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
         public static final HolonomicDriveController HDC = new HolonomicDriveController(
                 new PIDController(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
+                    AutoConstants.X_PID.kP,
+                    AutoConstants.X_PID.kI,
+                    AutoConstants.X_PID.kD),
                 new PIDController(
-                        AutoConstants.Y_CORRECTION_P,
-                        AutoConstants.Y_CORRECTION_I,
-                        AutoConstants.Y_CORRECTION_D),
+                    AutoConstants.Y_PID.kP,
+                    AutoConstants.Y_PID.kI,
+                    AutoConstants.Y_PID.kD),
                 new ProfiledPIDController(
-                        AutoConstants.ROTATION_CORRECTION_P,
-                        AutoConstants.ROTATION_CORRECTION_I,
-                        AutoConstants.ROTATION_CORRECTION_D,
+                    AutoConstants.HDC_THETA_PID.kP,
+                    AutoConstants.HDC_THETA_PID.kI,
+                    AutoConstants.HDC_THETA_PID.kD,
                         new TrapezoidProfile.Constraints(
                                 AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
                                 AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
 
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
-                new PIDConstants(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
-                new PIDConstants(
-                        AutoConstants.ROTATION_CORRECTION_P,
-                        AutoConstants.ROTATION_CORRECTION_I,
-                        AutoConstants.ROTATION_CORRECTION_D),
+                X_PID,
+                HPFC_THETA_PID,
                 MAX_SPEED_METERS_PER_SECOND,
                 Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH),
                 new ReplanningConfig());
