@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -19,6 +20,7 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
+import frc.robot.util.SpeedAngleTriplet;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
@@ -119,8 +121,11 @@ public class RobotContainer implements Logged {
         driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
 
         driver.y().onTrue(intake.outCommand());
-
+        
         driver.x().onTrue(intake.stop());
+
+        // TODO: change the SpeedAnglePair to have the corresponding values from shooter calc
+        driver.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, new SpeedAngleTriplet(12.0, 12.0, 45.0)));
 
     }
 

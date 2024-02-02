@@ -143,6 +143,8 @@ public final class Constants {
             }
         };
 
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
+
     }
 
     public static final class TrapConstants {
