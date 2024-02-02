@@ -117,44 +117,44 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        configureDriverBindings();
-        configureOperatorBindings();
+        configureDriverBindings(driver);
+        configureOperatorBindings(operator);
     }
     
-    private void configureOperatorBindings() {
+    private void configureOperatorBindings(PatriBoxController controller) {
 
-        operator.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        operator.povDown().onTrue(climb.toBottomCommand());
+        controller.povDown().onTrue(climb.toBottomCommand());
 
-        operator.povLeft().onTrue(elevator.toBottomCommand());
+        controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        operator.povRight().onTrue(pieceControl.placeTrapCommand());
+        controller.povRight().onTrue(pieceControl.placeTrapCommand());
 
-        operator.leftBumper()
-            .and(operator.rightBumper())
+        controller.leftBumper()
+            .and(controller.rightBumper())
             .onTrue(pieceControl.noteToShoot());
 
-        operator.rightBumper()
-            .and(operator.leftBumper().negate())
+        controller.rightBumper()
+            .and(controller.leftBumper().negate())
             .onTrue(pieceControl.noteToTarget(() -> true));
 
-        operator.leftTrigger(OIConstants.OPERATOR_DEADBAND)
+        controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
             .and(intake.hasGamePieceTrigger().negate())
             .onTrue(intake.inCommand());
 
-        operator.rightTrigger(OIConstants.OPERATOR_DEADBAND)
+        controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
             .onTrue(intake.outCommand());
 
-        operator.x().onTrue(intake.stop());
+        controller.x().onTrue(intake.stop());
     }
     
-    private void configureDriverBindings() {
+    private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing away from the driver station
-        driver.start().or(driver.back()).onTrue(
+        controller.start().or(driver.back()).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
@@ -164,37 +164,37 @@ public class RobotContainer implements Logged {
                             : 180))), 
                 swerve));
 
-        driver.b()
+        controller.b()
             .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
         
-        driver.leftStick()
+        controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());
         
-        driver.a()
+        controller.a()
             .and(intake.hasGamePieceTrigger().negate())
             .onTrue(intake.inCommand());
         
-        driver.y()
+        controller.y()
             .onTrue(intake.outCommand());
         
-        driver.leftBumper()
+        controller.leftBumper()
             .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
         
-        driver.leftTrigger()
+        controller.leftTrigger()
             .onTrue(shooterCalc.resetShooter());
         
-        driver.x()
+        controller.x()
             .onTrue(intake.stop());
         
-        driver.rightStick()
+        controller.rightStick()
             .whileTrue(
                 Commands.sequence(
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
                         return new ChassisSpeeds(
-                            driver.getLeftY(),
-                            driver.getLeftX(),
+                            controller.getLeftY(),
+                            controller.getLeftX(),
                             swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
                     },
                     () -> true)));
