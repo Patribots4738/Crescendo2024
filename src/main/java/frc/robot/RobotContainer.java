@@ -13,10 +13,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
+import frc.robot.commands.leds.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
@@ -81,8 +83,10 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
 
         prepareNamedCommands();
-    }
 
+        ledStrip.setDefaultCommand(new LPI(ledStrip, swerve::getPose));
+    }
+ 
     private void configureButtonBindings(){
         configureDriverBindings();
         configureOperatorBindings();
@@ -149,3 +153,4 @@ public class RobotContainer implements Logged {
         Timer.delay(0.25);
     }
 }
+
