@@ -108,8 +108,7 @@ public class RobotContainer implements Logged {
             () -> -driver.getRightX(),
             () -> !driver.leftBumper().getAsBoolean(),
             () -> (driver.leftBumper().getAsBoolean()
-                && FieldConstants.ALLIANCE
-                    .equals(Optional.ofNullable(Alliance.Blue)))));
+                && FieldConstants.IS_BLUE_ALLIANCE())));
               
         incinerateMotors();
         configureButtonBindings();

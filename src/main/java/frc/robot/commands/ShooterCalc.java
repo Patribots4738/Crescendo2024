@@ -179,7 +179,7 @@ public class ShooterCalc implements Logged{
     public SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
         // Constants have blue alliance positions at index 0
         // and red alliance positions at index 1
-        int positionIndex = FieldConstants.ALLIANCE == Optional.ofNullable(Alliance.Blue) ? 0 : 1;
+        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
 
         // Get our position relative to the desired field element
         if (shootingAtSpeaker) {
