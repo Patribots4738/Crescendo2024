@@ -100,21 +100,25 @@ public final class Constants {
         public static final int RIGHT_SHOOTER_CAN_ID = 12;
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
+        public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1 ;
+
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
 
-        public static final double PIVOT_P = 0.01;
+        // TODO: tune pid further
+        public static final double PIVOT_P = 0.2;
         public static final double PIVOT_I = 0;
-        public static final double PIVOT_D = 0;
+        public static final double PIVOT_D = 0.07;
 
         public static final int SHOOTER_CURRENT_LIMIT = 15;
         public static final int PIVOT_CURRENT_LIMIT = 15;
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
-        public static final double PIVOT_DEADBAND = 0.3;
-        public static final double SHOOTER_DEADBAND = 0.03;
+        public static final double PIVOT_DEADBAND = 1.125;
+        public static final double SHOOTER_DEADBAND = 0.3;
 
         // These are in %
         public static final double SHOOTER_MIN_OUTPUT = -1;
@@ -124,7 +128,7 @@ public final class Constants {
         public static final double PIVOT_MAX_OUTPUT = 1;
 
         public static final double PIVOT_MAX_ANGLE_DEGREES = 360.0;
-        public static final double PIVOT_REST_ANGLE_DEGREES = 10.0;
+        public static final double PIVOT_REST_ANGLE_DEGREES = 0;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
         /**
@@ -135,23 +139,22 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(10, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(15, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(20, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
-                put(25, SpeedAngleTriplet.of(0.0, 0.4, 10.0));
+                put(5, SpeedAngleTriplet.of(0.0, 300d, 60d));
+                put(10, SpeedAngleTriplet.of(0.0, 600d, 50d));
+                put(15, SpeedAngleTriplet.of(0.0, 900d, 40d));
+                put(20, SpeedAngleTriplet.of(0.0, 1200d, 30d));
+                put(25, SpeedAngleTriplet.of(0.0, 1500d, 20d));
+                put(30, SpeedAngleTriplet.of(0.0, 1800d, 10d));
             }
         };
 
         public static InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<Double, SpeedAngleTriplet>(
                 InverseInterpolator.forDouble(),
-                SpeedAngleTriplet.getInterpolator()) {};
-
-        static {
+                SpeedAngleTriplet.getInterpolator()) {{
             for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
-                INTERPOLATION_MAP.put(entry.getKey().doubleValue(), entry.getValue());
+                put(entry.getKey().doubleValue(), entry.getValue());
             }
-        }
+        }};
 
     }
 
@@ -440,6 +443,15 @@ public final class Constants {
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
+        // TODO: Should this be in Robot or RobotContainer??
+        public static boolean IS_RED_ALLIANCE() {
+            return ALLIANCE.equals(Optional.of(Alliance.Red));
+        }
+
+        public static boolean IS_BLUE_ALLIANCE() {
+            return ALLIANCE.equals(Optional.of(Alliance.Blue));
+        }
+
         public static enum GameMode {
             DISABLED,
             AUTONOMOUS,
@@ -518,6 +530,6 @@ public final class Constants {
         public static final int LEFT_CLIMB_INDEX = 3;
         public static final int RIGHT_CLIMB_INDEX = 4;
 
-        public static final Translation2d PIVOT_OFFSET = new Translation2d(0.112, 0.21);
+        public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
     }
 }
