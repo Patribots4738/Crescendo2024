@@ -77,7 +77,7 @@ public class NoteTrajectory implements Logged {
             y = kinematicEquation1(x0, vy0, ay, timer);
 
             traj = getNotePose(this.initialPose, x, y);
-            RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, x, y).relativeTo(new Pose3d(this.initialPose.get()));
+            RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, x, y).relativeTo(new Pose3d(pose.get()));
         }).repeatedly().until(() -> ((y.getAsDouble() < y0.getAsDouble()) || timer.get() > 2.5)));
     }
 
