@@ -116,9 +116,7 @@ public class RobotContainer implements Logged {
             () -> (driver.leftBumper().getAsBoolean()
                 && FieldConstants.ALLIANCE
                     .equals(Optional.ofNullable(Alliance.Blue)))));
-        
-        ledStrip.setDefaultCommand(new LPI(ledStrip, swerve::getPose));
-      
+              
         incinerateMotors();
         configureButtonBindings();
         
@@ -136,7 +134,7 @@ public class RobotContainer implements Logged {
         operator.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
         operator.povDown().onTrue(climb.toBottomCommand());
-
+        
         operator.leftBumper()
             .and(operator.rightBumper())
             .onTrue(pieceControl.noteToShoot());
