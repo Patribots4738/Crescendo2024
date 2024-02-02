@@ -210,6 +210,10 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(swerveModuleStates);
     }
 
+    public void stopMotors() {
+        drive(0, 0, 0, false);
+    }
+
     public ChassisSpeeds getRobotRelativeSpeeds() {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
     }
@@ -249,6 +253,10 @@ public class Swerve extends SubsystemBase implements Logged {
                 gyro.getRotation2d(),
                 getModulePositions(),
                 pose);
+    }
+
+    public Command resetOdometryCommand(Supplier<Pose2d> pose) {
+        return runOnce(() -> resetOdometry(pose.get()));
     }
 
     public SwerveModuleState[] getModuleStates() {

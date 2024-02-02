@@ -204,7 +204,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected().repeatedly();
+        return autoChooser.getSelected();
     }
 
     @Log.NT
@@ -214,10 +214,11 @@ public class RobotContainer implements Logged {
         // TODO: Autos currently start at C1-5, we need to integrate the other paths
         // with the center line schenanigans to make full autos
         autoChooser.setDefaultOption("Do Nothing", Commands.none());
-        autoChooser.addOption("W3-1 C1-5", AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false)));
+        autoChooser.addOption("W3-1 C1-5", swerve.resetOdometryCommand(starting::getPreviewStartingHolonomicPose).andThen(AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false))));
     }
 
     public void onDisabled() {
+        swerve.stopMotors();
     }
 
     public void onEnabled() {}
