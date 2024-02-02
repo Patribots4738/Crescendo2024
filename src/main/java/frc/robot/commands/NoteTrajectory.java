@@ -37,6 +37,8 @@ public class NoteTrajectory implements Logged {
   DoubleSupplier ax;
   DoubleSupplier ay;
 
+  Supplier<Pose2d> initialPose;
+
   Timer timer;
 
   @Log.NT
@@ -55,8 +57,7 @@ public class NoteTrajectory implements Logged {
     vy0 = () -> Rotation2d.fromDegrees(90-45).getCos() * 12.0;
     ax = () -> 0;
     ay = () -> -9.8;
-
-    
+    initialPose = () -> initialPose2d;
   }
 
   public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose) {
@@ -68,7 +69,7 @@ public class NoteTrajectory implements Logged {
         x = kinematicEquation1(x0, vx0, ax, timer);
         y = kinematicEquation1(x0, vy0, ay, timer);
 
-        traj = getNotePose(() -> pose.get(), x, y);
+        traj = getNotePose(this.initialPose, x, y);
       }).repeatedly().until(() -> ((y.getAsDouble() < y0.getAsDouble()) || timer.get() > 2.5)));
   }
 
