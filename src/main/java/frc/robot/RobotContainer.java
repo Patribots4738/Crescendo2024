@@ -67,7 +67,6 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
-        ledXboxController = new PatriBoxController(3, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
         limelight = new Limelight();
@@ -130,7 +129,6 @@ public class RobotContainer implements Logged {
     private void configureButtonBindings() {
         configureDriverBindings();
         configureOperatorBindings();
-        configureLedBindeing();
     }
     
     private void configureOperatorBindings() {
@@ -222,9 +220,9 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
     }
     
     private void incinerateMotors() {
@@ -238,9 +236,9 @@ public class RobotContainer implements Logged {
 
     private void initializeArrays() {
         Pose3d initialShooterPose = new Pose3d(
-                NTConstants.PIVOT_OFFSET.getX(),
+                NTConstants.PIVOT_OFFSET_METERS.getX(),
                 0,
-                NTConstants.PIVOT_OFFSET.getY(),
+                NTConstants.PIVOT_OFFSET_METERS.getY(),
             new Rotation3d()
         );
 

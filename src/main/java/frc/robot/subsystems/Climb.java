@@ -13,7 +13,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Neo.TelemtryPreference;
+import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 
 public class Climb extends SubsystemBase implements Logged {
@@ -29,8 +29,8 @@ public class Climb extends SubsystemBase implements Logged {
     }
 
     private void configureMotors() {
-        leftMotor.setTelemetryPreference(TelemtryPreference.ONLY_RELATIVE_ENCODER);
-        rightMotor.setTelemetryPreference(TelemtryPreference.ONLY_RELATIVE_ENCODER);
+        leftMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+        rightMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
 
         leftMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
         rightMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
