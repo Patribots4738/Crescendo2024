@@ -171,7 +171,7 @@ public class ShooterCalc implements Logged{
      */
     public Command resetShooter() {
         return shooter.stop()
-                .alongWith(Commands.runOnce(() -> pivot.setRestAngle()));
+                .alongWith(pivot.setRestAngleCommand());
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
