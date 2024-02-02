@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -335,8 +336,8 @@ public class Swerve extends SubsystemBase implements Logged {
         }, () -> false, () -> false);
     }
 
-    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, boolean fieldRelative) {
-        return new Drive(this, speeds, () -> fieldRelative, () -> false);
+    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
+        return new Drive(this, speeds, fieldRelative, () -> false);
     }
 
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {
