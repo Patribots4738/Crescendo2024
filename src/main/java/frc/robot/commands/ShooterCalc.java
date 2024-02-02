@@ -4,10 +4,15 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Swerve;
@@ -17,17 +22,37 @@ import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 import frc.robot.util.SpeedAngleTriplet;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class ShooterCalc implements Logged {
 
     private Pivot pivot;
     private Shooter shooter;
     private boolean aiming;
+
+    // Note Trajectories
+    DoubleSupplier x;
+    DoubleSupplier y;
+    DoubleSupplier x0;
+    DoubleSupplier y0;
+    DoubleSupplier vx0;
+    DoubleSupplier vy0;
+    DoubleSupplier ax;
+    DoubleSupplier ay;
+
+    Supplier<Pose2d> initialPose;
+
+    Timer timer;
+
+    @Log.NT
+    Pose3d traj = new Pose3d();
     
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.pivot = pivot;
         this.shooter = shooter;
         this.aiming = false;
+        setVariables(new Pose2d(), new SpeedAngleTriplet());
     }
     
     /**
@@ -47,7 +72,7 @@ public class ShooterCalc implements Logged {
         SpeedAngleTriplet triplet = calculateSpeed(robotPose, shootAtSpeaker.getAsBoolean());
         
         return pivot.setAngleCommand(triplet.getAngle())
-        .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
+            .alongWith(shooter.setSpeedCommand(triplet.getSpeeds()));
     }
     
     @Log.NT
@@ -222,6 +247,8 @@ public class ShooterCalc implements Logged {
                 .andThen(shooter.setSpeedCommand(ShooterConstants.SHOOTER_BACK_SPEED));
     }
 
+
+
     /**
      * Makes aiming false so that we stop any aiming loop currently happening, and
      * then sets the
@@ -293,5 +320,66 @@ public class ShooterCalc implements Logged {
         return Commands.parallel(
                 shooter.stop(),
                 pivot.stop());
+    }
+
+
+    private void setVariables(Pose2d initialPose2d, SpeedAngleTriplet speedAngleTriplet) {
+        x = () -> 0;
+        y = () -> 0;
+        x0 = () -> 0;
+        y0 = () -> 0;
+        // TODO: Change the left and right values to not be the x and y components as
+        // they are the wrong axis
+        vx0 = () -> Rotation2d.fromDegrees(90 - (speedAngleTriplet.getAngle())).getSin()
+                * speedAngleTriplet.getLeftSpeed();
+        vy0 = () -> Rotation2d.fromDegrees(90 - (speedAngleTriplet.getAngle())).getCos()
+                * speedAngleTriplet.getRightSpeed();
+        ax = () -> 0;
+        ay = () -> -9.8;
+        initialPose = () -> initialPose2d;
+    }
+
+    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, SpeedAngleTriplet speedAngleTriplet) {
+        return Commands.runOnce(() -> {
+            this.timer = new Timer();
+            this.timer.start();
+            setVariables(pose.get(), speedAngleTriplet);
+        }).andThen(Commands.runOnce(() -> {
+            x = kinematicEquation1(x0, vx0, ax, timer);
+            y = kinematicEquation1(x0, vy0, ay, timer);
+
+            traj = getNotePose(this.initialPose, x, y);
+        }).repeatedly().until(() -> ((y.getAsDouble() < y0.getAsDouble()) || timer.get() > 2.5)));
+    }
+
+    Pose3d getNotePose(Supplier<Pose2d> initialPose, DoubleSupplier x, DoubleSupplier y) {
+        return new Pose3d(
+                new Translation3d(x.getAsDouble(), 0, y.getAsDouble()).rotateBy(new Rotation3d(
+                        0,
+                        0,
+                        initialPose.get().getRotation().getRadians())),
+                new Rotation3d())
+                .transformBy(
+                        new Transform3d(
+                                new Translation3d(
+                                        initialPose.get().getX(),
+                                        initialPose.get().getY(),
+                                        0),
+                                new Rotation3d()));
+    }
+
+    /**
+     * Calculates the position using the kinematic equation:
+     * x = x0 + v0 * t + 0.5 * a * t^2
+     *
+     * @param x0 the initial position
+     * @param v0 the initial velocity
+     * @param a  the acceleration
+     * @param t  the time
+     * @return the final position
+     */
+    public DoubleSupplier kinematicEquation1(DoubleSupplier x0, DoubleSupplier v0, DoubleSupplier a, Timer t) {
+        return () -> (x0.getAsDouble() + v0.getAsDouble() * t.get()
+                + 0.5 * a.getAsDouble() * Math.pow(t.get(), 2));
     }
 }
