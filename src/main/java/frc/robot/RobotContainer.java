@@ -166,6 +166,8 @@ public class RobotContainer implements Logged {
 
 		driver.leftBumper().toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
 
+		driver.leftTrigger().onTrue(shooterCalc.resetShooter());
+
 		driver.x().onTrue(intake.stop());
 
 		driver.rightStick().whileTrue(

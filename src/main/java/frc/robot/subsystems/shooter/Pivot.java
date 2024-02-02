@@ -16,7 +16,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	private Neo pivot;
 
 	public Pivot() {
-		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
+		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID, true);
 
 		configMotor();
 	}
@@ -43,7 +43,7 @@ public class Pivot extends SubsystemBase implements Logged {
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
 			NTConstants.PIVOT_OFFSET_METERS.getY(),
-			new Rotation3d(0, Units.degreesToRadians(-pivot.getPosition()), 0)
+			new Rotation3d(0, Units.degreesToRadians(pivot.getPosition()), 0)
 		);
 	}
 

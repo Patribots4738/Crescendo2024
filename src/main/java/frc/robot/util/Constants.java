@@ -86,15 +86,16 @@ public final class Constants {
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
         public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
-        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1;
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1 ;
 
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
 
-        public static final double PIVOT_P = 0.01;
+        // TODO: tune pid further
+        public static final double PIVOT_P = 0.2;
         public static final double PIVOT_I = 0;
-        public static final double PIVOT_D = 0;
+        public static final double PIVOT_D = 0.07;
 
         public static final int SHOOTER_CURRENT_LIMIT = 15;
         public static final int PIVOT_CURRENT_LIMIT = 15;
@@ -123,12 +124,12 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(0.0, 0.4, 60d));
-                put(10, SpeedAngleTriplet.of(0.0, 0.6, 50d));
-                put(15, SpeedAngleTriplet.of(0.0, 0.8, 40d));
-                put(20, SpeedAngleTriplet.of(0.0, 1.0, 30d));
-                put(25, SpeedAngleTriplet.of(0.0, 1.2, 20d));
-                put(30, SpeedAngleTriplet.of(0.0, 1.4, 10d));
+                put(5, SpeedAngleTriplet.of(0.0, 300d, 60d));
+                put(10, SpeedAngleTriplet.of(0.0, 600d, 50d));
+                put(15, SpeedAngleTriplet.of(0.0, 900d, 40d));
+                put(20, SpeedAngleTriplet.of(0.0, 1200d, 30d));
+                put(25, SpeedAngleTriplet.of(0.0, 1500d, 20d));
+                put(30, SpeedAngleTriplet.of(0.0, 1800d, 10d));
             }
         };
 

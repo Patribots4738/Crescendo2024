@@ -97,7 +97,7 @@ public class ShooterCalc implements Logged{
     }
 
     public void logAngles(SpeedAngleTriplet triplet) {
-        desiredAngle = triplet.getAngle();
+        desiredAngle = -triplet.getAngle();
         realAngle = pivot.getAngle();
     }
 
@@ -171,7 +171,7 @@ public class ShooterCalc implements Logged{
      */
     public Command resetShooter() {
         return shooter.stop()
-                .alongWith(pivot.setRestAngleCommand());
+                .alongWith(Commands.runOnce(() -> pivot.setRestAngle()));
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
