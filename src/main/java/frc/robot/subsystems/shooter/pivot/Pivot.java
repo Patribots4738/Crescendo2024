@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.shooter.pivot;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -12,7 +12,7 @@ import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 
-public class Pivot extends SubsystemBase implements Logged {
+public class Pivot extends SubsystemBase implements Logged, PivotIO {
 	private Neo pivot;
 
 	public Pivot() {

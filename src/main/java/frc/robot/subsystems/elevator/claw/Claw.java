@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.elevator.claw;
 
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
@@ -9,7 +9,7 @@ import frc.robot.DriverUI;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
 
-public class Claw extends SubsystemBase {
+public class Claw extends SubsystemBase implements ClawIO{
     private final Neo claw;
     private boolean hasGamePiece = false;
     private double current = 0;
@@ -62,7 +62,7 @@ public class Claw extends SubsystemBase {
         return hasGamePiece;
     }
 
-    public void configMotors() {
+    private void configMotors() {
         // needs motor configs
         claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
         claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);

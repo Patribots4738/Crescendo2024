@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.elevator.Claw;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.claw.Claw;
+import frc.robot.subsystems.elevator.elevator.Elevator;
 import frc.robot.util.Constants.TrapConstants;
 
 public class PieceControl {

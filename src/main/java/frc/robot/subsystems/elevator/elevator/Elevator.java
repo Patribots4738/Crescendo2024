@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.elevator.elevator;
 
 import java.util.function.BooleanSupplier;
 
@@ -15,7 +15,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
 
-public class Elevator extends SubsystemBase {
+public class Elevator extends SubsystemBase implements ElevatorIO{
     private final Neo elevator;
 
 
