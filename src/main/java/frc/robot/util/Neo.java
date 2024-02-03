@@ -306,7 +306,7 @@ public class Neo extends CANSparkMax {
      * 
      * @param position the desired position to set
      */
-    public void setPosition(double position) {
+    public void resetEncoder(double position) {
         encoder.setPosition(position * reversedMultiplier);
     }
 
