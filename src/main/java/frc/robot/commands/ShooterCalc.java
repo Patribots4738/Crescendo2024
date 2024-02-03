@@ -55,9 +55,9 @@ public class ShooterCalc implements Logged{
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
         return Commands.runOnce(() -> {
-                SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
-
-                log(triplet);
+                SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean());
+                
+                log(triplet);   
         
                 pivot.setAngle(triplet.getAngle());
                 shooter.setSpeed(triplet.getSpeeds());
@@ -195,6 +195,33 @@ public class ShooterCalc implements Logged{
         this.distance = robotPose.getX();
 
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
+    }
+
+
+
+        // Gets a SpeedAngleTriplet by interpolating values from a map of already
+    // known required speeds and angles for certain poses
+    public SpeedAngleTriplet calculateSpeedTesting(Pose2d robotPose, boolean shootingAtSpeaker) {
+        // Constants have blue alliance positions at index 0
+        // and red alliance positions at index 1
+        Rotation2d pivotAngle = calculatePivotAngle(robotPose);
+        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
+
+        // Get our position relative to the desired field element
+        if (shootingAtSpeaker) {
+            robotPose = robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
+        } else {
+            robotPose = robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
+        }
+
+        // Use the distance as our key for interpolation
+        double distanceFeet = Units.metersToFeet(robotPose.getTranslation().getNorm());
+
+        this.distance = robotPose.getX();
+
+        SpeedAngleTriplet tempTriplet = ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
+        SpeedAngleTriplet realTriplet = new SpeedAngleTriplet(tempTriplet.getFirst(), pivotAngle.getDegrees());
+        return realTriplet;
     }
 
     /**
