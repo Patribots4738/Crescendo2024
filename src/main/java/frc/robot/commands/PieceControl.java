@@ -58,7 +58,7 @@ public class PieceControl {
         return indexer.toShooter()
                 .andThen(Commands.waitUntil(readyToShoot()))
                 .andThen(claw.intake())
-                .andThen(Commands.waitSeconds(ShooterConstants.SHOOTER_PASS_TIME)) // TODO: Change this to a wait until the note is in the shooter?
+                .andThen(Commands.waitSeconds(ShooterConstants.SHOOTER_PASS_SECONDS)) // TODO: Change this to a wait until the note is in the shooter?
                 .andThen(claw.stop())
                 .andThen(indexer.stop());
 
@@ -66,21 +66,23 @@ public class PieceControl {
 
     public Command noteToTarget(BooleanSupplier toAmp) {
         // maybe make setPosition a command ORR Make the Elevator Command
-        return this.elevator.setPositionCommand(
-                        toAmp.getAsBoolean() ? TrapConstants.AMP_PLACE_POS : TrapConstants.TRAP_PLACE_POS)
+        return Commands.either(
+                        elevator.setPositionCommand(TrapConstants.AMP_PLACE_POS),
+                        elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
+                        toAmp)
                 .andThen(
                         Commands.waitUntil(elevator.isAtTargetPosition()))
                 .andThen(claw.placeCommand())
-                .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_TIME))
+                .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
                 .andThen(elevator.toBottomCommand());
     }
 
     public Command intakeToClaw() {
         return intake.inCommand()
-                .alongWith(indexer.toTrap());
+                .alongWith(indexer.toElevator());
     }
 
-    public Command stopIntake() {
+    public Command stopIntakeAndIndexer() {
         return intake.stop()
                 .alongWith(indexer.stop());
     }

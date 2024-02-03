@@ -8,11 +8,11 @@ import frc.robot.util.Neo;
 
 public class Indexer extends SubsystemBase {
     private final Neo triggerWheel;
-    private double desiredSpeed;
+    private double desiredPercent;
 
     public Indexer() {
         triggerWheel = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID);
-        desiredSpeed = 0;
+        desiredPercent = 0;
         configMotor();
     }
 
@@ -28,28 +28,28 @@ public class Indexer extends SubsystemBase {
         triggerWheel.setBrakeMode();
     }
 
-    public double getDesiredSpeed() {
-        return desiredSpeed;
+    public double getDesiredPercent() {
+        return desiredPercent;
     }
 
-    public void setDesiredSpeed(double speed) {
-        desiredSpeed = speed;
-        triggerWheel.setTargetVelocity(speed);
+    public void setDesiredPercent(double percent) {
+        desiredPercent = percent;
+        triggerWheel.setTargetPercent(percent);
     }
 
-    public Command setSpeedCommand(double speed) {
-        return runOnce(() -> setDesiredSpeed(speed));
+    public Command setPercentCommand(double percent) {
+        return runOnce(() -> setDesiredPercent(percent));
     }
 
     public Command toShooter() {
-        return setSpeedCommand(IntakeConstants.SHOOTER_TRIGGER_WHEEL_SPEED);
+        return setPercentCommand(IntakeConstants.SHOOTER_TRIGGER_WHEEL_PERCENT);
     }
 
-    public Command toTrap() {
-        return setSpeedCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_SPEED);
+    public Command toElevator() {
+        return setPercentCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_PERCENT);
     }
 
     public Command stop() {
-        return setSpeedCommand(IntakeConstants.STOP_SPEED);
+        return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 }

@@ -144,7 +144,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.intakeToClaw());
 
         controller.leftTrigger()
-            .onFalse(pieceControl.stopIntake());
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
             .onTrue(intake.outCommand());
