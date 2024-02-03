@@ -65,9 +65,9 @@ public class PieceControl {
 
     public Command noteToTarget(BooleanSupplier toAmp) {
         // maybe make setPosition a command ORR Make the Elevator Command
-        return Commands.runOnce(
-                () -> this.elevator.setPositionCommand(
-                        toAmp.getAsBoolean() ? TrapConstants.AMP_PLACE_POS : TrapConstants.TRAP_PLACE_POS))
+        return 
+                this.elevator.setPositionCommand(
+                        toAmp.getAsBoolean() ? TrapConstants.AMP_PLACE_POS : TrapConstants.TRAP_PLACE_POS)
                 .andThen(
                         Commands.waitUntil(elevator.isAtTargetPosition()))
                 .andThen(claw.placeCommand())
