@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.swerve;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -38,7 +38,7 @@ import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
-public class Swerve extends SubsystemBase implements Logged {
+public class Swerve extends SubsystemBase implements Logged, SwerveIO {
 
     public static double twistScalar = 4;
 

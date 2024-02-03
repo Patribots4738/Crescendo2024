@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.leds;
 
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
 
-public class LedStrip extends SubsystemBase {
+public class LedStrip extends SubsystemBase implements LedStripIO {
 
     private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;

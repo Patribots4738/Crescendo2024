@@ -4,21 +4,16 @@
 
 package frc.robot.commands.leds;
 
-import java.lang.reflect.Array;
 import java.util.function.Supplier;
 
-import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.DriverUI;
-import frc.robot.subsystems.LedStrip;
+import frc.robot.subsystems.leds.LedStrip;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.Constants.FieldConstants.GameMode;

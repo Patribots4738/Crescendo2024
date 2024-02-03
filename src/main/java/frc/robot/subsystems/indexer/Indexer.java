@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.indexer;
 
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo;
 
-public class Indexer extends SubsystemBase {
+public class Indexer extends SubsystemBase implements IndexerIO {
     private final Neo triggerWheel;
     private double desiredSpeed;
 

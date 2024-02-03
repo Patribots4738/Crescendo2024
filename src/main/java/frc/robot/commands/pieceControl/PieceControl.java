@@ -1,18 +1,19 @@
-package frc.robot.commands;
+package frc.robot.commands.pieceControl;
 
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Swerve;
+import frc.robot.commands.shooterCalc.ShooterCalc;
 import frc.robot.subsystems.elevator.claw.Claw;
 import frc.robot.subsystems.elevator.elevator.Elevator;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.util.Constants.TrapConstants;
 
-public class PieceControl {
+public class PieceControl implements PieceControlIO {
     private NotePosition notePosition = NotePosition.NONE;
 
     private Intake intake;
@@ -23,6 +24,7 @@ public class PieceControl {
 
     private ShooterCalc shooterCalc;
 
+    @SuppressWarnings("unused")
     private Swerve swerve;
 
     public PieceControl(

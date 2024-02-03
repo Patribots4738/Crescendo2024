@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.shooterCalc;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.pivot.Pivot;
 import frc.robot.subsystems.shooter.shooter.Shooter;
 import frc.robot.util.Constants.FieldConstants;
@@ -17,7 +16,7 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 import frc.robot.util.SpeedAngleTriplet;
 
-public class ShooterCalc implements Logged{
+public class ShooterCalc implements Logged, ShooterCalcIO {
 
     private Pivot pivot;
     private Shooter shooter;
