@@ -139,12 +139,12 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(0.0, 300.0, 60.0));
-                put(10, SpeedAngleTriplet.of(0.0, 600.0, 50.0));
-                put(15, SpeedAngleTriplet.of(0.0, 900.0, 40.0));
-                put(20, SpeedAngleTriplet.of(0.0, 1200.0, 30.0));
-                put(25, SpeedAngleTriplet.of(0.0, 1500.0, 20.0));
-                put(30, SpeedAngleTriplet.of(0.0, 1800.0, 10.0));
+                put(5, SpeedAngleTriplet.of(3000.0, 2000.0, 60.0));
+                put(10, SpeedAngleTriplet.of(3000.0, 2000.0, 50.0));
+                put(15, SpeedAngleTriplet.of(3000.0, 2000.0, 40.0));
+                put(20, SpeedAngleTriplet.of(3000.0, 2000.0, 30.0));
+                put(25, SpeedAngleTriplet.of(3000.0, 2000.0, 20.0));
+                put(30, SpeedAngleTriplet.of(3000.0, 2000.0, 10.0));
             }
         };
 
