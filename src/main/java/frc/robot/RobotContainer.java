@@ -7,9 +7,7 @@ import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -29,13 +27,8 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
-import frc.robot.util.PatriBoxController;
-import frc.robot.util.PoseCalculations;
-import frc.robot.util.SpeedAngleTriplet;
 import monologue.Annotations.Log;
 import monologue.Logged;
-import frc.robot.util.Constants.NTConstants;
-import monologue.Annotations.Log;
 
 public class RobotContainer implements Logged {
     
