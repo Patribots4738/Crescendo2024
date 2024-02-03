@@ -1,22 +1,17 @@
 package frc.robot.subsystems;
 
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-
-import com.google.gson.JsonElement;
-
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
 
 public class LedStrip extends SubsystemBase {
@@ -45,7 +40,7 @@ public class LedStrip extends SubsystemBase {
         patternMap.put(1, greenNGold());
         patternMap.put(2, circus());
         patternMap.put(3, loading());
-        patternMap.put(5, alliance(() -> DriverStation.getAlliance().equals(Optional.of(Alliance.Red))));
+        patternMap.put(5, alliance(() -> FieldConstants.IS_RED_ALLIANCE()));
         patternMap.put(6, flash());
     }
 
@@ -64,7 +59,7 @@ public class LedStrip extends SubsystemBase {
             case (1) -> greenNGold();
             case (2) -> circus();
             case (3) -> loading();
-            case (5) -> alliance(() -> DriverStation.getAlliance().equals(Optional.of(Alliance.Red)));
+            case (5) -> alliance(() -> FieldConstants.IS_RED_ALLIANCE());
             case (6) -> flash();
             default -> runOnce(() -> {
             });

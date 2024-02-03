@@ -1,13 +1,11 @@
 package frc.robot.commands;
 
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.*;
@@ -179,7 +177,7 @@ public class ShooterCalc implements Logged{
     public SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
         // Constants have blue alliance positions at index 0
         // and red alliance positions at index 1
-        int positionIndex = FieldConstants.ALLIANCE == Optional.ofNullable(Alliance.Blue) ? 0 : 1;
+        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
 
         // Get our position relative to the desired field element
         if (shootingAtSpeaker) {

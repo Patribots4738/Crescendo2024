@@ -10,12 +10,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
-import frc.robot.commands.leds.LPI;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
@@ -25,15 +23,10 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.FieldConstants.GameMode;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
-import monologue.Monologue;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.NeoMotorConstants;
-import frc.robot.util.Constants.OIConstants;
-import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class RobotContainer implements Logged {
@@ -114,8 +107,7 @@ public class RobotContainer implements Logged {
             () -> -driver.getRightX(),
             () -> !driver.leftBumper().getAsBoolean(),
             () -> (driver.leftBumper().getAsBoolean()
-                && FieldConstants.ALLIANCE
-                    .equals(Optional.ofNullable(Alliance.Blue)))));
+                && FieldConstants.IS_BLUE_ALLIANCE())));
               
         incinerateMotors();
         configureButtonBindings();
@@ -125,48 +117,44 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        configureDriverBindings();
-        configureOperatorBindings();
+        configureDriverBindings(driver);
+        configureOperatorBindings(operator);
     }
     
-    private void configureOperatorBindings() {
+    private void configureOperatorBindings(PatriBoxController controller) {
 
-        operator.povUp()
-            .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        operator.povDown()
-            .onTrue(climb.toBottomCommand());
+        controller.povDown().onTrue(climb.toBottomCommand());
 
-        operator.povLeft()
-            .onTrue(elevator.toBottomCommand());
+        controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        operator.povRight()
-            .onTrue(pieceControl.placeTrapCommand());
+        controller.povRight().onTrue(pieceControl.placeTrapCommand());
 
-        operator.leftBumper()
-            .and(operator.rightBumper())
+        controller.leftBumper()
+            .and(controller.rightBumper())
             .onTrue(pieceControl.noteToShoot());
 
-        operator.rightBumper()
-            .and(operator.leftBumper().negate())
+        controller.rightBumper()
+            .and(controller.leftBumper().negate())
             .onTrue(pieceControl.noteToTarget(() -> true));
 
-        operator.leftTrigger(OIConstants.OPERATOR_DEADBAND)
+        controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
             .and(intake.hasGamePieceTrigger().negate())
             .onTrue(intake.inCommand());
 
-        operator.rightTrigger(OIConstants.OPERATOR_DEADBAND)
+        controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
             .onTrue(intake.outCommand());
 
-        operator.x().onTrue(intake.stop());
+        controller.x().onTrue(intake.stop());
     }
     
-    private void configureDriverBindings() {
+    private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing away from the driver station
-        driver.start().or(driver.back()).onTrue(
+        controller.start().or(driver.back()).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
@@ -176,39 +164,40 @@ public class RobotContainer implements Logged {
                             : 180))), 
                 swerve));
 
-        driver.b()
+        controller.b()
             .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
         
-        driver.leftStick()
+        controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());
         
-        driver.a()
+        controller.a()
             .and(intake.hasGamePieceTrigger().negate())
             .onTrue(intake.inCommand());
         
-        driver.y()
+        controller.y()
             .onTrue(intake.outCommand());
         
-        driver.leftBumper()
+        controller.leftBumper()
             .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
         
-        driver.leftTrigger()
+        controller.leftTrigger()
             .onTrue(shooterCalc.resetShooter());
         
-        driver.x()
+        controller.x()
             .onTrue(intake.stop());
         
-        driver.rightStick()
+        controller.rightStick()
             .whileTrue(
+                Commands.sequence(
+                swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
-                        return ChassisSpeeds.fromFieldRelativeSpeeds(
-                            driver.getLeftY(),
-                            driver.getLeftX(),
-                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(360)),
-                            swerve.getPose().getRotation());
+                        return new ChassisSpeeds(
+                            controller.getLeftY(),
+                            controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
                     },
-                () -> true));
+                    () -> true)));
     }
     
     public Command getAutonomousCommand() {
