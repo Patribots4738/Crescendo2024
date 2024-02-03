@@ -6,7 +6,9 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
@@ -72,6 +74,10 @@ public class Climb extends SubsystemBase implements Logged {
         );
     }
 
+    LedStrip ledStrip = new LedStrip();
+
+    
+
     public void toTop() {
         setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT);
     }
@@ -81,11 +87,13 @@ public class Climb extends SubsystemBase implements Logged {
     }
 
     public Command toTopCommand() {
-        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT));
+        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT))
+            .andThen(Commands.run(() -> ledStrip.setLED(Color.kGreen)));
     }
 
     public Command toBottomCommand() {
-        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT));
+        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT))
+        .andThen(Commands.run(() -> ledStrip.setLED(Color.kGreen)));
     }
 
     public Command povUpCommand(Supplier<Pose2d> positionSupplier) {

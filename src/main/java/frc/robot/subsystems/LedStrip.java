@@ -16,13 +16,17 @@ import frc.robot.util.Constants.LEDConstants;
 
 public class LedStrip extends SubsystemBase {
 
-    private AddressableLED led;
+	private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;
 
     private int currentPatternIndex;
     private final Supplier<Pose2d> poseSupplier;
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
+
+    public LedStrip() {
+        poseSupplier = () -> new Pose2d();
+    }
 
     public LedStrip(Supplier<Pose2d> poseSupplier) {
         this.poseSupplier = poseSupplier;
@@ -178,6 +182,20 @@ public class LedStrip extends SubsystemBase {
             }
             this.allianceOffset += 1;
             this.allianceOffset %= 10;
+        });
+    }
+
+    public Command elevaBottom() {
+        return runOnce(() -> { 
+                final Color color = Color.kBlanchedAlmond;
+                setLED(color);
+        });
+    }
+    
+    public Command elevaTop() {
+        return runOnce(() -> {
+            final Color color = Color.kOrange;
+            setLED(color);
         });
     }
 }
