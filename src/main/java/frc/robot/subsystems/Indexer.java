@@ -34,7 +34,7 @@ public class Indexer extends SubsystemBase {
 
     public void setDesiredSpeed(double speed) {
         desiredSpeed = speed;
-        triggerWheel.set(speed);
+        triggerWheel.setTargetVelocity(speed);
     }
 
     public Command setSpeedCommand(double speed) {

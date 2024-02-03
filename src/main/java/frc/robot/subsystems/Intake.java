@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command setCommand(double desiredSpeed) {
-        return runOnce(() -> intakeMotor.set(desiredSpeed));
+        return runOnce(() -> intakeMotor.setTargetVelocity(desiredSpeed));
     }
 
     public Command inCommand() {

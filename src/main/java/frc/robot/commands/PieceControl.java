@@ -8,6 +8,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
 
 public class PieceControl {
@@ -57,7 +58,7 @@ public class PieceControl {
         return indexer.toShooter()
                 .andThen(Commands.waitUntil(readyToShoot()))
                 .andThen(claw.intake())
-                .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?
+                .andThen(Commands.waitSeconds(ShooterConstants.SHOOTER_PASS_TIME)) // TODO: Change this to a wait until the note is in the shooter?
                 .andThen(claw.stop())
                 .andThen(indexer.stop());
 
@@ -65,14 +66,12 @@ public class PieceControl {
 
     public Command noteToTarget(BooleanSupplier toAmp) {
         // maybe make setPosition a command ORR Make the Elevator Command
-        return 
-                this.elevator.setPositionCommand(
+        return this.elevator.setPositionCommand(
                         toAmp.getAsBoolean() ? TrapConstants.AMP_PLACE_POS : TrapConstants.TRAP_PLACE_POS)
                 .andThen(
                         Commands.waitUntil(elevator.isAtTargetPosition()))
                 .andThen(claw.placeCommand())
-                .andThen(Commands.waitSeconds(1))
-                .andThen(claw.stop())
+                .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_TIME))
                 .andThen(elevator.toBottomCommand());
     }
 
@@ -81,11 +80,9 @@ public class PieceControl {
                 .alongWith(indexer.toTrap());
     }
 
-    public Command placeTrapCommand() {
-        return Commands.sequence(
-                elevator.toTopCommand(),
-                claw.placeCommand(),
-                Commands.waitSeconds(2));
+    public Command stopIntake() {
+        return intake.stop()
+                .alongWith(indexer.stop());
     }
 
 }

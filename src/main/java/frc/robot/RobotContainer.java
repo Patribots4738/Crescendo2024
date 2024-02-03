@@ -129,7 +129,7 @@ public class RobotContainer implements Logged {
 
         controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        controller.povRight().onTrue(pieceControl.placeTrapCommand());
+        controller.povRight().onTrue(elevator.toTopCommand());
 
         controller.leftBumper()
             .and(controller.rightBumper())
@@ -141,7 +141,10 @@ public class RobotContainer implements Logged {
 
         controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
             .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(intake.inCommand());
+            .onTrue(pieceControl.intakeToClaw());
+
+        controller.leftTrigger()
+            .onFalse(pieceControl.stopIntake());
 
         controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
             .onTrue(intake.outCommand());
