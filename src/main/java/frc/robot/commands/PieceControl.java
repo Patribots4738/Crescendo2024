@@ -3,11 +3,9 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.Constants.TrapConstants;
@@ -22,21 +20,18 @@ public class PieceControl {
 
     private ShooterCalc shooterCalc;
 
-    private Swerve swerve;
 
     public PieceControl(
             Intake intake,
             Indexer indexer,
             Elevator elevator,
             Claw claw,
-            ShooterCalc shooterCalc,
-            Swerve swerve) {
+            ShooterCalc shooterCalc) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.claw = claw;
         this.shooterCalc = shooterCalc;
-        this.swerve = swerve;
     }
 
     public Trigger readyToShoot() {
@@ -52,19 +47,19 @@ public class PieceControl {
                 claw.stop());
     }
 
-    // TODO: We assume that the note is already in the claw when we want to shoot
     // TODO: Possibly split this into two commands where one sends to shooter
     // without waiting
     public Command noteToShoot() {
+        // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from claw into indexer and then into 
         // shooter before stopping claw and indexer
         return indexer.toShooter()
                 .andThen(Commands.waitUntil(readyToShoot()))
                 .andThen(claw.intake())
-                .andThen(Commands.waitSeconds(1))
+                .andThen(Commands.waitSeconds(1)) // TODO: Change this to a wait until the note is in the shooter?
                 .andThen(claw.stop())
-                .andThen(indexer.stop()); // TODO: Change this to a wait until the note is in the shooter?
+                .andThen(indexer.stop());
 
     }
 
@@ -76,8 +71,14 @@ public class PieceControl {
                 .andThen(
                         Commands.waitUntil(elevator.isAtTargetPosition()))
                 .andThen(claw.placeCommand())
-                .andThen(new WaitCommand(1))
-                .andThen(stopAllMotors());
+                .andThen(Commands.waitSeconds(1))
+                .andThen(claw.stop())
+                .andThen(elevator.toBottomCommand());
+    }
+
+    public Command intakeToClaw() {
+        return intake.inCommand()
+                .alongWith(indexer.toTrap());
     }
 
     public Command placeTrapCommand() {

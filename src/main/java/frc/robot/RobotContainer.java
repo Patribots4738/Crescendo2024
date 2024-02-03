@@ -82,8 +82,8 @@ public class RobotContainer implements Logged {
             triggerWheel,
             elevator,
             claw,
-            shooterCalc,
-            swerve);
+            shooterCalc
+        );
         
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
