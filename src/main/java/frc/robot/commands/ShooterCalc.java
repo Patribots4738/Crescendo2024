@@ -74,6 +74,8 @@ public class ShooterCalc implements Logged {
     Pose2d robotPoseAngled;
     @Log.NT
     Pose2d robotPoseSurely;
+    @Log.NT
+    double desiredMPSForNote = 0;
 
 
     /**
@@ -94,15 +96,15 @@ public class ShooterCalc implements Logged {
                 Math.cos(currentAngleToSpeaker.getRadians())
                         * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()),
                 Math.signum(robotVelocity.vyMetersPerSecond)
-                        * Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond)
+                    * Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond)
                         - Math.sin(currentAngleToSpeaker.getRadians())
                                 * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()));
 
-        double desiredMPSForNote = Math.hypot(velocityTranslation.getX(), velocityTranslation.getY());
+        desiredMPSForNote = Math.hypot(velocityTranslation.getX(), velocityTranslation.getY());
 
         robotPoseSurely = new Pose2d(robotPose.getTranslation(), new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY()).unaryMinus());
 
-        return new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY());
+        return new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY()).unaryMinus();
     }
 
     /**
@@ -316,6 +318,6 @@ public class ShooterCalc implements Logged {
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose) {
-        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(pose, SpeedAngleTriplet.of(rpmToVelocity(calculateSpeed(pose.get(), true).getSpeeds()), 0.0, calculateSpeed(pose.get(), true).getAngle())).schedule());
+        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(pose, SpeedAngleTriplet.of(this.desiredMPSForNote, 0.0, calculateSpeed(pose.get(), true).getAngle())).schedule());
     }
 }
