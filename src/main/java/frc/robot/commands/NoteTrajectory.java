@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,15 +34,22 @@ import monologue.Annotations.Log;
  */
 public class NoteTrajectory implements Logged {
     DoubleSupplier x;
-    DoubleSupplier y;
     DoubleSupplier x0;
-    DoubleSupplier y0;
     DoubleSupplier vx0;
-    DoubleSupplier vy0;
     DoubleSupplier ax;
+    DoubleSupplier z;
+    DoubleSupplier z0;
+    DoubleSupplier vz0;
+    DoubleSupplier az;
+    DoubleSupplier y;
+    DoubleSupplier y0;
+    DoubleSupplier vy0;
     DoubleSupplier ay;
-
+    
     Supplier<Pose2d> initialPose;
+
+    @Log.NT
+    ChassisSpeeds fieldSpeeds;
 
     Timer timer;
 
@@ -49,37 +57,43 @@ public class NoteTrajectory implements Logged {
     Pose3d traj = new Pose3d();
 
     public NoteTrajectory() {
-        setVariables(new Pose2d(), new SpeedAngleTriplet());
+        setVariables(new Pose2d(), new ChassisSpeeds(), new SpeedAngleTriplet());
         timer = new Timer();
     }
 
-    private void setVariables(Pose2d initialPose2d, SpeedAngleTriplet speedAngleTriplet) {
+    private void setVariables(Pose2d initialPose2d, ChassisSpeeds speeds, SpeedAngleTriplet speedAngleTriplet) {
+        fieldSpeeds = speeds;
         x = () -> NTConstants.PIVOT_OFFSET_METERS.getX();
-        y = () -> NTConstants.PIVOT_OFFSET_METERS.getY();
+        y = () -> 0;
+        z = () -> NTConstants.PIVOT_OFFSET_METERS.getY();
         x0 = () -> NTConstants.PIVOT_OFFSET_METERS.getX();
-        y0 = () -> NTConstants.PIVOT_OFFSET_METERS.getY();
+        y0 = () -> 0;
+        z0 = () -> NTConstants.PIVOT_OFFSET_METERS.getY();
         // TODO: Change the left and right values to not be the x and y components as
         // they are the wrong axis
-        vx0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getSin()
-                * speedAngleTriplet.getLeftSpeed();
-        vy0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getCos()
-                * speedAngleTriplet.getLeftSpeed();
+        vx0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getSin() * speedAngleTriplet.getLeftSpeed()
+                    + speeds.vxMetersPerSecond;
+        vy0 = () -> speeds.vyMetersPerSecond;
+        vz0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getCos() * speedAngleTriplet.getLeftSpeed();
         ax = () -> 0;
-        ay = () -> -9.8;
+        ay = () -> 0;
+        az = () -> -9.8;
+
         initialPose = () -> initialPose2d;
     }
 
-    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, SpeedAngleTriplet speedAngleTriplet) {
+    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, SpeedAngleTriplet speedAngleTriplet) {
         return Commands.runOnce(() -> {
             this.timer.restart();
-            setVariables(pose.get(), speedAngleTriplet);
+            setVariables(pose.get(), speeds.get(), speedAngleTriplet);
             }).andThen(Commands.runOnce(() -> {
                 x = kinematicEquation1(x0, vx0, ax, timer);
+                z = kinematicEquation1(z0, vz0, az, timer);
                 y = kinematicEquation1(y0, vy0, ay, timer);
 
-                traj = getNotePose(this.initialPose, x, y);
-                RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, x, y).relativeTo(new Pose3d(pose.get()));
-            }).repeatedly().until(() -> ((y.getAsDouble() < y0.getAsDouble()) || timer.get() > 5)))
+                traj = getNotePose(this.initialPose, speedAngleTriplet, x, z, y);
+                RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, speedAngleTriplet, x, z, y).relativeTo(new Pose3d(pose.get()));
+            }).repeatedly().until(() -> ((z.getAsDouble() < z0.getAsDouble()) || timer.get() > 5)))
             .andThen(
                 Commands.runOnce(
                     this::zeroNote
@@ -87,9 +101,9 @@ public class NoteTrajectory implements Logged {
             );
     }
 
-    Pose3d getNotePose(Supplier<Pose2d> pose, DoubleSupplier x, DoubleSupplier y) {
+    Pose3d getNotePose(Supplier<Pose2d> pose, SpeedAngleTriplet speedAngleTriplet, DoubleSupplier x, DoubleSupplier y, DoubleSupplier z) {
         return new Pose3d(
-                new Translation3d(x.getAsDouble(), 0, y.getAsDouble()).rotateBy(new Rotation3d(
+                new Translation3d(x.getAsDouble(), z.getAsDouble(), y.getAsDouble()).rotateBy(new Rotation3d(
                         0,
                         0,
                         pose.get().getRotation().getRadians())),
@@ -100,7 +114,10 @@ public class NoteTrajectory implements Logged {
                                         pose.get().getX(),
                                         pose.get().getY(),
                                         0),
-                                new Rotation3d(Units.degreesToRadians(90),0,0)));
+                                new Rotation3d(
+                                    Units.degreesToRadians(90), 
+                                    -Units.degreesToRadians(speedAngleTriplet.getAngle()), 
+                                    pose.get().getRotation().getRadians())));
     }
 
     public void zeroNote() {
