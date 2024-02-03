@@ -7,10 +7,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.*;
@@ -76,6 +74,8 @@ public class ShooterCalc implements Logged {
     Pose2d robotPoseSurely;
     @Log.NT
     double desiredMPSForNote = 0;
+    @Log.NT
+    double degreesToSpeakerReferenced = 0;
 
 
     /**
@@ -89,22 +89,20 @@ public class ShooterCalc implements Logged {
      */
     public Rotation2d calculateSWDAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+
         currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
-        robotPoseAngled = new Pose2d(robotPose.getTranslation(), currentAngleToSpeaker);
+        
+        Rotation2d velocityRotation2d = new Rotation2d(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
 
-        Translation2d velocityTranslation = new Translation2d(
-                Math.cos(currentAngleToSpeaker.getRadians())
-                        * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()),
-                Math.signum(robotVelocity.vyMetersPerSecond)
-                    * Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond)
-                        - Math.sin(currentAngleToSpeaker.getRadians())
-                                * rpmToVelocity(calculateSpeed(robotPoseAngled, true).getSpeeds()));
+        double totalSpeed = Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
 
-        desiredMPSForNote = Math.hypot(velocityTranslation.getX(), velocityTranslation.getY());
+        double velocityTangentToSpeaker = totalSpeed * Math.sin(velocityRotation2d.getRadians() - currentAngleToSpeaker.getRadians());
 
-        robotPoseSurely = new Pose2d(robotPose.getTranslation(), new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY()).unaryMinus());
+        Rotation2d desiredRotation2d = Rotation2d.fromRadians(currentAngleToSpeaker.getRadians() - (Math.atan2(velocityTangentToSpeaker, rpmToVelocity(calculateSpeed(robotPose, true).getSpeeds()))));
 
-        return new Rotation2d(velocityTranslation.getX(), velocityTranslation.getY()).unaryMinus();
+        robotPoseSurely = new Pose2d(robotPose.getTranslation(), desiredRotation2d);
+
+        return desiredRotation2d;
     }
 
     /**
@@ -121,12 +119,13 @@ public class ShooterCalc implements Logged {
      * @return the velocity in meters per second
      */
     public double rpmToVelocity(Pair<Double, Double> speeds) {
-        
         double rotationsPerMinute = (speeds.getFirst() + speeds.getSecond()) / 2.0;
         double rotationsPerSecond = rotationsPerMinute / 60.0;
         double radiansPerSecond = rotationsPerSecond * Math.PI;
 
         double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
+
+        desiredMPSForNote = diameter * radiansPerSecond;
 
         // Normally this is 1 radius * 2 pi
         // but we are doing 2 radius * 1 pi
@@ -317,7 +316,7 @@ public class ShooterCalc implements Logged {
                 pivot.stop());
     }
 
-    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose) {
-        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(pose, SpeedAngleTriplet.of(this.desiredMPSForNote, 0.0, calculateSpeed(pose.get(), true).getAngle())).schedule());
+    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(pose, speeds, SpeedAngleTriplet.of(this.desiredMPSForNote, 0.0, calculateSpeed(pose.get(), true).getAngle())).schedule());
     }
 }
