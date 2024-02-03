@@ -40,8 +40,7 @@ public class Drive extends Command {
         addRequirements(swerve);
     }
 
-    public Drive(Swerve swerve, Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelativeSupplier,
-            BooleanSupplier shouldMirror) {
+    public Drive(Swerve swerve, Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelativeSupplier, BooleanSupplier shouldMirror) {
 
         this.swerve = swerve;
 
@@ -62,8 +61,10 @@ public class Drive extends Command {
     @Override
     public void execute() {
         double x = xSupplier.getAsDouble();
-        double y = ySupplier.getAsDouble();
-        if (shouldMirror.getAsBoolean() || !fieldRelativeSupplier.getAsBoolean()) {
+        // The driver's right is negative 
+        // on the field's axis
+        double y = -ySupplier.getAsDouble();
+        if (shouldMirror.getAsBoolean()) {
             x *= -1;
             y *= -1;
         }

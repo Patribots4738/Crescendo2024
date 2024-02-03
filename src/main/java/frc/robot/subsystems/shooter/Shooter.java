@@ -1,12 +1,5 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.shooter;
 
-import java.util.function.BooleanSupplier;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -62,7 +55,7 @@ public class Shooter extends SubsystemBase {
         motorRight.setTargetVelocity(speed);
     }
 
-    public void setSpeedPair(Pair<Double, Double> speeds) {
+    public void setSpeed(Pair<Double, Double> speeds) {
         motorLeft.setTargetVelocity(speeds.getFirst());
         motorRight.setTargetVelocity(speeds.getSecond());
     }
@@ -80,7 +73,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setSpeedCommand(Pair<Double, Double> speeds) {
-        return runOnce(() -> setSpeedPair(speeds));
+        return runOnce(() -> setSpeed(speeds));
+    }
+
+    public Pair<Double, Double> getSpeed() {
+        return new Pair<Double, Double>(motorLeft.getVelocity(), motorRight.getVelocity());
     }
 
     /**
@@ -90,22 +87,5 @@ public class Shooter extends SubsystemBase {
      */
     public Command stop() {
         return Commands.runOnce(() -> motorLeft.stopMotor());
-    }
-
-    // TODO: Implement a way to get the RPM of the shooter
-    /**
-     * The function is a BooleanSupplier that represents the the condition of
-     * the velocity of the motor being equal to its targetVelocity
-     * 
-     * 
-     * @return The method is returning a BooleanSupplier that returns true if
-     *         the current velocity of the motors is at the target velocity with a
-     *         small tolerance
-     */
-    public BooleanSupplier atDesiredRPM() {
-        return () -> (MathUtil.applyDeadband(
-                Math.abs(
-                        motorLeft.getVelocity() - motorLeft.getTargetVelocity()),
-                ShooterConstants.SHOOTER_DEADBAND) == 0);
     }
 }

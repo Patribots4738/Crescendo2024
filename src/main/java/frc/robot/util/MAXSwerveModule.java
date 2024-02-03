@@ -151,11 +151,6 @@ public class MAXSwerveModule {
         turningSpark.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
-    public void tick() {
-        drivingSpark.tick();
-        turningSpark.tick();
-    }
-
     public void configMotors() {
         turningSpark.restoreFactoryDefaults();
         drivingSpark.restoreFactoryDefaults();

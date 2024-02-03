@@ -1,14 +1,19 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.IdleMode;
+import java.util.function.Supplier;
 
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
-import frc.robot.util.Constants.FieldConstants.ChainPosition;
+import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 
 public class Climb extends SubsystemBase implements Logged {
@@ -20,44 +25,75 @@ public class Climb extends SubsystemBase implements Logged {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
         rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
 
-        leftMotor.setIdleMode(IdleMode.kBrake);
-        rightMotor.setIdleMode(IdleMode.kBrake);
+        configureMotors();
+    }
 
-        leftMotor.setInverted(true);
-        rightMotor.setInverted(false);
+    private void configureMotors() {
+        leftMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+        rightMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+
+        leftMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
+        rightMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
+
+        leftMotor.setSmartCurrentLimit(ClimbConstants.CLIMB_CURRENT_LIMIT);
+        rightMotor.setSmartCurrentLimit(ClimbConstants.CLIMB_CURRENT_LIMIT);
+
+        leftMotor.setPID(ClimbConstants.CLIMB_PID);
+        rightMotor.setPID(ClimbConstants.CLIMB_PID);
+    }
+
+    @Override
+    public void periodic() {
+        RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
+            0, 0, leftMotor.getPosition(),
+            new Rotation3d()
+        );
+        RobotContainer.components3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
+            0, 0, rightMotor.getPosition(),
+            new Rotation3d()
+        );
+    }
+
+    public void setPosition(Pair<Double, Double> positionPair) {
+        setPosition(positionPair.getFirst(), positionPair.getSecond());
     }
 
     public void setPosition(double pos1, double pos2) {
-        leftMotor.setPosition(pos1);
-        rightMotor.setPosition(pos2);
+        leftMotor.setTargetPosition(pos1);
+        rightMotor.setTargetPosition(pos2);
+
+        RobotContainer.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
+            0, 0, pos1,
+            new Rotation3d()
+        );
+        RobotContainer.desiredComponents3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
+            0, 0, pos2,
+            new Rotation3d()
+        );
     }
 
-    public Command toTop(ChainPosition chainPosition) {
-
-        if (chainPosition == ChainPosition.LEFT) {
-            return runOnce(() -> this.setPosition(ClimbConstants.ALMOST_HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-        } else if (chainPosition == ChainPosition.RIGHT) {
-            return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.ALMOST_HIGH_LIMIT));
-        } else {
-            return runOnce(() -> this.setPosition(ClimbConstants.HIGH_LIMIT, ClimbConstants.HIGH_LIMIT));
-        }
-
+    public void toTop() {
+        setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT);
     }
 
-    public Command toBottom() {
-
-        // This mimics the behavior of an asProxy command
-        // without the inclusion of the wrapper that asProxy brings along with it.
-        // therefore it is more advantagous to use this
-        // becuase we can't have two super.runOnce's
-        // as they would require this subsystem twice
-        // this is very bad and need fix :D
-        ParallelRaceGroup group = new ParallelRaceGroup();
-        group.addCommands(Commands.runOnce(() -> rightMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
-        group.addCommands(Commands.runOnce(() -> leftMotor.setPosition(ClimbConstants.ROCK_BOTTOM)));
-        group.addRequirements(this);
-
-        return group.andThen();
+    public void toBottom() {
+        setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT);
     }
 
+    public Command toTopCommand() {
+        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT));
+    }
+
+    public Command toBottomCommand() {
+        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT));
+    }
+
+    public Command povUpCommand(Supplier<Pose2d> positionSupplier) {
+        return runEnd(() -> {
+                Pair<Double, Double> positionPair = PoseCalculations.getChainIntercepts(positionSupplier.get());
+                setPosition(positionPair);
+            }, 
+            this::toTop
+        );
+    }
 }

@@ -1,16 +1,13 @@
 package frc.robot.util;
 
 import java.util.function.DoubleSupplier;
-import java.util.Optional;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
@@ -29,8 +26,10 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     @Override
+    // This is inverted because for some reason when you
+    // go forward on the controller, it returns a negative value
     public double getLeftY() {
-        return getLeftAxis().getY();
+        return -getLeftAxis().getY();
     }
 
     public Translation2d getLeftAxis() {
