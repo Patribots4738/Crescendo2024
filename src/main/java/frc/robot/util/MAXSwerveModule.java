@@ -58,10 +58,21 @@ public class MAXSwerveModule {
      * @return The current state of the module.
      */
     public SwerveModuleState getState() {
+        if (FieldConstants.IS_SIMULATION) {
+            return getSimState();
+        }
+        // Apply chassis angular offset to the encoder position to get the position
+        // relative to the chassis.
+        return new SwerveModuleState(drivingEncoder.getVelocity(),
+                new Rotation2d(turningEncoder.getPosition() - chassisAngularOffset));
+    }
+
+    public SwerveModuleState getSimState() {
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
         return new SwerveModuleState(drivingSpark.getVelocity(),
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
+
     }
 
     /**
@@ -70,6 +81,17 @@ public class MAXSwerveModule {
      * @return The current position of the module.
      */
     public SwerveModulePosition getPosition() {
+        if (FieldConstants.IS_SIMULATION) {
+            return getSimPosition();
+        }
+        // Apply chassis angular offset to the encoder position to get the position
+        // relative to the chassis.
+        return new SwerveModulePosition(
+                drivingEncoder.getPosition(),
+                new Rotation2d(turningEncoder.getPosition() - chassisAngularOffset));
+    }
+
+    public SwerveModulePosition getSimPosition() {
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
         return new SwerveModulePosition(
@@ -93,8 +115,15 @@ public class MAXSwerveModule {
                 new Rotation2d(turningEncoder.getPosition()));
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
-        drivingSpark.setTargetVelocity(optimizedDesiredState.speedMetersPerSecond);
-        turningSpark.setTargetPosition(optimizedDesiredState.angle.getRadians());
+        if (FieldConstants.IS_SIMULATION) {
+            drivingSpark.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
+            turningSpark.setTargetPosition(correctedDesiredState.angle.getRadians());
+        } else {
+            turningPIDController.setReference(optimizedDesiredState.angle.getRadians(),
+                    CANSparkBase.ControlType.kPosition);
+            drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond,
+                    CANSparkBase.ControlType.kVelocity);
+        }
 
         this.desiredState = desiredState;
     }
