@@ -299,7 +299,7 @@ public class ShooterCalc implements Logged {
                 pivot.stop());
     }
 
-    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, SpeedAngleTriplet speedAngleTriplet) {
-        return noteTrajectory.getNoteTrajectoryCommand(pose, speedAngleTriplet);
+    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose) {
+        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(pose, SpeedAngleTriplet.of(rpmToVelocity(calculateSpeed(pose.get(), true).getSpeeds()), 0.0, calculateSpeed(pose.get(), true).getAngle())).schedule());
     }
 }

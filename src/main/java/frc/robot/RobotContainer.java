@@ -140,7 +140,7 @@ public class RobotContainer implements Logged {
         driver.x().onTrue(intake.stop());
 
         // TODO: change the SpeedAnglePair to have the corresponding values from shooter calc
-        driver.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, new SpeedAngleTriplet(12.0, 12.0, 45.0)));
+        driver.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose));
 
     }
 
