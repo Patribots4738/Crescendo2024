@@ -69,9 +69,7 @@ public class ShooterCalc implements Logged {
     @Log.NT
     Rotation2d currentAngleToSpeaker;
     @Log.NT
-    Pose2d robotPoseAngled;
-    @Log.NT
-    Pose2d robotPoseSurely;
+    Pose2d desiredSWDPose;
     @Log.NT
     double desiredMPSForNote = 0;
     @Log.NT
@@ -88,25 +86,37 @@ public class ShooterCalc implements Logged {
      * @return              The angle to the speaker in the form of a Rotation2d object.
      */
     public Rotation2d calculateSWDAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+        // Calculate the robot's pose relative to the speaker
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
 
+        // Calculate the current angle to the speaker
         currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
-        
+
+        // Convert the robot's velocity to a Rotation2d object
         Rotation2d velocityRotation2d = new Rotation2d(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
 
+        // Calculate the total speed of the robot
         double totalSpeed = Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
 
+        // Calculate the component of the velocity that is tangent to the speaker
         double velocityTangentToSpeaker = totalSpeed * Math.sin(velocityRotation2d.getRadians() - currentAngleToSpeaker.getRadians());
 
-        Rotation2d desiredRotation2d = Rotation2d.fromRadians(currentAngleToSpeaker.getRadians() - (Math.atan2(velocityTangentToSpeaker, rpmToVelocity(calculateSpeed(robotPose, true).getSpeeds()))));
+        // Calculate the desired rotation to the speaker, taking into account the tangent velocity
+        Rotation2d desiredRotation2d = Rotation2d.fromRadians(
+            currentAngleToSpeaker.getRadians() - Math.atan2(
+                velocityTangentToSpeaker, 
+                rpmToVelocity(calculateSpeed(robotPose, true).getSpeeds())
+            )
+        );
 
-        robotPoseSurely = new Pose2d(robotPose.getTranslation(), desiredRotation2d);
+        // Update the robot's pose with the desired rotation
+        desiredSWDPose = new Pose2d(robotPose.getTranslation(), desiredRotation2d);
 
+        // Return the desired rotation
         return desiredRotation2d;
     }
 
     /**
-     * TODO: These should both probably work off of the current speed, not the desired speed.
      * This method is averaging the speeds to make a rough estimate of the speed of the note (or the edge of the wheels).
      * The formula used is V = 2π * D/2 * RPM/60.
      * First, it converts from Rotations per Minute to Rotations per Second.
