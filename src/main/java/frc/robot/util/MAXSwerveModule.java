@@ -29,6 +29,9 @@ public class MAXSwerveModule {
      */
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
         drivingSpark = new Neo(drivingCANId);
+        // Invert the turning encoder, since the output shaft rotates in the opposite
+        // direction of
+        // the steering motor in the MAXSwerve Module.
         turningSpark = new Neo(turningCANId, true); 
 
         configMotors();
