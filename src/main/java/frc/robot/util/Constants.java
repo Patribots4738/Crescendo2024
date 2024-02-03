@@ -438,8 +438,8 @@ public final class Constants {
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.5410515;
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
-        public static final double CHAIN_HEIGHT_METERS = 8.2112312;
-        public static final double SPEAKER_HEIGHT_METERS = 2.1082;
+        public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
+        public static final double SPEAKER_HEIGHT_METERS = 2.082813;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 

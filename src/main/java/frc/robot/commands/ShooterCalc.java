@@ -80,7 +80,7 @@ public class ShooterCalc implements Logged{
      */
     public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
         return Commands.run(() -> {
-                SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
+                SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean());
 
                 log(triplet);
 
@@ -241,11 +241,11 @@ public class ShooterCalc implements Logged{
         robotPose = robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
 
         // Calculate the distance in feet from the robot to the speaker
-        double distanceFeet = robotPose.getTranslation().getNorm();
+        double distanceMeters = robotPose.getTranslation().getNorm();
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z, distanceFeet);
+        return new Rotation2d(Units.radiansToDegrees(Math.atan2(FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z, distanceMeters)));
     }
 
 
