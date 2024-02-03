@@ -24,6 +24,7 @@ import java.util.List;
  * Original source published at https://github.com/FRC3005/Rapid-React-2022-Public/tree/d499655448ed592c85f9cfbbd78336d8841f46e2
  */
 public class Neo extends CANSparkMax {
+    public static Object turningSpark;
     public final RelativeEncoder encoder;
     public final SparkPIDController pidController;
 
@@ -306,7 +307,7 @@ public class Neo extends CANSparkMax {
      * 
      * @param position the desired position to set
      */
-    public void setPosition(double position) {
+    public void resetEncoder(double position) {
         encoder.setPosition(position * reversedMultiplier);
     }
 
