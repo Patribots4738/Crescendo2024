@@ -95,8 +95,8 @@ public class ShooterCalc implements Logged{
     }
 
     public void logAngles(SpeedAngleTriplet triplet) {
-        desiredAngle = -triplet.getAngle();
-        realAngle = pivot.getAngle();
+        desiredAngle = triplet.getAngle();
+        realAngle = -pivot.getAngle();
     }
 
     public void logAtDesired() {

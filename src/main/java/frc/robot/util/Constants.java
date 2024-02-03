@@ -420,10 +420,10 @@ public final class Constants {
         public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
         // TODO: Add these to the robot
-        public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 0;
-        public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 0;
-        public static final double SHOOTER_TRIGGER_WHEEL_SPEED = 0;
-        public static final double TRAP_TRIGGER_WHEEL_SPEED = 0;
+        public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 7;
+        public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 15;
+        public static final double SHOOTER_TRIGGER_WHEEL_SPEED = 20;
+        public static final double TRAP_TRIGGER_WHEEL_SPEED = 20;
         public static final int INTAKE_CURRENT_LIMIT_AMPS = 0;
     }
 
