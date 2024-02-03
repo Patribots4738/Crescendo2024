@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -49,19 +50,20 @@ public class NoteTrajectory implements Logged {
 
     public NoteTrajectory() {
         setVariables(new Pose2d(), new SpeedAngleTriplet());
+        timer = new Timer();
     }
 
     private void setVariables(Pose2d initialPose2d, SpeedAngleTriplet speedAngleTriplet) {
-        x = () -> 0;
-        y = () -> 0;
-        x0 = () -> 0;
-        y0 = () -> 0;
+        x = () -> NTConstants.PIVOT_OFFSET_METERS.getX();
+        y = () -> NTConstants.PIVOT_OFFSET_METERS.getY();
+        x0 = () -> NTConstants.PIVOT_OFFSET_METERS.getX();
+        y0 = () -> NTConstants.PIVOT_OFFSET_METERS.getY();
         // TODO: Change the left and right values to not be the x and y components as
         // they are the wrong axis
-        vx0 = () -> Rotation2d.fromDegrees(90 - (speedAngleTriplet.getAngle())).getSin()
+        vx0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getSin()
                 * speedAngleTriplet.getLeftSpeed();
-        vy0 = () -> Rotation2d.fromDegrees(90 - (speedAngleTriplet.getAngle())).getCos()
-                * speedAngleTriplet.getRightSpeed();
+        vy0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getCos()
+                * speedAngleTriplet.getLeftSpeed();
         ax = () -> 0;
         ay = () -> -9.8;
         initialPose = () -> initialPose2d;
@@ -69,16 +71,20 @@ public class NoteTrajectory implements Logged {
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, SpeedAngleTriplet speedAngleTriplet) {
         return Commands.runOnce(() -> {
-            this.timer = new Timer();
-            this.timer.start();
+            this.timer.restart();
             setVariables(pose.get(), speedAngleTriplet);
-        }).andThen(Commands.runOnce(() -> {
-            x = kinematicEquation1(x0, vx0, ax, timer);
-            y = kinematicEquation1(x0, vy0, ay, timer);
+            }).andThen(Commands.runOnce(() -> {
+                x = kinematicEquation1(x0, vx0, ax, timer);
+                y = kinematicEquation1(y0, vy0, ay, timer);
 
-            traj = getNotePose(this.initialPose, x, y);
-            RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, x, y).relativeTo(new Pose3d(pose.get()));
-        }).repeatedly().until(() -> ((y.getAsDouble() < y0.getAsDouble()) || timer.get() > 2.5)));
+                traj = getNotePose(this.initialPose, x, y);
+                RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, x, y).relativeTo(new Pose3d(pose.get()));
+            }).repeatedly().until(() -> ((y.getAsDouble() < y0.getAsDouble()) || timer.get() > 5)))
+            .andThen(
+                Commands.runOnce(
+                    this::zeroNote
+                )
+            );
     }
 
     Pose3d getNotePose(Supplier<Pose2d> pose, DoubleSupplier x, DoubleSupplier y) {
@@ -94,7 +100,11 @@ public class NoteTrajectory implements Logged {
                                         pose.get().getX(),
                                         pose.get().getY(),
                                         0),
-                                new Rotation3d()));
+                                new Rotation3d(Units.degreesToRadians(90),0,0)));
+    }
+
+    public void zeroNote() {
+        RobotContainer.components3d[NTConstants.NOTE_INDEX] = new Pose3d();
     }
 
     /**
@@ -108,8 +118,7 @@ public class NoteTrajectory implements Logged {
      * @return the final position
      */
     public DoubleSupplier kinematicEquation1(DoubleSupplier x0, DoubleSupplier v0, DoubleSupplier a, Timer t) {
-        DoubleSupplier x = () -> (x0.getAsDouble() + v0.getAsDouble() * t.get()
-                + 0.5 * a.getAsDouble() * Math.pow(t.get(), 2));
+        DoubleSupplier x = () -> (x0.getAsDouble() + v0.getAsDouble() * t.get() + 0.5 * a.getAsDouble() * Math.pow(t.get(), 2));
         return x;
     }
 }
