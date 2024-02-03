@@ -201,7 +201,7 @@ public class RobotContainer implements Logged {
                     },
                     () -> true)));
 
-        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose));
+        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
     
     public Command getAutonomousCommand() {
