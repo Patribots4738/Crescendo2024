@@ -52,10 +52,10 @@ public class RobotContainer implements Logged {
     private PieceControl pieceControl;
     
     @Log.NT
-    public static Pose3d[] components3d = new Pose3d[5];
+    public static Pose3d[] components3d = new Pose3d[6];
 
     @Log.NT
-    public static Pose3d[] desiredComponents3d = new Pose3d[5];
+    public static Pose3d[] desiredComponents3d = new Pose3d[6];
     
     public RobotContainer() {
         
@@ -155,7 +155,7 @@ public class RobotContainer implements Logged {
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing away from the driver station
-        controller.start().or(driver.back()).onTrue(
+        controller.start().or(controller.back()).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
@@ -188,17 +188,20 @@ public class RobotContainer implements Logged {
             .onTrue(intake.stop());
         
         controller.rightStick()
-            .whileTrue(
+            .toggleOnTrue(
                 Commands.sequence(
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
+                        ;
                         return new ChassisSpeeds(
                             controller.getLeftY(),
                             controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
+                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity())));
                     },
                     () -> true)));
+
+        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose));
     }
     
     public Command getAutonomousCommand() {
