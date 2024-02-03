@@ -1,6 +1,5 @@
 package frc.robot;
 
-import java.util.Optional;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
 import frc.robot.commands.pieceControl.PieceControl;
 import frc.robot.commands.shooterCalc.ShooterCalc;
-import frc.robot.subsystems.*;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.elevator.claw.Claw;
 import frc.robot.subsystems.elevator.elevator.Elevator;
