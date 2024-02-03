@@ -5,11 +5,14 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -193,6 +196,31 @@ public class ShooterCalc implements Logged{
 
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
+
+    /**
+     * Calculates the pivot angle based on the robot's pose.
+     * 
+     * @param robotPose The pose of the robot.
+     * @return The calculated pivot angle.
+     */
+    public Rotation2d calculatePivotAngle(Pose2d robotPose) {
+        // Determine the position index based on the alliance color
+        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
+
+        // Add the pivot offset to the robot's pose
+        robotPose = robotPose.plus(new Transform2d(NTConstants.PIVOT_OFFSET_X, 0, new Rotation2d()));
+
+        // Calculate the robot's pose relative to the speaker's position
+        robotPose = robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
+
+        // Calculate the distance in feet from the robot to the speaker
+        double distanceFeet = robotPose.getTranslation().getNorm();
+
+        // Return a new rotation object that represents the pivot angle
+        // The pivot angle is calculated based on the speaker's height and the distance to the speaker
+        return new Rotation2d(FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z, distanceFeet);
+    }
+
 
     public boolean pivotAtDesiredAngle() {
         return atDesiredAngle().getAsBoolean();
