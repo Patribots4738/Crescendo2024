@@ -11,7 +11,7 @@ public class Intake extends SubsystemBase {
     private final Neo intakeMotor;
 
     public Intake() {
-        intakeMotor = new Neo(IntakeConstants.TOP_INTAKE_CAN_ID);
+        intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID);
         configMotors();
     }
 
@@ -22,20 +22,20 @@ public class Intake extends SubsystemBase {
         intakeMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
     }
 
-    public Command setCommand(double desiredSpeed) {
-        return runOnce(() -> intakeMotor.set(desiredSpeed));
+    public Command setPercentCommand(double desiredPercent) {
+        return runOnce(() -> intakeMotor.setTargetPercent(desiredPercent));
     }
 
     public Command inCommand() {
-        return setCommand(IntakeConstants.INTAKE_SPEED);
+        return setPercentCommand(IntakeConstants.INTAKE_PERCENT);
     }
 
     public Command outCommand() {
-        return setCommand(IntakeConstants.OUTTAKE_SPEED);
+        return setPercentCommand(IntakeConstants.OUTTAKE_PERCENT);
     }
 
     public Command stop() {
-        return setCommand(IntakeConstants.STOP_SPEED);
+        return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 
     public Trigger hasGamePieceTrigger() {

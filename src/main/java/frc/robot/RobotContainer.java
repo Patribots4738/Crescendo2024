@@ -82,8 +82,8 @@ public class RobotContainer implements Logged {
             triggerWheel,
             elevator,
             claw,
-            shooterCalc,
-            swerve);
+            shooterCalc
+        );
         
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -129,7 +129,7 @@ public class RobotContainer implements Logged {
 
         controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        controller.povRight().onTrue(pieceControl.placeTrapCommand());
+        controller.povRight().onTrue(elevator.toTopCommand());
 
         controller.leftBumper()
             .and(controller.rightBumper())
@@ -141,7 +141,10 @@ public class RobotContainer implements Logged {
 
         controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
             .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(intake.inCommand());
+            .onTrue(pieceControl.intakeToClaw());
+
+        controller.leftTrigger()
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
             .onTrue(intake.outCommand());
