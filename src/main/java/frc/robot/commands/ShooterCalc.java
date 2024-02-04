@@ -119,7 +119,7 @@ public class ShooterCalc implements Logged{
 	public BooleanSupplier atDesiredAngle() {
 		return () -> (MathUtil.applyDeadband(
 				Math.abs(
-						pivot.getAngle() - desiredAngle),
+						realAngle - desiredAngle),
 				ShooterConstants.PIVOT_DEADBAND) == 0);
 	}
 
