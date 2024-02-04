@@ -42,7 +42,7 @@ public class Pivot extends SubsystemBase implements Logged {
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
-			NTConstants.PIVOT_OFFSET_METERS.getY(),
+			NTConstants.PIVOT_OFFSET_METERS.getZ(),
 			new Rotation3d(0, Units.degreesToRadians(getAngle()), 0)
 		);
 	}
@@ -61,7 +61,7 @@ public class Pivot extends SubsystemBase implements Logged {
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
-			NTConstants.PIVOT_OFFSET_METERS.getY(),
+			NTConstants.PIVOT_OFFSET_METERS.getZ(),
 			new Rotation3d(0, Units.degreesToRadians(angle), 0)
 		);
 	}

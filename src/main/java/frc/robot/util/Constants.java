@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -438,7 +439,8 @@ public final class Constants {
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.5410515;
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
-        public static final double CHAIN_HEIGHT_METERS = 8.2112312;
+        public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
+        public static final double SPEAKER_HEIGHT_METERS = 2.082813;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
@@ -528,7 +530,15 @@ public final class Constants {
         public static final int ELEVATOR_INDEX = 2;
         public static final int LEFT_CLIMB_INDEX = 3;
         public static final int RIGHT_CLIMB_INDEX = 4;
+        
+        public static final double PIVOT_OFFSET_X = 0.112;
+        public static final double PIVOT_OFFSET_Z = 0.21;
 
-        public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
+    
+        public static final Translation3d PIVOT_OFFSET_METERS = new Translation3d(
+            PIVOT_OFFSET_X,
+            0, 
+            PIVOT_OFFSET_Z);
+        
     }
 }
