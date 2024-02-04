@@ -248,7 +248,7 @@ public class ShooterCalc implements Logged{
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(Math.atan2(FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z, distanceMeters));
+        return new Rotation2d(distanceMeters, FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z);
     }
 
 

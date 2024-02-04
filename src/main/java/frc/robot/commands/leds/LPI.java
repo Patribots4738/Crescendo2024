@@ -77,7 +77,7 @@ public class LPI extends Command implements Logged{
             
             Translation2d desiredTranslation = closestPose.relativeTo(currentRobotPosition).getTranslation();
 
-            Rotation2d cardinalDirection = Rotation2d.fromRadians(Math.atan2(desiredTranslation.getY(), desiredTranslation.getX()));
+            Rotation2d cardinalDirection = new Rotation2d(desiredTranslation.getX(), desiredTranslation.getY());
 
             cardinalMagnitude = new Pose2d(desiredTranslation, cardinalDirection);
 
