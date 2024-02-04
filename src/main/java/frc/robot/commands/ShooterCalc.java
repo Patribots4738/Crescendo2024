@@ -199,7 +199,7 @@ public class ShooterCalc implements Logged{
 
 
 
-        // Gets a SpeedAngleTriplet by interpolating values from a map of already
+    // Gets a SpeedAngleTriplet by interpolating values from a map of already
     // known required speeds and angles for certain poses
     public SpeedAngleTriplet calculateSpeedTesting(Pose2d robotPose, boolean shootingAtSpeaker) {
         // Constants have blue alliance positions at index 0
@@ -245,7 +245,10 @@ public class ShooterCalc implements Logged{
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(Units.radiansToDegrees(Math.atan2(FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z, distanceMeters)));
+        return new Rotation2d(MathUtil.clamp(
+                        Math.atan2(FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z, distanceMeters),
+                        ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES,
+                        ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES));
     }
 
 

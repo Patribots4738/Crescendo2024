@@ -128,6 +128,9 @@ public final class Constants {
         public static final double PIVOT_MIN_OUTPUT = -1;
         public static final double PIVOT_MAX_OUTPUT = 1;
 
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 0;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+
         public static final double PIVOT_MAX_ANGLE_DEGREES = 360.0;
         public static final double PIVOT_REST_ANGLE_DEGREES = 0;
 

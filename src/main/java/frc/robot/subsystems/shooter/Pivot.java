@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -56,7 +57,9 @@ public class Pivot extends SubsystemBase implements Logged {
 	public void setAngle(double angle) {
 		// TODO: angle of pivot seems wrong in sim but i am not exactly sure how to fix it here
 		// Also I'm not sure if position input is getting conversion factor applied
-		pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES);
+		pivot.setTargetPosition(
+			MathUtil.clamp(angle, ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES, ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES) 
+			/ ShooterConstants.PIVOT_MAX_ANGLE_DEGREES);
 
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
