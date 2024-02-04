@@ -27,6 +27,7 @@ public class ShooterCalc implements Logged{
     @Log.NT
     double desiredRSpeed = 0, desiredLSpeed = 0, distance = 0, desiredAngle = 0;
 
+  
     @Log.NT
     double realAngle = 0, realRSpeed = 0, realLSpeed = 0;
 
@@ -249,6 +250,7 @@ public class ShooterCalc implements Logged{
                         Math.atan2(FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z, distanceMeters),
                         ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES,
                         ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES));
+
     }
 
 
