@@ -43,7 +43,7 @@ public class Pivot extends SubsystemBase implements Logged {
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
 			NTConstants.PIVOT_OFFSET_METERS.getZ(),
-			new Rotation3d(0, Units.degreesToRadians(pivot.getPosition()), 0)
+			new Rotation3d(0, Units.degreesToRadians(getAngle()), 0)
 		);
 	}
 
@@ -56,7 +56,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	public void setAngle(double angle) {
 		// TODO: angle of pivot seems wrong in sim but i am not exactly sure how to fix it here
 		// Also I'm not sure if position input is getting conversion factor applied
-		pivot.setTargetPosition(angle);
+		pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES);
 
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -97,7 +97,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return pivot.getPosition();
+		return pivot.getPosition() * ShooterConstants.PIVOT_MAX_ANGLE_DEGREES;
 	}
 
 	/**

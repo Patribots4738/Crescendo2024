@@ -102,7 +102,7 @@ public final class Constants {
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
         public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
-        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1 ;
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1;
 
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
@@ -130,6 +130,8 @@ public final class Constants {
 
         public static final double PIVOT_MAX_ANGLE_DEGREES = 360.0;
         public static final double PIVOT_REST_ANGLE_DEGREES = 0;
+
+        public static final double SHOOTER_PASS_SECONDS = 2;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
         /**
@@ -164,7 +166,7 @@ public final class Constants {
         public static final int RIGHT_ELEVATOR_CAN_ID = 15;
         public static final int CLAW_CAN_ID = 16;
         public static final double ELEVATOR_DEADBAND = .3;
-        public static final double OUTTAKE_TIME = .2;
+        public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
 
@@ -406,14 +408,13 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int TOP_INTAKE_CAN_ID = 19;
-        public static final int BOTTOM_INTAKE_CAN_ID = 20;
-        public static final int TRIGGER_WHEEL_CAN_ID = 21;
+        public static final int INTAKE_CAN_ID = 19;
+        public static final int TRIGGER_WHEEL_CAN_ID = 20;
 
         // % speeds of the motor
-        public static final double INTAKE_SPEED = 0.5;
-        public static final double OUTTAKE_SPEED = -0.5;
-        public static final double STOP_SPEED = 0;
+        public static final double INTAKE_PERCENT = 30;
+        public static final double OUTTAKE_PERCENT = -30;
+        public static final double STOP_PERCENT = 0;
 
         public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
         public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
@@ -421,10 +422,10 @@ public final class Constants {
         public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
         // TODO: Add these to the robot
-        public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 0;
-        public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 0;
-        public static final double SHOOTER_TRIGGER_WHEEL_SPEED = 0;
-        public static final double TRAP_TRIGGER_WHEEL_SPEED = 0;
+        public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 7;
+        public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 15;
+        public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = 30;
+        public static final double TRAP_TRIGGER_WHEEL_PERCENT = -30;
         public static final int INTAKE_CURRENT_LIMIT_AMPS = 0;
     }
 

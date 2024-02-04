@@ -98,8 +98,8 @@ public class ShooterCalc implements Logged{
     }
 
     public void logAngles(SpeedAngleTriplet triplet) {
-        desiredAngle = -triplet.getAngle();
-        realAngle = pivot.getAngle();
+        desiredAngle = triplet.getAngle();
+        realAngle = -pivot.getAngle();
     }
 
     public void logAtDesired() {
@@ -122,7 +122,7 @@ public class ShooterCalc implements Logged{
 	public BooleanSupplier atDesiredAngle() {
 		return () -> (MathUtil.applyDeadband(
 				Math.abs(
-						pivot.getAngle() - desiredAngle),
+						realAngle - desiredAngle),
 				ShooterConstants.PIVOT_DEADBAND) == 0);
 	}
 

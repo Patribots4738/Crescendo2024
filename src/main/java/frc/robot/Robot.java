@@ -1,7 +1,12 @@
 package frc.robot;
 
+import java.lang.System.Logger;
+
+import org.littletonrobotics.urcl.URCL;
+
 import com.revrobotics.REVPhysicsSim;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,8 +39,10 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         robotContainer = new RobotContainer();
         Monologue.setupMonologue(robotContainer, "Robot", false, false);
-    }
 
+        DataLogManager.start();
+        URCL.start();
+}
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
      * diagnostics
