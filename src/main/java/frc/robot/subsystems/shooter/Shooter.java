@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -56,8 +57,16 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setSpeed(Pair<Double, Double> speeds) {
-        motorLeft.setTargetVelocity(speeds.getFirst());
-        motorRight.setTargetVelocity(speeds.getSecond());
+        motorLeft.setTargetVelocity(
+                MathUtil.clamp(
+                    speeds.getFirst(), 
+                    ShooterConstants.SHOOTER_RPM_UPPER_LIMIT,
+                    ShooterConstants.SHOOTER_RPM_LOWER_LIMIT));
+        motorRight.setTargetVelocity(
+                MathUtil.clamp(
+                    speeds.getSecond(), 
+                    ShooterConstants.SHOOTER_RPM_UPPER_LIMIT, 
+                    ShooterConstants.SHOOTER_RPM_LOWER_LIMIT));
     }
 
     /**

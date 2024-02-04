@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,7 +25,11 @@ public class Intake extends SubsystemBase {
     }
 
     public Command setPercentCommand(double desiredPercent) {
-        return runOnce(() -> intakeMotor.setTargetPercent(desiredPercent));
+        return runOnce(() -> intakeMotor.setTargetPercent(
+                                    MathUtil.clamp(
+                                        desiredPercent, 
+                                        IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
+                                        IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT)));
     }
 
     public Command inCommand() {

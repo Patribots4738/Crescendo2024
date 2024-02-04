@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -62,6 +63,14 @@ public class Claw extends SubsystemBase {
         return hasGamePiece;
     }
 
+    public void setTargetPercent(double percent) {
+        claw.setTargetPercent(
+            MathUtil.clamp(
+                percent, 
+                TrapConstants.CLAW_LOWER_PERCENT_LIMIT, 
+                TrapConstants.CLAW_UPPER_PERCENT_LIMIT));
+    }
+
     public void configMotors() {
         // needs motor configs
         claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
@@ -80,16 +89,20 @@ public class Claw extends SubsystemBase {
     }
 
     public Command outtake() {
-        return Commands.runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE));
+        return runOnce(() -> setTargetPercent(TrapConstants.CLAW_OUTTAKE_PERCENT));
     }
 
     public Command stop() {
-        return Commands.runOnce(() -> claw.setTargetVelocity(0));
+        return runOnce(() -> setTargetPercent(TrapConstants.CLAW_STOP_PERCENT));
+    }
+
+    public void setIntakingTimestamp() {
+        startIntakingTimestamp = DriverUI.currentTimestamp;
     }
 
     public Command intake() {
-        startIntakingTimestamp = DriverUI.currentTimestamp;
-        return runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_INTAKE));
+        return runOnce(() -> setIntakingTimestamp())
+                .andThen(runOnce(() -> setTargetPercent(TrapConstants.CLAW_INTAKE_PERCENT)));
     }
 
 }
