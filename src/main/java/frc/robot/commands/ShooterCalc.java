@@ -7,10 +7,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.DriverUI;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -85,21 +88,8 @@ public class ShooterCalc implements Logged {
      * 
      * @return              The angle to the speaker in the form of a Rotation2d object.
      */
-    public Rotation2d calculateSWDAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
-        // Calculate the robot's pose relative to the speaker
-        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-
-        // Calculate the current angle to the speaker
-        currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
-
-        // Convert the robot's velocity to a Rotation2d object
-        Rotation2d velocityRotation2d = new Rotation2d(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
-
-        // Calculate the total speed of the robot
-        double totalSpeed = Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
-
-        // Calculate the component of the velocity that is tangent to the speaker
-        double velocityTangentToSpeaker = totalSpeed * Math.sin(velocityRotation2d.getRadians() - currentAngleToSpeaker.getRadians());
+    public Rotation2d calculateSWDRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+        double velocityTangentToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity).getX();
 
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         Rotation2d desiredRotation2d = Rotation2d.fromRadians(
@@ -114,6 +104,28 @@ public class ShooterCalc implements Logged {
 
         // Return the desired rotation
         return desiredRotation2d;
+    }
+
+    private Translation2d getVelocityVectorToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+        // Calculate the robot's pose relative to the speaker
+        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+
+        // Calculate the current angle to the speaker
+        currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
+
+        // Convert the robot's velocity to a Rotation2d object
+        Rotation2d velocityRotation2d = new Rotation2d(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
+
+        // Calculate the total speed of the robot
+        double totalSpeed = Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
+
+        double angleDifference = velocityRotation2d.getRadians() - currentAngleToSpeaker.getRadians();
+        // Calculate the component of the velocity that is tangent to the speaker
+        double velocityTangentToSpeaker = totalSpeed * Math.sin(angleDifference);
+
+        double velocityNormalToSpeaker = totalSpeed * Math.cos(angleDifference);
+        
+        return new Translation2d(velocityTangentToSpeaker, velocityNormalToSpeaker);
     }
 
     /**
@@ -327,6 +339,74 @@ public class ShooterCalc implements Logged {
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
-        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(pose, speeds, SpeedAngleTriplet.of(this.desiredMPSForNote, 0.0, calculateSpeed(pose.get(), true).getAngle())).schedule());
+        SpeedAngleTriplet calculationTriplet = calculateSWDSpeedAngleTripletToSpeaker(pose, speeds);
+
+        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(
+            pose, 
+            speeds, 
+            new Pair<Double, Double> (rpmToVelocity(calculationTriplet.getSpeeds()), calculationTriplet.getAngle())
+            ).schedule());
+    }
+    
+    private SpeedAngleTriplet calculateSWDSpeedAngleTripletToSpeaker(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds){
+        double dt = DriverUI.currentTimestamp - DriverUI.previousTimestamp;
+
+        return new SpeedAngleTriplet(
+            calculateSWDShooterSpeedsToSpeaker(pose, speeds, dt),
+            calculateSWDPivotAngleToSpeaker(pose, speeds, dt).getDegrees()
+        );
+    }
+
+    /**
+     * Calculates the shooter speeds required to reach the speaker position.
+     * 
+     * @param pose   a supplier of the robot's current pose
+     * @param speeds a supplier of the robot's current chassis speeds
+     * @param dt     the time interval for integration
+     * @return a pair of shooter speeds (left and right) required to reach the speaker position
+     */
+    private Pair<Double, Double> calculateSWDShooterSpeedsToSpeaker(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, double dt) {
+        Pose2d estimatedPose = integratePosition(pose, speeds, dt);
+
+        SpeedAngleTriplet futureTriplet = 
+            ShooterConstants.INTERPOLATION_MAP.get(
+                estimatedPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION()).getX()
+            );
+            
+
+        double velocityNormalToSpeaker = getVelocityVectorToSpeaker(pose.get(), speeds.get()).getY();
+        double averageAddedRPM = velocityToRPM(velocityNormalToSpeaker);
+
+        double averageTotalRPM = futureTriplet.getAverageSpeed() - averageAddedRPM;
+
+        // Un-average the rpm to get the shooter wheels up to speed
+        // Use the difference at the initial guess to get a gooder average
+        double difference = futureTriplet.getLeftSpeed() - futureTriplet.getRightSpeed();
+
+        return Pair.of(
+            averageTotalRPM + difference, 
+            averageTotalRPM - difference
+        );
+    }
+
+
+    private Rotation2d calculateSWDPivotAngleToSpeaker(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, double dt) {
+        Pose2d estimatedPose = integratePosition(pose, speeds, dt);
+
+        estimatedPose = estimatedPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+
+        return Rotation2d.fromDegrees(ShooterConstants.INTERPOLATION_MAP.get(estimatedPose.getX()).getAngle());
+    }
+
+    private Pose2d integratePosition(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, double dt) {
+        Pose2d robotPose = pose.get();
+        ChassisSpeeds robotSpeeds = speeds.get();
+        
+        Pose2d estimatedPose = robotPose.exp(new Twist2d(
+            robotSpeeds.vxMetersPerSecond * dt, 
+            robotSpeeds.vyMetersPerSecond * dt, 
+            robotSpeeds.omegaRadiansPerSecond * dt)
+        );
+        return estimatedPose;
     }
 }

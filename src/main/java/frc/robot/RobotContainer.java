@@ -197,7 +197,7 @@ public class RobotContainer implements Logged {
                         return new ChassisSpeeds(
                             controller.getLeftY(),
                             controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
 

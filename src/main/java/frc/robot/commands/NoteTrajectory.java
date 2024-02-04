@@ -7,6 +7,7 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -57,11 +58,11 @@ public class NoteTrajectory implements Logged {
     Pose3d traj = new Pose3d();
 
     public NoteTrajectory() {
-        setVariables(new Pose2d(), new ChassisSpeeds(), new SpeedAngleTriplet());
+        setVariables(new Pose2d(), new ChassisSpeeds(), new Pair<Double, Double>(0.0, 0.0));
         timer = new Timer();
     }
 
-    private void setVariables(Pose2d initialPose2d, ChassisSpeeds speeds, SpeedAngleTriplet speedAngleTriplet) {
+    private void setVariables(Pose2d initialPose2d, ChassisSpeeds speeds, Pair<Double, Double> speedAnglePair) {
         fieldSpeeds = speeds;
         x = () -> NTConstants.PIVOT_OFFSET_METERS.getX();
         y = () -> 0;
@@ -71,10 +72,10 @@ public class NoteTrajectory implements Logged {
         z0 = () -> NTConstants.PIVOT_OFFSET_METERS.getY();
         // TODO: Change the left and right values to not be the x and y components as
         // they are the wrong axis
-        vx0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getSin() * speedAngleTriplet.getLeftSpeed()
+        vx0 = () -> Rotation2d.fromDegrees(90 - speedAnglePair.getSecond()).getSin() * speedAnglePair.getFirst()
                     + speeds.vxMetersPerSecond;
         vy0 = () -> speeds.vyMetersPerSecond;
-        vz0 = () -> Rotation2d.fromDegrees(90 - speedAngleTriplet.getAngle()).getCos() * speedAngleTriplet.getLeftSpeed();
+        vz0 = () -> Rotation2d.fromDegrees(90 - speedAnglePair.getSecond()).getCos() * speedAnglePair.getFirst();
         ax = () -> 0;
         ay = () -> 0;
         az = () -> -9.8;
@@ -82,17 +83,17 @@ public class NoteTrajectory implements Logged {
         initialPose = () -> initialPose2d;
     }
 
-    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, SpeedAngleTriplet speedAngleTriplet) {
+    public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, Pair<Double, Double> speedAnglePair) {
         return Commands.runOnce(() -> {
             this.timer.restart();
-            setVariables(pose.get(), speeds.get(), speedAngleTriplet);
+            setVariables(pose.get(), speeds.get(), speedAnglePair);
             }).andThen(Commands.runOnce(() -> {
                 x = kinematicEquation1(x0, vx0, ax, timer);
                 z = kinematicEquation1(z0, vz0, az, timer);
                 y = kinematicEquation1(y0, vy0, ay, timer);
 
-                traj = getNotePose(this.initialPose, speedAngleTriplet, x, z, y);
-                RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, speedAngleTriplet, x, z, y).relativeTo(new Pose3d(pose.get()));
+                traj = getNotePose(this.initialPose, speedAnglePair, x, z, y);
+                RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(this.initialPose, speedAnglePair, x, z, y).relativeTo(new Pose3d(pose.get()));
             }).repeatedly().until(() -> ((z.getAsDouble() < z0.getAsDouble()) || timer.get() > 5)))
             .andThen(
                 Commands.runOnce(
@@ -101,7 +102,7 @@ public class NoteTrajectory implements Logged {
             );
     }
 
-    Pose3d getNotePose(Supplier<Pose2d> pose, SpeedAngleTriplet speedAngleTriplet, DoubleSupplier x, DoubleSupplier y, DoubleSupplier z) {
+    Pose3d getNotePose(Supplier<Pose2d> pose, Pair<Double,Double> speedAnglePair, DoubleSupplier x, DoubleSupplier y, DoubleSupplier z) {
         return new Pose3d(
                 new Translation3d(x.getAsDouble(), z.getAsDouble(), y.getAsDouble()).rotateBy(new Rotation3d(
                         0,
@@ -116,7 +117,7 @@ public class NoteTrajectory implements Logged {
                                         0),
                                 new Rotation3d(
                                     Units.degreesToRadians(90), 
-                                    -Units.degreesToRadians(speedAngleTriplet.getAngle()), 
+                                    -Units.degreesToRadians(speedAnglePair.getSecond()), 
                                     pose.get().getRotation().getRadians())));
     }
 
