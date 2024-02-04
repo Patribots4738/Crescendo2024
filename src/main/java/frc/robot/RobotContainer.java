@@ -1,7 +1,6 @@
 package frc.robot;
 
 import java.util.Optional;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -12,42 +11,41 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
-import frc.robot.commands.autonomous.AutoPathStorage;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
+import frc.robot.commands.autonomous.AutoPathStorage;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
-import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import monologue.Annotations.Log;
 import monologue.Logged;
-import monologue.Annotations.Log;
+import frc.robot.util.Constants.NTConstants;
 
 public class RobotContainer implements Logged {
-
+    
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
     private Swerve swerve;
     private final Intake intake;
-    
+
     @SuppressWarnings("unused")
     private final DriverUI driverUI;
     private final Limelight limelight;
-    private final AutoPathStorage autoPathStorage;
+    private final LedStrip ledStrip;
     private final Climb climb;
     private Indexer triggerWheel;
     private Pivot pivot;
@@ -56,42 +54,45 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
-
+    private AutoPathStorage autoPathStorage;
+    
     @Log.NT
     public static Pose3d[] components3d = new Pose3d[5];
+
     @Log.NT
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
-
+    
     public RobotContainer() {
+        
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
-
+        
         limelight = new Limelight();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
         driverUI = new DriverUI();
+        ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
-
         shooter = new Shooter();
         elevator = new Elevator();
         claw = new Claw();
-
+        
         pivot = new Pivot();
-      
+        
         shooterCalc = new ShooterCalc(shooter, pivot);
-
+        
         pieceControl = new PieceControl(
-            intake, 
-            triggerWheel, 
-            elevator, 
-            claw, 
-            shooterCalc, 
-            swerve
+            intake,
+            triggerWheel,
+            elevator,
+            claw,
+            shooterCalc
         );
-        autoPathStorage = new AutoPathStorage(() -> true);
-
+      
+        autoPathStorage = new AutoPathStorage(driver.y());
+        
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
             // This can be present (sees tag) or not present (does not see tag)
@@ -102,108 +103,115 @@ public class RobotContainer implements Logged {
             // then we can confirm that the estimated position is realistic
             if (result.isPresent()) {
                 swerve.getPoseEstimator().addVisionMeasurement(
-                        result.get(),
-                        DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
+                result.get(),
+                DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
             }
         }, limelight));
-
+        
         swerve.setDefaultCommand(new Drive(
-                swerve,
-                driver::getLeftY,
-                driver::getLeftX,
-                () -> -driver.getRightX(),
-                () -> !driver.leftBumper().getAsBoolean(),
-                () -> (driver.leftBumper().getAsBoolean()
-                        && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))));
-
+            swerve,
+            driver::getLeftY,
+            driver::getLeftX,
+            () -> -driver.getRightX(),
+            () -> !driver.leftBumper().getAsBoolean(),
+            () -> (driver.leftBumper().getAsBoolean()
+                && FieldConstants.IS_BLUE_ALLIANCE())));
+              
         incinerateMotors();
         configureButtonBindings();
-
+        
         setupAutoChooser();
         registerNamedCommands();
+        initializeArrays();
     }
-
+    
     private void configureButtonBindings() {
-        configureDriverBindings();
-        configureOperatorBindings();
+        configureDriverBindings(driver);
+        configureOperatorBindings(operator);
     }
+    
+    private void configureOperatorBindings(PatriBoxController controller) {
 
-    private void configureOperatorBindings() {
-        operator.y().onTrue((climb.toTop(PoseCalculations.getChainPosition(swerve.getPose()))));
+        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        operator.a().onTrue((climb.toBottom()));
+        controller.povDown().onTrue(climb.toBottomCommand());
 
-        operator.b().onTrue(
-            pieceControl.prepareToFire(operator.leftBumper())
-        );
+        controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
-            pieceControl.prepareToFire(operator.x())
-        );
+        controller.povRight().onTrue(elevator.toTopCommand());
 
-        operator.leftBumper().and(operator.rightBumper()).onTrue(
-            pieceControl.noteToShoot()
-        );
+        controller.leftBumper()
+            .and(controller.rightBumper())
+            .onTrue(pieceControl.noteToShoot());
 
-        operator.rightBumper().and(operator.leftBumper().negate()).onTrue(
-            pieceControl.noteToTarget(() -> true)
-        );
+        controller.rightBumper()
+            .and(controller.leftBumper().negate())
+            .onTrue(pieceControl.noteToTarget(() -> true));
 
-        operator.leftTrigger(OIConstants.OPERATOR_DEADBAND).and(
-            intake.hasGamePieceTrigger().negate()
-        ).onTrue(
-            intake.inCommand()
-        );
+        controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
+            .and(intake.hasGamePieceTrigger().negate())
+            .onTrue(pieceControl.intakeToClaw());
 
-        operator.rightTrigger(OIConstants.OPERATOR_DEADBAND).onTrue(
-            intake.outCommand()
-        );
+        controller.leftTrigger()
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
-        operator.x().onTrue(
-            intake.stop()
-        );
+        controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
+            .onTrue(intake.outCommand());
+
+        controller.x().onTrue(intake.stop());
     }
-
-    private void configureDriverBindings() {
-
+    
+    private void configureDriverBindings(PatriBoxController controller) {
+        
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing away from the driver station
-        driver.start().or(driver.back()).onTrue(
-                Commands.runOnce(() -> swerve.resetOdometry(
-                        new Pose2d(
-                                swerve.getPose().getTranslation(),
-                                Rotation2d.fromDegrees(
-                                        FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red))
-                                                ? 0
-                                                : 180))),
-                        swerve));
+        controller.start().or(driver.back()).onTrue(
+            Commands.runOnce(() -> swerve.resetOdometry(
+                new Pose2d(
+                    swerve.getPose().getTranslation(),
+                    Rotation2d.fromDegrees(
+                        FieldConstants.IS_RED_ALLIANCE()
+                            ? 0
+                            : 180))), 
+                swerve));
 
-        driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
-
-        driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
-      
-        driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
-
-        driver.y().onTrue(intake.outCommand());
-
-        driver.x().onTrue(intake.stop());
+        controller.b()
+            .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
         
-        driver.rightStick().whileTrue(
-            Commands.sequence(
+        controller.leftStick()
+            .toggleOnTrue(swerve.toggleSpeed());
+        
+        controller.a()
+            .and(intake.hasGamePieceTrigger().negate())
+            .onTrue(intake.inCommand());
+        
+        controller.y()
+            .onTrue(intake.outCommand());
+        
+        controller.leftBumper()
+            .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
+        
+        controller.leftTrigger()
+            .onTrue(shooterCalc.resetShooter());
+        
+        controller.x()
+            .onTrue(intake.stop());
+        
+        controller.rightStick()
+            .whileTrue(
+                Commands.sequence(
+                swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
-                        return ChassisSpeeds.fromFieldRelativeSpeeds(
-                            driver.getLeftY(),
-                            driver.getLeftX(),
-                            swerve.getAlignmentSpeeds(Rotation2d.fromRadians(360)),
-                            swerve.getPose().getRotation());
-                    }, true)
-            )
-        );
-
+                        return new ChassisSpeeds(
+                            controller.getLeftY(),
+                            controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
+                    },
+                    () -> true)));
     }
-
+    
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
@@ -215,7 +223,15 @@ public class RobotContainer implements Logged {
         // TODO: Autos currently start at C1-5, we need to integrate the other paths
         // with the center line schenanigans to make full autos
         autoChooser.setDefaultOption("Do Nothing", Commands.none());
-        autoChooser.addOption("W3-1 C1-5", swerve.resetOdometryCommand(() -> starting.getPreviewStartingHolonomicPose().plus(new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180)))).andThen(AutoBuilder.followPath(starting).andThen(autoPathStorage.generateCenterLineComplete(1, 5, false))));
+        autoChooser.addOption("W3-1 C1-5", 
+            swerve.resetOdometryCommand(
+                () -> starting.getPreviewStartingHolonomicPose()
+                    .plus(new Transform2d(
+                            new Translation2d(), 
+                            Rotation2d.fromDegrees(180))))
+            .andThen(
+                AutoBuilder.followPath(starting)
+                .andThen(autoPathStorage.generateCenterLineComplete(1, 5, false))));
     }
 
     public void onDisabled() {
@@ -229,11 +245,11 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
     }
-
+    
     private void incinerateMotors() {
         Timer.delay(0.25);
         for (CANSparkBase neo : NeoMotorConstants.motors) {
@@ -243,4 +259,21 @@ public class RobotContainer implements Logged {
         Timer.delay(0.25);
     }
 
+    private void initializeArrays() {
+        Pose3d initialShooterPose = new Pose3d(
+                NTConstants.PIVOT_OFFSET_METERS.getX(),
+                0,
+                NTConstants.PIVOT_OFFSET_METERS.getY(),
+            new Rotation3d()
+        );
+
+        components3d[0] = initialShooterPose;
+        desiredComponents3d[0] = initialShooterPose;
+
+        for (int i = 1; i < components3d.length; i++) {
+            components3d[i] = new Pose3d();
+            desiredComponents3d[i] = new Pose3d();
+        }
+    }
 }
+

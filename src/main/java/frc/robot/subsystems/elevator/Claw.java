@@ -30,7 +30,7 @@ public class Claw extends SubsystemBase {
     public Command placeCommand() {
         return runOnce(this::outtake)
                 .andThen(
-                        Commands.waitSeconds(TrapConstants.OUTTAKE_TIME))
+                        Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
                 .andThen(
                         runOnce(this::stop));
     }

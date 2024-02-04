@@ -2,6 +2,7 @@
 
 package frc.robot.util;
 
+import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
@@ -354,6 +355,25 @@ public class Neo extends CANSparkMax {
     }
 
     /**
+     * Sets the PID constants for the Neo motor controller.
+     * 
+     * @param constants the PID constants to set
+     */
+    public void setPID(PIDConstants constants) {
+        setPID(constants, 0);
+    }
+
+    /**
+     * Sets the PID constants for the Neo motor controller.
+     * 
+     * @param constants the PID constants to set
+     * @param slotID    the slot ID of the PID controller
+     */
+    public void setPID(PIDConstants constants, int slotID) {
+        setPID(constants.kP, constants.kI, constants.kD, -1, 1, slotID);
+    }
+
+    /**
      * Sets the PID values and output limits for the Neo motor controller.
      * 
      * @param P          the proportional gain
@@ -553,7 +573,7 @@ public class Neo extends CANSparkMax {
         this.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
-    public enum TelemtryPreference {
+    public enum TelemetryPreference {
         ONLY_ABSOLUTE_ENCODER,
         ONLY_RELATIVE_ENCODER,
         NO_TELEMETRY,
@@ -568,7 +588,7 @@ public class Neo extends CANSparkMax {
      *             this will tell the motor to only send 
      *             that type of telemtry
      */
-    public void setTelemetryPreference(TelemtryPreference type) {
+    public void setTelemetryPreference(TelemetryPreference type) {
         final int maxDelay = NeoMotorConstants.MAX_PERIODIC_STATUS_TIME_MS;
         final int minDelay = NeoMotorConstants.FAST_PERIODIC_STATUS_TIME_MS;
 
