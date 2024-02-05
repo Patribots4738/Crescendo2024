@@ -21,10 +21,13 @@ import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.CalibrationControl;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.CalibrationControlIO.CalibrationMode;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import frc.robot.util.Constants.NTConstants;
 import monologue.Annotations.Log;
@@ -33,6 +36,7 @@ public class RobotContainer implements Logged {
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
+    private final PatriBoxController calibration;
 
     private Swerve swerve;
     private final Intake intake;
@@ -49,6 +53,8 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
+
+    private CalibrationControl calibrationControl;
     
     @Log.NT
     public static Pose3d[] components3d = new Pose3d[5];
@@ -60,6 +66,8 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
+        calibration = new PatriBoxController(2, 0.15);
+
         DriverStation.silenceJoystickConnectionWarning(true);
         
         limelight = new Limelight();
@@ -84,6 +92,8 @@ public class RobotContainer implements Logged {
             claw,
             shooterCalc
         );
+
+        calibrationControl = new CalibrationControl(ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP);
         
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -108,7 +118,7 @@ public class RobotContainer implements Logged {
             () -> !driver.leftBumper().getAsBoolean(),
             () -> (driver.leftBumper().getAsBoolean()
                 && FieldConstants.IS_BLUE_ALLIANCE())));
-              
+
         incinerateMotors();
         configureButtonBindings();
         
@@ -151,6 +161,45 @@ public class RobotContainer implements Logged {
 
         controller.x().onTrue(intake.stop());
     }
+
+    private void configureCalibrationBindings(PatriBoxController controller) {
+        controller.a()
+            .and(controller.b().negate())
+            .and(controller.x().negate())
+            .and(controller.y().negate())
+            .toggleOnTrue(
+            // TODO: add tuning for pivot
+            calibrationControl.setCalibrationMode(CalibrationMode.PIVOT)
+        );
+
+        controller.povRight().onTrue(
+            calibrationControl.incrementIndex()
+        );
+
+        controller.povLeft().onTrue(
+            calibrationControl.decrementIndex()
+        );
+
+        controller.y().onTrue(
+            calibrationControl.setValueByIndex(calibrationControl.getCurrentVal())
+        );
+
+        controller.povUp().onTrue(
+            calibrationControl.setCurrentVal(calibrationControl.getCurrentVal())
+        );
+        controller.povDown().onTrue(
+            calibrationControl.setCurrentVal(null)
+        );
+
+        controller.x()
+            .and(controller.a().negate())
+            .and(controller.b().negate())
+            .and(controller.y().negate())
+            .toggleOnTrue(
+            // TODO: add tuning for shooter
+            calibrationControl.setCalibrationMode(CalibrationMode.SHOOTER)
+        );
+    }
     
     private void configureDriverBindings(PatriBoxController controller) {
         
@@ -172,22 +221,16 @@ public class RobotContainer implements Logged {
         
         controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());
+
+        // controller.a()
+        //     .and(intake.hasGamePieceTrigger().negate())
+        //     .onTrue(intake.inCommand());
         
-        controller.a()
-            .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(intake.inCommand());
+        // controller.y()
+        //     .onTrue(intake.outCommand());
         
-        controller.y()
-            .onTrue(intake.outCommand());
-        
-        controller.leftBumper()
-            .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
-        
-        controller.leftTrigger()
-            .onTrue(shooterCalc.resetShooter());
-        
-        controller.x()
-            .onTrue(intake.stop());
+        // controller.x()
+        //     .onTrue(intake.stop());
         
         controller.rightStick()
             .whileTrue(
