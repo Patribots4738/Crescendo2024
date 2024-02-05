@@ -13,22 +13,22 @@ public class CalibrationControl {
     private BooleanSupplier rightLocked;
     private BooleanSupplier pivotLocked;
 
-    private DoubleSupplier distance = () -> 0;
+    private double distance = 0;
 
     public CalibrationControl() {
-        this.currentVal = new SpeedAngleTriplet();
-        this.leftLocked = () -> false;
-        this.rightLocked = () -> false;
-        this.pivotLocked = () -> false;
+        currentVal = new SpeedAngleTriplet();
+        leftLocked = () -> false;
+        rightLocked = () -> false;
+        pivotLocked = () -> false;
     }
     
     public Command changeLeftSpeed(double increment) {
         if(!leftLocked.getAsBoolean()) {
             return Commands.runOnce(
-                () -> this.currentVal = SpeedAngleTriplet.of(
-                    this.currentVal.getLeftSpeed() + increment,
-                    this.currentVal.getRightSpeed(),
-                    this.currentVal.getAngle()));
+                () -> currentVal = SpeedAngleTriplet.of(
+                    currentVal.getLeftSpeed() + increment,
+                    currentVal.getRightSpeed(),
+                    currentVal.getAngle()));
         } else {
             return Commands.none();
         }
@@ -45,10 +45,10 @@ public class CalibrationControl {
     public Command changeRightSpeed(double increment) {
         if(!rightLocked.getAsBoolean()) {
             return Commands.runOnce(
-                () -> this.currentVal = SpeedAngleTriplet.of(
-                        this.currentVal.getLeftSpeed(),
-                        this.currentVal.getRightSpeed() + increment,
-                        this.currentVal.getAngle()));
+                () -> currentVal = SpeedAngleTriplet.of(
+                        currentVal.getLeftSpeed(),
+                        currentVal.getRightSpeed() + increment,
+                        currentVal.getAngle()));
         } else {
             return Commands.none();
         }
@@ -82,18 +82,25 @@ public class CalibrationControl {
         }
     }
     
+    public Command logDistance() {
+        return Commands.runOnce(
+            () -> { 
+                System.out.println("Distance: " + distance); 
+            });
+    }
+
     public Command logAll() {
         return Commands.runOnce(
-                () -> System.out.println("Distance: " + this.distance.getAsDouble() + ", Values: " + this.currentVal));
+                () -> System.out.println("Distance: " + distance + ", Speeds: ("+currentVal.getLeftSpeed()+", "+currentVal.getRightSpeed()+"), Angle: ("+currentVal.getAngle()+")"));
     }
 
     public Command incrementAngle() {
         if(!pivotLocked.getAsBoolean()) {
             return Commands.runOnce(
-                () -> this.currentVal = SpeedAngleTriplet.of(
-                        this.currentVal.getLeftSpeed(),
-                        this.currentVal.getRightSpeed(),
-                        this.currentVal.getAngle() + 10));
+                () -> currentVal = SpeedAngleTriplet.of(
+                        currentVal.getLeftSpeed(),
+                        currentVal.getRightSpeed(),
+                        currentVal.getAngle() + 10));
         } else {
             return Commands.none();
         }
@@ -102,10 +109,10 @@ public class CalibrationControl {
     public Command decrementAngle() {
         if(!pivotLocked.getAsBoolean()) {
             return Commands.runOnce(
-                () -> this.currentVal = SpeedAngleTriplet.of(
-                        this.currentVal.getLeftSpeed(),
-                        this.currentVal.getRightSpeed(),
-                        this.currentVal.getAngle() - 10));
+                () -> currentVal = SpeedAngleTriplet.of(
+                        currentVal.getLeftSpeed(),
+                        currentVal.getRightSpeed(),
+                        currentVal.getAngle() - 10));
         } else {
             return Commands.none();
         }
@@ -115,28 +122,28 @@ public class CalibrationControl {
         return Commands.runOnce(
                 () -> {
                     System.out.println("Locking Left");
-                    this.leftLocked = () -> true;
+                    leftLocked = () -> true;
                 });
     }
 
     public Command unlockLeftSpeed() {
         return Commands.runOnce(() -> {
             System.out.println("Unlocking Left");
-            this.leftLocked = () -> false;
+            leftLocked = () -> false;
         });
     }
 
     public Command lockRightSpeed() {
         return Commands.runOnce(() -> {
             System.out.println("Locking Right");
-            this.rightLocked = () -> true;
+            rightLocked = () -> true;
         });
     }
 
     public Command unlockRightSpeed() {
         return Commands.runOnce(() -> {
             System.out.println("Unlocking Right");
-            this.rightLocked = () -> false;
+            rightLocked = () -> false;
         });
     }
 
@@ -155,30 +162,31 @@ public class CalibrationControl {
     public Command lockPivotAngle() {
         return Commands.runOnce(() -> {
             System.out.println("Locking Pivot");
-            this.pivotLocked = () -> true;
+            pivotLocked = () -> true;
         });
     }
 
     public Command unlockPivotAngle() {
         return Commands.runOnce(() -> {
             System.out.println("Unlocking Pivot");
-            this.pivotLocked = () -> false;
+            pivotLocked = () -> false;
         });
     }
 
     public Command increaseDistance() {
-        return Commands.runOnce(
-                () -> {
-                    System.out.println("Distance: " + this.distance.getAsDouble());
-                    this.distance = () -> this.distance.getAsDouble() + 1;
-                });
+        return Commands.sequence(
+            Commands.runOnce(
+                () -> { distance++; }),
+            logDistance()
+        );
     }
 
     public Command decreaseDistance() {
-        return Commands.runOnce(
-                () -> {
-                    System.out.println("Distance: " + this.distance.getAsDouble());
-                    this.distance = () -> this.distance.getAsDouble() - 1;
-                });
+        return Commands.sequence(
+            Commands.runOnce(
+                () -> { distance--; }),
+            logDistance()
+        );
     }
+
 }
