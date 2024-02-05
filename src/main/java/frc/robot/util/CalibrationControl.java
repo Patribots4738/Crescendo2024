@@ -1,131 +1,184 @@
 package frc.robot.util;
 
-import java.util.HashMap;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-public class CalibrationControl implements CalibrationControlIO {
-    private HashMap<Integer, SpeedAngleTriplet> hashMap;
+public class CalibrationControl {
     private SpeedAngleTriplet currentVal;
 
-    private boolean leftLocked;
-    private boolean rightLocked;
-    private boolean pivotLocked;
+    private BooleanSupplier leftLocked;
+    private BooleanSupplier rightLocked;
+    private BooleanSupplier pivotLocked;
+
+    private DoubleSupplier distance = () -> 0;
 
     public CalibrationControl() {
-        hashMap = new HashMap<Integer, SpeedAngleTriplet>();
-        currentVal = new SpeedAngleTriplet();
-        leftLocked = false;
-        rightLocked = false;
-        pivotLocked = false;
+        this.currentVal = new SpeedAngleTriplet();
+        this.leftLocked = () -> false;
+        this.rightLocked = () -> false;
+        this.pivotLocked = () -> false;
+    }
+    
+    public Command changeLeftSpeed(double increment) {
+        if(!leftLocked.getAsBoolean()) {
+            return Commands.runOnce(
+                () -> this.currentVal = SpeedAngleTriplet.of(
+                    this.currentVal.getLeftSpeed() + increment,
+                    this.currentVal.getRightSpeed(),
+                    this.currentVal.getAngle()));
+        } else {
+            return Commands.none();
+        }
     }
 
-    @Override
-    public HashMap<Integer, SpeedAngleTriplet> getHashMap() {
-        return this.hashMap;
-    }
-
-    @Override
     public Command incrementLeftSpeed() {
-        return Commands.runOnce(
-            () -> currentVal = 
-                SpeedAngleTriplet.of(
-                    currentVal.getLeftSpeed() + 1, 
-                    currentVal.getRightSpeed(), 
-                    currentVal.getAngle()));
+        return changeLeftSpeed(100);
     }
 
-    @Override
     public Command decrementLeftSpeed() {
-        return Commands.runOnce(
-            () -> currentVal = 
-                SpeedAngleTriplet.of(
-                    currentVal.getLeftSpeed() - 1, 
-                    currentVal.getRightSpeed(), 
-                    currentVal.getAngle()
-                ));
+        return changeLeftSpeed(-100);
+    }
+    
+    public Command changeRightSpeed(double increment) {
+        if(!rightLocked.getAsBoolean()) {
+            return Commands.runOnce(
+                () -> this.currentVal = SpeedAngleTriplet.of(
+                        this.currentVal.getLeftSpeed(),
+                        this.currentVal.getRightSpeed() + increment,
+                        this.currentVal.getAngle()));
+        } else {
+            return Commands.none();
+        }
     }
 
-    @Override
     public Command incrementRightSpeed() {
-        return Commands.runOnce(
-            () -> currentVal = 
-                SpeedAngleTriplet.of(
-                    currentVal.getLeftSpeed(),
-                    currentVal.getRightSpeed() + 1,
-                    currentVal.getAngle()
-                ));
+        return changeRightSpeed(100);
     }
 
-    @Override
     public Command decrementRightSpeed() {
-        return Commands.runOnce(
-            () -> currentVal =
-                SpeedAngleTriplet.of(
-                    currentVal.getLeftSpeed(), 
-                    currentVal.getRightSpeed() - 1, 
-                    currentVal.getAngle()
-                ));
+        return changeRightSpeed(-100);
     }
 
-    @Override
     public Command incrementBothSpeeds() {
-        return Commands.sequence(
-            incrementLeftSpeed(),
-            incrementRightSpeed()
-        );
+        if(!leftLocked.getAsBoolean() && !rightLocked.getAsBoolean()) {
+            return Commands.sequence(
+                incrementLeftSpeed(),
+                incrementRightSpeed());
+        } else {
+            return Commands.none();
+        }
     }
 
-    @Override
     public Command decrementBothSpeeds() {
-        return Commands.sequence(
-            decrementLeftSpeed(),
-            decrementRightSpeed()
-        );
+        if(!leftLocked.getAsBoolean() && !rightLocked.getAsBoolean()) {
+            return Commands.sequence(
+                decrementLeftSpeed(),
+                decrementRightSpeed());
+        } else {
+            return Commands.none();
+        }
     }
-
-    @Override
+    
     public Command logAll() {
         return Commands.runOnce(
-            () -> System.out.println(currentVal)
-        );
+                () -> System.out.println("Distance: " + this.distance.getAsDouble() + ", Values: " + this.currentVal));
     }
 
-    @Override
     public Command incrementAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'incrementAngle'");
+        if(!pivotLocked.getAsBoolean()) {
+            return Commands.runOnce(
+                () -> this.currentVal = SpeedAngleTriplet.of(
+                        this.currentVal.getLeftSpeed(),
+                        this.currentVal.getRightSpeed(),
+                        this.currentVal.getAngle() + 10));
+        } else {
+            return Commands.none();
+        }
     }
 
-    @Override
     public Command decrementAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'decrementAngle'");
+        if(!pivotLocked.getAsBoolean()) {
+            return Commands.runOnce(
+                () -> this.currentVal = SpeedAngleTriplet.of(
+                        this.currentVal.getLeftSpeed(),
+                        this.currentVal.getRightSpeed(),
+                        this.currentVal.getAngle() - 10));
+        } else {
+            return Commands.none();
+        }
     }
 
-    @Override
-    public Command lockBothSpeeds() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'lockBothSpeeds'");
-    }
-
-    @Override
     public Command lockLeftSpeed() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'lockLeftSpeed'");
+        return Commands.runOnce(
+                () -> {
+                    System.out.println("Locking Left");
+                    this.leftLocked = () -> true;
+                });
     }
 
-    @Override
+    public Command unlockLeftSpeed() {
+        return Commands.runOnce(() -> {
+            System.out.println("Unlocking Left");
+            this.leftLocked = () -> false;
+        });
+    }
+
     public Command lockRightSpeed() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'lockRightSpeed'");
+        return Commands.runOnce(() -> {
+            System.out.println("Locking Right");
+            this.rightLocked = () -> true;
+        });
     }
 
-    @Override
+    public Command unlockRightSpeed() {
+        return Commands.runOnce(() -> {
+            System.out.println("Unlocking Right");
+            this.rightLocked = () -> false;
+        });
+    }
+
+    public Command lockBothSpeeds() {
+        return Commands.sequence(
+                lockLeftSpeed(),
+                lockRightSpeed());
+    }
+
+    public Command unlockBothSpeeds() {
+        return Commands.sequence(
+                unlockLeftSpeed(),
+                unlockRightSpeed());
+    }
+
     public Command lockPivotAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'lockPivotAngle'");
+        return Commands.runOnce(() -> {
+            System.out.println("Locking Pivot");
+            this.pivotLocked = () -> true;
+        });
+    }
+
+    public Command unlockPivotAngle() {
+        return Commands.runOnce(() -> {
+            System.out.println("Unlocking Pivot");
+            this.pivotLocked = () -> false;
+        });
+    }
+
+    public Command increaseDistance() {
+        return Commands.runOnce(
+                () -> {
+                    System.out.println("Distance: " + this.distance.getAsDouble());
+                    this.distance = () -> this.distance.getAsDouble() + 1;
+                });
+    }
+
+    public Command decreaseDistance() {
+        return Commands.runOnce(
+                () -> {
+                    System.out.println("Distance: " + this.distance.getAsDouble());
+                    this.distance = () -> this.distance.getAsDouble() - 1;
+                });
     }
 }

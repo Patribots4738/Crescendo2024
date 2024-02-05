@@ -23,11 +23,9 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.CalibrationControl;
 import frc.robot.util.PatriBoxController;
-import frc.robot.util.CalibrationControlIO.CalibrationMode;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
-import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import frc.robot.util.Constants.NTConstants;
 import monologue.Annotations.Log;
@@ -36,7 +34,7 @@ public class RobotContainer implements Logged {
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
-    private final PatriBoxController calibration;
+    private final PatriBoxController calibrationController;
 
     private Swerve swerve;
     private final Intake intake;
@@ -66,7 +64,7 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
-        calibration = new PatriBoxController(2, 0.15);
+        calibrationController = new PatriBoxController(2, 0.15);
 
         DriverStation.silenceJoystickConnectionWarning(true);
         
@@ -93,7 +91,7 @@ public class RobotContainer implements Logged {
             shooterCalc
         );
 
-        calibrationControl = new CalibrationControl(ShooterConstants.SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP);
+        calibrationControl = new CalibrationControl();
         
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -129,6 +127,7 @@ public class RobotContainer implements Logged {
     private void configureButtonBindings() {
         configureDriverBindings(driver);
         configureOperatorBindings(operator);
+        configureCalibrationBindings(calibrationController);
     }
     
     private void configureOperatorBindings(PatriBoxController controller) {
@@ -163,41 +162,70 @@ public class RobotContainer implements Logged {
     }
 
     private void configureCalibrationBindings(PatriBoxController controller) {
-        controller.a()
-            .and(controller.b().negate())
-            .and(controller.x().negate())
-            .and(controller.y().negate())
-            .toggleOnTrue(
-            // TODO: add tuning for pivot
-            calibrationControl.setCalibrationMode(CalibrationMode.PIVOT)
+        controller.leftBumper().onTrue(
+            calibrationControl.incrementLeftSpeed()
+        );
+        controller.back().onTrue(
+            calibrationControl.decrementLeftSpeed()
         );
 
-        controller.povRight().onTrue(
-            calibrationControl.incrementIndex()
+        controller.rightBumper().onTrue(
+            calibrationControl.incrementRightSpeed()
+        );
+        controller.start().onTrue(
+            calibrationControl.decrementRightSpeed()
+        );
+
+
+        controller.leftStick().whileTrue(
+            Math.signum(controller.getLeftY()) == -1.0 
+                ? calibrationControl.decrementBothSpeeds() 
+                : calibrationControl.incrementBothSpeeds()
+        );
+        controller.rightStick().whileTrue(
+            Math.signum(controller.getLeftY()) == -1.0 
+                ? calibrationControl.decrementAngle() 
+                : calibrationControl.incrementAngle()
+        );
+
+
+        controller.povDown().onTrue(
+            calibrationControl.logAll()
+        );
+
+        controller.povUp().and(controller.y()).onTrue(
+            calibrationControl.unlockBothSpeeds()
+        );
+        controller.y().and(controller.povUp().negate()).onTrue(
+            calibrationControl.lockBothSpeeds()
+        );
+
+        controller.povUp().and(controller.x()).onTrue(
+            calibrationControl.unlockLeftSpeed()
+        );
+        controller.x().and(controller.povUp().negate()).onTrue(
+            calibrationControl.lockLeftSpeed()
+        );
+
+        controller.povUp().and(controller.b()).onTrue(
+            calibrationControl.unlockRightSpeed()
+        );
+        controller.b().and(controller.povUp().negate()).onTrue(
+            calibrationControl.lockRightSpeed()
+        );
+
+        controller.povUp().and(controller.a()).onTrue(
+            calibrationControl.unlockPivotAngle()
+        );
+        controller.a().and(controller.povUp().negate()).onTrue(
+            calibrationControl.lockPivotAngle()
         );
 
         controller.povLeft().onTrue(
-            calibrationControl.decrementIndex()
+            calibrationControl.decreaseDistance()
         );
-
-        controller.y().onTrue(
-            calibrationControl.setValueByIndex(calibrationControl.getCurrentVal())
-        );
-
-        controller.povUp().onTrue(
-            calibrationControl.setCurrentVal(calibrationControl.getCurrentVal())
-        );
-        controller.povDown().onTrue(
-            calibrationControl.setCurrentVal(null)
-        );
-
-        controller.x()
-            .and(controller.a().negate())
-            .and(controller.b().negate())
-            .and(controller.y().negate())
-            .toggleOnTrue(
-            // TODO: add tuning for shooter
-            calibrationControl.setCalibrationMode(CalibrationMode.SHOOTER)
+        controller.povRight().onTrue(
+            calibrationControl.increaseDistance()
         );
     }
     
