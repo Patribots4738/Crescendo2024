@@ -72,20 +72,25 @@ public class CalibrationControl implements CalibrationControlIO {
 
     @Override
     public Command incrementBothSpeeds() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'incrementBothSpeeds'");
+        return Commands.sequence(
+            incrementLeftSpeed(),
+            incrementRightSpeed()
+        );
     }
 
     @Override
     public Command decrementBothSpeeds() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'decrementBothSpeeds'");
+        return Commands.sequence(
+            decrementLeftSpeed(),
+            decrementRightSpeed()
+        );
     }
 
     @Override
     public Command logAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'logAll'");
+        return Commands.runOnce(
+            () -> System.out.println(currentVal)
+        );
     }
 
     @Override
