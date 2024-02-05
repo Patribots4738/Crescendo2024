@@ -19,10 +19,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.NTConstants;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class NoteTrajectory extends Command implements Logged {
+public class NoteTrajectory extends Command {
     double x, x0, vx0, ax, z, z0, vz0, az, y, y0, vy0, ay;
 
     Supplier<Pose2d> poseSupplier;
@@ -34,9 +32,15 @@ public class NoteTrajectory extends Command implements Logged {
     Pair<Double, Double> speedAnglePair;
     Timer timer = new Timer(); 
 
-    @Log.NT
     Pose3d currentNotePosition = new Pose3d();
 
+    /**
+     * Represents a trajectory note.
+     * 
+     * @param poseSupplier  a supplier for the pose of the trajectory
+     * @param speedSupplier a supplier for the chassis speeds of the trajectory
+     * @param pairSupplier  a supplier for a pair of doubles representing additional information about the trajectory
+     */
     public NoteTrajectory(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, Supplier<Pair<Double, Double>> pairSupplier) {
         this.poseSupplier = poseSupplier;
         this.speedSupplier = speedSupplier;
@@ -85,12 +89,24 @@ public class NoteTrajectory extends Command implements Logged {
         zeroNote();
     }
 
-    // Returns true when the command should end.
+    // Returns true when either the note is lower than it started
+    // or if the timer has reached 3 seconds.
     @Override
     public boolean isFinished() {
-        return (z < z0 || timer.get() > 5);
+        return (z < z0 || timer.get() > 3);
     }
 
+    /**
+     * Calculates the pose of a note based on the given parameters. :)
+     * 
+     * @param pose           The initial pose of the robot.
+     * @param speedAnglePair A pair of values representing the speed and angle of
+     *                       the note.
+     * @param x              The x-coordinate of the note.
+     * @param y              The y-coordinate of the note.
+     * @param z              The z-coordinate of the note.
+     * @return The pose of the note.
+     */
     Pose3d getNotePose(Pose2d pose, Pair<Double,Double> speedAnglePair, double x, double y, double z) {
         return new Pose3d(
                 new Translation3d(x, y, z).rotateBy(new Rotation3d(
