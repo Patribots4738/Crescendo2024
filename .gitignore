@@ -170,6 +170,8 @@ out/
 
 # Simulation GUI and other tools window save file
 *-window.json
+simgui-ds.json
+simgui.json
 
 # Simulation data log directory
 logs/
@@ -179,6 +181,3 @@ ctre_sim/
 
 # Choreo trajectories to stop branches from losing their sync-ness
 *.traj
-
-simgui.json
-simgui-ds.json
