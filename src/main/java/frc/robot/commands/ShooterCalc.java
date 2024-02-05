@@ -35,13 +35,10 @@ public class ShooterCalc implements Logged {
     @Log.NT 
     boolean atDesiredAngle = false , atDesiredRPM = false;
     
-
-    private NoteTrajectory noteTrajectory;
     
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.pivot = pivot;
         this.shooter = shooter;
-        this.noteTrajectory = new NoteTrajectory();
     }
     
     /**
@@ -341,11 +338,13 @@ public class ShooterCalc implements Logged {
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
         SpeedAngleTriplet calculationTriplet = calculateSWDSpeedAngleTripletToSpeaker(pose, speeds);
 
-        return Commands.runOnce(() -> noteTrajectory.getNoteTrajectoryCommand(
+        return Commands.runOnce(() -> new NoteTrajectory(
             pose, 
             speeds, 
-            new Pair<Double, Double> (rpmToVelocity(calculationTriplet.getSpeeds()), calculationTriplet.getAngle())
-            ).schedule());
+            () -> Pair.of(
+                rpmToVelocity(calculationTriplet.getSpeeds()), 
+                calculationTriplet.getAngle())
+        ).schedule());
     }
     
     private SpeedAngleTriplet calculateSWDSpeedAngleTripletToSpeaker(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds){
