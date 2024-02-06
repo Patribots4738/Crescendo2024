@@ -95,5 +95,8 @@ public class Elevator extends SubsystemBase {
     public Command stop() {
         return runOnce(() -> elevator.stopMotor());
     }
+    public PIDNotConstants getPIDNotConstants() {
+        return this.elevatorPID;
+    }
 
 }

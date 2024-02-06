@@ -59,6 +59,11 @@ public class Climb extends SubsystemBase implements Logged {
         rightMotor.setPID(climbPID.getPID());
     }
 
+
+    public PIDNotConstants getPidNotConstants() {
+        return this.climbPID;
+    }
+
     public void setPosition(Pair<Double, Double> positionPair) {
         setPosition(positionPair.getFirst(), positionPair.getSecond());
     }

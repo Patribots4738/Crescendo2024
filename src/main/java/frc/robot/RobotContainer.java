@@ -83,7 +83,10 @@ public class RobotContainer implements Logged {
         shooterCalc = new ShooterCalc(shooter, pivot);
         
         PIDTuner = new PIDTunerCommands(new PIDNotConstants[] {
-            shooter.getPIDNotConstants()
+            pivot.getPIDNotConstants(),
+            shooter.getPIDNotConstants(),
+            elevator.getPIDNotConstants(),
+            climb.getPidNotConstants()
         });
 
         pieceControl = new PieceControl(
@@ -139,7 +142,7 @@ public class RobotContainer implements Logged {
         controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.05));
         controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(.05));
     }
-
+  
 
     private void configureOperatorBindings(PatriBoxController controller) {
 
