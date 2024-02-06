@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
@@ -34,7 +35,6 @@ public class RobotContainer implements Logged {
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
-    private final PatriBoxController calibrationController;
 
     private Swerve swerve;
     private final Intake intake;
@@ -64,7 +64,6 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
-        calibrationController = new PatriBoxController(2, 0.15);
 
         DriverStation.silenceJoystickConnectionWarning(true);
         
@@ -126,8 +125,8 @@ public class RobotContainer implements Logged {
     
     private void configureButtonBindings() {
         configureDriverBindings(driver);
-        configureOperatorBindings(operator);
-        configureCalibrationBindings(calibrationController);
+        // configureOperatorBindings(operator);
+        configureCalibrationBindings(operator);
     }
     
     private void configureOperatorBindings(PatriBoxController controller) {
@@ -160,7 +159,58 @@ public class RobotContainer implements Logged {
 
         controller.x().onTrue(intake.stop());
     }
+    
+    private void configureDriverBindings(PatriBoxController controller) {
+        
+        // Upon hitting start or back,
+        // reset the orientation of the robot
+        // to be facing away from the driver station
+        controller.start().or(driver.back()).onTrue(
+            Commands.runOnce(() -> swerve.resetOdometry(
+                new Pose2d(
+                    swerve.getPose().getTranslation(),
+                    Rotation2d.fromDegrees(
+                        FieldConstants.IS_RED_ALLIANCE()
+                            ? 0
+                            : 180))), 
+                swerve));
 
+        controller.b()
+            .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
+        
+        controller.leftStick()
+            .toggleOnTrue(swerve.toggleSpeed());
+        
+        controller.a()
+            .and(intake.hasGamePieceTrigger().negate())
+            .onTrue(intake.inCommand());
+        
+        controller.y()
+            .onTrue(intake.outCommand());
+        
+        controller.leftBumper()
+            .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
+        
+        controller.leftTrigger()
+            .onTrue(shooterCalc.resetShooter());
+        
+        controller.x()
+            .onTrue(intake.stop());
+        
+        controller.rightStick()
+            .whileTrue(
+                Commands.sequence(
+                swerve.resetHDC(),
+                swerve.getDriveCommand(
+                    () -> {
+                        return new ChassisSpeeds(
+                            controller.getLeftY(),
+                            controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
+                    },
+                    () -> true)));
+    }
+    
     private void configureCalibrationBindings(PatriBoxController controller) {
         controller.leftBumper().onTrue(
             calibrationControl.incrementLeftSpeed()
@@ -176,14 +226,13 @@ public class RobotContainer implements Logged {
             calibrationControl.decrementRightSpeed()
         );
 
-
-        controller.leftStick().whileTrue(
+        controller.getLeftYMoving().whileTrue(
             Math.signum(controller.getLeftY()) == -1.0 
                 ? calibrationControl.decrementBothSpeeds() 
                 : calibrationControl.incrementBothSpeeds()
         );
-        controller.rightStick().whileTrue(
-            Math.signum(controller.getLeftY()) == -1.0 
+        controller.getRightYMoving().whileTrue(
+            Math.signum(controller.getRightY()) == -1.0 
                 ? calibrationControl.decrementAngle() 
                 : calibrationControl.incrementAngle()
         );
@@ -227,51 +276,6 @@ public class RobotContainer implements Logged {
         controller.povRight().onTrue(
             calibrationControl.increaseDistance()
         );
-    }
-    
-    private void configureDriverBindings(PatriBoxController controller) {
-        
-        // Upon hitting start or back,
-        // reset the orientation of the robot
-        // to be facing away from the driver station
-        controller.start().or(driver.back()).onTrue(
-            Commands.runOnce(() -> swerve.resetOdometry(
-                new Pose2d(
-                    swerve.getPose().getTranslation(),
-                    Rotation2d.fromDegrees(
-                        FieldConstants.IS_RED_ALLIANCE()
-                            ? 0
-                            : 180))), 
-                swerve));
-
-        controller.b()
-            .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
-        
-        controller.leftStick()
-            .toggleOnTrue(swerve.toggleSpeed());
-
-        // controller.a()
-        //     .and(intake.hasGamePieceTrigger().negate())
-        //     .onTrue(intake.inCommand());
-        
-        // controller.y()
-        //     .onTrue(intake.outCommand());
-        
-        // controller.x()
-        //     .onTrue(intake.stop());
-        
-        controller.rightStick()
-            .whileTrue(
-                Commands.sequence(
-                swerve.resetHDC(),
-                swerve.getDriveCommand(
-                    () -> {
-                        return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
-                    },
-                    () -> true)));
     }
     
     public Command getAutonomousCommand() {

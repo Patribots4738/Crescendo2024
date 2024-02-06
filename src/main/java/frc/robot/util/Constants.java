@@ -143,7 +143,7 @@ public final class Constants {
          * The distances are in feet, the speeds are in RPM, and the angles are in
          * degrees.
          */
-        public static HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
+        public final static HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
                 put(5, SpeedAngleTriplet.of(0.0, 300d, 60d));
                 put(10, SpeedAngleTriplet.of(0.0, 600d, 50d));

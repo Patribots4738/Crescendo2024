@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
@@ -37,6 +38,18 @@ public class PatriBoxController extends CommandXboxController {
                 MathUtil.applyDeadband(super.getLeftY(), deadband));
 
         return driverLeftAxis;
+    }
+
+    public Trigger getLeftYMoving() {
+        return new Trigger(
+            () -> getLeftY() != 0.0
+        );
+    }
+
+    public Trigger getRightYMoving() {
+        return new Trigger(
+            () -> getRightY() != 0.0
+        );
     }
 
     @Override

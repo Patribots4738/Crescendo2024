@@ -1,29 +1,27 @@
 package frc.robot.util;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class CalibrationControl {
     private SpeedAngleTriplet currentVal;
 
-    private BooleanSupplier leftLocked;
-    private BooleanSupplier rightLocked;
-    private BooleanSupplier pivotLocked;
+    private boolean leftLocked;
+    private boolean rightLocked;
+    private boolean pivotLocked;
 
     private double distance = 0;
 
     public CalibrationControl() {
         currentVal = new SpeedAngleTriplet();
-        leftLocked = () -> false;
-        rightLocked = () -> false;
-        pivotLocked = () -> false;
+        leftLocked = false;
+        rightLocked = false;
+        pivotLocked = false;
     }
     
     public Command changeLeftSpeed(double increment) {
-        if(!leftLocked.getAsBoolean()) {
+        if(!leftLocked) {
             return Commands.runOnce(
                 () -> currentVal = SpeedAngleTriplet.of(
                     currentVal.getLeftSpeed() + increment,
@@ -43,7 +41,7 @@ public class CalibrationControl {
     }
     
     public Command changeRightSpeed(double increment) {
-        if(!rightLocked.getAsBoolean()) {
+        if(!rightLocked) {
             return Commands.runOnce(
                 () -> currentVal = SpeedAngleTriplet.of(
                         currentVal.getLeftSpeed(),
@@ -63,7 +61,7 @@ public class CalibrationControl {
     }
 
     public Command incrementBothSpeeds() {
-        if(!leftLocked.getAsBoolean() && !rightLocked.getAsBoolean()) {
+        if(!leftLocked && !rightLocked) {
             return Commands.sequence(
                 incrementLeftSpeed(),
                 incrementRightSpeed());
@@ -73,7 +71,7 @@ public class CalibrationControl {
     }
 
     public Command decrementBothSpeeds() {
-        if(!leftLocked.getAsBoolean() && !rightLocked.getAsBoolean()) {
+        if(!leftLocked && !rightLocked) {
             return Commands.sequence(
                 decrementLeftSpeed(),
                 decrementRightSpeed());
@@ -85,17 +83,17 @@ public class CalibrationControl {
     public Command logDistance() {
         return Commands.runOnce(
             () -> { 
-                System.out.println("Distance: " + distance); 
+                System.out.println("Distance: " + Units.metersToFeet(distance) + "ft"); 
             });
     }
 
     public Command logAll() {
         return Commands.runOnce(
-                () -> System.out.println("Distance: " + distance + ", Speeds: ("+currentVal.getLeftSpeed()+", "+currentVal.getRightSpeed()+"), Angle: ("+currentVal.getAngle()+")"));
+                () -> System.out.println("put(" + Units.metersToFeet(distance) + ", SpeedAngleTriplet.of("+currentVal.getLeftSpeed()+", "+currentVal.getRightSpeed()+", "+currentVal.getAngle()+"));"));
     }
 
     public Command incrementAngle() {
-        if(!pivotLocked.getAsBoolean()) {
+        if(!pivotLocked) {
             return Commands.runOnce(
                 () -> currentVal = SpeedAngleTriplet.of(
                         currentVal.getLeftSpeed(),
@@ -107,7 +105,7 @@ public class CalibrationControl {
     }
 
     public Command decrementAngle() {
-        if(!pivotLocked.getAsBoolean()) {
+        if(!pivotLocked) {
             return Commands.runOnce(
                 () -> currentVal = SpeedAngleTriplet.of(
                         currentVal.getLeftSpeed(),
@@ -121,29 +119,29 @@ public class CalibrationControl {
     public Command lockLeftSpeed() {
         return Commands.runOnce(
                 () -> {
-                    System.out.println("Locking Left");
-                    leftLocked = () -> true;
+                    leftLocked = true;
+                    System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
                 });
     }
 
     public Command unlockLeftSpeed() {
         return Commands.runOnce(() -> {
-            System.out.println("Unlocking Left");
-            leftLocked = () -> false;
+            leftLocked = true;
+            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 
     public Command lockRightSpeed() {
         return Commands.runOnce(() -> {
-            System.out.println("Locking Right");
-            rightLocked = () -> true;
+            rightLocked = true;
+            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 
     public Command unlockRightSpeed() {
         return Commands.runOnce(() -> {
-            System.out.println("Unlocking Right");
-            rightLocked = () -> false;
+            rightLocked = true;
+            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 
@@ -162,14 +160,14 @@ public class CalibrationControl {
     public Command lockPivotAngle() {
         return Commands.runOnce(() -> {
             System.out.println("Locking Pivot");
-            pivotLocked = () -> true;
+            pivotLocked = true;
         });
     }
 
     public Command unlockPivotAngle() {
         return Commands.runOnce(() -> {
             System.out.println("Unlocking Pivot");
-            pivotLocked = () -> false;
+            pivotLocked = true;
         });
     }
 
