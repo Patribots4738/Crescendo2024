@@ -37,8 +37,6 @@ public class RobotContainer implements Logged {
     private Swerve swerve;
     private final Intake intake;
 
-    @SuppressWarnings("unused")
-    private final DriverUI driverUI;
     private final Limelight limelight;
     private final LedStrip ledStrip;
     private final Climb climb;
@@ -66,7 +64,6 @@ public class RobotContainer implements Logged {
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        driverUI = new DriverUI();
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
         shooter = new Shooter();
@@ -96,7 +93,7 @@ public class RobotContainer implements Logged {
             if (result.isPresent()) {
                 swerve.getPoseEstimator().addVisionMeasurement(
                 result.get(),
-                DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
+                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
             }
         }, limelight));
         
@@ -204,7 +201,7 @@ public class RobotContainer implements Logged {
     }
     
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
+        return Commands.none();
     }
     
     public void onDisabled() {

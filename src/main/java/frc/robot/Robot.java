@@ -36,6 +36,9 @@ public class Robot extends TimedRobot {
 
     private RobotContainer robotContainer;
 
+    public static double currentTimestamp = 0;
+    public static double previousTimestamp = 0;
+
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
@@ -58,8 +61,8 @@ public class Robot extends TimedRobot {
         Monologue.updateAll();
         CommandScheduler.getInstance().run();
 
-        DriverUI.previousTimestamp = DriverUI.currentTimestamp;
-        DriverUI.currentTimestamp = Timer.getFPGATimestamp();
+        Robot.previousTimestamp = Robot.currentTimestamp;
+        Robot.currentTimestamp = Timer.getFPGATimestamp();
 
     }
 
