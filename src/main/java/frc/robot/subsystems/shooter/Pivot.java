@@ -13,14 +13,17 @@ import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 import com.pathplanner.lib.util.PIDConstants;
+import frc.robot.util.PIDNotConstants;
 
 public class Pivot extends SubsystemBase implements Logged {
 	private Neo pivot;
+    private PIDNotConstants pivotPID;
 
 	public Pivot() {
 		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID, true);
 
 		configMotor();
+        pivotPID = new PIDNotConstants(pivot.getPID(), pivot.getPIDController());
 	}
 
 	public void configMotor() {
@@ -36,6 +39,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_MAX_OUTPUT);
 
 		// sets brake mode
+        
 		pivot.setBrakeMode();
 	}
 
@@ -47,6 +51,7 @@ public class Pivot extends SubsystemBase implements Logged {
 			NTConstants.PIVOT_OFFSET_METERS.getZ(),
 			new Rotation3d(0, Units.degreesToRadians(getAngle()), 0)
 		);
+        pivotPID.updatePID();
 	}
 
 	/**
@@ -69,7 +74,9 @@ public class Pivot extends SubsystemBase implements Logged {
 			new Rotation3d(0, Units.degreesToRadians(angle), 0)
 		);
 	}
-
+    public PIDNotConstants getPIDNotConstants() {
+        return this.pivotPID;
+    }
 	/**
 	 * The function takes an angle in degrees and returns a command that sets
 	 * the pivot to the angle converted to a position

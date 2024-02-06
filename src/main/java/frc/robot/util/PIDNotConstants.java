@@ -46,9 +46,15 @@ public class PIDNotConstants {
   }
 
   public void updatePID() {
-    this.PIDController.setP(this.kP);
-    this.PIDController.setI(this.kI);
-    this.PIDController.setD(this.kI);
+    if (PIDController.getP() != this.kP) {
+        this.PIDController.setP(this.kP);
+    }
+    if (PIDController.getI() != this.kI) {
+        this.PIDController.setI(this.kI);
+    }
+    if (PIDController.getD() != this.kD) {
+        this.PIDController.setD(this.kD);
+    }
   }
   /**
    * Create a new PIDConstants object
@@ -58,7 +64,7 @@ public class PIDNotConstants {
   public PIDNotConstants(double kP, SparkPIDController PIDController) {
     this(kP, 0, 0, PIDController);
   }
-  
+
   public PIDNotConstants(PIDConstants PID, SparkPIDController PIDController) {
     this(PID.kP, PID.kD, PID.kI, 1.0, PIDController);
   }
