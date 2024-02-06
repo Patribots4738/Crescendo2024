@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Robot;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -181,7 +182,7 @@ public class ShooterCalc implements Logged{
     public SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
         // Constants have blue alliance positions at index 0
         // and red alliance positions at index 1
-        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
+        int positionIndex = Robot.isBlueAlliance() ? 0 : 1;
 
         // Get our position relative to the desired field element
         if (shootingAtSpeaker) {
@@ -204,7 +205,7 @@ public class ShooterCalc implements Logged{
         // Constants have blue alliance positions at index 0
         // and red alliance positions at index 1
         Rotation2d pivotAngle = calculatePivotAngle(robotPose);
-        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
+        int positionIndex = Robot.isBlueAlliance() ? 0 : 1;
 
         // Get our position relative to the desired field element
         if (shootingAtSpeaker) {
@@ -235,7 +236,7 @@ public class ShooterCalc implements Logged{
      */
     public Rotation2d calculatePivotAngle(Pose2d robotPose) {
         // Determine the position index based on the alliance color
-        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
+        int positionIndex = Robot.isBlueAlliance() ? 0 : 1;
 
         // Add the pivot offset to the robot's pose
         robotPose = robotPose.plus(new Transform2d(NTConstants.PIVOT_OFFSET_X, 0, new Rotation2d()));

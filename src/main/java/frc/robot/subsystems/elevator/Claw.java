@@ -5,7 +5,7 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.DriverUI;
+import frc.robot.Robot;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
 
@@ -57,7 +57,7 @@ public class Claw extends SubsystemBase {
                             claw.getOutputCurrent() > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT)
                     &&
                     (claw.getTargetVelocity() > TrapConstants.CLAW_HAS_PIECE_MIN_TARGET_VELO) &&
-                    (DriverUI.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
+                    (Robot.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
         }
         return hasGamePiece;
     }
@@ -88,7 +88,7 @@ public class Claw extends SubsystemBase {
     }
 
     public Command intake() {
-        startIntakingTimestamp = DriverUI.currentTimestamp;
+        startIntakingTimestamp = Robot.currentTimestamp;
         return runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_INTAKE));
     }
 

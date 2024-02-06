@@ -26,10 +26,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.DriverUI;
+import frc.robot.Robot;
 import frc.robot.commands.Drive;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.Constants.AutoConstants;
@@ -75,6 +76,9 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Log.NT
     Pose2d robotPose2d = new Pose2d();
+
+    @Log.NT
+    Field2d field2d = new Field2d();
 
     // The gyro sensor
     private final Pigeon2 gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
@@ -135,13 +139,15 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        poseEstimator.updateWithTime(DriverUI.currentTimestamp, gyro.getRotation2d(), getModulePositions());
+        poseEstimator.updateWithTime(Robot.currentTimestamp, gyro.getRotation2d(), getModulePositions());
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
     }
 
     public void logPositions() {
+
+        Pose2d currentPose = getPose();
 
         swerveMeasuredStates = new SwerveModuleState[] {
                 frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
@@ -151,27 +157,27 @@ public class Swerve extends SubsystemBase implements Logged {
 
         if (FieldConstants.IS_SIMULATION) {
             resetOdometry(
-                    getPose().exp(
+                    currentPose.exp(
                             new Twist2d(
                                     0, 0,
                                     speeds.omegaRadiansPerSecond * .02)));
         }
 
-        DriverUI.field.setRobotPose(getPose());
-        SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getRadians());
+        field2d.setRobotPose(currentPose);
+        SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
-        robotPose2d = getPose();
+        robotPose2d = currentPose;
 
         robotPose3d = new Pose3d(
                 new Translation3d(
-                        getPose().getX(),
-                        getPose().getY(),
+                        currentPose.getX(),
+                        currentPose.getY(),
                         Math.hypot(
                                 Rotation2d.fromDegrees(gyro.getRoll().refresh().getValue()).getSin()
                                         * DriveConstants.ROBOT_LENGTH_METERS / 2.0,
                                 Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
-                new Rotation3d(0, 0, getPose().getRotation().getRadians()));
+                new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
 
     }
 
@@ -201,9 +207,9 @@ public class Swerve extends SubsystemBase implements Logged {
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed,
-                                getPose().getRotation()), (Timer.getFPGATimestamp() - DriverUI.previousTimestamp))
+                                getPose().getRotation()), (Timer.getFPGATimestamp() - Robot.previousTimestamp))
                         : ChassisSpeeds.discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed),
-                                (Timer.getFPGATimestamp() - DriverUI.previousTimestamp)));
+                                (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
 
         setModuleStates(swerveModuleStates);
     }
@@ -267,13 +273,6 @@ public class Swerve extends SubsystemBase implements Logged {
         return states;
 
     }
-
-    public double getSpeedMetersPerSecond() {
-        // We update the UI at the end of the loop,
-        // so this is a way of looking into the past.
-        return ((DriverUI.field.getRobotPose().getTranslation().minus(getPose().getTranslation()).getNorm()) / 0.02);
-    }
-
 
     /**
      * Returns an array of SwerveModulePosition objects representing the positions of all swerve modules.

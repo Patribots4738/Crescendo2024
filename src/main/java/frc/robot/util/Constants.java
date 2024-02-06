@@ -450,15 +450,6 @@ public final class Constants {
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
-        // TODO: Should this be in Robot or RobotContainer??
-        public static boolean IS_RED_ALLIANCE() {
-            return ALLIANCE.equals(Optional.of(Alliance.Red));
-        }
-
-        public static boolean IS_BLUE_ALLIANCE() {
-            return ALLIANCE.equals(Optional.of(Alliance.Blue));
-        }
-
         public static enum GameMode {
             DISABLED,
             AUTONOMOUS,

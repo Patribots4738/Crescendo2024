@@ -42,8 +42,6 @@ public class RobotContainer implements Logged {
     private Swerve swerve;
     private final Intake intake;
 
-    @SuppressWarnings("unused")
-    private final DriverUI driverUI;
     private final Limelight limelight;
     private final LedStrip ledStrip;
     private final Climb climb;
@@ -72,7 +70,6 @@ public class RobotContainer implements Logged {
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        driverUI = new DriverUI();
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
         shooter = new Shooter();
@@ -104,7 +101,7 @@ public class RobotContainer implements Logged {
             if (result.isPresent()) {
                 swerve.getPoseEstimator().addVisionMeasurement(
                 result.get(),
-                DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
+                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
             }
         }, limelight));
         
@@ -115,7 +112,7 @@ public class RobotContainer implements Logged {
             () -> -driver.getRightX(),
             () -> !driver.leftBumper().getAsBoolean(),
             () -> (driver.leftBumper().getAsBoolean()
-                && FieldConstants.IS_BLUE_ALLIANCE())));
+                && Robot.isBlueAlliance())));
               
         incinerateMotors();
         configureButtonBindings();
@@ -171,7 +168,7 @@ public class RobotContainer implements Logged {
                 new Pose2d(
                     swerve.getPose().getTranslation(),
                     Rotation2d.fromDegrees(
-                        FieldConstants.IS_RED_ALLIANCE()
+                        Robot.isRedAlliance()
                             ? 0
                             : 180))), 
                 swerve));
