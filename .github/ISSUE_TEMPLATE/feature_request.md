@@ -1,12 +1,12 @@
 ---
 name: Feature Request
 about: Suggest an idea for the robot
-title: ''
+title: '[Feature] '
 labels: enhancement
 assignees: ''
-
 ---
 ## User Story
+
 
 ## Acceptance Criteria
 - [ ] 

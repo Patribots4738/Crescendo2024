@@ -1,10 +1,9 @@
 ---
 name: Bug Report
 about: Report a bug with the robot code - or another company screwing us over
-title: ''
+title: '[Bug] '
 labels: bug, enhancement, help wanted
 assignees: ''
-
 ---
 ## Bug + Desired Behavior
 
