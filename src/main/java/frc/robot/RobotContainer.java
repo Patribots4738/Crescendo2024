@@ -107,7 +107,7 @@ public class RobotContainer implements Logged {
             () -> -driver.getRightX(),
             () -> !driver.leftBumper().getAsBoolean(),
             () -> (driver.leftBumper().getAsBoolean()
-                && FieldConstants.IS_BLUE_ALLIANCE())));
+                && Robot.isBlueAlliance())));
               
         incinerateMotors();
         configureButtonBindings();
@@ -162,7 +162,7 @@ public class RobotContainer implements Logged {
                 new Pose2d(
                     swerve.getPose().getTranslation(),
                     Rotation2d.fromDegrees(
-                        FieldConstants.IS_RED_ALLIANCE()
+                        Robot.isRedAlliance()
                             ? 0
                             : 180))), 
                 swerve));

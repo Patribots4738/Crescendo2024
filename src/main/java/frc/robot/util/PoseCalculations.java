@@ -3,6 +3,7 @@ package frc.robot.util;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.Robot;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
@@ -15,8 +16,8 @@ public class PoseCalculations implements Logged {
         double minDifference = 10000;
         int closestChainIndex = 0;
 
-        int startingIndex = FieldConstants.IS_RED_ALLIANCE() ? 3 : 0;
-        int endingIndex = FieldConstants.IS_RED_ALLIANCE() ? 6 : 3;
+        int startingIndex = Robot.isRedAlliance() ? 3 : 0;
+        int endingIndex = Robot.isRedAlliance() ? 6 : 3;
 
         for (int i = startingIndex; i < endingIndex; i++) {
             Pose2d currentChainPose = FieldConstants.CHAIN_POSITIONS[i];
