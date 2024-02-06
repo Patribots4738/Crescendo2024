@@ -1,7 +1,7 @@
 ---
 name: Bug Report
 about: Report a bug with the robot code - or another company screwing us over
-title: '[Bug] '
+title: ''
 labels: bug, help wanted
 assignees: ''
 ---
