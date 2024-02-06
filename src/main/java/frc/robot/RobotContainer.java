@@ -226,12 +226,12 @@ public class RobotContainer implements Logged {
             calibrationControl.decrementRightSpeed()
         );
 
-        controller.getLeftYMoving().whileTrue(
+        controller.leftY().whileTrue(
             Math.signum(controller.getLeftY()) == -1.0 
                 ? calibrationControl.decrementBothSpeeds() 
                 : calibrationControl.incrementBothSpeeds()
         );
-        controller.getRightYMoving().whileTrue(
+        controller.rightY().whileTrue(
             Math.signum(controller.getRightY()) == -1.0 
                 ? calibrationControl.decrementAngle() 
                 : calibrationControl.incrementAngle()

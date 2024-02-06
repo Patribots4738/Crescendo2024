@@ -159,15 +159,15 @@ public class CalibrationControl {
 
     public Command lockPivotAngle() {
         return Commands.runOnce(() -> {
-            System.out.println("Locking Pivot");
             pivotLocked = true;
+            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 
     public Command unlockPivotAngle() {
         return Commands.runOnce(() -> {
-            System.out.println("Unlocking Pivot");
             pivotLocked = true;
+            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 

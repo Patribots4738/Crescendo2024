@@ -40,16 +40,26 @@ public class PatriBoxController extends CommandXboxController {
         return driverLeftAxis;
     }
 
-    public Trigger getLeftYMoving() {
+    public Trigger leftY() {
         return new Trigger(
             () -> getLeftY() != 0.0
         );
     }
 
-    public Trigger getRightYMoving() {
+    public Trigger leftX() {
         return new Trigger(
-            () -> getRightY() != 0.0
+            () -> getLeftX() != 0.0
         );
+    }
+
+    public Trigger rightY() {
+        return new Trigger(
+                () -> getRightY() != 0.0);
+    }
+
+    public Trigger rightX() {
+        return new Trigger(
+                () -> getRightX() != 0.0);
     }
 
     @Override
