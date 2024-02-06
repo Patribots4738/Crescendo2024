@@ -12,6 +12,7 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
+import com.pathplanner.lib.util.PIDConstants;
 
 public class Pivot extends SubsystemBase implements Logged {
 	private Neo pivot;
@@ -111,4 +112,5 @@ public class Pivot extends SubsystemBase implements Logged {
 	public Command stop() {
 		return runOnce(() -> pivot.stopMotor());
 	}
+    
 }

@@ -6,19 +6,21 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.PIDNotConstants;
 
 public class Shooter extends SubsystemBase {
     /** Creates a new shooter. */
     private final Neo motorLeft;
     private final Neo motorRight;
 
+    public final PIDNotConstants shooterPID;
     public Shooter() {
 
         motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID);
         motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID);
 
         configMotors();
-
+        shooterPID = new PIDNotConstants(motorLeft.getPID(), motorLeft.getPIDController());
     }
 
     public void configMotors() {
@@ -42,7 +44,11 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        shooterPID.updatePID();
+        motorRight.setPID(shooterPID.getPID());
     }
+
+    
 
     /**
      * The function sets both of the motors to a targetVelocity that is
@@ -87,5 +93,9 @@ public class Shooter extends SubsystemBase {
      */
     public Command stop() {
         return Commands.runOnce(() -> motorLeft.stopMotor());
+    }
+
+    public PIDNotConstants getPIDNotConstants() {
+        return this.shooterPID;
     }
 }
