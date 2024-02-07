@@ -60,7 +60,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				angle, 
 				ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES, 
 				ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
-		pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES);
+		pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES * ShooterConstants.PIVOT_GEAR_RATIO);
 
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -101,7 +101,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return pivot.getPosition() * ShooterConstants.PIVOT_MAX_ANGLE_DEGREES;
+		return pivot.getPosition() * ShooterConstants.PIVOT_MAX_ANGLE_DEGREES / ShooterConstants.PIVOT_GEAR_RATIO;
 	}
 
 	/**

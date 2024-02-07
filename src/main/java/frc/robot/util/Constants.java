@@ -101,8 +101,10 @@ public final class Constants {
         public static final int RIGHT_SHOOTER_CAN_ID = 12;
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
-        public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
-        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1;
+        public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1.0;
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1.0;
+
+        public static final double PIVOT_GEAR_RATIO = 100.8;
 
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
