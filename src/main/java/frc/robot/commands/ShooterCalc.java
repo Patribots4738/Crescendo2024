@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -200,12 +201,32 @@ public class ShooterCalc implements Logged {
 
     public Command prepareFireViaMathCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
         return Commands.run(() -> {
-                Rotation2d angle = calculateSWDPivotAngleToSpeaker(robotPose.get(), speeds.get(), 0.02);
-                Pair<Double, Double> speedsPair = calculateShooterSpeedsForApex(robotPose.get(), speeds.get(), 0.02);
+                Rotation2d angle = calculatePivotAngle(robotPose.get());
+                Pair<Double, Double> speedsPair = calculateShooterSpeedsForApex(robotPose.get(), angle);
 
                 pivot.setAngle(angle.getDegrees());
                 shooter.setSpeed(speedsPair);
             }, pivot, shooter);
+    }
+
+    /**
+     * Calculates the pivot angle based on the robot's pose.
+     * 
+     * @param robotPose The pose of the robot.
+     * @return The calculated pivot angle.
+     */
+    public Rotation2d calculatePivotAngle(Pose2d robotPose) {
+        // Add the pivot offset to the robot's pose
+        robotPose = robotPose.plus(new Transform2d(0.112, 0, robotPose.getRotation()));
+        // Calculate the robot's pose relative to the speaker's position
+        robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+
+        // Calculate the distance in feet from the robot to the speaker
+        double distanceMeters = robotPose.getTranslation().getNorm();
+
+        // Return a new rotation object that represents the pivot angle
+        // The pivot angle is calculated based on the speaker's height and the distance to the speaker
+        return new Rotation2d(distanceMeters, 3);
     }
 
     public Command prepareFireMovingCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
@@ -363,23 +384,26 @@ public class ShooterCalc implements Logged {
      * @param robotSpeeds   the current chassis speeds of the robot
      * @return              a pair of shooter speeds (left and right) required to reach the speaker position
      */
-    private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, ChassisSpeeds robotSpeeds, double dt) {
-        Rotation2d pivotAngle = calculateSWDPivotAngleToSpeaker(robotPose, robotSpeeds, dt);
-        double d = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION()).getTranslation().getNorm();
-        double desiredRPM = velocityToRPM(Math.sqrt(19.6*d)/(pivotAngle.getSin()));
+    private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, Rotation2d pivotAngle) {
+        double desiredRPM = velocityToRPM(Math.sqrt(2 * 9.8 * 2.08) / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
-        SpeedAngleTriplet calculationTriplet = calculateSWDSpeedAngleTripletToSpeaker(pose, speeds);
+        return Commands.runOnce(
+            () -> {
+                Rotation2d pivotAngle = calculatePivotAngle(pose.get());
+                SpeedAngleTriplet calculationTriplet = SpeedAngleTriplet.of(calculateShooterSpeedsForApex(pose.get(), pivotAngle), pivotAngle.getDegrees());
 
-        return Commands.runOnce(() -> new NoteTrajectory(
-            pose, 
-            speeds, 
-            () -> Pair.of(
-                rpmToVelocity(calculationTriplet.getSpeeds()), 
-                calculationTriplet.getAngle())
-        ).schedule());
+                new NoteTrajectory(
+                    pose, 
+                    speeds, 
+                    () -> Pair.of(
+                        rpmToVelocity(calculationTriplet.getSpeeds()), 
+                        calculationTriplet.getAngle())
+                ).schedule();
+            }
+        );
     }
     
     private SpeedAngleTriplet calculateSWDSpeedAngleTripletToSpeaker(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds){
