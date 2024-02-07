@@ -24,14 +24,14 @@ public class ShooterCalc implements Logged{
     private Shooter shooter;
 
 
-    @Log.NT
+    @Log
     double desiredRSpeed = 0, desiredLSpeed = 0, distance = 0, desiredAngle = 0;
 
   
-    @Log.NT
+    @Log
     double realAngle = 0, realRSpeed = 0, realLSpeed = 0;
 
-    @Log.NT 
+    @Log 
     boolean atDesiredAngle = false , atDesiredRPM = false;
     
 
