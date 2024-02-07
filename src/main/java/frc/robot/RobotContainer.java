@@ -48,10 +48,10 @@ public class RobotContainer implements Logged {
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
     
-    @Log.NT
+    @Log
     public static Pose3d[] components3d = new Pose3d[5];
 
-    @Log.NT
+    @Log
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
     
     public RobotContainer() {
