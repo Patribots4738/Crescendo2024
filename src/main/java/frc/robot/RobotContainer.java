@@ -179,7 +179,7 @@ public class RobotContainer implements Logged {
             .onTrue(intake.outCommand());
         
         controller.leftBumper()
-            .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
+            .toggleOnTrue(shooterCalc.prepareFireViaMathCommand(() -> true, swerve::getPose, swerve::getRobotRelativeVelocity));
         
         controller.leftTrigger()
             .onTrue(shooterCalc.resetShooter());

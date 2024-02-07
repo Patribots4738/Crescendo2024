@@ -198,6 +198,27 @@ public class ShooterCalc implements Logged {
             }, pivot, shooter);
     }
 
+    public Command prepareFireViaMathCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.run(() -> {
+                Rotation2d angle = calculateSWDPivotAngleToSpeaker(robotPose.get(), speeds.get(), 0.02);
+                Pair<Double, Double> speedsPair = calculateShooterSpeedsForApex(robotPose.get(), speeds.get(), 0.02);
+
+                pivot.setAngle(angle.getDegrees());
+                shooter.setSpeed(speedsPair);
+            }, pivot, shooter);
+    }
+
+    public Command prepareFireMovingCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.run(() -> {
+                SpeedAngleTriplet triplet = calculateSWDSpeedAngleTripletToSpeaker(robotPose, speeds);
+
+                log(triplet);
+
+                pivot.setAngle(triplet.getAngle());
+                shooter.setSpeed(triplet.getSpeeds());
+            }, pivot, shooter);
+    }
+
     public void logSpeeds(SpeedAngleTriplet triplet) {
         desiredRSpeed = triplet.getRightSpeed();
         desiredLSpeed = triplet.getLeftSpeed();
@@ -335,6 +356,20 @@ public class ShooterCalc implements Logged {
                 pivot.stop());
     }
 
+    /**
+     * Calculates the shooter speeds required to reach the speaker position.
+     * 
+     * @param robotPose     the current pose of the robot
+     * @param robotSpeeds   the current chassis speeds of the robot
+     * @return              a pair of shooter speeds (left and right) required to reach the speaker position
+     */
+    private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, ChassisSpeeds robotSpeeds, double dt) {
+        Rotation2d pivotAngle = calculateSWDPivotAngleToSpeaker(robotPose, robotSpeeds, dt);
+        double d = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION()).getTranslation().getNorm();
+        double desiredRPM = velocityToRPM(Math.sqrt(19.6*d)/(pivotAngle.getSin()));
+        return Pair.of(desiredRPM, desiredRPM);
+    }
+
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
         SpeedAngleTriplet calculationTriplet = calculateSWDSpeedAngleTripletToSpeaker(pose, speeds);
 
@@ -351,8 +386,8 @@ public class ShooterCalc implements Logged {
         double dt = DriverUI.currentTimestamp - DriverUI.previousTimestamp;
 
         return new SpeedAngleTriplet(
-            calculateSWDShooterSpeedsToSpeaker(pose, speeds, dt),
-            calculateSWDPivotAngleToSpeaker(pose, speeds, dt).getDegrees()
+            calculateSWDShooterSpeedsToSpeaker(pose.get(), speeds.get(), dt),
+            calculateSWDPivotAngleToSpeaker(pose.get(), speeds.get(), dt).getDegrees()
         );
     }
 
@@ -364,7 +399,7 @@ public class ShooterCalc implements Logged {
      * @param dt     the time interval for integration
      * @return a pair of shooter speeds (left and right) required to reach the speaker position
      */
-    private Pair<Double, Double> calculateSWDShooterSpeedsToSpeaker(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, double dt) {
+    private Pair<Double, Double> calculateSWDShooterSpeedsToSpeaker(Pose2d pose, ChassisSpeeds speeds, double dt) {
         Pose2d estimatedPose = integratePosition(pose, speeds, dt);
 
         SpeedAngleTriplet futureTriplet = 
@@ -373,7 +408,7 @@ public class ShooterCalc implements Logged {
             );
             
 
-        double velocityNormalToSpeaker = getVelocityVectorToSpeaker(pose.get(), speeds.get()).getY();
+        double velocityNormalToSpeaker = getVelocityVectorToSpeaker(pose, speeds).getY();
         double averageAddedRPM = velocityToRPM(velocityNormalToSpeaker);
 
         double averageTotalRPM = futureTriplet.getAverageSpeed() - averageAddedRPM;
@@ -389,7 +424,7 @@ public class ShooterCalc implements Logged {
     }
 
 
-    private Rotation2d calculateSWDPivotAngleToSpeaker(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, double dt) {
+    private Rotation2d calculateSWDPivotAngleToSpeaker(Pose2d pose, ChassisSpeeds speeds, double dt) {
         Pose2d estimatedPose = integratePosition(pose, speeds, dt);
 
         estimatedPose = estimatedPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
@@ -397,9 +432,9 @@ public class ShooterCalc implements Logged {
         return Rotation2d.fromDegrees(ShooterConstants.INTERPOLATION_MAP.get(estimatedPose.getX()).getAngle());
     }
 
-    private Pose2d integratePosition(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds, double dt) {
-        Pose2d robotPose = pose.get();
-        ChassisSpeeds robotSpeeds = speeds.get();
+    private Pose2d integratePosition(Pose2d pose, ChassisSpeeds speeds, double dt) {
+        Pose2d robotPose = pose;
+        ChassisSpeeds robotSpeeds = speeds;
         
         Pose2d estimatedPose = robotPose.exp(new Twist2d(
             robotSpeeds.vxMetersPerSecond * dt, 
