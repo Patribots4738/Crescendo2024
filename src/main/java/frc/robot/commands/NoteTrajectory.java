@@ -61,10 +61,10 @@ public class NoteTrajectory extends Command {
         x0 = NTConstants.PIVOT_OFFSET_METERS.getX();
         y0 = 0;
         z0 = NTConstants.PIVOT_OFFSET_METERS.getY();
-        vx0 = Rotation2d.fromDegrees(90 - speedAnglePair.getSecond()).getSin() * speedAnglePair.getFirst()
+        vx0 = Rotation2d.fromDegrees(speedAnglePair.getSecond()).getCos() * speedAnglePair.getFirst()
                 + speeds.vxMetersPerSecond;
         vy0 = speeds.vyMetersPerSecond;
-        vz0 = Rotation2d.fromDegrees(90 - speedAnglePair.getSecond()).getCos() * speedAnglePair.getFirst();
+        vz0 = Rotation2d.fromDegrees(speedAnglePair.getSecond()).getSin() * speedAnglePair.getFirst();
         ax = 0;
         ay = 0;
         az = -9.8;
