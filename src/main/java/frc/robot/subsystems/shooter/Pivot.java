@@ -55,8 +55,6 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @param double The angle to set the shooter to
 	 */
 	public void setAngle(double angle) {
-		// TODO: angle of pivot seems wrong in sim but i am not exactly sure how to fix it here
-		// Also I'm not sure if position input is getting conversion factor applied
 		angle = 
 			MathUtil.clamp(
 				angle, 
