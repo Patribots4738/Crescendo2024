@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -59,8 +60,16 @@ public class Climb extends SubsystemBase implements Logged {
     }
 
     public void setPosition(double pos1, double pos2) {
-        leftMotor.setTargetPosition(pos1);
-        rightMotor.setTargetPosition(pos2);
+        leftMotor.setTargetPosition(
+            MathUtil.clamp(
+                pos1,
+                ClimbConstants.BOTTOM_LIMIT,
+                ClimbConstants.TOP_LIMIT));
+        rightMotor.setTargetPosition(
+            MathUtil.clamp(
+                pos2,
+                ClimbConstants.BOTTOM_LIMIT,
+                ClimbConstants.TOP_LIMIT));
 
         RobotContainer.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, pos1,

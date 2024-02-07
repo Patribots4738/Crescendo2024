@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
