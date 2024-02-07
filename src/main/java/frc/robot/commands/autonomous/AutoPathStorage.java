@@ -4,11 +4,14 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,10 +24,12 @@ import java.util.function.BooleanSupplier;
  * with each segment having its own method 
  * to make sure that the modularity stays clean
  */
-public class AutoPathStorage {
+public class AutoPathStorage implements Logged {
 
     private final BooleanSupplier hasPieceSupplier;
     private final Map<String, PathPlannerPath> pathCache = new HashMap<>();
+    @Log.NT
+    private SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /**
      * Creates a new AutoPathStorage object.
@@ -34,11 +39,23 @@ public class AutoPathStorage {
     public AutoPathStorage(BooleanSupplier hasPieceSupplier) {
         this.hasPieceSupplier = hasPieceSupplier;
         preloadPaths();
+        generateSendableChooser();
     }
 
-    public void preloadPaths() {
-        // To keep the code clean, this for loop goes through 
-        // All of C1-5, C5-1, C1-5S, and C5-1S
+    private void preloadPaths() {
+        preloadCenterLinePaths();
+    }
+
+    private void generateSendableChooser() {
+        autoChooser.setDefaultOption("No Auto", Commands.none());
+        
+    }
+
+    /**
+     * Preloads the center line paths into the path cache.
+     * These paths include shooting and skipping paths for each note on the center line.
+     */
+    private void preloadCenterLinePaths() {
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
 
             int shootingIndex = (i * 2);
