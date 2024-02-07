@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.IntakeConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class Intake extends SubsystemBase {
     private final Neo intakeMotor;
@@ -20,8 +21,7 @@ public class Intake extends SubsystemBase {
     public void configMotors() {
         intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
-        intakeMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        intakeMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
+        intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
     public Command setPercentCommand(double desiredPercent) {
