@@ -67,6 +67,10 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
         return new SpeedAngleTriplet(leftSpeed, rightSpeed, angle);
     }
 
+    public static SpeedAngleTriplet of(Pair<Double, Double> speeds, Double angle) {
+        return new SpeedAngleTriplet(speeds, angle);
+    }
+
     /**
      * Interpolates between this SpeedAngleTriplet and another SpeedAngleTriplet
      * based on a given parameter.
