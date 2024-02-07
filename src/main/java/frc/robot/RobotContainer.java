@@ -139,8 +139,9 @@ public class RobotContainer implements Logged {
         controller.povLeft().onTrue(PIDTuner.decreaseSubsystemCommand());
         controller.rightBumper().onTrue(PIDTuner.PIDIncrementCommand());
         controller.leftBumper().onTrue(PIDTuner.PIDDecreaseCommand());
-        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.05));
-        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(.05));
+        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(1000));
+        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(1000));
+        controller.a().onTrue(PIDTuner.logCommand());
     }
   
 

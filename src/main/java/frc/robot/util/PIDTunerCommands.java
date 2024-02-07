@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class PIDTunerCommands {
     
     private PIDNotConstants[] subsystems;
-    private Command[] PIDChangeArray;
     private int subsystemIndex;
     private int PIDIndex;
 
@@ -19,12 +18,13 @@ public class PIDTunerCommands {
     }
 
     public void increment() {
-        if (subsystemIndex < subsystems.length) {
+        if (subsystemIndex < subsystems.length - 1) {
             this.subsystemIndex++;
         }
     }
+
     public void PIDIncrement() {
-        if (PIDIndex < PIDChangeArray.length) {
+        if (PIDIndex < 2) {
             this.PIDIndex++;
         }
     }
@@ -35,20 +35,45 @@ public class PIDTunerCommands {
         }
     }
 
+    public void log() {
+        System.out.println("Subsystem: " + subsystemToString(subsystemIndex));
+        System.out.println(subsystems[subsystemIndex].toString());
+        System.out.println("PID Index: " + this.PIDIndex);
+    }
+
+
+    public String subsystemToString(int index) {
+        switch (index) {
+            case 0: 
+                return "Pivot";
+            case 1: 
+                return "Shooter";
+            case 2:
+                return "Elevator";
+            case 3:
+                return "Climb";
+        }
+        return "";
+    }
+
     public void decrease() {
         if (subsystemIndex > 0) {
             this.subsystemIndex--;
         }
     }
     public void increasePID(double value) {
-        switch (PIDIndex) {
+        switch (this.PIDIndex) {
             case 0:
-                subsystems[subsystemIndex].setP(value);
+                subsystems[subsystemIndex].setP(subsystems[subsystemIndex].getP() + value);
+                break;
             case 1: 
-                subsystems[subsystemIndex].setI(.01 * value);
+                subsystems[subsystemIndex].setI(subsystems[subsystemIndex].getI() + .01 * value);
+                break;
             case 2: 
-                subsystems[subsystemIndex].setD(value);
+                subsystems[subsystemIndex].setD(subsystems[subsystemIndex].getD() + value);
+                break;
         }
+        log();
     }
 
 
@@ -64,10 +89,14 @@ public class PIDTunerCommands {
     public Command decreaseCurrentPIDCommand(double value) {
         return Commands.runOnce(() -> this.increasePID(-value));
     }
+
     public Command PIDIncrementCommand() {
         return Commands.runOnce(() -> PIDIncrement());
     }
     public Command PIDDecreaseCommand() {
-        return Commands.runOnce(() -> PIDIncrement());
+        return Commands.runOnce(() -> PIDDecrease());
+    }
+    public Command logCommand() {
+        return Commands.runOnce(() -> log());
     }
 }

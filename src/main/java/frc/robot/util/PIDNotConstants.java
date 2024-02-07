@@ -56,6 +56,10 @@ public class PIDNotConstants {
         this.PIDController.setD(this.kD);
     }
   }
+
+  public String toString() {
+    return "P: " + this.kP + "\nI: " + this.kI + "\nD: " + this.kD;
+  }
   /**
    * Create a new PIDConstants object
    *
@@ -66,23 +70,11 @@ public class PIDNotConstants {
   }
 
   public PIDNotConstants(PIDConstants PID, SparkPIDController PIDController) {
-    this(PID.kP, PID.kD, PID.kI, 1.0, PIDController);
+    this(PID.kP, PID.kI, PID.kD, 1.0, PIDController);
   }
 
   public PIDConstants getPID() {
-    return new PIDConstants(this.kP, this.kD, this.kI);
-  }
-
-  public void incrementPBy(double value) {
-    kP += value;
-  }
-  
-  public void incrementIBy(double value) {
-    kI += value;
-  }
-
-  public void incrementDBy(double value) {
-    kD += value;
+    return new PIDConstants(this.kP, this.kI, this.kD);
   }
 
   public void setP(double value) {
