@@ -22,12 +22,17 @@ public class Intake extends SubsystemBase {
         intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
+    public void setPercent(double desiredPercent) {
+        desiredPercent = 
+            MathUtil.clamp(
+                desiredPercent, 
+                IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
+                IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
+        intakeMotor.setTargetPercent(desiredPercent);
+    }
+
     public Command setPercentCommand(double desiredPercent) {
-        return runOnce(() -> intakeMotor.setTargetPercent(
-                                    MathUtil.clamp(
-                                        desiredPercent, 
-                                        IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
-                                        IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT)));
+        return runOnce(() -> setPercent(desiredPercent));
     }
 
     public Command inCommand() {

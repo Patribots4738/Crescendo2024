@@ -64,11 +64,12 @@ public class Claw extends SubsystemBase {
     }
 
     public void setTargetPercent(double percent) {
-        claw.setTargetPercent(
+        percent = 
             MathUtil.clamp(
                 percent, 
                 TrapConstants.CLAW_LOWER_PERCENT_LIMIT, 
-                TrapConstants.CLAW_UPPER_PERCENT_LIMIT));
+                TrapConstants.CLAW_UPPER_PERCENT_LIMIT);
+        claw.setTargetPercent(percent);
     }
 
     public void configMotors() {

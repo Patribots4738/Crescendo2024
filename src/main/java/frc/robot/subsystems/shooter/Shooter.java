@@ -57,16 +57,18 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setSpeed(Pair<Double, Double> speeds) {
-        motorLeft.setTargetVelocity(
-                MathUtil.clamp(
-                    speeds.getFirst(), 
-                    ShooterConstants.SHOOTER_RPM_UPPER_LIMIT,
-                    ShooterConstants.SHOOTER_RPM_LOWER_LIMIT));
-        motorRight.setTargetVelocity(
-                MathUtil.clamp(
-                    speeds.getSecond(), 
-                    ShooterConstants.SHOOTER_RPM_UPPER_LIMIT, 
-                    ShooterConstants.SHOOTER_RPM_LOWER_LIMIT));
+        double speedLeft = 
+            MathUtil.clamp(
+                speeds.getFirst(), 
+                ShooterConstants.SHOOTER_RPM_UPPER_LIMIT,
+                ShooterConstants.SHOOTER_RPM_LOWER_LIMIT);
+        double speedRight = 
+            MathUtil.clamp(
+                speeds.getSecond(), 
+                ShooterConstants.SHOOTER_RPM_UPPER_LIMIT,
+                ShooterConstants.SHOOTER_RPM_LOWER_LIMIT);
+        motorLeft.setTargetVelocity(speedLeft);
+        motorRight.setTargetVelocity(speedRight);
     }
 
     /**
