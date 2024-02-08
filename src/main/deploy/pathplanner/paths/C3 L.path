@@ -20,8 +20,8 @@
         "y": 6.219024666492783
       },
       "prevControl": {
-        "x": 6.960262431163161,
-        "y": 6.1638670197833125
+        "x": 6.997034195636141,
+        "y": 6.140884666987699
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Shooting1",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0
