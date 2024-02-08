@@ -362,10 +362,9 @@ public class ShooterCalc implements Logged {
 
                 new NoteTrajectory(
                     pose,
-                    speeds, 
-                    () -> Pair.of(
-                        rpmToVelocity(calculationTriplet.getSpeeds()), 
-                        calculationTriplet.getAngle())
+                    speeds.get(),
+                    rpmToVelocity(calculationTriplet.getSpeeds()), 
+                    calculationTriplet.getAngle()
                 ).schedule();
             }
         );
