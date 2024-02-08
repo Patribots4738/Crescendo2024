@@ -21,6 +21,7 @@ import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.CalibrationControl;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
@@ -49,6 +50,8 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
+
+    private CalibrationControl calibrationControl;
     
     @Log.NT
     public static Pose3d[] components3d = new Pose3d[5];
@@ -60,6 +63,7 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
+
         DriverStation.silenceJoystickConnectionWarning(true);
         
         limelight = new Limelight();
@@ -84,6 +88,8 @@ public class RobotContainer implements Logged {
             claw,
             shooterCalc
         );
+
+        calibrationControl = new CalibrationControl();
         
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -108,7 +114,7 @@ public class RobotContainer implements Logged {
             () -> !driver.leftBumper().getAsBoolean(),
             () -> (driver.leftBumper().getAsBoolean()
                 && FieldConstants.IS_BLUE_ALLIANCE())));
-              
+
         incinerateMotors();
         configureButtonBindings();
         
@@ -118,7 +124,8 @@ public class RobotContainer implements Logged {
     
     private void configureButtonBindings() {
         configureDriverBindings(driver);
-        configureOperatorBindings(operator);
+        // configureOperatorBindings(operator);
+        configureCalibrationBindings(operator);
     }
     
     private void configureOperatorBindings(PatriBoxController controller) {
@@ -201,6 +208,69 @@ public class RobotContainer implements Logged {
                             swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
                     },
                     () -> true)));
+    }
+    
+    private void configureCalibrationBindings(PatriBoxController controller) {
+        controller.leftBumper().onTrue(
+            calibrationControl.incrementLeftSpeed()
+        );
+        controller.back().onTrue(
+            calibrationControl.decrementLeftSpeed()
+        );
+
+        controller.rightBumper().onTrue(
+            calibrationControl.incrementRightSpeed()
+        );
+        controller.start().onTrue(
+            calibrationControl.decrementRightSpeed()
+        );
+
+        controller.leftY().whileTrue(
+            Math.signum(controller.getLeftY()) == -1.0 
+                ? calibrationControl.decrementBothSpeeds() 
+                : calibrationControl.incrementBothSpeeds()
+        );
+        controller.rightY().whileTrue(
+            Math.signum(controller.getRightY()) == -1.0 
+                ? calibrationControl.decrementAngle() 
+                : calibrationControl.incrementAngle()
+        );
+
+
+        controller.povDown().onTrue(
+            calibrationControl.logAll()
+        );
+
+        controller.y().toggleOnTrue(
+            calibrationControl.lockBothSpeeds()
+        ).toggleOnFalse(
+            calibrationControl.unlockBothSpeeds()
+        );
+
+        controller.x().toggleOnTrue(
+            calibrationControl.lockLeftSpeed()
+        ).toggleOnFalse(
+            calibrationControl.unlockLeftSpeed()
+        );
+
+        controller.b().toggleOnTrue(
+            calibrationControl.lockRightSpeed()
+        ).toggleOnFalse(
+            calibrationControl.unlockRightSpeed()
+        );
+
+        controller.a().toggleOnTrue(
+            calibrationControl.lockPivotAngle()
+        ).toggleOnFalse(
+            calibrationControl.unlockPivotAngle()
+        );
+
+        controller.povLeft().onTrue(
+            calibrationControl.decreaseDistance()
+        );
+        controller.povRight().onTrue(
+            calibrationControl.increaseDistance()
+        );
     }
     
     public Command getAutonomousCommand() {
