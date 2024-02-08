@@ -67,7 +67,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Preloads",
   "previewStartingState": {
     "rotation": -131.76638787511214,
     "velocity": 0
