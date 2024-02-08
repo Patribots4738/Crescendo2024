@@ -241,32 +241,28 @@ public class RobotContainer implements Logged {
             calibrationControl.logAll()
         );
 
-        controller.povUp().and(controller.y()).onTrue(
+        controller.y().toggleOnTrue(
+            calibrationControl.lockBothSpeeds()
+        ).toggleOnFalse(
             calibrationControl.unlockBothSpeeds()
         );
-        controller.y().and(controller.povUp().negate()).onTrue(
-            calibrationControl.lockBothSpeeds()
-        );
 
-        controller.povUp().and(controller.x()).onTrue(
+        controller.x().toggleOnTrue(
+            calibrationControl.lockLeftSpeed()
+        ).toggleOnFalse(
             calibrationControl.unlockLeftSpeed()
         );
-        controller.x().and(controller.povUp().negate()).onTrue(
-            calibrationControl.lockLeftSpeed()
-        );
 
-        controller.povUp().and(controller.b()).onTrue(
+        controller.b().toggleOnTrue(
+            calibrationControl.lockRightSpeed()
+        ).toggleOnFalse(
             calibrationControl.unlockRightSpeed()
         );
-        controller.b().and(controller.povUp().negate()).onTrue(
-            calibrationControl.lockRightSpeed()
-        );
 
-        controller.povUp().and(controller.a()).onTrue(
-            calibrationControl.unlockPivotAngle()
-        );
-        controller.a().and(controller.povUp().negate()).onTrue(
+        controller.a().toggleOnTrue(
             calibrationControl.lockPivotAngle()
+        ).toggleOnFalse(
+            calibrationControl.unlockPivotAngle()
         );
 
         controller.povLeft().onTrue(
