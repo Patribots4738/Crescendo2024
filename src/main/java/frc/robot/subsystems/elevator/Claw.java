@@ -96,12 +96,12 @@ public class Claw extends SubsystemBase {
     public Command stop() {
         return runOnce(() -> setTargetPercent(TrapConstants.CLAW_STOP_PERCENT));
     }
-    public void setIntakingTimestamp() {
-        startIntakingTimestamp = DriverUI.currentTimestamp;
+    public void updateIntakingTimestamp() {
+        startIntakingTimestamp = Robot.currentTimestamp;
     }
 
     public Command intake() {
-        return runOnce(() -> setIntakingTimestamp())
+        return runOnce(() -> updateIntakingTimestamp())
                 .andThen(runOnce(() -> setTargetPercent(TrapConstants.CLAW_INTAKE_PERCENT)));
     }
 
