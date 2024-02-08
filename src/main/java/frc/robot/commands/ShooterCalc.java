@@ -87,14 +87,20 @@ public class ShooterCalc implements Logged {
      * @return              The angle to the speaker in the form of a Rotation2d object.
      */
     public Rotation2d calculateSWDRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
-        double velocityTangentToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity).getX();
+        Translation2d velocityVectorToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity);
+        double velocityTangent = velocityVectorToSpeaker.getX();
+        double velocityNormal = velocityVectorToSpeaker.getY();
 
+        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+        Rotation2d currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
+        double velocityArcTan = Math.atan2(
+            velocityTangent, 
+            rpmToVelocity(calculateSpeed(robotPose, true).getSpeeds())
+        );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
+        // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
         Rotation2d desiredRotation2d = Rotation2d.fromRadians(
-            currentAngleToSpeaker.getRadians() - Math.atan2(
-                velocityTangentToSpeaker, 
-                rpmToVelocity(calculateSpeed(robotPose, true).getSpeeds())
-            )
+            currentAngleToSpeaker.getRadians() + velocityArcTan + Math.PI
         );
 
         // Update the robot's pose with the desired rotation
@@ -155,20 +161,20 @@ public class ShooterCalc implements Logged {
 
 
     /**
-     * Converts the velocity of the shooter wheel to RPM (Rotations Per Minute).
+     * Converts the velocity of the note to RPM (Rotations Per Minute).
      * Equation: ((V/(2π)) / (D/2)) * 60 = RPM
      * 
-     * @param noteVelocity the velocity of the shooter wheel in meters per second
+     * @param noteVelocity the velocity of the initial note in meters per second
      * @return the RPM (Rotations Per Minute) of the shooter wheel
      */
     public double velocityToRPM(double noteVelocity) {
         double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
     
         // Convert velocity back to radians per second
-        double radiansPerSecond = noteVelocity / diameter;
+        double radiansPerSecond = noteVelocity / (2*Math.PI);
     
         // Convert radians per second back to rotations per second
-        double rotationsPerSecond = radiansPerSecond / Math.PI;
+        double rotationsPerSecond = radiansPerSecond / (diameter/2);
     
         // Convert rotations per second back to rotations per minute
         return rotationsPerSecond * 60.0;
@@ -393,7 +399,25 @@ public class ShooterCalc implements Logged {
         return Commands.runOnce(
             () -> {
                 Rotation2d pivotAngle = calculatePivotAngle(pose.get());
-                SpeedAngleTriplet calculationTriplet = SpeedAngleTriplet.of(calculateShooterSpeedsForApex(pose.get(), pivotAngle), pivotAngle.getDegrees());
+                Pose2d futurePose = integratePosition(pose.get(), speeds.get(), 0.02);
+                SpeedAngleTriplet currentTriplet = SpeedAngleTriplet.of(calculateShooterSpeedsForApex(pose.get(), pivotAngle), pivotAngle.getDegrees());
+                double normalVelocity = -getVelocityVectorToSpeaker(pose.get(), speeds.get()).getY();
+
+                double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
+                double v0z = Math.sqrt(9.8*2*2.08);
+                double v0x = originalv0 * Math.cos(Math.toRadians(currentTriplet.getAngle())) + normalVelocity;
+
+                double newv0 = Math.sqrt(Math.pow(v0x,2)+ Math.pow(v0z,2));
+                Rotation2d newAngle = new Rotation2d(v0x, v0z);
+
+                SpeedAngleTriplet calculationTriplet = 
+                    SpeedAngleTriplet.of(
+                        Pair.of(
+                            velocityToRPM(newv0), 
+                            velocityToRPM(newv0)
+                        ), 
+                        newAngle.getDegrees()
+                    );
 
                 new NoteTrajectory(
                     pose, 

@@ -502,7 +502,7 @@ public final class Constants {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Speaker
-                new Pose2d(0, 5.547, Rotation2d.fromDegrees(180)),
+                new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)),
                 // Red Speaker
                 new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(180)),
         };
