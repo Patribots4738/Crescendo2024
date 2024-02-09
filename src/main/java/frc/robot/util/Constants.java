@@ -102,7 +102,8 @@ public final class Constants {
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
         public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1.0;
-        public static final double PIVOT_POSITION_CONVERSION_FACTOR = FieldConstants.IS_SIMULATION ? 1 : 360;
+        // degrees
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
