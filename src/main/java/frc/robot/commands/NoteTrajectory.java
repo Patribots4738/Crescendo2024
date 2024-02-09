@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.util.Constants;
 import frc.robot.util.Constants.NTConstants;
 
 public class NoteTrajectory extends Command {
@@ -65,7 +66,7 @@ public class NoteTrajectory extends Command {
         vz0 = Rotation2d.fromDegrees(pivotAngle).getSin() * initialVelocity;
         ax = 0;
         ay = 0;
-        az = -9.8;
+        az = -Constants.GRAVITY;
     }
 
     // Called every time the scheduler runs while the command is scheduled.

@@ -18,6 +18,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
+import frc.robot.util.Constants;
 import frc.robot.util.SpeedAngleTriplet;
 
 public class ShooterCalc implements Logged {
@@ -76,7 +77,7 @@ public class ShooterCalc implements Logged {
      *                       of the robot. It is of type `Supplier<Pose2d>`.
      * @return The method is returning a Command object.
      */
-    public Command prepareFireMovingCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+    public Command prepareSWDCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
         return Commands.run(() -> {
             SpeedAngleTriplet triplet = calculateSWDTriplet(robotPose.get(), speeds.get());
             pivot.setAngle(triplet.getAngle());
@@ -84,7 +85,7 @@ public class ShooterCalc implements Logged {
         }, pivot, shooter);
     }
 
-    public Command prepareFireViaMathCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+    public Command prepareSWDSimCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotSpeeds) {
         return Commands.run(() -> {
             Rotation2d angle = calculatePivotAngle(robotPose.get());
             Pair<Double, Double> speedsPair = calculateShooterSpeedsForApex(robotPose.get(), angle);
@@ -332,33 +333,14 @@ public class ShooterCalc implements Logged {
      * @return              a pair of shooter speeds (left and right) required to reach the speaker position
      */
     private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, Rotation2d pivotAngle) {
-        double desiredRPM = velocityToRPM(Math.sqrt(2 * 9.8 * 2.08) / (pivotAngle.getSin()));
+        double desiredRPM = velocityToRPM(Math.sqrt(2 * Constants.GRAVITY * 2.08) / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
         return Commands.runOnce(
             () -> {
-                Pose2d currentPose = pose.get();
-                Rotation2d pivotAngle = calculatePivotAngle(currentPose);
-                SpeedAngleTriplet currentTriplet = SpeedAngleTriplet.of(calculateShooterSpeedsForApex(currentPose, pivotAngle), pivotAngle.getDegrees());
-                double normalVelocity = -getVelocityVectorToSpeaker(currentPose, speeds.get()).getY();
-
-                double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-                double v0z = Math.sqrt(9.8*2*2.08);
-                double v0x = originalv0 * Math.cos(Math.toRadians(currentTriplet.getAngle())) + normalVelocity;
-
-                double newv0 = Math.sqrt(Math.pow(v0x,2)+ Math.pow(v0z,2));
-                Rotation2d newAngle = new Rotation2d(v0x, v0z);
-
-                SpeedAngleTriplet calculationTriplet = 
-                    SpeedAngleTriplet.of(
-                        Pair.of(
-                            velocityToRPM(newv0),
-                            velocityToRPM(newv0)
-                        ),
-                        newAngle.getDegrees()
-                    );
+                SpeedAngleTriplet calculationTriplet = calculateSWDTriplet(pose.get(), speeds.get());
 
                 new NoteTrajectory(
                     pose,
@@ -384,10 +366,10 @@ public class ShooterCalc implements Logged {
         double normalVelocity = -getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = Math.sqrt(9.8*2*2.08);
-        double v0x = originalv0 * Math.cos(Math.toRadians(currentTriplet.getAngle())) + normalVelocity;
+        double v0z = Math.sqrt(Constants.GRAVITY*2*2.08);
+        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
 
-        double newv0 = Math.sqrt(Math.pow(v0x,2)+ Math.pow(v0z,2));
+        double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
 
         return 

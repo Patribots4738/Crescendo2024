@@ -504,7 +504,7 @@ public final class Constants {
                 // Blue Speaker
                 new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)),
                 // Red Speaker
-                new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(180)),
+                new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(0)),
         };
 
         private static final Pose2d[] AMP_POSITIONS = new Pose2d[] {
@@ -542,5 +542,7 @@ public final class Constants {
 
         public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
     }
+
+    public static final double GRAVITY = 9.8;
 
 }
