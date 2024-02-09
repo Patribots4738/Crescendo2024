@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class Shooter extends SubsystemBase {
     /** Creates a new shooter. */
@@ -30,6 +31,8 @@ public class Shooter extends SubsystemBase {
                 ShooterConstants.SHOOTER_D,
                 ShooterConstants.SHOOTER_MIN_OUTPUT,
                 ShooterConstants.SHOOTER_MAX_OUTPUT);
+                motorLeft.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+                motorRight.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
 
         motorRight.setPID(
                 ShooterConstants.SHOOTER_P,

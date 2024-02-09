@@ -14,6 +14,7 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class Elevator extends SubsystemBase {
     private final Neo elevator;
@@ -31,6 +32,7 @@ public class Elevator extends SubsystemBase {
         elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         elevator.setPID(TrapConstants.TRAP_PID);
+        elevator.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
     @Override

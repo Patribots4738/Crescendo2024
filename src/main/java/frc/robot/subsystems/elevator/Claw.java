@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriverUI;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class Claw extends SubsystemBase {
     private final Neo claw;
@@ -69,6 +70,7 @@ public class Claw extends SubsystemBase {
         claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         claw.setInverted(false);
         claw.setBrakeMode();
+        claw.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
     public void updateOutputCurrent() {

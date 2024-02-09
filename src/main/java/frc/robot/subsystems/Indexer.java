@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class Indexer extends SubsystemBase {
     private final Neo triggerWheel;
@@ -26,6 +27,8 @@ public class Indexer extends SubsystemBase {
 
         // sets brake mode
         triggerWheel.setBrakeMode();
+
+        triggerWheel.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
     public double getDesiredPercent() {

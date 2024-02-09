@@ -33,6 +33,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_D,
 				ShooterConstants.PIVOT_MIN_OUTPUT,
 				ShooterConstants.PIVOT_MAX_OUTPUT);
+				pivot.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
 
 		// sets brake mode
 		pivot.setBrakeMode();
