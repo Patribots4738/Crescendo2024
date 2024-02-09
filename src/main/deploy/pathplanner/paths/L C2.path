@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.201844788907944,
-        "y": 6.219024666492783
+        "x": 6.1237047894028604,
+        "y": 6.205235254815414
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.992437725077018,
-        "y": 6.108709373073842
+        "x": 8.66555300859762,
+        "y": 5.75937761058053
       },
       "isLocked": false,
       "linkedName": "L"
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Shooting2",
+  "folder": "Stage",
   "previewStartingState": {
     "rotation": -173.92664670661742,
     "velocity": 0

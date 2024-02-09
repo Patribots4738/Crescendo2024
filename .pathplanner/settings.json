@@ -3,11 +3,11 @@
   "robotLength": 0.8636,
   "holonomicMode": true,
   "pathFolders": [
-    "Wings",
+    "Amp",
+    "Center Line",
     "Preloads",
-    "Shooting1",
-    "Shooting2",
-    "Skipping"
+    "Stage",
+    "Wings"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.87,

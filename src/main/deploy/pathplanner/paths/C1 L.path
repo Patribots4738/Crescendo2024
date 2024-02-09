@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 6.201844788907944,
-        "y": 6.219024666492783
+        "x": 6.1237047894028604,
+        "y": 6.205235254815414
       },
       "prevControl": {
-        "x": 6.840754196625976,
-        "y": 6.623514075695565
+        "x": 6.762614197120893,
+        "y": 6.609724664018198
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Shooting1",
+  "folder": "Center Line",
   "previewStartingState": {
     "rotation": -147.6279551719741,
     "velocity": 0
