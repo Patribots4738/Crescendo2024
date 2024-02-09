@@ -507,6 +507,8 @@ public final class Constants {
                 new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(0)),
         };
 
+        public static final double SPEAKER_HEIGHT = 2.08;
+
         private static final Pose2d[] AMP_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
@@ -543,6 +545,6 @@ public final class Constants {
         public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
     }
 
-    public static final double GRAVITY = 9.8;
+    public static final double GRAVITY = -9.8;
 
 }

@@ -333,7 +333,7 @@ public class ShooterCalc implements Logged {
      * @return              a pair of shooter speeds (left and right) required to reach the speaker position
      */
     private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, Rotation2d pivotAngle) {
-        double desiredRPM = velocityToRPM(Math.sqrt(2 * Constants.GRAVITY * 2.08) / (pivotAngle.getSin()));
+        double desiredRPM = velocityToRPM(Math.sqrt(2 * -Constants.GRAVITY * FieldConstants.SPEAKER_HEIGHT) / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
 
@@ -366,7 +366,7 @@ public class ShooterCalc implements Logged {
         double normalVelocity = -getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = Math.sqrt(Constants.GRAVITY*2*2.08);
+        double v0z = Math.sqrt(-Constants.GRAVITY*2*2.08);
         double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
 
         double newv0 = Math.hypot(v0x, v0z);

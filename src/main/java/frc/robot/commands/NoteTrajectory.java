@@ -66,7 +66,7 @@ public class NoteTrajectory extends Command {
         vz0 = Rotation2d.fromDegrees(pivotAngle).getSin() * initialVelocity;
         ax = 0;
         ay = 0;
-        az = -Constants.GRAVITY;
+        az = Constants.GRAVITY;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
