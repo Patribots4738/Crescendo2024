@@ -25,7 +25,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	public void configMotor() {
 		pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
 		pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-		pivot.setVelocityConversionFactor(ShooterConstants.PIVOT_VELOCITY_CONVERSION_FACTOR);
+		pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
 		pivot.setPID(
 				ShooterConstants.PIVOT_P,
