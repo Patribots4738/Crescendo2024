@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Wings",
   "previewStartingState": {
     "rotation": 179.68108315009079,
     "velocity": 0
