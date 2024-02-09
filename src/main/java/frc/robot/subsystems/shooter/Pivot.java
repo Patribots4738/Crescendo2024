@@ -25,7 +25,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	public void configMotor() {
 		pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
 		pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-		pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
+		pivot.setVelocityConversionFactor(ShooterConstants.PIVOT_VELOCITY_CONVERSION_FACTOR);
 
 		pivot.setPID(
 				ShooterConstants.PIVOT_P,
@@ -60,7 +60,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				angle, 
 				ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES, 
 				ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
-		pivot.setTargetPosition(angle / ShooterConstants.PIVOT_MAX_ANGLE_DEGREES * ShooterConstants.PIVOT_GEAR_RATIO);
+		pivot.setTargetPosition(angle);
 
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -101,7 +101,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return pivot.getPosition() * ShooterConstants.PIVOT_MAX_ANGLE_DEGREES / ShooterConstants.PIVOT_GEAR_RATIO;
+		return pivot.getPosition();
 	}
 
 	/**
