@@ -74,8 +74,8 @@ public class Pivot extends SubsystemBase implements Logged {
 			pivot.setTargetPosition(angle);
 		} else {
 			pivotPIDController.setReference(
-				angle,
-				CANSparkBase.ControlType.kPosition);
+					angle,
+					CANSparkBase.ControlType.kPosition);
 		}
 
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
