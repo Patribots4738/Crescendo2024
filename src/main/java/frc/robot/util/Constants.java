@@ -545,6 +545,6 @@ public final class Constants {
         public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
     }
 
-    public static final double GRAVITY = -9.8;
+    public static final double GRAVITY = 9.8;
 
 }
