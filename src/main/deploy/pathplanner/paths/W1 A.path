@@ -30,7 +30,35 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Start",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": []
+        }
+      }
+    },
+    {
+      "name": "End",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PlaceAmp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.87,
     "maxAcceleration": 3.5,
@@ -45,7 +73,7 @@
   "reversed": false,
   "folder": "Wings",
   "previewStartingState": {
-    "rotation": 179.62704148778369,
+    "rotation": -91.51540121645418,
     "velocity": 0
   },
   "useDefaultConstraints": false

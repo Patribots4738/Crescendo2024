@@ -38,10 +38,27 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1,
+      "name": "Start",
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "End",
+      "waypointRelativePos": 0.45,
+      "command": {
+        "type": "parallel",
         "data": {
           "commands": [
             {

@@ -20,8 +20,8 @@
         "y": 4.100051738737296
       },
       "prevControl": {
-        "x": 7.673481446253673,
-        "y": 4.2938695806469624
+        "x": 7.715274318980092,
+        "y": 4.281697752362158
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Halfway",
+      "waypointRelativePos": 0.55,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.87,
     "maxAcceleration": 8.12,
