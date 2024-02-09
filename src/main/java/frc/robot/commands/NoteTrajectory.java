@@ -18,41 +18,41 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.util.Constants;
 import frc.robot.util.Constants.NTConstants;
 
 public class NoteTrajectory extends Command {
     double x, x0, vx0, ax, z, z0, vz0, az, y, y0, vy0, ay;
 
     Supplier<Pose2d> poseSupplier;
-    Supplier<ChassisSpeeds> speedSupplier;
-    Supplier<Pair<Double, Double>> pairSupplier;
-
+    ChassisSpeeds initalSpeeds;
     Pose2d initialPose;
-    ChassisSpeeds speeds;
-    Pair<Double, Double> speedAnglePair;
+    double initialVelocity;
+    double pivotAngle;
+    
+    
     Timer timer = new Timer(); 
-
     Pose3d currentNotePosition = new Pose3d();
 
     /**
      * Represents a trajectory note.
      * 
-     * @param poseSupplier  a supplier for the pose of the trajectory
-     * @param speedSupplier a supplier for the chassis speeds of the trajectory
-     * @param pairSupplier  a supplier for a pair of doubles representing additional information about the trajectory
+     * @param poseSupplier    a supplier for the pose of the trajectory
+     * @param initialSpeeds   a supplier for the chassis speeds of the trajectory
+     * @param initialVelocity the initial velocity of the note
+     * @param pivotAngle      the angle of the pivot
      */
-    public NoteTrajectory(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, Supplier<Pair<Double, Double>> pairSupplier) {
+    public NoteTrajectory(Supplier<Pose2d> poseSupplier, ChassisSpeeds initialSpeeds, double initialVelocity, double pivotAngle) {
         this.poseSupplier = poseSupplier;
-        this.speedSupplier = speedSupplier;
-        this.pairSupplier = pairSupplier;
+        this.initalSpeeds = initialSpeeds;
+        this.initialVelocity = initialVelocity;
+        this.pivotAngle = pivotAngle;
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         initialPose = poseSupplier.get();
-        speeds = speedSupplier.get();
-        speedAnglePair = pairSupplier.get();
         timer.restart();
 
         x = NTConstants.PIVOT_OFFSET_METERS.getX();
@@ -61,13 +61,14 @@ public class NoteTrajectory extends Command {
         x0 = NTConstants.PIVOT_OFFSET_METERS.getX();
         y0 = 0;
         z0 = NTConstants.PIVOT_OFFSET_METERS.getY();
-        vx0 = Rotation2d.fromDegrees(speedAnglePair.getSecond()).getCos() * speedAnglePair.getFirst()
-                + speeds.vxMetersPerSecond;
-        vy0 = speeds.vyMetersPerSecond;
-        vz0 = Rotation2d.fromDegrees(speedAnglePair.getSecond()).getSin() * speedAnglePair.getFirst();
+      
+        vx0 = Rotation2d.fromDegrees(pivotAngle).getCos() * initialVelocity + initalSpeeds.vxMetersPerSecond;
+        vy0 = initalSpeeds.vyMetersPerSecond;
+        vz0 = Rotation2d.fromDegrees(pivotAngle).getSin() * initialVelocity;
+      
         ax = 0;
         ay = 0;
-        az = -9.8;
+        az = -Constants.GRAVITY;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -78,9 +79,9 @@ public class NoteTrajectory extends Command {
         y = kinematicEquation3(y0, vy0, ay, t);
         z = kinematicEquation3(z0, vz0, az, t);
 
-        currentNotePosition = getNotePose(initialPose, speedAnglePair, x, y, z);
+        currentNotePosition = getNotePose(initialPose, pivotAngle, x, y, z);
 
-        RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(initialPose, speedAnglePair, x, y, z).relativeTo(new Pose3d(poseSupplier.get()));
+        RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(initialPose, pivotAngle, x, y, z).relativeTo(new Pose3d(poseSupplier.get()));
     }
 
     // Called once the command ends or is interrupted.
@@ -100,14 +101,13 @@ public class NoteTrajectory extends Command {
      * Calculates the pose of a note based on the given parameters. :)
      * 
      * @param pose           The initial pose of the robot.
-     * @param speedAnglePair A pair of values representing the speed and angle of
-     *                       the note.
+     * @param pivotAngle     The angle of the pivot.
      * @param x              The x-coordinate of the note.
      * @param y              The y-coordinate of the note.
      * @param z              The z-coordinate of the note.
      * @return The pose of the note.
      */
-    Pose3d getNotePose(Pose2d pose, Pair<Double,Double> speedAnglePair, double x, double y, double z) {
+    Pose3d getNotePose(Pose2d pose, double pivotAngle, double x, double y, double z) {
         return new Pose3d(
                 new Translation3d(x, y, z).rotateBy(new Rotation3d(
                         0,
@@ -122,7 +122,7 @@ public class NoteTrajectory extends Command {
                                         0),
                                 new Rotation3d(
                                     Units.degreesToRadians(90), 
-                                    -Units.degreesToRadians(speedAnglePair.getSecond()), 
+                                    -Units.degreesToRadians(pivotAngle), 
                                     pose.getRotation().getRadians())));
     }
 
