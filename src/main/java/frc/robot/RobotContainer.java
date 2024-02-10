@@ -118,27 +118,28 @@ public class RobotContainer implements Logged {
         configureOperatorBindings(operator);
     }
     
+    // TODO: uncomment these bindings (they are commented because we aren't testing them)
     private void configureOperatorBindings(PatriBoxController controller) {
 
-        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        // controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        controller.povDown().onTrue(climb.toBottomCommand());
+        // controller.povDown().onTrue(climb.toBottomCommand());
 
-        controller.povLeft().onTrue(elevator.toBottomCommand());
+        // controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        controller.povRight().onTrue(elevator.toTopCommand());
+        // controller.povRight().onTrue(elevator.toTopCommand());
 
         controller.leftBumper()
             .and(controller.rightBumper())
             .onTrue(pieceControl.noteToShoot());
 
-        controller.rightBumper()
-            .and(controller.leftBumper().negate())
-            .onTrue(pieceControl.noteToTarget(() -> true));
+        // controller.rightBumper()
+        //     .and(controller.leftBumper().negate())
+        //     .onTrue(pieceControl.noteToTarget(() -> true));
 
-        controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
-            .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(pieceControl.intakeToClaw());
+        // controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
+        //     .and(intake.hasGamePieceTrigger().negate())
+        //     .onTrue(pieceControl.intakeToClaw());
 
         controller.leftTrigger()
             .onFalse(pieceControl.stopIntakeAndIndexer());
