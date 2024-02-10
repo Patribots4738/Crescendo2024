@@ -51,11 +51,14 @@ public class RobotContainer implements Logged {
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
     
-    @Log.NT
-    public static Pose3d[] components3d = new Pose3d[6];
+    @Log
+    public static Pose3d[] components3d = new Pose3d[5];
 
-    @Log.NT
-    public static Pose3d[] desiredComponents3d = new Pose3d[6];
+    @Log
+    public static Pose3d[] desiredComponents3d = new Pose3d[5];
+
+    @Log
+    public static Pose3d[] notePose3ds = new Pose3d[12];
     
     public RobotContainer() {
         
@@ -195,8 +198,8 @@ public class RobotContainer implements Logged {
                     () -> {
                         ;
                         return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
@@ -247,6 +250,11 @@ public class RobotContainer implements Logged {
         for (int i = 1; i < components3d.length; i++) {
             components3d[i] = new Pose3d();
             desiredComponents3d[i] = new Pose3d();
+        }
+
+        notePose3ds[0] = new Pose3d();
+        for (int i = 1; i < notePose3ds.length; i++) {
+            notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
     }
 }

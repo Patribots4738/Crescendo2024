@@ -36,7 +36,7 @@ public class LPI extends Command implements Logged{
     Pose2d currentRobotPosition;
     Translation2d currentRobotTranslation;
     
-    @Log.NT
+    @Log
     Pose2d cardinalMagnitude;
 
     public LPI(LedStrip ledStrip, Supplier<Pose2d> positionSupplier) {

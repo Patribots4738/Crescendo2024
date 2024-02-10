@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -532,6 +533,36 @@ public final class Constants {
         public static final Pose2d M_POSE = new Pose2d();
 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
+
+        public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
+
+        // need to update
+        private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);
+        private static double CENTERLINE_SEPARATION_Y = Units.inchesToMeters(66);
+        private static double SPIKE_X = Units.inchesToMeters(114);
+        // need
+        private static double SPIKE_FIRST_Y = Units.inchesToMeters(161.638);
+        private static double SPIKE_SEPARATION_Y = Units.inchesToMeters(57);
+        private static double NOTE_Z = Units.inchesToMeters(2);
+
+        private static Translation3d[] CENTERLINE_TRANSLATIONS = new Translation3d[5];
+        private static Translation3d[] SPIKE_TRANSLATIONS_BLUE = new Translation3d[3];
+        private static Translation3d[] SPIKE_TRANSLATIONS_RED = new Translation3d[3];
+        public static Translation3d[] NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
+
+        static {
+            for (int i = 0; i < SPIKE_TRANSLATIONS_BLUE.length; i++) {
+                SPIKE_TRANSLATIONS_BLUE[i] = new Translation3d(SPIKE_X, SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y), NOTE_Z);
+                SPIKE_TRANSLATIONS_RED[i] = new Translation3d(FIELD_WIDTH_METERS - SPIKE_X, SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y), NOTE_Z);
+            }
+            for (int i = 0; i < CENTERLINE_TRANSLATIONS.length; i++) {
+                CENTERLINE_TRANSLATIONS[i] =
+                        new Translation3d(CENTERLINE_X, CENTERLINE_FIRST_Y + (i * CENTERLINE_SEPARATION_Y), NOTE_Z);
+            }
+            System.arraycopy(SPIKE_TRANSLATIONS_BLUE, 0, NOTE_TRANSLATIONS, 0, SPIKE_TRANSLATIONS_BLUE.length);
+            System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length, SPIKE_TRANSLATIONS_RED.length);
+            System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
+        }
     }
     
     public static final class NTConstants {
@@ -540,7 +571,6 @@ public final class Constants {
         public static final int ELEVATOR_INDEX = 2;
         public static final int LEFT_CLIMB_INDEX = 3;
         public static final int RIGHT_CLIMB_INDEX = 4;
-        public static final int NOTE_INDEX = 5;
 
         public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
     }

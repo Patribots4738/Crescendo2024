@@ -4,9 +4,6 @@
 
 package frc.robot.commands;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,17 +16,19 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
+import monologue.Logged;
 
-public class NoteTrajectory extends Command {
+public class NoteTrajectory extends Command implements Logged {
     double x, x0, vx0, ax, z, z0, vz0, az, y, y0, vy0, ay;
 
-    Supplier<Pose2d> poseSupplier;
     ChassisSpeeds initalSpeeds;
     Pose2d initialPose;
     double initialVelocity;
     double pivotAngle;
-    
+
+    int noteIndex = 0;
     
     Timer timer = new Timer(); 
     Pose3d currentNotePosition = new Pose3d();
@@ -42,17 +41,17 @@ public class NoteTrajectory extends Command {
      * @param initialVelocity the initial velocity of the note
      * @param pivotAngle      the angle of the pivot
      */
-    public NoteTrajectory(Supplier<Pose2d> poseSupplier, ChassisSpeeds initialSpeeds, double initialVelocity, double pivotAngle) {
-        this.poseSupplier = poseSupplier;
+    public NoteTrajectory(Pose2d initialPose, ChassisSpeeds initialSpeeds, double initialVelocity, double pivotAngle) {
+        this.initialPose = initialPose;
         this.initalSpeeds = initialSpeeds;
         this.initialVelocity = initialVelocity;
         this.pivotAngle = pivotAngle;
+        noteIndex = (int) (Math.random() * FieldConstants.NOTE_TRANSLATIONS.length);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        initialPose = poseSupplier.get();
         timer.restart();
 
         x = NTConstants.PIVOT_OFFSET_METERS.getX();
@@ -81,7 +80,7 @@ public class NoteTrajectory extends Command {
 
         currentNotePosition = getNotePose(initialPose, pivotAngle, x, y, z);
 
-        RobotContainer.components3d[NTConstants.NOTE_INDEX] = getNotePose(initialPose, pivotAngle, x, y, z).relativeTo(new Pose3d(poseSupplier.get()));
+        RobotContainer.notePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
     }
 
     // Called once the command ends or is interrupted.
@@ -121,13 +120,13 @@ public class NoteTrajectory extends Command {
                                         pose.getY(),
                                         0),
                                 new Rotation3d(
-                                    Units.degreesToRadians(90), 
+                                    0, 
                                     -Units.degreesToRadians(pivotAngle), 
                                     pose.getRotation().getRadians())));
     }
 
     public void zeroNote() {
-        RobotContainer.components3d[NTConstants.NOTE_INDEX] = new Pose3d();
+        RobotContainer.notePose3ds[noteIndex+1] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
     }
 
     /**

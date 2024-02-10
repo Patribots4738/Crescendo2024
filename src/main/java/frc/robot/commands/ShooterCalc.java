@@ -26,13 +26,13 @@ public class ShooterCalc implements Logged {
     private Pivot pivot;
     private Shooter shooter;
 
-    @Log.NT
+    @Log
     double desiredRSpeed = 0, desiredLSpeed = 0, distance = 0, desiredAngle = 0;
 
-    @Log.NT
+    @Log
     double realAngle = 0, realRSpeed = 0, realLSpeed = 0;
 
-    @Log.NT 
+    @Log 
     boolean atDesiredAngle = false , atDesiredRPM = false;
     
     public ShooterCalc(Shooter shooter, Pivot pivot) {
@@ -214,13 +214,13 @@ public class ShooterCalc implements Logged {
     }
 
     
-    @Log.NT
+    @Log
     Rotation2d currentAngleToSpeaker;
-    @Log.NT
+    @Log
     Pose2d desiredSWDPose;
-    @Log.NT
+    @Log
     double desiredMPSForNote = 0;
-    @Log.NT
+    @Log
     double degreesToSpeakerReferenced = 0;
 
     /**
@@ -235,12 +235,15 @@ public class ShooterCalc implements Logged {
     public Rotation2d calculateSWDRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
         Translation2d velocityVectorToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity);
         double velocityTangent = velocityVectorToSpeaker.getX();
+        // TODO: Check if this velocity should be accounted for in the x component of atan2
+        // TODO: I think this should be "newv0" from the SWD calculation for normal velocity
+        double velocityNormal = velocityVectorToSpeaker.getY();
 
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
         Rotation2d currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            rpmToVelocity(calculateSpeed(robotPose, true).getSpeeds())
+            rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))-velocityNormal
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
@@ -274,7 +277,7 @@ public class ShooterCalc implements Logged {
 
         double velocityNormalToSpeaker = totalSpeed * Math.cos(angleDifference);
         
-        return new Translation2d(velocityTangentToSpeaker, velocityNormalToSpeaker);
+        return new Translation2d(velocityTangentToSpeaker, -velocityNormalToSpeaker);
     }
 
     /**
@@ -343,7 +346,7 @@ public class ShooterCalc implements Logged {
                 SpeedAngleTriplet calculationTriplet = calculateSWDTriplet(pose.get(), speeds.get());
 
                 new NoteTrajectory(
-                    pose,
+                    desiredSWDPose,
                     speeds.get(),
                     rpmToVelocity(calculationTriplet.getSpeeds()), 
                     calculationTriplet.getAngle()
@@ -363,11 +366,11 @@ public class ShooterCalc implements Logged {
         Pose2d currentPose = pose;
         Rotation2d pivotAngle = calculatePivotAngle(currentPose);
         SpeedAngleTriplet currentTriplet = SpeedAngleTriplet.of(calculateShooterSpeedsForApex(currentPose, pivotAngle), pivotAngle.getDegrees());
-        double normalVelocity = -getVelocityVectorToSpeaker(currentPose, speeds).getY();
+        double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = Math.sqrt(Constants.GRAVITY*2*2.08);
-        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
+        double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);
+        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) - normalVelocity;
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);

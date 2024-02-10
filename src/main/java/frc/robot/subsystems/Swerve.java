@@ -64,16 +64,16 @@ public class Swerve extends SubsystemBase implements Logged {
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-    @Log.NT
+    @Log
     SwerveModuleState[] swerveMeasuredStates;
 
-    @Log.NT
+    @Log
     SwerveModuleState[] swerveDesiredStates;
 
-    @Log.NT
+    @Log
     Pose3d robotPose3d = new Pose3d();
 
-    @Log.NT
+    @Log
     Pose2d robotPose2d = new Pose2d();
 
     // The gyro sensor
