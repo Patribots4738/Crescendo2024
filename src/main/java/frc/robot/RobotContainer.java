@@ -182,7 +182,7 @@ public class RobotContainer implements Logged {
             .onTrue(intake.outCommand());
         
         controller.leftBumper()
-            .toggleOnTrue(shooterCalc.prepareSWDSimCommand(() -> true, swerve::getPose, swerve::getRobotRelativeVelocity));
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         
         controller.leftTrigger()
             .onTrue(shooterCalc.resetShooter());
@@ -205,6 +205,7 @@ public class RobotContainer implements Logged {
                     () -> true)));
 
         controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
     
     public Command getAutonomousCommand() {

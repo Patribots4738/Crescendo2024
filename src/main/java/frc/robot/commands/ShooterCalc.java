@@ -85,16 +85,6 @@ public class ShooterCalc implements Logged {
         }, pivot, shooter);
     }
 
-    public Command prepareSWDSimCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotSpeeds) {
-        return Commands.run(() -> {
-            Rotation2d angle = calculatePivotAngle(robotPose.get());
-            Pair<Double, Double> speedsPair = calculateShooterSpeedsForApex(robotPose.get(), angle);
-
-            pivot.setAngle(angle.getDegrees());
-            shooter.setSpeed(speedsPair);
-        }, pivot, shooter);
-    }
-
     /**
      * Calculates the pivot angle based on the robot's pose.
      * 
@@ -243,7 +233,8 @@ public class ShooterCalc implements Logged {
         Rotation2d currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))-velocityNormal
+            rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
+            // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
