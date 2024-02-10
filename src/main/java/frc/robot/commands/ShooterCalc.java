@@ -370,7 +370,7 @@ public class ShooterCalc implements Logged {
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
         double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);
-        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) - normalVelocity;
+        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
