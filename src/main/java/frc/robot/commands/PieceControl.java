@@ -56,10 +56,11 @@ public class PieceControl {
         // rotation and speed before sending note from claw into indexer and then into 
         // shooter before stopping claw and indexer
         return indexer.toShooter()
+                //TODO: uncomment claw commands
                 .andThen(Commands.waitUntil(readyToShoot()))
-                .andThen(claw.intake())
+                // .andThen(claw.intake())
                 .andThen(Commands.waitSeconds(ShooterConstants.SHOOTER_PASS_SECONDS)) // TODO: Change this to a wait until the note is in the shooter?
-                .andThen(claw.stop())
+                // .andThen(claw.stop())
                 .andThen(indexer.stop());
 
     }
