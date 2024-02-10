@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -21,8 +22,17 @@ public class Intake extends SubsystemBase {
         intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
+    public void setPercent(double desiredPercent) {
+        desiredPercent = 
+            MathUtil.clamp(
+                desiredPercent, 
+                IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
+                IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
+        intakeMotor.setTargetPercent(desiredPercent);
+    }
+
     public Command setPercentCommand(double desiredPercent) {
-        return runOnce(() -> intakeMotor.setTargetPercent(desiredPercent));
+        return runOnce(() -> setPercent(desiredPercent));
     }
 
     public Command inCommand() {

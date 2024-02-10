@@ -1,5 +1,10 @@
 package frc.robot.subsystems.shooter;
 
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -8,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
@@ -15,9 +21,13 @@ import monologue.Logged;
 
 public class Pivot extends SubsystemBase implements Logged {
 	private Neo pivot;
+	private AbsoluteEncoder pivotEncoder;
+	private SparkPIDController pivotPIDController;
 
 	public Pivot() {
 		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID, true);
+		this.pivotEncoder = pivot.getAbsoluteEncoder(Type.kDutyCycle);
+		this.pivotPIDController = pivot.getPIDController();
 
 		configMotor();
 	}
@@ -25,7 +35,8 @@ public class Pivot extends SubsystemBase implements Logged {
 	public void configMotor() {
 		pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
 		pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-		pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
+		pivotPIDController.setFeedbackDevice(pivotEncoder);
+		pivotEncoder.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
 		pivot.setPID(
 				ShooterConstants.PIVOT_P,
@@ -41,11 +52,10 @@ public class Pivot extends SubsystemBase implements Logged {
 	@Override
 	public void periodic() {
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-			NTConstants.PIVOT_OFFSET_METERS.getX(),
-			0,
-			NTConstants.PIVOT_OFFSET_METERS.getZ(),
-			new Rotation3d(0, Units.degreesToRadians(getAngle()), 0)
-		);
+				NTConstants.PIVOT_OFFSET_METERS.getX(),
+				0,
+				NTConstants.PIVOT_OFFSET_METERS.getZ(),
+				new Rotation3d(0, Units.degreesToRadians(getAngle()), 0));
 	}
 
 	/**
@@ -55,18 +65,24 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @param double The angle to set the shooter to
 	 */
 	public void setAngle(double angle) {
-		// TODO: angle of pivot seems wrong in sim but i am not exactly sure how to fix it here
-		// Also I'm not sure if position input is getting conversion factor applied
-		pivot.setTargetPosition(
-			MathUtil.clamp(angle, ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES, ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES) 
-			/ ShooterConstants.PIVOT_MAX_ANGLE_DEGREES);
+		angle = MathUtil.clamp(
+				angle,
+				ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES,
+				ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
+
+		if (FieldConstants.IS_SIMULATION) {
+			pivot.setTargetPosition(angle);
+		} else {
+			pivotPIDController.setReference(
+					angle,
+					CANSparkBase.ControlType.kPosition);
+		}
 
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-			NTConstants.PIVOT_OFFSET_METERS.getX(),
-			0,
-			NTConstants.PIVOT_OFFSET_METERS.getZ(),
-			new Rotation3d(0, Units.degreesToRadians(angle), 0)
-		);
+				NTConstants.PIVOT_OFFSET_METERS.getX(),
+				0,
+				NTConstants.PIVOT_OFFSET_METERS.getZ(),
+				new Rotation3d(0, Units.degreesToRadians(angle), 0));
 	}
 
 	/**
@@ -100,7 +116,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return pivot.getPosition() * ShooterConstants.PIVOT_MAX_ANGLE_DEGREES;
+		return pivot.getPosition();
 	}
 
 	/**

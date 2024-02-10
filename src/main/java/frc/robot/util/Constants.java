@@ -101,8 +101,9 @@ public final class Constants {
         public static final int RIGHT_SHOOTER_CAN_ID = 12;
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
-        public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
-        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1;
+        public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1.0;
+        // degrees
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
@@ -129,7 +130,10 @@ public final class Constants {
         public static final double PIVOT_MAX_OUTPUT = 1;
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 0;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 58;
+
+        public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
+        public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
 
         public static final double PIVOT_MAX_ANGLE_DEGREES = 360.0;
         public static final double PIVOT_REST_ANGLE_DEGREES = 0;
@@ -187,10 +191,17 @@ public final class Constants {
         // TODO: set these values
         public static final double RESET_POS = 0;
         public static final double INTAKE_TIME = 0;
-        public static final double CLAW_OUTTAKE = -1;
-        public static final double CLAW_INTAKE = 1;
+        public static final double CLAW_OUTTAKE_PERCENT = -.5;
+        public static final double CLAW_INTAKE_PERCENT = .5;
+        public static final double CLAW_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.48;
         public static final double AMP_PLACE_POS = 0.48;
+
+        public static final double ELEVATOR_TOP_LIMIT = 0.48;
+        public static final double ELEVATOR_BOTTOM_LIMIT = 0;
+
+        public static final double CLAW_LOWER_PERCENT_LIMIT = 1;
+        public static final double CLAW_UPPER_PERCENT_LIMIT = -1;
 
         public static final double CLAW_HAS_PIECE_UPPER_LIMIT = 0;
         public static final double CLAW_HAS_PIECE_LOWER_LIMIT = -0.25;
@@ -415,20 +426,26 @@ public final class Constants {
         public static final int TRIGGER_WHEEL_CAN_ID = 20;
 
         // % speeds of the motor
-        public static final double INTAKE_PERCENT = 30;
-        public static final double OUTTAKE_PERCENT = -30;
+        public static final double INTAKE_PERCENT = .3;
+        public static final double OUTTAKE_PERCENT = -.3;
         public static final double STOP_PERCENT = 0;
 
         public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
         public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
+
+        public static final double INTAKE_PERCENT_UPPER_LIMIT = 1;
+        public static final double INTAKE_PERCENT_LOWER_LIMIT = -1;
+
+        public static final double INDEXER_PERCENT_UPPER_LIMIT = 1;
+        public static final double INDEXER_PERCENT_LOWER_LIMIT = -1;
 
         public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
         // TODO: Add these to the robot
         public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 7;
         public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 15;
-        public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = 30;
-        public static final double TRAP_TRIGGER_WHEEL_PERCENT = -30;
+        public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = .3;
+        public static final double TRAP_TRIGGER_WHEEL_PERCENT = -.3;
         public static final int INTAKE_CURRENT_LIMIT_AMPS = 0;
     }
 

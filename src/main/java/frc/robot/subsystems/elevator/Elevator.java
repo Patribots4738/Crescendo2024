@@ -57,6 +57,10 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setPosition(double pos) {
+        pos = MathUtil.clamp(
+            pos,
+            TrapConstants.ELEVATOR_BOTTOM_LIMIT,
+            TrapConstants.ELEVATOR_TOP_LIMIT);
         elevator.setTargetPosition(pos);
         RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
             0, 0, pos,
