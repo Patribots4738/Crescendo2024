@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.SparkPIDController;
@@ -18,11 +20,18 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
+import monologue.Annotations.Log;
 
 public class Pivot extends SubsystemBase implements Logged {
 	private Neo pivot;
 	private AbsoluteEncoder pivotEncoder;
 	private SparkPIDController pivotPIDController;
+
+	@Log
+	public double realAngle = 0, desiredAngle = 0;
+	
+	@Log
+	public boolean atDesiredAngle = false;
 
 	public Pivot() {
 		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID, true);
@@ -51,6 +60,12 @@ public class Pivot extends SubsystemBase implements Logged {
 
 	@Override
 	public void periodic() {
+
+		realAngle = -getAngle();
+		desiredAngle = -getTargetAngle();
+
+		atDesiredAngle = atDesiredAngle().getAsBoolean();
+
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 				NTConstants.PIVOT_OFFSET_METERS.getX(),
 				0,
@@ -119,6 +134,10 @@ public class Pivot extends SubsystemBase implements Logged {
 		return pivot.getPosition();
 	}
 
+	public double getTargetAngle() {
+		return pivot.getTargetPosition();
+	}
+
 	/**
 	 * The function is a command that stops the motor
 	 * 
@@ -126,5 +145,19 @@ public class Pivot extends SubsystemBase implements Logged {
 	 */
 	public Command stop() {
 		return runOnce(() -> pivot.stopMotor());
+	}
+
+	/**
+	 * Determines if the pivot rotation is at its target with a small
+	 * tolerance
+	 * 
+	 * @return The method is returning a BooleanSupplier that returns true
+	 *         if the pivot is at its target rotation and false otherwise
+	 */
+	public BooleanSupplier atDesiredAngle() {
+		return () -> (MathUtil.applyDeadband(
+				Math.abs(
+						getAngle() - getTargetAngle()),
+				ShooterConstants.PIVOT_DEADBAND) == 0);
 	}
 }

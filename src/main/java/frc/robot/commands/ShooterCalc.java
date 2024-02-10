@@ -26,14 +26,7 @@ public class ShooterCalc implements Logged{
 
 
     @Log
-    double desiredRSpeed = 0, desiredLSpeed = 0, distance = 0, desiredAngle = 0;
-
-  
-    @Log
-    double realAngle = 0, realRSpeed = 0, realLSpeed = 0;
-
-    @Log 
-    boolean atDesiredAngle = false , atDesiredRPM = false;
+    double distance = 0;
     
 
     public ShooterCalc(Shooter shooter, Pivot pivot) {
@@ -57,9 +50,7 @@ public class ShooterCalc implements Logged{
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
         return Commands.runOnce(() -> {
-                SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean());
-                
-                log(triplet);   
+                SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean()); 
         
                 pivot.setAngle(triplet.getAngle());
                 shooter.setSpeed(triplet.getSpeeds());
@@ -84,69 +75,9 @@ public class ShooterCalc implements Logged{
         return Commands.run(() -> {
                 SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean());
 
-                log(triplet);
-
                 pivot.setAngle(triplet.getAngle());
                 shooter.setSpeed(triplet.getSpeeds());
-            }, pivot, shooter);
-    }
-
-    public void logSpeeds(SpeedAngleTriplet triplet) {
-        desiredRSpeed = triplet.getRightSpeed();
-        desiredLSpeed = triplet.getLeftSpeed();
-
-        realRSpeed = shooter.getSpeed().getSecond();
-        realLSpeed = shooter.getSpeed().getFirst();
-    }
-
-    public void logAngles(SpeedAngleTriplet triplet) {
-        desiredAngle = triplet.getAngle();
-        realAngle = -pivot.getAngle();
-    }
-
-    public void logAtDesired() {
-        atDesiredAngle = pivotAtDesiredAngle();
-        atDesiredRPM = shooterAtDesiredRPM();
-    }
-
-    public void log(SpeedAngleTriplet triplet) {
-        logSpeeds(triplet);
-        logAngles(triplet);
-        logAtDesired();
-    }
-    /**
-	 * Determines if the pivot rotation is at its target with a small
-	 * tolerance
-	 * 
-	 * @return The method is returning a BooleanSupplier that returns true
-	 *         if the pivot is at its target rotation and false otherwise
-	 */
-	public BooleanSupplier atDesiredAngle() {
-		return () -> (MathUtil.applyDeadband(
-				Math.abs(
-						realAngle - desiredAngle),
-				ShooterConstants.PIVOT_DEADBAND) == 0);
-	}
-
-    // TODO: Implement a way to get the RPM of the shooter
-    /**
-     * The function is a BooleanSupplier that represents the the condition of
-     * the velocity of the motor being equal to its targetVelocity
-     * 
-     * 
-     * @return The method is returning a BooleanSupplier that returns true if
-     *         the current velocity of the motors is at the target velocity with a
-     *         small tolerance
-     */
-    public BooleanSupplier atDesiredRPM() {
-        return () -> (MathUtil.applyDeadband(
-                Math.abs(
-                        shooter.getSpeed().getFirst() - shooter.getSpeed().getFirst()),
-                ShooterConstants.SHOOTER_DEADBAND) == 0
-                && MathUtil.applyDeadband(
-                Math.abs(
-                        shooter.getSpeed().getSecond() - shooter.getSpeed().getSecond()),
-                ShooterConstants.SHOOTER_DEADBAND) == 0);
+        }, pivot, shooter);
     }
 
     /**
@@ -161,7 +92,7 @@ public class ShooterCalc implements Logged{
     public Command sendBackCommand() {
         return resetShooter()
                 .andThen(Commands.waitUntil(
-                        () -> atDesiredAngle().getAsBoolean() && atDesiredRPM().getAsBoolean()))
+                        () -> pivotAtDesiredAngle() && shooterAtDesiredRPM()))
                 .andThen(shooter.setSpeedCommand(ShooterConstants.SHOOTER_BACK_SPEED));
     }
 
@@ -252,18 +183,17 @@ public class ShooterCalc implements Logged{
         return new Rotation2d(distanceMeters, FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z);
     }
 
-
-    public boolean pivotAtDesiredAngle() {
-        return atDesiredAngle().getAsBoolean();
-    }
-
-    public boolean shooterAtDesiredRPM() {
-        return atDesiredRPM().getAsBoolean();
-    }
-
     public Command stopMotors() {
         return Commands.parallel(
                 shooter.stop(),
                 pivot.stop());
+    }
+
+    public boolean pivotAtDesiredAngle() {
+        return pivot.atDesiredAngle().getAsBoolean();
+    }
+    
+    public boolean shooterAtDesiredRPM() {
+        return shooter.atDesiredRPM().getAsBoolean();
     }
 }
