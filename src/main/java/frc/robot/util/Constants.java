@@ -463,7 +463,16 @@ public final class Constants {
                 new Translation3d(-CAM_X, -CAM_Y, CAM_HEIGHT),
                 new Rotation3d(0, CAM_PITCH, (Math.PI) + CAM_YAW));
 
-        public static final Pose3d[] cameras = new Pose3d[] {cam1, cam2, cam3, cam4};
+        private static final Pose3d cam5 = 
+            new Pose3d(
+                0.0508, -0.1524, 0.589701,
+                new Rotation3d(0, Units.degreesToRadians(-33), Units.degreesToRadians(15)));
+        private static final Pose3d cam6 =
+        new Pose3d(
+                -0.254, -0.155575, 0.589701,
+                new Rotation3d(0, Units.degreesToRadians(180), Units.degreesToRadians(-10)));
+
+        public static final Pose3d[] cameras = new Pose3d[] {cam5, cam6};
     }
     
     public static final class NTConstants {
