@@ -12,11 +12,13 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
@@ -54,8 +56,8 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_MIN_OUTPUT,
 				ShooterConstants.PIVOT_MAX_OUTPUT);
 
-		// sets brake mode
-		pivot.setBrakeMode();
+		// Change to brake when done testing
+		pivot.setCoastMode();
 	}
 
 	@Override
@@ -114,13 +116,6 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	/**
-	 * The function sets the pivot angle to the rest angle constant
-	 */
-	public void setRestAngle() {
-		this.setAngle(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
-	}
-
-	/**
 	 * The function is a command that sets the rotation of the pivot to
 	 * a default resting position
 	 * 
@@ -128,6 +123,10 @@ public class Pivot extends SubsystemBase implements Logged {
 	 */
 	public Command setRestAngleCommand() {
 		return setAngleCommand(ShooterConstants.PIVOT_REST_ANGLE_DEGREES);
+	}
+
+	public Command setMaxAngleCommand() {
+		return setAngleCommand(ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
 	}
 
 	public double getAngle() {
