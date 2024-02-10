@@ -119,7 +119,7 @@ public final class Constants {
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
-        public static final double PIVOT_DEADBAND = 1.125;
+        public static final double PIVOT_DEADBAND = .5;
         public static final double SHOOTER_DEADBAND = 0.3;
 
         // These are in %
@@ -172,7 +172,7 @@ public final class Constants {
         public static final int LEFT_ELEVATOR_CAN_ID = 14;
         public static final int RIGHT_ELEVATOR_CAN_ID = 15;
         public static final int CLAW_CAN_ID = 16;
-        public static final double ELEVATOR_DEADBAND = .03;
+        public static final double ELEVATOR_DEADBAND = .003;
         public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
@@ -228,7 +228,7 @@ public final class Constants {
         public static final double TOP_LIMIT = 0.5125;
         public static final double BOTTOM_LIMIT = 0.0;
 
-        public static final double CLIMB_DEADBAND = 0.02;
+        public static final double CLIMB_DEADBAND = 0.002;
         
         public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
     }

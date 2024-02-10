@@ -58,6 +58,8 @@ public class Shooter extends SubsystemBase implements Logged {
         rightRPM = realRPM.getSecond();
         leftDesiredRPM = desiredRPM.getFirst();
         rightDesiredRPM = desiredRPM.getSecond();
+
+        atDesiredRPM = atDesiredRPM().getAsBoolean();
     }
 
     /**
