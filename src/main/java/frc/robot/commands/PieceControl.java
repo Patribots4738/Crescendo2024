@@ -21,7 +21,6 @@ public class PieceControl {
 
     private ShooterCalc shooterCalc;
 
-
     public PieceControl(
             Intake intake,
             Indexer indexer,
@@ -43,7 +42,6 @@ public class PieceControl {
         return Commands.parallel(
                 intake.stop(),
                 indexer.stop(),
-                shooterCalc.stopMotors(),
                 elevator.stop(),
                 claw.stop());
     }
@@ -55,12 +53,26 @@ public class PieceControl {
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from claw into indexer and then into 
         // shooter before stopping claw and indexer
-        return indexer.toShooter()
-                .andThen(Commands.waitUntil(readyToShoot()))
-                .andThen(claw.intake())
-                .andThen(Commands.waitSeconds(ShooterConstants.SHOOTER_PASS_SECONDS)) // TODO: Change this to a wait until the note is in the shooter?
-                .andThen(claw.stop())
-                .andThen(indexer.stop());
+        return Commands.sequence(
+                intake.inCommand(),
+                claw.intake(),
+                indexer.toShooter(),
+                Commands.waitSeconds(2),
+                stopAllMotors());
+
+    }
+
+    public Command ejectNote() {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from claw into indexer and then into 
+        // shooter before stopping claw and indexer
+        return Commands.sequence(
+                intake.outCommand(),
+                claw.outtake(),
+                indexer.toElevator(),
+                Commands.waitSeconds(2),
+                stopAllMotors());
 
     }
 
