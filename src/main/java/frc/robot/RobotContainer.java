@@ -126,7 +126,7 @@ public class RobotContainer implements Logged {
     
     // TODO: uncomment these bindings (they are commented because we aren't testing them)
     private void configureOperatorBindings(PatriBoxController controller) {
-
+        controller.b().onTrue(shooterCalc.stopPivotShooter().alongWith(pieceControl.stopAllMotors()));
         controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
         controller.povDown().onTrue(climb.toBottomCommand());
@@ -145,8 +145,21 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.start().or(controller.back())
-            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(3,6.6, new Rotation2d()))));
+            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(1.332, 5.587, new Rotation2d()))));
         
+        controller.rightStick()
+            .toggleOnTrue(
+                Commands.sequence(
+                swerve.resetHDC(),
+                swerve.getDriveCommand(
+                    () -> {
+                        ;
+                        return new ChassisSpeeds(
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                    },
+                    () -> true)));
         // controller.rightBumper()
         //     .and(controller.leftBumper().negate())
         //     .onTrue(pieceControl.noteToTarget(() -> true));
@@ -182,6 +195,7 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
+        
         
         controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());

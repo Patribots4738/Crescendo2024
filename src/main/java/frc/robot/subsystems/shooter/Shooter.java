@@ -103,6 +103,8 @@ public class Shooter extends SubsystemBase implements Logged{
      * @return The method is returning a Command object.
      */
     public Command stop() {
-        return Commands.runOnce(() -> motorLeft.stopMotor());
+        return runOnce(() -> motorLeft.set(0))
+            .andThen(runOnce(() -> motorRight.set(0)));
     }
+
 }
