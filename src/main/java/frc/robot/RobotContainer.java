@@ -176,16 +176,22 @@ public class RobotContainer implements Logged {
         controller.rightStick()
         // TODO: AIM AT CHAIN IF HOOKS UP
             .toggleOnTrue(
-                Commands.sequence(
-                swerve.resetHDC(),
-                swerve.getDriveCommand(
-                    () -> {
-                        return new ChassisSpeeds(
-                            -controller.getLeftY(),
-                            -controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
-                    },
-                    () -> true)));
+                Commands.parallel(
+                    Commands.sequence(
+                        swerve.resetHDC(),
+                        swerve.getDriveCommand(
+                            () -> {
+                                return new ChassisSpeeds(
+                                    -controller.getLeftY(),
+                                    -controller.getLeftX(),
+                                    swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                            },
+                            () -> true
+                        )
+                    ),
+                    shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                )
+            );
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
