@@ -195,7 +195,6 @@ public final class Constants {
         public static final double CLAW_INTAKE_PERCENT = 1;
         public static final double CLAW_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.48;
-        public static final double AMP_PLACE_POS = 0.48;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.48;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;

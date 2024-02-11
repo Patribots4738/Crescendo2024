@@ -42,10 +42,10 @@ public class PieceControl {
 
     public Command stopAllMotors() {
         return Commands.parallel(
-                intake.stop(),
-                indexer.stop(),
-                elevator.stop(),
-                claw.stop());
+                intake.stopCommand(),
+                indexer.stopCommand(),
+                elevator.stopCommand(),
+                claw.stopCommand());
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
@@ -81,14 +81,20 @@ public class PieceControl {
     public Command noteToTarget() {
         // maybe make setPosition a command ORR Make the Elevator Command
         return Commands.either(
-                        elevator.setPositionCommand(TrapConstants.AMP_PLACE_POS),
-                        elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
-                        this::getShooterMode)
-                .andThen(
-                        Commands.waitUntil(elevator.isAtTargetPosition()))
-                .andThen(claw.placeCommand())
-                .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-                .andThen(elevator.toBottomCommand());
+            elevatorPlacementCommand(),
+            noteToShoot(),
+            this::getShooterMode
+        );
+    }
+
+    public Command elevatorPlacementCommand() {
+        return Commands.sequence(
+            elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
+            Commands.waitUntil(elevator.isAtTargetPosition()),
+            claw.placeCommand(),
+            Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
+            elevator.toBottomCommand()
+        );
     }
 
     public Command intakeToClaw() {
@@ -97,8 +103,8 @@ public class PieceControl {
     }
 
     public Command stopIntakeAndIndexer() {
-        return intake.stop()
-                .alongWith(indexer.stop());
+        return intake.stopCommand()
+                .alongWith(indexer.stopCommand());
     }
 
     public boolean getShooterMode() {

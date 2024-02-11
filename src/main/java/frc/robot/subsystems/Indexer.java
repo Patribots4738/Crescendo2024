@@ -54,7 +54,7 @@ public class Indexer extends SubsystemBase {
         return setPercentCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_PERCENT);
     }
 
-    public Command stop() {
+    public Command stopCommand() {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 }

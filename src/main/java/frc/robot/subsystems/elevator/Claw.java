@@ -33,7 +33,7 @@ public class Claw extends SubsystemBase {
                 .andThen(
                         Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
                 .andThen(
-                        runOnce(this::stop));
+                        runOnce(this::stopCommand));
     }
 
     public Command intakeFromHandoff() {
@@ -41,7 +41,7 @@ public class Claw extends SubsystemBase {
                 .andThen(
                         Commands.waitSeconds(TrapConstants.INTAKE_TIME))
                 .andThen(
-                        runOnce(this::stop));
+                        runOnce(this::stopCommand));
     }
 
     public boolean hasGamePiece() {
@@ -91,7 +91,7 @@ public class Claw extends SubsystemBase {
         return runOnce(() -> claw.set(TrapConstants.CLAW_OUTTAKE_PERCENT));
     }
 
-    public Command stop() {
+    public Command stopCommand() {
         return runOnce(() -> claw.set(TrapConstants.CLAW_STOP_PERCENT));
     }
     public void updateIntakingTimestamp() {

@@ -108,7 +108,7 @@ public class Elevator extends SubsystemBase implements Logged {
         return runOnce(this::toTop);
     }
 
-    public Command stop() {
+    public Command stopCommand() {
         return runOnce(() -> elevator.stopMotor());
     }
 

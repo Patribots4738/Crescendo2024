@@ -118,22 +118,28 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        // configureDriverBindings(driver);
-        configureOperatorBindings(driver);
+        if (FieldConstants.IS_SIMULATION) {
+            configureSimulationBindings(driver);
+        } else {
+            configureDriverBindings(driver);
+            configureOperatorBindings(operator);
+        }
     }
     
     // TODO: uncomment these bindings (they are commented because we aren't testing them)
     private void configureOperatorBindings(PatriBoxController controller) {
 
-        controller.povDown().onTrue(elevator.toBottomCommand());
-
-        controller.povUp().onTrue(elevator.toTopCommand());
-
-        controller.rightBumper()
-            .onTrue(intake.outCommand());
+        controller.povUp()
+            .onTrue(elevator.toTopCommand());
+        
+        controller.povDown()
+            .onTrue(elevator.toBottomCommand());
 
         controller.leftBumper()
-            .onTrue(intake.inCommand());
+            .onTrue(intake.toggleInCommand());
+
+        controller.rightBumper()
+            .onTrue(intake.toggleOutCommand());
 
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true));
@@ -157,35 +163,36 @@ public class RobotContainer implements Logged {
                             : 180))), 
                 swerve));
 
-        controller.povUp().onTrue(climb.toTopCommand());
+        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
         controller.povDown().onTrue(climb.toBottomCommand());
         
         controller.a();
         // TODO: AMP ALIGN
         
-        controller.rightTrigger();
-        // TODO: SHOOT/PLACE NOTE
+        controller.rightTrigger()
+            .onTrue(pieceControl.noteToTarget());
 
         controller.rightStick()
-        // TODO: AIM AT SPEAKER/CHAIN
+        // TODO: AIM AT CHAIN IF HOOKS UP
             .toggleOnTrue(
                 Commands.sequence(
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
-                        ;
                         return new ChassisSpeeds(
                             -controller.getLeftY(),
                             -controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
-
+    }
+    
+    private void configureSimulationBindings(PatriBoxController controller) {
         controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
-    
+
     public Command getAutonomousCommand() {
         return Commands.none();
     }
