@@ -87,7 +87,7 @@ public class RobotContainer implements Logged {
             shooterCalc
         );
         
-        if (false) {
+        if (limelight.isConnected()) {
             limelight.setDefaultCommand(Commands.run(() -> {
                 // Create an "Optional" object that contains the estimated pose of the robot
                 // This can be present (sees tag) or not present (does not see tag)

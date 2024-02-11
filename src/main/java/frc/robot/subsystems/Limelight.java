@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import java.util.Optional;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,16 +12,31 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Constants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
 // https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-public class Limelight extends SubsystemBase {
+public class Limelight extends SubsystemBase implements Logged{
 
     private NetworkTable table;
     private NetworkTableEntry botPose;
 
+    private static NetworkTableEntry timingTestEntry;
+    private static boolean timingTestEntryValue = false;
+
+    @Log
+    public boolean isConnected = false;
+
+    @Log
+    public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
+
     public Limelight() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
 
+        // Uses network tables to check status of limelight
+        timingTestEntry = table.getEntry("TIMING_TEST_ENTRY");
+        
         botPose = table.getEntry("botpose");
     }
 
@@ -152,6 +168,10 @@ public class Limelight extends SubsystemBase {
         return (table.getEntry("tv").getDouble(0) == 0) ? false : true;
     }
 
+    private NetworkTableEntry getPipelineLatencyRaw() {
+        return table.getEntry("tl");
+    }
+
     /**
      * Latency in ms of the pipeline
      * 
@@ -159,7 +179,7 @@ public class Limelight extends SubsystemBase {
      *         capture latency.
      */
     public double getPipelineLatency() {
-        return table.getEntry("tl").getDouble(0) / 1000.0;
+        return getPipelineLatencyRaw().getDouble(0) / 1000.0;
     }
 
     /**
@@ -197,5 +217,21 @@ public class Limelight extends SubsystemBase {
      */
     public void setPipeline(int pipeline) {
         table.getEntry("pipeline").setNumber(pipeline);;
+    }
+
+    // https://github.com/StuyPulse/Alfred/blob/c7ebcdf0e586a32e6e28b5b808fb6aee6deee325/src/main/java/frc/util/Limelight.java#L28
+    public boolean isConnected() {// Force an update and get current time
+        timingTestEntryValue = !timingTestEntryValue; // flip test value
+        timingTestEntry.setBoolean(timingTestEntryValue);
+        long currentTime = timingTestEntry.getLastChange();
+
+        // Get most recent update from limelight
+        long lastUpdate = getPipelineLatencyRaw().getLastChange();
+
+        // Calculate limelights last update
+        timeDifference = currentTime - lastUpdate;
+        boolean connected = timeDifference < Constants.LIMELIGHT_MAX_UPDATE_TIME;
+
+        return connected;
     }
 }
