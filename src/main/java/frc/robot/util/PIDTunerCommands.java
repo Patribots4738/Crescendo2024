@@ -36,7 +36,7 @@ public class PIDTunerCommands {
     }
 
     public void PIDIncrement() {
-        if (PIDIndex < 2) {
+        if (PIDIndex < 3) {
             this.PIDIndex++;
             System.out.println("Currently editing: " + (PIDIndex == 0 ? "P" : PIDIndex == 1 ? "D" : "I"));
         }
@@ -60,6 +60,16 @@ public class PIDTunerCommands {
             df.format(subsystems[subsystemIndex].getD()));
     }
 
+    public void logAll() {
+        for (int i = 0; i < subsystems.length; i++) {
+            DecimalFormat df = new DecimalFormat("0.####");
+            System.out.printf("public static final PIDConstants %s_PID = new PIDConstants(%n    %s, %n    %s, %n    %s);%n",
+                subsystemToString(i).toUpperCase(),
+                df.format(subsystems[i].getP()),
+                df.format(subsystems[i].getI()),
+                df.format(subsystems[i].getD()));
+        }
+    }
 
     public String subsystemToString(int index) {
         switch (index) {
@@ -85,6 +95,9 @@ public class PIDTunerCommands {
                 break;
             case 2:
                 subsystems[subsystemIndex].setI(subsystems[subsystemIndex].getI() + .01 * value);
+                break;
+            case 3:
+                subsystems[subsystemIndex].setFF(subsystems[subsystemIndex].getFF() + .0001 * value);
                 break;
         }
         System.out.println(subsystems[subsystemIndex].toString());

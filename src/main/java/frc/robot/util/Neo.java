@@ -418,6 +418,10 @@ public class Neo extends CANSparkMax {
         pidController.setOutputRange(minOutput, maxOutput, slotID);
     }
 
+    public void setFF(double ff) {
+        pidController.setFF(ff);
+    }
+
     /**
      * Sets the position conversion factor for the encoder.
      * This is generally a gear ratio

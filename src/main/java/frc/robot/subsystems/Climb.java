@@ -76,8 +76,6 @@ public class Climb extends SubsystemBase implements Logged {
             0, 0, rightMotor.getPosition(),
             new Rotation3d()
         );
-        climbPID.updatePID();
-        rightMotor.setPID(climbPID.getPID());
     }
 
 

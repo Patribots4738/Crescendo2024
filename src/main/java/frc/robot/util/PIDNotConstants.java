@@ -18,18 +18,19 @@ public class PIDNotConstants implements Logged {
     /** D */
     @Log
     public double kD;
+    @Log
+    public double kFF = 0.001;
     /** Integral range */
-    public final double iZone;
+    public final double iZone = 0;
 
     private final SparkPIDController PIDController;
 
-    public PIDNotConstants(double kP, double kI, double kD, double iZone, SparkPIDController PIDController) {
+    public PIDNotConstants(double kP, double kI, double kD, double ff, SparkPIDController PIDController) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
-        this.iZone = iZone;
+        this.kFF= ff;
         this.PIDController = PIDController;
-        this.updatePID();
     }
 
     /**
@@ -40,7 +41,7 @@ public class PIDNotConstants implements Logged {
      * @param kD D
      */
     public PIDNotConstants(double kP, double kI, double kD, SparkPIDController PIDController) {
-        this(kP, kI, kD, 1.0, PIDController);
+        this(kP, kI, kD, 0, PIDController);
     }
 
     /**
@@ -53,20 +54,8 @@ public class PIDNotConstants implements Logged {
         this(kP, 0, kD, PIDController);
     }
 
-    public void updatePID() {
-        if (MathUtil.applyDeadband(PIDController.getP() - this.kP, 0.0001) != 0) {
-            this.PIDController.setP(this.kP);
-        }
-        if (MathUtil.applyDeadband(PIDController.getI() - this.kI, 0.0001) != 0) {
-            this.PIDController.setI(this.kI);
-        }
-        if (MathUtil.applyDeadband(PIDController.getD() - this.kD, 0.0001) != 0) {
-            this.PIDController.setD(this.kD);
-        }
-    }
-
     public String toString() {
-        return String.format("P: %.4f | I: %.4f | D: %.4f", this.kP, this.kI, this.kD);
+        return String.format("P: %.6f | I: %.6f | D: %.6f | FF: %.6f", this.kP, this.kI, this.kD, this.kFF);
     }
 
     /**
@@ -78,8 +67,12 @@ public class PIDNotConstants implements Logged {
         this(kP, 0, 0, PIDController);
     }
 
+    public PIDNotConstants(PIDConstants PID, double ff, SparkPIDController PIDController) {
+        this(PID.kP, PID.kI, PID.kD, ff, PIDController);
+    }
+
     public PIDNotConstants(PIDConstants PID, SparkPIDController PIDController) {
-        this(PID.kP, PID.kI, PID.kD, 1.0, PIDController);
+        this(PID.kP, PID.kI, PID.kD, 0, PIDController);
     }
 
     public PIDConstants getPID() {
@@ -88,14 +81,22 @@ public class PIDNotConstants implements Logged {
 
     public void setP(double value) {
         kP = value;
+        this.PIDController.setP(value);
     }
 
     public void setI(double value) {
         kI = value;
+        this.PIDController.setI(value);
     }
 
     public void setD(double value) {
         kD = value;
+        this.PIDController.setD(value);
+    }
+
+    public void setFF(double value) {
+        kFF = value;
+        this.PIDController.setFF(value);
     }
 
     public double getP() {
@@ -108,6 +109,10 @@ public class PIDNotConstants implements Logged {
 
     public double getD() {
         return this.kD;
+    }
+
+    public double getFF() {
+        return this.kFF;
     }
 
 }

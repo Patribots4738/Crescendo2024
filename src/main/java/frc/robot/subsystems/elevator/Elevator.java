@@ -41,26 +41,23 @@ public class Elevator extends SubsystemBase implements Logged {
         elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         elevator.setPID(TrapConstants.TRAP_PID);
-
-        // Change to brake when done testing
-        elevator.setCoastMode();
     }
 
     @Override
     public void periodic() {
-        pos = elevator.getPosition();
-        desiredPos = elevator.getTargetPosition();
+        // pos = elevator.getPosition();
+        // desiredPos = elevator.getTargetPosition();
 
-        atDesiredPos = atDesiredPosition().getAsBoolean();
-        RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
-            0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
-            new Rotation3d()
-        );
-        RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
-            0, 0, elevator.getPosition(),
-            new Rotation3d()
-        );
-        elevatorPID.updatePID();
+        // atDesiredPos = atDesiredPosition().getAsBoolean();
+
+        // RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
+        //     0, 0, pos * TrapConstants.CLAW_POSITION_MULTIPLIER, 
+        //     new Rotation3d()
+        // );
+        // RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+        //     0, 0, pos,
+        //     new Rotation3d()
+        // );
     }
 
     public double getPosition() {

@@ -117,15 +117,18 @@ public final class Constants {
         // degrees
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
-        public static final double SHOOTER_P = .1;
-        public static final double SHOOTER_I = 0;
-        public static final double SHOOTER_D = 0;
+        public static final PIDConstants SHOOTER_PID = new PIDConstants(
+            0.002,
+            0,
+            0.20992
+        );
+        public static final double SHOOTER_FF = 0.0001762;
 
-
-        // TODO: tune pid further
-        public static final double PIVOT_P = 0.1;
-        public static final double PIVOT_I = 0;
-        public static final double PIVOT_D = 0.002;
+        public static final PIDConstants PIVOT_PID = new PIDConstants(
+            0.05,
+            0,
+            0.0083
+        );
 
         public static final int SHOOTER_CURRENT_LIMIT = 80;
         public static final int PIVOT_CURRENT_LIMIT = 15;
@@ -190,7 +193,7 @@ public final class Constants {
         public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
-        public static final int CLAW_CURRENT_LIMIT = 20;
+        public static final int CLAW_CURRENT_LIMIT = 15;
 
         public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
         public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;

@@ -345,8 +345,8 @@ public class ShooterCalc implements Logged {
         return 
             SpeedAngleTriplet.of(
                 Pair.of(
-                    velocityToRPM(newv0),
-                    velocityToRPM(newv0)
+                    velocityToRPM(newv0)+700,
+                    velocityToRPM(newv0)+300
                 ),
                 newAngle.getDegrees()
             );
