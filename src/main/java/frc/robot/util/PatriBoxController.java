@@ -4,10 +4,12 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
@@ -26,6 +28,86 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     @Override
+    public Trigger povUp() {
+        return super.getHID().getPOV() == 0 ? new Trigger(() -> true) : new Trigger(() -> false);
+    }
+    
+    @Override
+    public Trigger povDown() {
+        return new Trigger(() -> super.getHID().getPOV() == 180);
+    }
+
+    @Override
+    public Trigger povRight() {
+        return new Trigger(() -> super.getHID().getPOV() == 90);
+    }
+
+    @Override
+    public Trigger povLeft() {
+        return new Trigger(() -> super.getHID().getPOV() == 270);
+    }
+
+    @Override
+    public Trigger leftBumper() {
+        return new Trigger(super.getHID()::getLeftBumper);
+    }
+
+    @Override
+    public Trigger rightBumper() {
+        return new Trigger(super.getHID()::getRightBumper);
+    }
+
+    @Override
+    public Trigger b() {
+        return new Trigger(super.getHID()::getBButton);
+    }
+
+    @Override
+    public Trigger y() {
+        return new Trigger(super.getHID()::getYButton);
+    }
+
+    @Override
+    public Trigger x() {
+        return new Trigger(super.getHID()::getXButton);
+    }
+
+    @Override
+    public Trigger a() {
+        return new Trigger(super.getHID()::getAButton);
+    }
+
+    @Override
+    public Trigger start() {
+        return new Trigger(super.getHID()::getStartButton);
+    }
+
+    @Override
+    public Trigger back() {
+        return new Trigger(super.getHID()::getBackButton);
+    }
+
+    @Override
+    public Trigger leftTrigger() {
+        return leftTrigger(0.5);
+    }
+
+    @Override
+    public Trigger leftTrigger(double threshold) {
+        return new Trigger(() -> super.getHID().getLeftTriggerAxis() > threshold);
+    }
+
+    @Override
+    public Trigger rightTrigger(double threshold) {
+        return new Trigger(() -> super.getHID().getRightTriggerAxis() > threshold);
+    }
+
+    @Override
+    public Trigger rightTrigger() {
+        return rightTrigger(0.5);
+    }
+
+    @Override
     // This is inverted because for some reason when you
     // go forward on the controller, it returns a negative value
     public double getLeftY() {
@@ -33,8 +115,8 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public Translation2d getLeftAxis() {
-        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
-                MathUtil.applyDeadband(super.getLeftY(), deadband));
+        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getHID().getLeftX(), deadband),
+                MathUtil.applyDeadband(super.getHID().getLeftY(), deadband));
         return driverLeftAxis;
     }
 
@@ -49,8 +131,8 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public Translation2d getRightAxis() {
-        return toCircle(MathUtil.applyDeadband(super.getRightX(), deadband),
-                MathUtil.applyDeadband(super.getRightY(), deadband));
+        return toCircle(MathUtil.applyDeadband(super.getHID().getRightX(), deadband),
+                MathUtil.applyDeadband(super.getHID().getRightY(), deadband));
     }
 
     // All calculations can be referenced here
