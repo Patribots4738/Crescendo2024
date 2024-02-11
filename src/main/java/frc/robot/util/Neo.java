@@ -567,7 +567,7 @@ public class Neo extends CANSparkMax {
      * This will make it try to stop when not power.
      */
     public void setBrakeMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kCoast);
+        this.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
     /**
@@ -575,9 +575,10 @@ public class Neo extends CANSparkMax {
      * This will make it spin freely when not powered.
      */
     public void setCoastMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        this.setIdleMode(CANSparkBase.IdleMode.kCoast);
     }
 
+    
     public enum TelemetryPreference {
         DEFAULT,
         ONLY_ABSOLUTE_ENCODER,
