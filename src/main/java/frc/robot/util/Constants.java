@@ -110,9 +110,9 @@ public final class Constants {
         public static final double SHOOTER_D = 0;
 
         // TODO: tune pid further
-        public static final double PIVOT_P = 0.2;
+        public static final double PIVOT_P = 0.05;
         public static final double PIVOT_I = 0;
-        public static final double PIVOT_D = 0.07;
+        public static final double PIVOT_D = 0.002;
 
         public static final int SHOOTER_CURRENT_LIMIT = 15;
         public static final int PIVOT_CURRENT_LIMIT = 15;
@@ -126,17 +126,17 @@ public final class Constants {
         public static final double SHOOTER_MIN_OUTPUT = -1;
         public static final double SHOOTER_MAX_OUTPUT = 1;
 
-        public static final double PIVOT_MIN_OUTPUT = -1;
-        public static final double PIVOT_MAX_OUTPUT = 1;
+        public static final double PIVOT_MIN_OUTPUT = -0.25;
+        public static final double PIVOT_MAX_OUTPUT = 0.25;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 0;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 58;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES_WRONG = 343.5;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES_WRONG = 300;
+
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 43;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
-
-        public static final double PIVOT_MAX_ANGLE_DEGREES = 58.0;
-        public static final double PIVOT_REST_ANGLE_DEGREES = 20.0;
 
         public static final double SHOOTER_PASS_SECONDS = 2;
 
@@ -149,12 +149,12 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(0.0, 300d, 60d));
-                put(10, SpeedAngleTriplet.of(0.0, 600d, 50d));
-                put(15, SpeedAngleTriplet.of(0.0, 900d, 40d));
-                put(20, SpeedAngleTriplet.of(0.0, 1200d, 30d));
-                put(25, SpeedAngleTriplet.of(0.0, 1500d, 20d));
-                put(30, SpeedAngleTriplet.of(0.0, 1800d, 10d));
+                put(5, SpeedAngleTriplet.of(0.0, 0d, 60d));
+                put(10, SpeedAngleTriplet.of(0.0, 0d, 50d));
+                put(15, SpeedAngleTriplet.of(0.0, 0d, 42d));
+                put(20, SpeedAngleTriplet.of(0.0, 0d, 36d));
+                put(25, SpeedAngleTriplet.of(0.0, 0d, 29d));
+                put(30, SpeedAngleTriplet.of(0.0, 0d, 22d));
             }
         };
 
@@ -169,15 +169,13 @@ public final class Constants {
     }
 
     public static final class TrapConstants {
-        public static final int LEFT_ELEVATOR_CAN_ID = 14;
-        public static final int RIGHT_ELEVATOR_CAN_ID = 15;
-        public static final int CLAW_CAN_ID = 16;
+        public static final int ELEVATOR_CAN_ID = 14;
+        public static final int CLAW_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = .003;
         public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
-
-        public static final int CLAW_CURRENT_LIMIT = 7;
+        public static final int CLAW_CURRENT_LIMIT = 20;
 
         public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
         public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;
@@ -191,8 +189,8 @@ public final class Constants {
         // TODO: set these values
         public static final double RESET_POS = 0;
         public static final double INTAKE_TIME = 0;
-        public static final double CLAW_OUTTAKE_PERCENT = -.5;
-        public static final double CLAW_INTAKE_PERCENT = .5;
+        public static final double CLAW_OUTTAKE_PERCENT = -1;
+        public static final double CLAW_INTAKE_PERCENT = 1;
         public static final double CLAW_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.48;
         public static final double AMP_PLACE_POS = 0.48;
@@ -215,17 +213,20 @@ public final class Constants {
 
     public static final class ClimbConstants {
 
-        public static final int LEFT_CLIMB_CAN_ID = 17;
-        public static final int RIGHT_CLIMB_CAN_ID = 18;
+        public static final int  LEFT_CLIMB_CAN_ID = 16;
+        public static final int RIGHT_CLIMB_CAN_ID = 17;
 
-        public static final double CLIMB_POSITION_CONVERSION_FACTOR = 0.1;
+        private static final double GEAR_RATIO = 16.0/Units.inchesToMeters(3.0);
+        private static final double CLIMB_HEIGHT = Units.inchesToMeters(20)*2.0;
+        
+        public static final double CLIMB_POSITION_CONVERSION_FACTOR = 1.0/(GEAR_RATIO*CLIMB_HEIGHT);
         public static final int CLIMB_CURRENT_LIMIT = 40;
 
-        public static final PIDConstants CLIMB_PID = new PIDConstants(0.5, 0, 0);
+        public static final PIDConstants CLIMB_PID = new PIDConstants(5, 0, 0);
 
         public static final double EXTENSION_LIMIT_METERS = Units.feetToMeters(3.65);
         
-        public static final double TOP_LIMIT = 0.5125;
+        public static final double TOP_LIMIT = 0.517;
         public static final double BOTTOM_LIMIT = 0.0;
 
         public static final double CLIMB_DEADBAND = 0.002;
@@ -428,12 +429,11 @@ public final class Constants {
         public static final int TRIGGER_WHEEL_CAN_ID = 10;
 
         // % speeds of the motor
-        public static final double INTAKE_PERCENT = .3;
-        public static final double OUTTAKE_PERCENT = -.3;
+        public static final double INTAKE_PERCENT = 1;
+        public static final double OUTTAKE_PERCENT = -1;
         public static final double STOP_PERCENT = 0;
 
-        public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
-        public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
+        public static final int INTAKE_CURRENT_LIMIT_AMPS = 20;
 
         public static final double INTAKE_PERCENT_UPPER_LIMIT = 1;
         public static final double INTAKE_PERCENT_LOWER_LIMIT = -1;
@@ -446,9 +446,8 @@ public final class Constants {
         // TODO: Add these to the robot
         public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 7;
         public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 15;
-        public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = .3;
-        public static final double TRAP_TRIGGER_WHEEL_PERCENT = -.3;
-        public static final int INTAKE_CURRENT_LIMIT_AMPS = 0;
+        public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = -1;
+        public static final double TRAP_TRIGGER_WHEEL_PERCENT = 1;
     }
 
     public static final class FieldConstants {
@@ -541,8 +540,8 @@ public final class Constants {
         public static final int PIVOT_INDEX = 0;
         public static final int CLAW_INDEX = 1;
         public static final int ELEVATOR_INDEX = 2;
-        public static final int LEFT_CLIMB_INDEX = 3;
-        public static final int RIGHT_CLIMB_INDEX = 4;
+        public static final int LEFT_CLIMB_INDEX = 4;
+        public static final int RIGHT_CLIMB_INDEX = 3;
         
         public static final double PIVOT_OFFSET_X = 0.112;
         public static final double PIVOT_OFFSET_Z = 0.21;

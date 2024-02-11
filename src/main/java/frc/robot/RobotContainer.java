@@ -37,7 +37,7 @@ public class RobotContainer implements Logged {
     private Swerve swerve;
     private final Intake intake;
 
-    private final Limelight limelight;
+    private Limelight limelight;
     private final LedStrip ledStrip;
     private final Climb climb;
     private Indexer triggerWheel;
@@ -60,7 +60,7 @@ public class RobotContainer implements Logged {
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
-        limelight = new Limelight();
+        // limelight = new Limelight();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
@@ -71,6 +71,7 @@ public class RobotContainer implements Logged {
         claw = new Claw();
         
         pivot = new Pivot();
+        incinerateMotors();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
         
@@ -83,18 +84,18 @@ public class RobotContainer implements Logged {
         );
         
         limelight.setDefaultCommand(Commands.run(() -> {
-            // Create an "Optional" object that contains the estimated pose of the robot
-            // This can be present (sees tag) or not present (does not see tag)
-            Optional<Pose2d> result = limelight.getPose2d();
-            // The skew of the tag represents how confident the camera is
-            // If the result of the estimatedRobotPose exists,
-            // and the skew of the tag is less than 3 degrees,
-            // then we can confirm that the estimated position is realistic
-            if (result.isPresent()) {
-                swerve.getPoseEstimator().addVisionMeasurement(
-                result.get(),
-                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
-            }
+        // Create an "Optional" object that contains the estimated pose of the robot
+        // This can be present (sees tag) or not present (does not see tag)
+        Optional<Pose2d> result = limelight.getPose2d();
+        // The skew of the tag represents how confident the camera is
+        // If the result of the estimatedRobotPose exists,
+        // and the skew of the tag is less than 3 degrees,
+        // then we can confirm that the estimated position is realistic
+        if (result.isPresent()) {
+        swerve.getPoseEstimator().addVisionMeasurement(
+        result.get(),
+        Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
+        }
         }, limelight));
         
         swerve.setDefaultCommand(new Drive(
@@ -102,11 +103,10 @@ public class RobotContainer implements Logged {
             driver::getLeftY,
             driver::getLeftX,
             () -> -driver.getRightX(),
-            () -> !driver.leftBumper().getAsBoolean(),
-            () -> (driver.leftBumper().getAsBoolean()
+            () -> !driver.y().getAsBoolean(),
+            () -> (driver.y().getAsBoolean()
                 && Robot.isBlueAlliance())));
               
-        incinerateMotors();
         configureButtonBindings();
         
         prepareNamedCommands();
@@ -114,25 +114,33 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        configureDriverBindings(driver);
-        configureOperatorBindings(operator);
+        // configureDriverBindings(driver);
+        configureOperatorBindings(driver);
     }
     
     // TODO: uncomment these bindings (they are commented because we aren't testing them)
     private void configureOperatorBindings(PatriBoxController controller) {
 
-        // controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        // controller.povDown().onTrue(climb.toBottomCommand());
+        controller.povDown().onTrue(climb.toBottomCommand());
 
         // controller.povLeft().onTrue(elevator.toBottomCommand());
 
         // controller.povRight().onTrue(elevator.toTopCommand());
 
         controller.leftBumper()
-            .and(controller.rightBumper())
             .onTrue(pieceControl.noteToShoot());
 
+        controller.rightBumper()
+            .onTrue(pieceControl.ejectNote());
+
+        controller.a()
+            .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
+
+        controller.start().or(controller.back())
+            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(3,6.6, new Rotation2d()))));
+        
         // controller.rightBumper()
         //     .and(controller.leftBumper().negate())
         //     .onTrue(pieceControl.noteToTarget(() -> true));
@@ -141,13 +149,14 @@ public class RobotContainer implements Logged {
         //     .and(intake.hasGamePieceTrigger().negate())
         //     .onTrue(pieceControl.intakeToClaw());
 
-        controller.leftTrigger()
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+        // controller.leftTrigger()
+        //     .onFalse(pieceControl.stopIntakeAndIndexer());
 
-        controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
-            .onTrue(intake.outCommand());
+        // controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
+        //     .onTrue(intake.outCommand());
 
-        controller.x().onTrue(intake.stop());
+        // controller.x().onTrue(intake.stop());
+
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
@@ -180,9 +189,6 @@ public class RobotContainer implements Logged {
         
         controller.leftBumper()
             .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
-        
-        controller.leftTrigger()
-            .onTrue(shooterCalc.resetShooter());
         
         controller.x()
             .onTrue(intake.stop());

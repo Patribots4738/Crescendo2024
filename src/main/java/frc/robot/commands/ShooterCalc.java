@@ -73,40 +73,13 @@ public class ShooterCalc implements Logged{
      */
     public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
         return Commands.run(() -> {
-                SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean());
+                SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
 
                 pivot.setAngle(triplet.getAngle());
                 shooter.setSpeed(triplet.getSpeeds());
         }, pivot, shooter);
     }
 
-    /**
-     * The function is a command that resets the shooter to a speed of 0 and an
-     * angle constant and
-     * once it has reached its desired states it sets the shooter to a negative
-     * speed to pass the
-     * piece back to handoff
-     * 
-     * @return The method is returning a Command object.
-     */
-    public Command sendBackCommand() {
-        return resetShooter()
-                .andThen(Commands.waitUntil(
-                        () -> pivotAtDesiredAngle() && shooterAtDesiredRPM()))
-                .andThen(shooter.setSpeedCommand(ShooterConstants.SHOOTER_BACK_SPEED));
-    }
-
-    /**
-     * Makes aiming false so that we stop any aiming loop currently happening, and
-     * then sets the
-     * shooter to a speed of 0 and the pivot angle to a predetermined constant
-     * 
-     * @return The method is returning a Command object.
-     */
-    public Command resetShooter() {
-        return shooter.stop()
-                .alongWith(pivot.setRestAngleCommand());
-    }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
     // known required speeds and angles for certain poses

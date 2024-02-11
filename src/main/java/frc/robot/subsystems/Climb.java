@@ -32,8 +32,8 @@ public class Climb extends SubsystemBase implements Logged {
     public boolean atDesiredPos = false;
 
     public Climb() {
-        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, false);
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true);
 
         configureMotors();
     }
@@ -52,8 +52,8 @@ public class Climb extends SubsystemBase implements Logged {
         rightMotor.setPID(ClimbConstants.CLIMB_PID);
 
         // Change to brake when done testing x2
-        leftMotor.setCoastMode();
-        rightMotor.setCoastMode();
+        leftMotor.setBrakeMode();
+        rightMotor.setBrakeMode();
     }
 
     @Override
@@ -90,6 +90,7 @@ public class Climb extends SubsystemBase implements Logged {
                 pos2,
                 ClimbConstants.BOTTOM_LIMIT,
                 ClimbConstants.TOP_LIMIT);
+
         leftMotor.setTargetPosition(pos1);
         rightMotor.setTargetPosition(pos2);
 
