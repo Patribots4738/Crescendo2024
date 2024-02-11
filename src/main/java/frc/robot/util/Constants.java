@@ -105,7 +105,7 @@ public final class Constants {
         // degrees
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
-        public static final double SHOOTER_P = 0.01;
+        public static final double SHOOTER_P = 0.3;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
 
@@ -114,7 +114,7 @@ public final class Constants {
         public static final double PIVOT_I = 0;
         public static final double PIVOT_D = 0.002;
 
-        public static final int SHOOTER_CURRENT_LIMIT = 15;
+        public static final int SHOOTER_CURRENT_LIMIT = 80;
         public static final int PIVOT_CURRENT_LIMIT = 15;
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
