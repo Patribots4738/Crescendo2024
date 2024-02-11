@@ -4,20 +4,15 @@
 
 package frc.robot.commands.leds;
 
-import java.lang.reflect.Array;
 import java.util.function.Supplier;
 
-import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.DriverUI;
+import frc.robot.Robot;
 import frc.robot.subsystems.LedStrip;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
@@ -77,7 +72,7 @@ public class LPI extends Command implements Logged{
             
             Translation2d desiredTranslation = closestPose.relativeTo(currentRobotPosition).getTranslation();
 
-            Rotation2d cardinalDirection = Rotation2d.fromRadians(Math.atan2(desiredTranslation.getY(), desiredTranslation.getX()));
+            Rotation2d cardinalDirection = new Rotation2d(desiredTranslation.getX(), desiredTranslation.getY());
 
             cardinalMagnitude = new Pose2d(desiredTranslation, cardinalDirection);
 
@@ -99,7 +94,7 @@ public class LPI extends Command implements Logged{
         } else {
             // Flash the LEDs based on the current timestamp
             ledStrip.setLED(
-                ((int) (DriverUI.currentTimestamp * 10) % 2 == 0) 
+                ((int) (Robot.currentTimestamp * 10) % 2 == 0) 
                     ? Color.kGreen 
                     : Color.kGold
             );

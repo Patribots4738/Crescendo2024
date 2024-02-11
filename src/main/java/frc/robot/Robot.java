@@ -1,8 +1,14 @@
 package frc.robot;
 
+import java.util.Optional;
+
+import org.littletonrobotics.urcl.URCL;
+
 import com.revrobotics.REVPhysicsSim;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,12 +36,17 @@ public class Robot extends TimedRobot {
 
     private RobotContainer robotContainer;
 
+    public static double currentTimestamp = 0;
+    public static double previousTimestamp = 0;
+
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
         Monologue.setupMonologue(robotContainer, "Robot", false, false);
-    }
 
+        DataLogManager.start();
+        URCL.start();
+}
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
      * diagnostics
@@ -50,8 +61,8 @@ public class Robot extends TimedRobot {
         Monologue.updateAll();
         CommandScheduler.getInstance().run();
 
-        DriverUI.previousTimestamp = DriverUI.currentTimestamp;
-        DriverUI.currentTimestamp = Timer.getFPGATimestamp();
+        Robot.previousTimestamp = Robot.currentTimestamp;
+        Robot.currentTimestamp = Timer.getFPGATimestamp();
 
     }
 
@@ -138,5 +149,13 @@ public class Robot extends TimedRobot {
         for (Neo neo : NeoMotorConstants.motors) {
             neo.tick();
         }
+    }
+
+    public static boolean isRedAlliance() {
+        return FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red));
+    }
+
+    public static boolean isBlueAlliance() {
+        return FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Blue));
     }
 }

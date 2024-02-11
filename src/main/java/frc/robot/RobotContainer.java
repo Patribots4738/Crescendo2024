@@ -38,8 +38,6 @@ public class RobotContainer implements Logged {
     private Swerve swerve;
     private final Intake intake;
 
-    @SuppressWarnings("unused")
-    private final DriverUI driverUI;
     private final Limelight limelight;
     private final LedStrip ledStrip;
     private final Climb climb;
@@ -70,7 +68,6 @@ public class RobotContainer implements Logged {
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        driverUI = new DriverUI();
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
         shooter = new Shooter();
@@ -86,8 +83,8 @@ public class RobotContainer implements Logged {
             triggerWheel,
             elevator,
             claw,
-            shooterCalc,
-            swerve);
+            shooterCalc
+        );
         
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -100,7 +97,7 @@ public class RobotContainer implements Logged {
             if (result.isPresent()) {
                 swerve.getPoseEstimator().addVisionMeasurement(
                 result.get(),
-                DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
+                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
             }
         }, limelight));
         
@@ -111,7 +108,7 @@ public class RobotContainer implements Logged {
             () -> -driver.getRightX(),
             () -> !driver.leftBumper().getAsBoolean(),
             () -> (driver.leftBumper().getAsBoolean()
-                && FieldConstants.IS_BLUE_ALLIANCE())));
+                && Robot.isBlueAlliance())));
               
         incinerateMotors();
         configureButtonBindings();
@@ -125,27 +122,31 @@ public class RobotContainer implements Logged {
         configureOperatorBindings(operator);
     }
     
+    // TODO: uncomment these bindings (they are commented because we aren't testing them)
     private void configureOperatorBindings(PatriBoxController controller) {
 
-        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        // controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        controller.povDown().onTrue(climb.toBottomCommand());
+        // controller.povDown().onTrue(climb.toBottomCommand());
 
-        controller.povLeft().onTrue(elevator.toBottomCommand());
+        // controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        controller.povRight().onTrue(pieceControl.placeTrapCommand());
+        // controller.povRight().onTrue(elevator.toTopCommand());
 
         controller.leftBumper()
             .and(controller.rightBumper())
             .onTrue(pieceControl.noteToShoot());
 
-        controller.rightBumper()
-            .and(controller.leftBumper().negate())
-            .onTrue(pieceControl.noteToTarget(() -> true));
+        // controller.rightBumper()
+        //     .and(controller.leftBumper().negate())
+        //     .onTrue(pieceControl.noteToTarget(() -> true));
 
-        controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
-            .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(intake.inCommand());
+        // controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
+        //     .and(intake.hasGamePieceTrigger().negate())
+        //     .onTrue(pieceControl.intakeToClaw());
+
+        controller.leftTrigger()
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
             .onTrue(intake.outCommand());
@@ -163,7 +164,7 @@ public class RobotContainer implements Logged {
                 new Pose2d(
                     swerve.getPose().getTranslation(),
                     Rotation2d.fromDegrees(
-                        FieldConstants.IS_RED_ALLIANCE()
+                        Robot.isRedAlliance()
                             ? 0
                             : 180))), 
                 swerve));
@@ -209,7 +210,7 @@ public class RobotContainer implements Logged {
     }
     
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
+        return Commands.none();
     }
     
     public void onDisabled() {
