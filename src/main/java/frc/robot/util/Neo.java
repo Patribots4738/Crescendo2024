@@ -365,16 +365,16 @@ public class Neo extends CANSparkMax {
      * 
      * @param constants the PID constants to set
      */
-    public void setPID(PIDConstants constants) {
+    public void setPID(PatrIDConstants constants) {
         setPID(constants, 0);
     }
 
-    public void setPID(PIDConstants constants, double minOutput, double maxOutput) {
-        setPID(constants.kP, constants.kI, constants.kD, minOutput, maxOutput, 0);
+    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, 0);
     }
 
-    public void setPID(PIDConstants constants, double minOutput, double maxOutput, int slotID) {
-        setPID(constants.kP, constants.kI, constants.kD, minOutput, maxOutput, slotID);
+    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput, int slotID) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, slotID);
     }
 
     /**
@@ -383,8 +383,8 @@ public class Neo extends CANSparkMax {
      * @param constants the PID constants to set
      * @param slotID    the slot ID of the PID controller
      */
-    public void setPID(PIDConstants constants, int slotID) {
-        setPID(constants.kP, constants.kI, constants.kD, -1, 1, slotID);
+    public void setPID(PatrIDConstants constants, int slotID) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), -1, 1, slotID);
     }
 
     /**
@@ -466,8 +466,8 @@ public class Neo extends CANSparkMax {
         return pidController.getD();
     }
 
-    public PIDConstants getPID() {
-        return new PIDConstants(pidController.getP(), pidController.getI(), pidController.getD());
+    public PatrIDConstants getPID() {
+        return new PatrIDConstants(pidController.getP(), pidController.getI(), pidController.getD());
     }
 
     /**

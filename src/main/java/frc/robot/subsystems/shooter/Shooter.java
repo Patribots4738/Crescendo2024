@@ -8,6 +8,7 @@ import frc.robot.commands.ShooterCalc;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.PIDNotConstants;
+import frc.robot.util.PatrIDConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

@@ -19,7 +19,7 @@ public class PIDNotConstants implements Logged {
     @Log
     public double kD;
     @Log
-    public double kFF = 0.001;
+    public double kFF;
     /** Integral range */
     public final double iZone = 0;
 
@@ -67,16 +67,17 @@ public class PIDNotConstants implements Logged {
         this(kP, 0, 0, PIDController);
     }
 
-    public PIDNotConstants(PIDConstants PID, double ff, SparkPIDController PIDController) {
-        this(PID.kP, PID.kI, PID.kD, ff, PIDController);
+    public PIDNotConstants(PatrIDConstants PID, double ff, SparkPIDController PIDController) {
+        this(PID.getP(), PID.getI(), PID.getD(), ff, PIDController);
     }
 
-    public PIDNotConstants(PIDConstants PID, SparkPIDController PIDController) {
-        this(PID.kP, PID.kI, PID.kD, 0, PIDController);
+    public PIDNotConstants(PatrIDConstants PID, SparkPIDController PIDController) {
+        this(PID.getP(), PID.getI(), PID.getD(), 0, PIDController);
     }
 
-    public PIDConstants getPID() {
-        return new PIDConstants(this.kP, this.kI, this.kD);
+
+    public PatrIDConstants getPID() {
+        return new PatrIDConstants(this.kP, this.kI, this.kD);
     }
 
     public void setP(double value) {

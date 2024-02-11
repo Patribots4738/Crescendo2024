@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+import frc.robot.util.PatrIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import java.util.Optional;
 import edu.wpi.first.math.Pair;
@@ -117,14 +118,14 @@ public final class Constants {
         // degrees
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
-        public static final PIDConstants SHOOTER_PID = new PIDConstants(
+        public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
             0,
             0.20992
         );
         public static final double SHOOTER_FF = 0.0001762;
 
-        public static final PIDConstants PIVOT_PID = new PIDConstants(
+        public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
             0.05,
             0,
             0.0083
@@ -202,7 +203,7 @@ public final class Constants {
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
 
-        public static final PIDConstants TRAP_PID = new PIDConstants(0.5, 0, 0);
+        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0);
 
         // TODO: set these values
         public static final double RESET_POS = 0;
@@ -240,7 +241,7 @@ public final class Constants {
         public static final double CLIMB_POSITION_CONVERSION_FACTOR = 1.0/(GEAR_RATIO*CLIMB_HEIGHT);
         public static final int CLIMB_CURRENT_LIMIT = 40;
 
-        public static final PIDConstants CLIMB_PID = new PIDConstants(5, 0, 0);
+        public static final PatrIDConstants CLIMB_PID = new PatrIDConstants(5, 0, 0);
 
         public static final double EXTENSION_LIMIT_METERS = Units.feetToMeters(3.65);
         
