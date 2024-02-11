@@ -1,7 +1,5 @@
 package frc.robot;
 
-import java.lang.System.Logger;
-
 import org.littletonrobotics.urcl.URCL;
 
 import com.revrobotics.REVPhysicsSim;
