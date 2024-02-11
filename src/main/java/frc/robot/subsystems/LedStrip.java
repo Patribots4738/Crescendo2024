@@ -1,15 +1,21 @@
 package frc.robot.subsystems;
 
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.DriverUI;
+import frc.robot.RobotContainer;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
@@ -24,14 +30,15 @@ public class LedStrip extends SubsystemBase {
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
-    public LedStrip() {
-        poseSupplier = () -> new Pose2d();
-    }
+    //public LedStrip() {
+    //    poseSupplier = () -> new Pose2d();
+    //}
 
     public LedStrip(Supplier<Pose2d> poseSupplier) {
         this.poseSupplier = poseSupplier;
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
-        ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
+        ledBuffer = new AddressableLEDBuffer(LEDConstants.PWM_PORT);
+        LEDConstants.LED_COUNT = ledBuffer.getLength();
 
         led.setLength(ledBuffer.getLength());
 
@@ -110,6 +117,35 @@ public class LedStrip extends SubsystemBase {
     public void setLED(Color color) {
         setLED(0, ledBuffer.getLength(), color);
     }
+
+    /**
+     * 
+     * firstColor is the color that the gradient starts on
+     * @param firstColor
+     * 
+     * second Color is the color that the gradient ends on
+     * @param secondColor
+     * 
+     * startIndex is the LED that the gradient starts on
+     * @param startIndex
+     * 
+     * endIndex is the LED that the gradient ends on
+     * @param endIndex
+     */
+    public void setLEDGradient(Color firstColor, Color secondColor, int startIndex, int endIndex) {
+        for (int i = startIndex; i < endIndex; i++) {
+            double ratio = (i - startIndex) / (endIndex - startIndex);
+            ledBuffer.setLED(i, sampleGradient(firstColor, secondColor, ratio));
+        }
+    }
+
+    public void oohShiny(Color blinkI, Color blinkII, int blinkAmount, int setIndexs) {
+        for (int j = blinkAmount; j > 0; j--) {
+            Color blinkColor = (j % 2 == 0) ? blinkI : blinkII;
+            ledBuffer.setLED(setIndexs, blinkColor);
+        }
+    }
+
     public Command turnOff() {
         return runOnce(() -> setLED(Color.kBlack));
     }
@@ -184,18 +220,121 @@ public class LedStrip extends SubsystemBase {
             this.allianceOffset %= 10;
         });
     }
+    
+    Color Orange = new Color(250, 160, 30);
+    Color GreerYeller = new Color(50, 250, 0);
+    Color TurnOff = new Color(0, 0, 0);
 
-    public Command elevaBottom() {
-        return runOnce(() -> { 
-                final Color color = Color.kBlanchedAlmond;
-                setLED(color);
+    public Command elevatorGradientLED() {
+        return Commands.run(() -> {
+            setLEDGradient(Orange, GreerYeller, 1, 10);
         });
     }
-    
-    public Command elevaTop() {
-        return runOnce(() -> {
-            final Color color = Color.kOrange;
-            setLED(color);
+
+    public Command elevatorTOPLED() {
+        return Commands.run(() -> {
+            oohShiny(GreerYeller, TurnOff, currentPatternIndex, allianceOffset);
         });
+    }
+
+    public Command lightsoffLED() {
+        return Commands.runOnce(() -> {
+            setLED(Color.kBlack);
+        });
+    }
+
+    public Command cautionLED() {
+        return runOnce(() -> {
+            for (int i = 0; i < ledBuffer.getLength(); i++) {
+                final Color color = (i % 2 == 0) ? Color.kYellow : Color.kDarkGray;
+                setLED(i, color);
+            }
+        });
+    }
+
+    public Command yellowgreerLED() {
+        return Commands.runOnce(() -> {
+            setLED(Color.kGreenYellow);
+        });
+    }
+
+    public Command redLED() {
+        return Commands.runOnce(() -> {
+            setLED(Color.kRed);
+        });
+    }
+
+    public Command almmondLED() {
+        return Commands.runOnce(() -> {
+            setLED(Color.kBlanchedAlmond);});
+    }
+
+    public Command blueLED() {
+        return Commands.runOnce(() -> {
+            setLED(Color.kBlue);
+        });
+    }
+
+    public Command greerLED() {
+        return Commands.runOnce(() -> {
+            setLED(Color.kGreen);
+        });
+    }
+
+    public Command trackElevator(DoubleSupplier elevatorPositionSupplier) {
+        return Commands.run(() -> {
+            double currentElevatorPosition = elevatorPositionSupplier.getAsDouble();
+            // convert the elevator position [0,1] 
+            // to an LED index (int minIndex, int maxIndex)
+            // did someone say interpolation???
+            int topmostActiveLED = (int) Math.round(
+                MathUtil.interpolate(
+                    0, 
+                    LEDConstants.ELEVATOR_LED_COUNT, 
+                    currentElevatorPosition
+                ));
+
+            Color desiredColor = Color.kAliceBlue;
+
+            if (topmostActiveLED == LEDConstants.ELEVATOR_LED_COUNT) {
+                desiredColor = ((int) (DriverUI.currentTimestamp * 5)) % 2 == 0
+                    ? Color.kBlack 
+                    : Color.kGreenYellow;
+            }
+            
+
+            
+            setLED(
+                LEDConstants.ELEVATOR_LEFT_START_INDEX, 
+                LEDConstants.ELEVATOR_LEFT_START_INDEX + topmostActiveLED, 
+                desiredColor
+            );
+            setLED(
+                LEDConstants.ELEVATOR_RIGHT_START_INDEX, 
+                LEDConstants.ELEVATOR_RIGHT_START_INDEX + topmostActiveLED, 
+                desiredColor
+            );
+            
+        }).until(() -> {
+            return elevatorPositionSupplier.getAsDouble() == 0;
+        });
+    }
+
+    public Command fullElevatorCommand(DoubleSupplier elevatorPositionSupplier) {
+        return Commands.sequence(
+            Commands.run(() -> {})
+                .until(() -> elevatorPositionSupplier.getAsDouble() == 1),
+            Commands.run(()-> {})
+                .until(() -> elevatorPositionSupplier.getAsDouble() < 0.95),
+            Commands.run(()-> {})
+                .until(() -> elevatorPositionSupplier.getAsDouble() == 0)
+        );
+    }
+
+    private Color sampleGradient(Color firstColor, Color secondColor, double ratio) {
+        return new Color(
+            firstColor.red * ratio + secondColor.red * (1 - ratio), 
+            firstColor.green * ratio + secondColor.green * (1 - ratio), 
+            firstColor.blue * ratio + secondColor.blue * (1 - ratio));
     }
 }

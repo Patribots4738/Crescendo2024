@@ -123,13 +123,15 @@ public class RobotContainer implements Logged {
     
     private void configureOperatorBindings(PatriBoxController controller) {
 
-        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose))
+        .whileTrue(ledStrip.cautionLED());
         
-        controller.povDown().onTrue(climb.toBottomCommand());
-
+        controller.povDown().onTrue(climb.toBottomCommand().andThen(ledStrip.greerLED()));
+        
         controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        controller.povRight().onTrue(pieceControl.placeTrapCommand());
+        controller.povRight().onTrue(pieceControl.placeTrapCommand())
+        .onTrue(ledStrip.elevatorGradientLED());
 
         controller.leftBumper()
             .and(controller.rightBumper())
@@ -141,12 +143,15 @@ public class RobotContainer implements Logged {
 
         controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
             .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(intake.inCommand());
+            .onTrue(intake.inCommand())
+            .whileTrue(ledStrip.blueLED());
 
         controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
-            .onTrue(intake.outCommand());
+            .onTrue(intake.outCommand())
+            .whileTrue(ledStrip.almmondLED());
 
-        controller.x().onTrue(intake.stop());
+        controller.x().onTrue(intake.stop())
+        .whileTrue(ledStrip.redLED());
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
@@ -184,7 +189,8 @@ public class RobotContainer implements Logged {
             .onTrue(shooterCalc.resetShooter());
         
         controller.x()
-            .onTrue(intake.stop());
+            .onTrue(intake.stop())
+            .whileTrue(Commands.runOnce(() -> ledStrip.redLED()));
         
         controller.rightStick()
             .whileTrue(
@@ -198,7 +204,9 @@ public class RobotContainer implements Logged {
                             swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
                     },
                     () -> true)));
-    }
+
+        }
+    
     
     public Command getAutonomousCommand() {
         return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());

@@ -74,10 +74,6 @@ public class Climb extends SubsystemBase implements Logged {
         );
     }
 
-    LedStrip ledStrip = new LedStrip();
-
-    
-
     public void toTop() {
         setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT);
     }
@@ -87,13 +83,11 @@ public class Climb extends SubsystemBase implements Logged {
     }
 
     public Command toTopCommand() {
-        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT))
-            .andThen(Commands.run(() -> ledStrip.setLED(Color.kGreen)));
+        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT));
     }
 
     public Command toBottomCommand() {
-        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT))
-        .andThen(Commands.run(() -> ledStrip.setLED(Color.kGreen)));
+        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT));
     }
 
     public Command povUpCommand(Supplier<Pose2d> positionSupplier) {

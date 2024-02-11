@@ -1,10 +1,7 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.subsystems.LedStrip;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Neo;
@@ -25,27 +22,22 @@ public class Intake extends SubsystemBase {
         intakeMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
     }
 
-    LedStrip ledStrip = new LedStrip();
+    //LedStrip ledStrip = new LedStrip();
 
     public Command setCommand(double desiredSpeed) {
         return runOnce(() -> intakeMotor.set(desiredSpeed));
     }
 
     public Command inCommand() {
-        return setCommand(IntakeConstants.INTAKE_SPEED)
-            .alongWith(Commands.run(() -> ledStrip.setLED(Color.kBlue)))
-                .andThen(Commands.run(() -> ledStrip.setLED(Color.kGreen)));
+        return setCommand(IntakeConstants.INTAKE_SPEED);
     }
 
     public Command outCommand() {
-        return setCommand(IntakeConstants.OUTTAKE_SPEED)
-            .alongWith(Commands.run(() -> ledStrip.setLED(Color.kBlanchedAlmond)))
-                .andThen(Commands.run(() -> ledStrip.setLED(Color.kBrown)));
+        return setCommand(IntakeConstants.OUTTAKE_SPEED);
     }
 
     public Command stop() {
-        return setCommand(IntakeConstants.STOP_SPEED)
-            .alongWith(Commands.run(() -> ledStrip.setLED(Color.kRed)));
+        return setCommand(IntakeConstants.STOP_SPEED);
     }
 
     public Trigger hasGamePieceTrigger() {
