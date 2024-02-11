@@ -54,7 +54,7 @@ public class Limelight extends SubsystemBase {
         if (hasTarget(botPoseArray)) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(arrayToPose3d(botPoseArray));
+            return Optional.of(arrayToPose3d(botPoseArray));
         }
     }
 
@@ -75,7 +75,7 @@ public class Limelight extends SubsystemBase {
         if (hasTarget(botPoseArray)) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(
+            return Optional.of(
                     new Pose2d(new Translation2d(botPoseArray[0], botPoseArray[1]), new Rotation2d(botPoseArray[5])));
         }
     }
@@ -87,7 +87,7 @@ public class Limelight extends SubsystemBase {
      * @param botPoseArray the output of the camera
      * @return if there is a target or not
      */
-    private boolean hasTarget(double[] botPoseArray) {
+    boolean hasTarget(double[] botPoseArray) {
         boolean allZeros = true;
         for (double val : botPoseArray) {
             if (val != 0) {
@@ -104,7 +104,7 @@ public class Limelight extends SubsystemBase {
      * 
      * or
      * 
-     * the coordinate system of the robot (array (6))
+     * the cooraaaaaaaadinate system of the robot (array (6))
      * 
      * @param targetSpace is weather or not the camera pose is returned as a
      *                    targetSpace
@@ -116,7 +116,8 @@ public class Limelight extends SubsystemBase {
     }
 
     /**
-     * 3D transform of the primary in-view AprilTag
+     * 3D transform of the primary-
+     *  in-view AprilTag
      * in the coordinate system of the Camera (array (6))
      * 
      * or
@@ -195,6 +196,6 @@ public class Limelight extends SubsystemBase {
      * @param pipeline The pipeline index (0-9)
      */
     public void setPipeline(int pipeline) {
-        table.getEntry("pipeline").setNumber(pipeline);
+        table.getEntry("pipeline").setNumber(pipeline);;
     }
 }

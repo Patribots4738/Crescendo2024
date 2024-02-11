@@ -42,7 +42,6 @@ public class PieceControl {
         return Commands.parallel(
                 intake.stop(),
                 indexer.stop(),
-                shooterCalc.stopMotors(),
                 elevator.stop(),
                 claw.stop());
     }
