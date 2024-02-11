@@ -135,8 +135,8 @@ public final class Constants {
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
 
-        public static final double PIVOT_MAX_ANGLE_DEGREES = 360.0;
-        public static final double PIVOT_REST_ANGLE_DEGREES = 0;
+        public static final double PIVOT_MAX_ANGLE_DEGREES = 58.0;
+        public static final double PIVOT_REST_ANGLE_DEGREES = 20.0;
 
         public static final double SHOOTER_PASS_SECONDS = 2;
 
