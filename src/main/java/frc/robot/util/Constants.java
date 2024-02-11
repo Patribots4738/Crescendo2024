@@ -117,13 +117,13 @@ public final class Constants {
         // degrees
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
-        public static final double SHOOTER_P = 0.3;
+        public static final double SHOOTER_P = .1;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
 
 
         // TODO: tune pid further
-        public static final double PIVOT_P = 0.05;
+        public static final double PIVOT_P = 0.1;
         public static final double PIVOT_I = 0;
         public static final double PIVOT_D = 0.002;
 
@@ -145,7 +145,7 @@ public final class Constants {
         public static final double PIVOT_LOWER_LIMIT_DEGREES_WRONG = 343.5;
         public static final double PIVOT_UPPER_LIMIT_DEGREES_WRONG = 300;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 43;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;

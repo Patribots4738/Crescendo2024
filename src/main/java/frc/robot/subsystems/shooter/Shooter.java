@@ -7,13 +7,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.PIDNotConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements Logged{
     /** Creates a new shooter. */
     private final Neo motorLeft;
     private final Neo motorRight;
 
     public final PIDNotConstants shooterPID;
+    @Log
+    private double targetLeftSpeed = 0;
+    @Log
+    private double targetRightSpeed = 0;
+
+    @Log
+    private double currentLeftSpeed = 0;
+    @Log
+    private double currentRightSpeed = 0;
+
     public Shooter() {
 
         motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID);
@@ -43,9 +55,10 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
         shooterPID.updatePID();
         motorRight.setPID(shooterPID.getPID());
+        currentLeftSpeed = motorLeft.getVelocity();
+        currentRightSpeed = motorRight.getVelocity();
     }
 
     
@@ -59,11 +72,15 @@ public class Shooter extends SubsystemBase {
     public void setSpeed(double speed) {
         motorLeft.setTargetVelocity(speed);
         motorRight.setTargetVelocity(speed);
+        targetLeftSpeed = speed;
+        targetRightSpeed = speed;
     }
 
     public void setSpeed(Pair<Double, Double> speeds) {
         motorLeft.setTargetVelocity(speeds.getFirst());
         motorRight.setTargetVelocity(speeds.getSecond());
+        targetLeftSpeed = speeds.getFirst();
+        targetRightSpeed = speeds.getSecond();
     }
 
     /**
