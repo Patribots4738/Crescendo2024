@@ -278,7 +278,7 @@ public class Neo extends CANSparkMax {
      * if in simulation.
      */
     public void register() {
-        NeoMotorConstants.motors.add(this);
+        NeoMotorConstants.MOTOR_LIST.add(this);
         if (FieldConstants.IS_SIMULATION)
             REVPhysicsSim.getInstance().addSparkMax(this, DCMotor.getNEO(1));  
     }

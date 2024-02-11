@@ -344,7 +344,7 @@ public class RobotContainer implements Logged {
     
     private void incinerateMotors() {
         Timer.delay(0.25);
-        for (CANSparkBase neo : NeoMotorConstants.motors) {
+        for (CANSparkBase neo : NeoMotorConstants.MOTOR_LIST) {
             neo.burnFlash();
             Timer.delay(0.005);
         }
