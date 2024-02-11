@@ -1,43 +1,66 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
+import frc.robot.Robot;
+import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.FieldConstants.ChainPosition;
-import monologue.Annotations.Log;
+import monologue.Logged;
 
-public class PoseCalculations {
+public class PoseCalculations implements Logged {
 
-    @Log.NT
-    public static ChainPosition getChainPosition(Pose2d position) {
+    public static Pair<Double, Double> getChainIntercepts(Pose2d position) {
         Pose2d closestChainPose;
 
         double minDifference = 10000;
         int closestChainIndex = 0;
 
-        for (int i = 0; i < FieldConstants.CHAIN_POSITIONS.length; i++) {
+        int startingIndex = Robot.isRedAlliance() ? 3 : 0;
+        int endingIndex = Robot.isRedAlliance() ? 6 : 3;
+
+        for (int i = startingIndex; i < endingIndex; i++) {
             Pose2d currentChainPose = FieldConstants.CHAIN_POSITIONS[i];
             double currentChainDistance = position.getTranslation().getDistance(currentChainPose.getTranslation());
 
-            minDifference = currentChainDistance < minDifference
-                    ? currentChainDistance
-                    : minDifference;
-
-            closestChainIndex = currentChainDistance < minDifference
-                    ? i
-                    : closestChainIndex;
+            if (currentChainDistance < minDifference) {
+                minDifference = currentChainDistance;
+                closestChainIndex = i;
+            }
         }
 
         closestChainPose = FieldConstants.CHAIN_POSITIONS[closestChainIndex];
 
         Pose2d relativePosition = position.relativeTo(closestChainPose);
 
-        if (relativePosition.getX() < Units.metersToInches(FieldConstants.CHAIN_LENGTH_METERS / 3)) {
-            return ChainPosition.LEFT;
-        } else if (relativePosition.getX() > Units.metersToInches(FieldConstants.CHAIN_LENGTH_METERS / 3)) {
-            return ChainPosition.RIGHT;
+        if (Math.abs(relativePosition.getTranslation().getX()) > 1) {
+            return Pair.of(0d, 0d);
         }
-        return ChainPosition.CENTER;
+
+        double leftIntercept = getChainIntercept(relativePosition.getY() + ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
+        double rightIntercept = getChainIntercept(relativePosition.getY() - ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
+
+        return Pair.of(leftIntercept - 0.6, rightIntercept - 0.6);
+    }
+
+    /**
+     * Given an intercept of the chain, return the height of the chain at that
+     * location.
+     * 
+     * @param x The posision along the X axis of the chain
+     *          as seen in https://www.desmos.com/calculator/84ioficbl2
+     *          For some reason, that desmos breaks on chrome on my home computer
+     *          please send help... i used edge to make it :(
+     * 
+     * @return The height of the chain at that location
+     */
+    private static double getChainIntercept(double x) {
+        // The ds here turn the integers into doubles
+        // so that integer divion does not occur.
+        double calculation = 3d / 10d * Math.pow(x, 2) + 0.725;
+        // Clamp the output to be no lower than the lowest point of the chain,
+        // and no higher than the extension limit of our elevator
+        return MathUtil.clamp(calculation, 0.725, ClimbConstants.EXTENSION_LIMIT_METERS);
     }
 
 }

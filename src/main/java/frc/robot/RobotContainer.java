@@ -5,12 +5,13 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,24 +25,23 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PatriBoxController;
-import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
-import monologue.Logged;
 import monologue.Annotations.Log;
+import monologue.Logged;
 
 public class RobotContainer implements Logged {
-
+    
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
     private Swerve swerve;
     private final Intake intake;
 
-    @SuppressWarnings("unused")
-    private final DriverUI driverUI;
-    private final Limelight limelight;
+    private Limelight limelight;
+    private final LedStrip ledStrip;
     private final Climb climb;
     private Indexer triggerWheel;
     private Pivot pivot;
@@ -50,39 +50,45 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
-
-    @Log.NT
+    
+    @Log
     public static Pose3d[] components3d = new Pose3d[5];
-    @Log.NT
+
+    @Log
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
 
+    @Log
+    public static Pose3d[] notePose3ds = new Pose3d[12];
+    
     public RobotContainer() {
+        
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
-
+        
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        driverUI = new DriverUI();
+        limelight = new Limelight(swerve::getPose);
+        ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
         limelight = new Limelight(swerve::getPose);
 
         shooter = new Shooter();
         elevator = new Elevator();
         claw = new Claw();
-
+        
         pivot = new Pivot();
-
+        incinerateMotors();
+        
         shooterCalc = new ShooterCalc(shooter, pivot);
-
+        
         pieceControl = new PieceControl(
                 intake,
                 triggerWheel,
                 elevator,
                 claw,
-                shooterCalc,
-                swerve);
+                shooterCalc);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -93,121 +99,145 @@ public class RobotContainer implements Logged {
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
             if (result.valid) {
-                swerve.getPoseEstimator().addVisionMeasurement(
-                        result.getBotPose2d(),
-                        DriverUI.currentTimestamp - limelight.getLatencyDiffSeconds());
+                swerve.getPoseEstimator().addVisionMeasurement( 
+                    result.getBotPose2d(),
+                    Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
             }
         }, limelight));
 
         swerve.setDefaultCommand(new Drive(
-                swerve,
-                driver::getLeftY,
-                driver::getLeftX,
-                () -> -driver.getRightX(),
-                () -> !driver.leftBumper().getAsBoolean(),
-                () -> (driver.leftBumper().getAsBoolean()
-                        && FieldConstants.ALLIANCE.equals(Optional.ofNullable(Alliance.Blue)))));
-
-        incinerateMotors();
+            swerve,
+            driver::getLeftY,
+            driver::getLeftX,
+            () -> -driver.getRightX(),
+            () -> !driver.y().getAsBoolean(),
+            () -> (driver.y().getAsBoolean()
+                && Robot.isBlueAlliance())));
+              
         configureButtonBindings();
-
+        
         prepareNamedCommands();
+        initializeArrays();
     }
-
+    
     private void configureButtonBindings() {
-        configureDriverBindings();
-        configureOperatorBindings();
+        configureDriverBindings(driver);
+        configureOperatorBindings(operator);
     }
+    
+    // TODO: uncomment these bindings (they are commented because we aren't testing them)
+    private void configureOperatorBindings(PatriBoxController controller) {
 
-    private void configureOperatorBindings() {
-        operator.y().onTrue((climb.toTop(PoseCalculations.getChainPosition(swerve.getPose()))));
+        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        
+        controller.povDown().onTrue(climb.toBottomCommand());
 
-        operator.a().onTrue((climb.toBottom()));
+        // controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        operator.b().onTrue(
-                pieceControl.prepareToFire(operator.leftBumper()));
+        // controller.povRight().onTrue(elevator.toTopCommand());
 
-        operator.leftBumper().and(operator.rightBumper().negate()).onTrue(
-                pieceControl.prepareToFire(operator.x()));
+        controller.leftBumper()
+            .onTrue(pieceControl.noteToShoot());
 
-        operator.leftBumper().and(operator.rightBumper()).onTrue(
-                pieceControl.noteToShoot());
+        controller.rightBumper()
+            .onTrue(pieceControl.ejectNote());
 
-        operator.rightBumper().and(operator.leftBumper().negate()).onTrue(
-                pieceControl.noteToTarget(() -> true));
+        controller.a()
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
-        operator.leftTrigger(OIConstants.OPERATOR_DEADBAND).and(
-                intake.hasGamePieceTrigger().negate()).onTrue(
-                        intake.inCommand());
+        controller.start().or(controller.back())
+            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(3,6.6, new Rotation2d()))));
+        
+        // controller.rightBumper()
+        //     .and(controller.leftBumper().negate())
+        //     .onTrue(pieceControl.noteToTarget(() -> true));
 
-        operator.rightTrigger(OIConstants.OPERATOR_DEADBAND).onTrue(
-                intake.outCommand());
+        // controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
+        //     .and(intake.hasGamePieceTrigger().negate())
+        //     .onTrue(pieceControl.intakeToClaw());
 
-        operator.x().onTrue(
-                intake.stop());
+        // controller.leftTrigger()
+        //     .onFalse(pieceControl.stopIntakeAndIndexer());
+
+        // controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
+        //     .onTrue(intake.outCommand());
+
+        // controller.x().onTrue(intake.stop());
+
     }
-
-    private void configureDriverBindings() {
-
+    
+    private void configureDriverBindings(PatriBoxController controller) {
+        
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing away from the driver station
-        driver.start().or(driver.back()).onTrue(
-                Commands.runOnce(() -> swerve.resetOdometry(
-                        new Pose2d(
-                                swerve.getPose().getTranslation(),
-                                Rotation2d.fromDegrees(
-                                        FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red))
-                                                ? 0
-                                                : 180))),
-                        swerve));
+        controller.start().or(controller.back()).onTrue(
+            Commands.runOnce(() -> swerve.resetOdometry(
+                new Pose2d(
+                    swerve.getPose().getTranslation(),
+                    Rotation2d.fromDegrees(
+                        Robot.isRedAlliance()
+                            ? 0
+                            : 180))), 
+                swerve));
 
-        driver.rightBumper().whileTrue(Commands.runOnce(swerve::getSetWheelsX));
-
-        driver.leftStick().toggleOnTrue(swerve.toggleSpeed());
-
-        driver.a().and(intake.hasGamePieceTrigger().negate()).onTrue(intake.inCommand());
-
-        driver.y().onTrue(intake.outCommand());
-
-        driver.x().onTrue(intake.stop());
-
-        driver.rightStick().whileTrue(
+        controller.b()
+            .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
+        
+        controller.leftStick()
+            .toggleOnTrue(swerve.toggleSpeed());
+        
+        controller.a()
+            .and(intake.hasGamePieceTrigger().negate())
+            .onTrue(intake.inCommand());
+        
+        controller.y()
+            .onTrue(intake.outCommand());
+        
+        controller.leftBumper()
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        
+        controller.x()
+            .onTrue(intake.stop());
+        
+        controller.rightStick()
+            .toggleOnTrue(
                 Commands.sequence(
-                        swerve.getDriveCommand(
-                                () -> {
-                                    return ChassisSpeeds.fromFieldRelativeSpeeds(
-                                            driver.getLeftY(),
-                                            driver.getLeftX(),
-                                            swerve.getAlignmentSpeeds(Rotation2d.fromRadians(360)),
-                                            swerve.getPose().getRotation());
-                                }, true)));
+                swerve.resetHDC(),
+                swerve.getDriveCommand(
+                    () -> {
+                        ;
+                        return new ChassisSpeeds(
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                    },
+                    () -> true)));
 
+        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
-
+    
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
+        return Commands.none();
     }
-
+    
     public void onDisabled() {
     }
-
+    
     public void onEnabled() {
     }
-
+    
     public void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL",
-                shooterCalc.prepareFireCommand(() -> true, FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM",
-                shooterCalc.prepareFireCommand(() -> true, FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR",
-                shooterCalc.prepareFireCommand(() -> true, FieldConstants.R_POSE));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
     }
-
+    
     private void incinerateMotors() {
         Timer.delay(0.25);
         for (CANSparkBase neo : NeoMotorConstants.motors) {
@@ -217,4 +247,26 @@ public class RobotContainer implements Logged {
         Timer.delay(0.25);
     }
 
+    private void initializeArrays() {
+        Pose3d initialShooterPose = new Pose3d(
+                NTConstants.PIVOT_OFFSET_METERS.getX(),
+                0,
+                NTConstants.PIVOT_OFFSET_METERS.getY(),
+            new Rotation3d()
+        );
+
+        components3d[0] = initialShooterPose;
+        desiredComponents3d[0] = initialShooterPose;
+
+        for (int i = 1; i < components3d.length; i++) {
+            components3d[i] = new Pose3d();
+            desiredComponents3d[i] = new Pose3d();
+        }
+
+        notePose3ds[0] = new Pose3d();
+        for (int i = 1; i < notePose3ds.length; i++) {
+            notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
+        }
+    }
 }
+

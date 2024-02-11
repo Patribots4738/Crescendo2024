@@ -1,24 +1,33 @@
 package frc.robot.subsystems.shooter;
 
-import java.util.function.BooleanSupplier;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements Logged{
     /** Creates a new shooter. */
     private final Neo motorLeft;
     private final Neo motorRight;
 
+    @Log
+    private double targetLeftSpeed = 0;
+    @Log
+    private double targetRightSpeed = 0;
+
+    @Log
+    private double currentLeftSpeed = 0;
+    @Log
+    private double currentRightSpeed = 0;
+
     public Shooter() {
 
         motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID);
-        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID);
+        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true);
 
         configMotors();
 
@@ -44,7 +53,8 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
+        currentLeftSpeed = motorLeft.getVelocity();
+        currentRightSpeed = motorRight.getVelocity();
     }
 
     /**
@@ -56,11 +66,15 @@ public class Shooter extends SubsystemBase {
     public void setSpeed(double speed) {
         motorLeft.setTargetVelocity(speed);
         motorRight.setTargetVelocity(speed);
+        targetLeftSpeed = speed;
+        targetRightSpeed = speed;
     }
 
-    public void setSpeedPair(Pair<Double, Double> speeds) {
+    public void setSpeed(Pair<Double, Double> speeds) {
         motorLeft.setTargetVelocity(speeds.getFirst());
         motorRight.setTargetVelocity(speeds.getSecond());
+        targetLeftSpeed = speeds.getFirst();
+        targetRightSpeed = speeds.getSecond();
     }
 
     /**
@@ -76,7 +90,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setSpeedCommand(Pair<Double, Double> speeds) {
-        return runOnce(() -> setSpeedPair(speeds));
+        return runOnce(() -> setSpeed(speeds));
+    }
+
+    public Pair<Double, Double> getSpeed() {
+        return new Pair<Double, Double>(motorLeft.getVelocity(), motorRight.getVelocity());
     }
 
     /**
@@ -86,22 +104,5 @@ public class Shooter extends SubsystemBase {
      */
     public Command stop() {
         return Commands.runOnce(() -> motorLeft.stopMotor());
-    }
-
-    // TODO: Implement a way to get the RPM of the shooter
-    /**
-     * The function is a BooleanSupplier that represents the the condition of
-     * the velocity of the motor being equal to its targetVelocity
-     * 
-     * 
-     * @return The method is returning a BooleanSupplier that returns true if
-     *         the current velocity of the motors is at the target velocity with a
-     *         small tolerance
-     */
-    public BooleanSupplier atDesiredRPM() {
-        return () -> (MathUtil.applyDeadband(
-                Math.abs(
-                        motorLeft.getVelocity() - motorLeft.getTargetVelocity()),
-                ShooterConstants.SHOOTER_DEADBAND) == 0);
     }
 }

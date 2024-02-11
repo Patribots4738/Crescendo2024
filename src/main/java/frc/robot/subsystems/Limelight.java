@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,8 +27,15 @@ public class Limelight extends SubsystemBase implements Logged{
     String limelightName = "limelight";
     private final Supplier<Pose2d> robotPoseSupplier;
 
-    @Log.NT
+    @Log
     Pose3d[] visableTags;
+
+    @Log
+    public boolean isConnected = false;
+
+    @Log
+    public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
+
 
     public Limelight(Supplier<Pose2d> robotPoseSupplier) {
         this.robotPoseSupplier = robotPoseSupplier;
