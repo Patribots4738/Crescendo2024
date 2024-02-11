@@ -132,7 +132,7 @@ public final class Constants {
         public static final double PIVOT_LOWER_LIMIT_DEGREES_WRONG = 343.5;
         public static final double PIVOT_UPPER_LIMIT_DEGREES_WRONG = 300;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 43;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
