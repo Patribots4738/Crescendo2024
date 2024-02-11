@@ -424,8 +424,8 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int INTAKE_CAN_ID = 19;
-        public static final int TRIGGER_WHEEL_CAN_ID = 20;
+        public static final int INTAKE_CAN_ID = 9;
+        public static final int TRIGGER_WHEEL_CAN_ID = 10;
 
         // % speeds of the motor
         public static final double INTAKE_PERCENT = .3;
