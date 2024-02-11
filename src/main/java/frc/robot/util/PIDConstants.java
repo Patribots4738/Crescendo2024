@@ -75,7 +75,8 @@ public class PIDConstants {
     }
 
     public String toString() {
-        return String.format("P: %.4f | I: %.4f | D: %.4f | FF: %.4f | iZone: %.4f | minOutput: %.4f | maxOutput: %.4f", this.P, this.I, this.D, this.FF, this.iZone, this.minOutput, this.maxOutput);
+        return String.format("P: %.4f | I: %.4f | D: %.4f | FF: %.4f | iZone: %.4f | minOutput: %.4f | maxOutput: %.4f",
+                this.P, this.I, this.D, this.FF, this.iZone, this.minOutput, this.maxOutput);
     }
 
     /**
