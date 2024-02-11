@@ -72,7 +72,6 @@ public class RobotContainer implements Logged {
         limelight = new Limelight(swerve::getPose);
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
-        limelight = new Limelight(swerve::getPose);
 
         shooter = new Shooter();
         elevator = new Elevator();
