@@ -1,24 +1,27 @@
 package frc.robot.util;
 
 import com.revrobotics.SparkPIDController;
+
+import monologue.Logged;
+
 import com.pathplanner.lib.util.PIDConstants;
 
-public class PIDNotConstants {
+public class PIDNotConstants implements Logged {
     /** P */
-    public double kP;
+    public double p;
     /** I */
-    public double kI;
+    public double i;
     /** D */
-    public double kD;
+    public double d;
     /** Integral range */
     public final double iZone;
 
     private final SparkPIDController PIDController;
 
-    public PIDNotConstants(double kP, double kI, double kD, double iZone, SparkPIDController PIDController) {
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
+    public PIDNotConstants(double p, double i, double d, double iZone, SparkPIDController PIDController) {
+        this.p = p;
+        this.i = i;
+        this.d = d;
         this.iZone = iZone;
         this.PIDController = PIDController;
         this.updatePID();
@@ -27,47 +30,50 @@ public class PIDNotConstants {
     /**
      * Create a new PIDConstants object
      *
-     * @param kP P
-     * @param kI I
-     * @param kD D
+     * @param p P
+     * @param i I
+     * @param d D
      */
-    public PIDNotConstants(double kP, double kI, double kD, SparkPIDController PIDController) {
-        this(kP, kI, kD, 1.0, PIDController);
+    public PIDNotConstants(double p, double i, double d, SparkPIDController PIDController) {
+        this(p, i, d, 1.0, PIDController);
     }
 
     /**
      * Create a new PIDConstants object
      *
-     * @param kP P
-     * @param kD D
+     * @param p P
+     * @param d D
      */
-    public PIDNotConstants(double kP, double kD, SparkPIDController PIDController) {
-        this(kP, 0, kD, PIDController);
+    public PIDNotConstants(double p, double d, SparkPIDController PIDController) {
+        this(p, 0, d, PIDController);
     }
 
     public void updatePID() {
-        if (PIDController.getP() != this.kP) {
-            this.PIDController.setP(this.kP);
+        if (PIDController.getP() != this.p) {
+            this.PIDController.setP(this.p);
+            System.out.println("Changeing P to: " + p);
         }
-        if (PIDController.getI() != this.kI) {
-            this.PIDController.setI(this.kI);
+        if (PIDController.getI() != this.i) {
+            this.PIDController.setI(this.i);
+            System.out.println("Changeing I to: " + i);
         }
-        if (PIDController.getD() != this.kD) {
-            this.PIDController.setD(this.kD);
+        if (PIDController.getD() != this.d) {
+            this.PIDController.setD(this.d);
+            System.out.println("Changeing D to: " + d);
         }
     }
 
     public String toString() {
-        return "P: " + this.kP + "\nI: " + this.kI + "\nD: " + this.kD;
+        return "P: " + this.p + "\nI: " + this.i + "\nD: " + this.d;
     }
 
     /**
      * Create a new PIDConstants object
      *
-     * @param kP P
+     * @param p P
      */
-    public PIDNotConstants(double kP, SparkPIDController PIDController) {
-        this(kP, 0, 0, PIDController);
+    public PIDNotConstants(double p, SparkPIDController PIDController) {
+        this(p, 0, 0, PIDController);
     }
 
     public PIDNotConstants(PIDConstants PID, SparkPIDController PIDController) {
@@ -75,31 +81,31 @@ public class PIDNotConstants {
     }
 
     public PIDConstants getPID() {
-        return new PIDConstants(this.kP, this.kI, this.kD);
+        return new PIDConstants(this.p, this.i, this.d);
     }
 
     public void setP(double value) {
-        kP = value;
+        p = value;
     }
 
     public void setI(double value) {
-        kI = value;
+        i = value;
     }
 
     public void setD(double value) {
-        kD = value;
+        d = value;
     }
 
     public double getP() {
-        return this.kP;
+        return this.p;
     }
 
     public double getI() {
-        return this.kI;
+        return this.i;
     }
 
     public double getD() {
-        return this.kD;
+        return this.d;
     }
 
 }
