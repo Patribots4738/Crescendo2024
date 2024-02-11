@@ -83,6 +83,8 @@ public class RobotContainer implements Logged {
         
         pivot = new Pivot();
         incinerateMotors();
+
+        limelight = new Limelight();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
         
