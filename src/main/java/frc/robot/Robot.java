@@ -45,6 +45,9 @@ public class Robot extends TimedRobot {
         Monologue.setupMonologue(robotContainer, "Robot", false, false);
 
         DataLogManager.start();
+        DataLogManager.logNetworkTables(true);
+        DriverStation.startDataLog(DataLogManager.getLog(), true);
+        DriverStation.silenceJoystickConnectionWarning(true);
         URCL.start();
 }
     /**
