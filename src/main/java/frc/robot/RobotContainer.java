@@ -47,9 +47,6 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
-    // Correct?
-    private Elevator enableElevatorMode;
-    private Shooter enableShooterMode;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -123,43 +120,21 @@ public class RobotContainer implements Logged {
     
     private void configureOperatorBindings(PatriBoxController controller) {
 
-        //controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
-        
-        //controller.povDown().onTrue(climb.toBottomCommand());
 
         controller.povDown().onTrue(elevator.toBottomCommand());
 
         controller.povUp().onTrue(elevator.toTopCommand());
 
-        // controller.leftBumper()
-        //    .and(controller.rightBumper())
-        //    .onTrue(pieceControl.noteToShoot());
-
         controller.rightBumper()
-        // OUTTAKE
-        //  .and(controller.leftBumper().negate())
             .onTrue(intake.outCommand());
 
         controller.leftBumper()
-        // INTAKE
             .onTrue(intake.inCommand());
 
-        //controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
-        //    .and(intake.hasGamePieceTrigger().negate())
-        //    .onTrue(pieceControl.intakeToClaw());
-
-        //controller.leftTrigger()
-        //    .onFalse(pieceControl.stopIntakeAndIndexer());
-
-        //controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
-        //    .onTrue(intake.outCommand());
-
         controller.x()
-        // SHOOTER MODE
             .onTrue(pieceControl.setShooterModeCommand(true));
 
         controller.b()
-        // ELEVATOR MODE
             .onTrue(pieceControl.setShooterModeCommand(false));
     }
     
@@ -181,29 +156,15 @@ public class RobotContainer implements Logged {
         controller.povUp().onTrue(climb.toTopCommand());
         
         controller.povDown().onTrue(climb.toBottomCommand());
-
-        //controller.b()
-        //    .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
-        
-        //controller.leftStick()
-        //    .toggleOnTrue(swerve.toggleSpeed());
         
         controller.a();
         // TODO: AMP ALIGN
-        //  .and(intake.hasGamePieceTrigger().negate())
-        //  .onTrue(intake.inCommand());
-        
-        //controller.leftBumper()
-        //    .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
         
         controller.rightTrigger();
         // TODO: SHOOT/PLACE NOTE
-        
-        //controller.x()
-        //    .onTrue(intake.stop());
 
         controller.rightStick()
-        // AIM AT SPEAKER/CHAIN
+        // TODO: AIM AT SPEAKER/CHAIN
             .whileTrue(
                 Commands.sequence(
                 swerve.resetHDC(),
