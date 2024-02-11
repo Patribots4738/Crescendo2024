@@ -140,7 +140,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.ejectNote());
 
         controller.a()
-            .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.start().or(controller.back())
             .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(3,6.6, new Rotation2d()))));
