@@ -2,9 +2,7 @@ package frc.robot;
 
 import java.util.Optional;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -202,7 +200,7 @@ public class RobotContainer implements Logged {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
-        NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
+        NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget());
         NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
         NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
         NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
