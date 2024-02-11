@@ -12,17 +12,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
 
 public class Elevator extends SubsystemBase {
     private final Neo elevator;
-
+    private final PIDNotConstants elevatorPID;
 
     /** Creates a new Elevator. */
     public Elevator() {
         elevator = new Neo(TrapConstants.LEFT_ELEVATOR_CAN_ID);
         configMotors();
+        elevatorPID = new PIDNotConstants(elevator.getPID(), elevator.getPIDController());
     }
 
     public void configMotors() {
@@ -43,6 +45,7 @@ public class Elevator extends SubsystemBase {
             0, 0, elevator.getPosition(),
             new Rotation3d()
         );
+        elevatorPID.updatePID();
     }
 
     public double getPosition() {
@@ -91,6 +94,9 @@ public class Elevator extends SubsystemBase {
 
     public Command stop() {
         return runOnce(() -> elevator.stopMotor());
+    }
+    public PIDNotConstants getPIDNotConstants() {
+        return this.elevatorPID;
     }
 
 }

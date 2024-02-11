@@ -29,11 +29,14 @@ import frc.robot.util.Constants.OIConstants;
 import monologue.Logged;
 import frc.robot.util.Constants.NTConstants;
 import monologue.Annotations.Log;
+import frc.robot.util.PIDNotConstants;
+import frc.robot.util.PIDTunerCommands;
 
 public class RobotContainer implements Logged {
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
+    private final PatriBoxController PIDTunerController;
 
     private Swerve swerve;
     private final Intake intake;
@@ -52,6 +55,7 @@ public class RobotContainer implements Logged {
     private PieceControl pieceControl;
 
     private CalibrationControl calibrationControl;
+    private PIDTunerCommands PIDTuner;
     
     @Log.NT
     public static Pose3d[] components3d = new Pose3d[5];
@@ -63,7 +67,7 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
-
+        PIDTunerController = new PatriBoxController(OIConstants.PID_TUNER_CONTROLLER_PORT, OIConstants.PID_TUNER_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
         limelight = new Limelight();
@@ -81,6 +85,13 @@ public class RobotContainer implements Logged {
         
         shooterCalc = new ShooterCalc(shooter, pivot);
         
+        PIDTuner = new PIDTunerCommands(new PIDNotConstants[] {
+            pivot.getPIDNotConstants(),
+            shooter.getPIDNotConstants(),
+            elevator.getPIDNotConstants(),
+            climb.getPidNotConstants()
+        });
+
         pieceControl = new PieceControl(
             intake,
             triggerWheel,
@@ -124,10 +135,21 @@ public class RobotContainer implements Logged {
     
     private void configureButtonBindings() {
         configureDriverBindings(driver);
-        // configureOperatorBindings(operator);
-        configureCalibrationBindings(operator);
+        configureOperatorBindings(operator);
+        configurePIDTunerBindings(PIDTunerController);
     }
     
+    private void configurePIDTunerBindings(PatriBoxController controller) {
+        controller.povRight().onTrue(PIDTuner.incrementSubsystemCommand());
+        controller.povLeft().onTrue(PIDTuner.decreaseSubsystemCommand());
+        controller.rightBumper().onTrue(PIDTuner.PIDIncrementCommand());
+        controller.leftBumper().onTrue(PIDTuner.PIDDecreaseCommand());
+        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(1000));
+        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(1000));
+        controller.a().onTrue(PIDTuner.logCommand());
+    }
+  
+
     private void configureOperatorBindings(PatriBoxController controller) {
 
         controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));

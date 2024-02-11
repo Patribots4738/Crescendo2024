@@ -27,6 +27,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
 /**
  * Welcome to the home of the many many variables :D
@@ -96,6 +98,16 @@ public final class Constants {
         public static final boolean GYRO_REVERSED = true;
     }
 
+
+    public static final class TuningConstants implements Logged {
+        public final int DRIVE_INDEX = 0;
+        public final int PIVOT_INDEX = 1;
+        public final int SHOOTER_INDEX = 2;
+        public final int ELEVATOR_INDEX = 3;
+        public final int CLIMB_INDEX = 4;
+
+    }
+
     public static final class ShooterConstants {
         public static final int LEFT_SHOOTER_CAN_ID = 11;
         public static final int RIGHT_SHOOTER_CAN_ID = 12;
@@ -107,6 +119,7 @@ public final class Constants {
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
+
 
         // TODO: tune pid further
         public static final double PIVOT_P = 0.2;
@@ -340,9 +353,11 @@ public final class Constants {
 
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final int OPERATOR_CONTROLLER_PORT = 1;
+        public static final int PID_TUNER_CONTROLLER_PORT = 2;
 
         public static final double DRIVER_DEADBAND = 0.15;
         public static final double OPERATOR_DEADBAND = 0.15;
+        public static final double PID_TUNER_DEADBAND = 0.15;
 
         // See https://www.desmos.com/calculator/e07raajzh5
         // And

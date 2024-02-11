@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -20,12 +21,14 @@ public class Climb extends SubsystemBase implements Logged {
 
     private final Neo leftMotor;
     private final Neo rightMotor;
+    private final PIDNotConstants climbPID;
 
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
         rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
 
         configureMotors();
+        climbPID = new PIDNotConstants(leftMotor.getPID(), leftMotor.getPIDController());
     }
 
     private void configureMotors() {
@@ -52,6 +55,13 @@ public class Climb extends SubsystemBase implements Logged {
             0, 0, rightMotor.getPosition(),
             new Rotation3d()
         );
+        climbPID.updatePID();
+        rightMotor.setPID(climbPID.getPID());
+    }
+
+
+    public PIDNotConstants getPidNotConstants() {
+        return this.climbPID;
     }
 
     public void setPosition(Pair<Double, Double> positionPair) {

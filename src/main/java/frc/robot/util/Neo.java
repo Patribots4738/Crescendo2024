@@ -452,6 +452,10 @@ public class Neo extends CANSparkMax {
         return pidController.getD();
     }
 
+    public PIDConstants getPID() {
+        return new PIDConstants(pidController.getP(), pidController.getI(), pidController.getD());
+    }
+
     /**
      * Gets the I-Zone constant for PID controller.
      * The I-Zone is the zone at which the integral

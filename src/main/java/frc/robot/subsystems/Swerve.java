@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriverUI;
 import frc.robot.commands.Drive;
 import frc.robot.util.MAXSwerveModule;
+import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -43,7 +44,6 @@ public class Swerve extends SubsystemBase implements Logged {
     public static double twistScalar = 4;
 
     private double speedMultiplier = 1;
-
     private final MAXSwerveModule frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
             DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
