@@ -2,26 +2,31 @@ package frc.robot.util;
 
 import com.revrobotics.SparkPIDController;
 
+import edu.wpi.first.math.MathUtil;
 import monologue.Logged;
+import monologue.Annotations.Log;
 
 import com.pathplanner.lib.util.PIDConstants;
 
 public class PIDNotConstants implements Logged {
     /** P */
-    public double p;
+    @Log
+    public double kP;
     /** I */
-    public double i;
+    @Log
+    public double kI;
     /** D */
-    public double d;
+    @Log
+    public double kD;
     /** Integral range */
     public final double iZone;
 
     private final SparkPIDController PIDController;
 
-    public PIDNotConstants(double p, double i, double d, double iZone, SparkPIDController PIDController) {
-        this.p = p;
-        this.i = i;
-        this.d = d;
+    public PIDNotConstants(double kP, double kI, double kD, double iZone, SparkPIDController PIDController) {
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
         this.iZone = iZone;
         this.PIDController = PIDController;
         this.updatePID();
@@ -30,50 +35,47 @@ public class PIDNotConstants implements Logged {
     /**
      * Create a new PIDConstants object
      *
-     * @param p P
-     * @param i I
-     * @param d D
+     * @param kP P
+     * @param kI I
+     * @param kD D
      */
-    public PIDNotConstants(double p, double i, double d, SparkPIDController PIDController) {
-        this(p, i, d, 1.0, PIDController);
+    public PIDNotConstants(double kP, double kI, double kD, SparkPIDController PIDController) {
+        this(kP, kI, kD, 1.0, PIDController);
     }
 
     /**
      * Create a new PIDConstants object
      *
-     * @param p P
-     * @param d D
+     * @param kP P
+     * @param kD D
      */
-    public PIDNotConstants(double p, double d, SparkPIDController PIDController) {
-        this(p, 0, d, PIDController);
+    public PIDNotConstants(double kP, double kD, SparkPIDController PIDController) {
+        this(kP, 0, kD, PIDController);
     }
 
     public void updatePID() {
-        if (PIDController.getP() != this.p) {
-            this.PIDController.setP(this.p);
-            System.out.println("Changeing P to: " + p);
+        if (MathUtil.applyDeadband(PIDController.getP() - this.kP, 0.0001) != 0) {
+            this.PIDController.setP(this.kP);
         }
-        if (PIDController.getI() != this.i) {
-            this.PIDController.setI(this.i);
-            System.out.println("Changeing I to: " + i);
+        if (MathUtil.applyDeadband(PIDController.getI() - this.kI, 0.0001) != 0) {
+            this.PIDController.setI(this.kI);
         }
-        if (PIDController.getD() != this.d) {
-            this.PIDController.setD(this.d);
-            System.out.println("Changeing D to: " + d);
+        if (MathUtil.applyDeadband(PIDController.getD() - this.kD, 0.0001) != 0) {
+            this.PIDController.setD(this.kD);
         }
     }
 
     public String toString() {
-        return "P: " + this.p + "\nI: " + this.i + "\nD: " + this.d;
+        return String.format("P: %.4f | I: %.4f | D: %.4f", this.kP, this.kI, this.kD);
     }
 
     /**
      * Create a new PIDConstants object
      *
-     * @param p P
+     * @param kP P
      */
-    public PIDNotConstants(double p, SparkPIDController PIDController) {
-        this(p, 0, 0, PIDController);
+    public PIDNotConstants(double kP, SparkPIDController PIDController) {
+        this(kP, 0, 0, PIDController);
     }
 
     public PIDNotConstants(PIDConstants PID, SparkPIDController PIDController) {
@@ -81,31 +83,31 @@ public class PIDNotConstants implements Logged {
     }
 
     public PIDConstants getPID() {
-        return new PIDConstants(this.p, this.i, this.d);
+        return new PIDConstants(this.kP, this.kI, this.kD);
     }
 
     public void setP(double value) {
-        p = value;
+        kP = value;
     }
 
     public void setI(double value) {
-        i = value;
+        kI = value;
     }
 
     public void setD(double value) {
-        d = value;
+        kD = value;
     }
 
     public double getP() {
-        return this.p;
+        return this.kP;
     }
 
     public double getI() {
-        return this.i;
+        return this.kI;
     }
 
     public double getD() {
-        return this.d;
+        return this.kD;
     }
 
 }

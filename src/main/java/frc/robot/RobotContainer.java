@@ -37,7 +37,6 @@ public class RobotContainer implements Logged {
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
-    private final PatriBoxController PIDTunerController;
 
     private Swerve swerve;
     private final Intake intake;
@@ -68,7 +67,6 @@ public class RobotContainer implements Logged {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
-        PIDTunerController = new PatriBoxController(OIConstants.PID_TUNER_CONTROLLER_PORT, OIConstants.PID_TUNER_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
         // limelight = new Limelight();
@@ -138,9 +136,9 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        configureDriverBindings(driver);
-        configureOperatorBindings(operator);
-        configurePIDTunerBindings(PIDTunerController);
+        // configureDriverBindings(driver);
+        // configureOperatorBindings(operator);
+        configurePIDTunerBindings(driver);
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
@@ -148,9 +146,11 @@ public class RobotContainer implements Logged {
         controller.povLeft().onTrue(PIDTuner.decreaseSubsystemCommand());
         controller.rightBumper().onTrue(PIDTuner.PIDIncrementCommand());
         controller.leftBumper().onTrue(PIDTuner.PIDDecreaseCommand());
-        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(1000));
-        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(1000));
+        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.1));
+        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(.1));
         controller.a().onTrue(PIDTuner.logCommand());
+        controller.x().onTrue(PIDTuner.multiplyPIDCommand(2));
+        controller.b().onTrue(PIDTuner.multiplyPIDCommand(.5));
     }
   
 
