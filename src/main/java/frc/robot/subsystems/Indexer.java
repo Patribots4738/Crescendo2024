@@ -20,8 +20,7 @@ public class Indexer extends SubsystemBase {
 
     public void configMotor() {
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
-        triggerWheel.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS,
-                IntakeConstants.TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS);
+        triggerWheel.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_CURRENT_LIMIT_AMPS);
         triggerWheel.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
         triggerWheel.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         triggerWheel.setInverted(false);
@@ -39,7 +38,7 @@ public class Indexer extends SubsystemBase {
                             percent, 
                             IntakeConstants.INDEXER_PERCENT_LOWER_LIMIT, 
                             IntakeConstants.INDEXER_PERCENT_UPPER_LIMIT);
-        triggerWheel.setTargetPercent(desiredPercent);
+        triggerWheel.set(desiredPercent);
     }
 
     public Command setPercentCommand(double percent) {

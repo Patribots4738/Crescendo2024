@@ -52,9 +52,6 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_D,
 				ShooterConstants.PIVOT_MIN_OUTPUT,
 				ShooterConstants.PIVOT_MAX_OUTPUT);
-
-		// Change to brake when done testing
-		pivot.setCoastMode();
 	}
 
 	@Override
@@ -125,7 +122,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @return The method is returning a Command object.
 	 */
 	public Command stop() {
-		return runOnce(() -> pivot.stopMotor());
+		return runOnce(() -> pivot.set(0));
 	}
 
 	/**
