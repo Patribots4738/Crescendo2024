@@ -149,22 +149,24 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(0.0, 300d, 60d));
-                put(10, SpeedAngleTriplet.of(0.0, 600d, 50d));
-                put(15, SpeedAngleTriplet.of(0.0, 900d, 40d));
-                put(20, SpeedAngleTriplet.of(0.0, 1200d, 30d));
-                put(25, SpeedAngleTriplet.of(0.0, 1500d, 20d));
-                put(30, SpeedAngleTriplet.of(0.0, 1800d, 10d));
+                put(5, SpeedAngleTriplet.of(3000.0, 3000.0, 45.0));
+                put(10, SpeedAngleTriplet.of(4000.0, 4000.0, 45.0));
+                put(15, SpeedAngleTriplet.of(6000.0, 4000.0, 40.0));
+                put(20, SpeedAngleTriplet.of(6000.0, 4000.0, 30.0));
+                put(25, SpeedAngleTriplet.of(6000.0, 4000.0, 20.0));
+                put(30, SpeedAngleTriplet.of(6000.0, 4000.0, 10.0));
             }
         };
 
-        public static InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<Double, SpeedAngleTriplet>(
+        public static final InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(),
                 SpeedAngleTriplet.getInterpolator()) {{
             for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
                 put(entry.getKey().doubleValue(), entry.getValue());
             }
         }};
+
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
 
     }
 
@@ -507,21 +509,23 @@ public final class Constants {
 
         // Speaker Positions: Blue alliance left
         // @formatter:off
-                //
-                //  0             1
-                //
-                //
-                // @formatter:on
-        public static final Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
+        //
+        //  0             1
+        //
+        //
+        // @formatter:on
+        private static final Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Speaker
                 new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)),
                 // Red Speaker
-                new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(180)),
+                new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(0)),
         };
 
-        public static Pose2d[] AMP_POSITIONS = new Pose2d[] {
+        public static final double SPEAKER_HEIGHT = 2.08;
+
+        private static final Pose2d[] AMP_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Amp
@@ -530,13 +534,52 @@ public final class Constants {
                 new Pose2d(14.706, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
         };
 
+        public static Pose2d GET_SPEAKER_POSITION() {
+            return SPEAKER_POSITIONS[ALLIANCE.isPresent() && ALLIANCE.get().equals(Alliance.Red) ? 1 : 0];
+        } 
+
+        public static Pose2d GET_AMP_POSITION() {
+            return AMP_POSITIONS[ALLIANCE.isPresent() && ALLIANCE.get().equals(Alliance.Red) ? 1 : 0];
+        }
+
         // TODO: make real constants
         public static final Pose2d L_POSE = new Pose2d();
         public static final Pose2d R_POSE = new Pose2d();
         public static final Pose2d M_POSE = new Pose2d();
 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
+
+        public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
+
+        // need to update
+        private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);
+        private static double CENTERLINE_SEPARATION_Y = Units.inchesToMeters(66);
+        private static double SPIKE_X = Units.inchesToMeters(114);
+        // need
+        private static double SPIKE_FIRST_Y = Units.inchesToMeters(161.638);
+        private static double SPIKE_SEPARATION_Y = Units.inchesToMeters(57);
+        private static double NOTE_Z = Units.inchesToMeters(2);
+
+        private static Translation3d[] CENTERLINE_TRANSLATIONS = new Translation3d[5];
+        private static Translation3d[] SPIKE_TRANSLATIONS_BLUE = new Translation3d[3];
+        private static Translation3d[] SPIKE_TRANSLATIONS_RED = new Translation3d[3];
+        public static Translation3d[] NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
+
+        static {
+            for (int i = 0; i < SPIKE_TRANSLATIONS_BLUE.length; i++) {
+                SPIKE_TRANSLATIONS_BLUE[i] = new Translation3d(SPIKE_X, SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y), NOTE_Z);
+                SPIKE_TRANSLATIONS_RED[i] = new Translation3d(FIELD_WIDTH_METERS - SPIKE_X, SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y), NOTE_Z);
+            }
+            for (int i = 0; i < CENTERLINE_TRANSLATIONS.length; i++) {
+                CENTERLINE_TRANSLATIONS[i] =
+                        new Translation3d(CENTERLINE_X, CENTERLINE_FIRST_Y + (i * CENTERLINE_SEPARATION_Y), NOTE_Z);
+            }
+            System.arraycopy(SPIKE_TRANSLATIONS_BLUE, 0, NOTE_TRANSLATIONS, 0, SPIKE_TRANSLATIONS_BLUE.length);
+            System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length, SPIKE_TRANSLATIONS_RED.length);
+            System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
+        }
     }
+    
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
         public static final int CLAW_INDEX = 1;
@@ -554,4 +597,7 @@ public final class Constants {
             PIVOT_OFFSET_Z);
         
     }
+
+    public static final double GRAVITY = 9.8;
+
 }

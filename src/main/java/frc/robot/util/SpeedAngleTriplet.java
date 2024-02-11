@@ -50,6 +50,10 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
         return super.getFirst();
     }
 
+    public double getAverageSpeed() {
+        return (getLeftSpeed() + getRightSpeed()) / 2.0;
+    }
+
     /**
      * Returns the angle value.
      *
@@ -61,6 +65,10 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
 
     public static SpeedAngleTriplet of(Double leftSpeed, Double rightSpeed, Double angle) {
         return new SpeedAngleTriplet(leftSpeed, rightSpeed, angle);
+    }
+
+    public static SpeedAngleTriplet of(Pair<Double, Double> speeds, Double angle) {
+        return new SpeedAngleTriplet(speeds, angle);
     }
 
     /**
