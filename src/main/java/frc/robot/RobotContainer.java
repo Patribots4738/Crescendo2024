@@ -87,20 +87,22 @@ public class RobotContainer implements Logged {
             shooterCalc
         );
         
-        limelight.setDefaultCommand(Commands.run(() -> {
-        // Create an "Optional" object that contains the estimated pose of the robot
-        // This can be present (sees tag) or not present (does not see tag)
-        Optional<Pose2d> result = limelight.getPose2d();
-        // The skew of the tag represents how confident the camera is
-        // If the result of the estimatedRobotPose exists,
-        // and the skew of the tag is less than 3 degrees,
-        // then we can confirm that the estimated position is realistic
-        if (result.isPresent()) {
-        swerve.getPoseEstimator().addVisionMeasurement(
-        result.get(),
-        Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
+        if (false) {
+            limelight.setDefaultCommand(Commands.run(() -> {
+                // Create an "Optional" object that contains the estimated pose of the robot
+                // This can be present (sees tag) or not present (does not see tag)
+                Optional<Pose2d> result = limelight.getPose2d();
+                // The skew of the tag represents how confident the camera is
+                // If the result of the estimatedRobotPose exists,
+                // and the skew of the tag is less than 3 degrees,
+                // then we can confirm that the estimated position is realistic
+                if (result.isPresent()) {
+                swerve.getPoseEstimator().addVisionMeasurement(
+                result.get(),
+                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
+                }
+            }, limelight));
         }
-        }, limelight));
         
         swerve.setDefaultCommand(new Drive(
             swerve,
