@@ -13,9 +13,6 @@ public class PIDNotConstants {
 
   private final SparkPIDController PIDController;
 
-
-
-
   public PIDNotConstants(double kP, double kI, double kD, double iZone, SparkPIDController PIDController) {
     this.kP = kP;
     this.kI = kI;

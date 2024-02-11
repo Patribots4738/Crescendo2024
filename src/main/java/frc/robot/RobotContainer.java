@@ -4,6 +4,7 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,13 +25,13 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.CalibrationControl;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
-import monologue.Logged;
-import frc.robot.util.Constants.NTConstants;
 import monologue.Annotations.Log;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PIDTunerCommands;
+import monologue.Logged;
 
 public class RobotContainer implements Logged {
     
@@ -41,9 +42,7 @@ public class RobotContainer implements Logged {
     private Swerve swerve;
     private final Intake intake;
 
-    @SuppressWarnings("unused")
-    private final DriverUI driverUI;
-    private final Limelight limelight;
+    private Limelight limelight;
     private final LedStrip ledStrip;
     private final Climb climb;
     private Indexer triggerWheel;
@@ -53,15 +52,17 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
-
     private CalibrationControl calibrationControl;
     private PIDTunerCommands PIDTuner;
     
-    @Log.NT
+    @Log
     public static Pose3d[] components3d = new Pose3d[5];
 
-    @Log.NT
+    @Log
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
+
+    @Log
+    public static Pose3d[] notePose3ds = new Pose3d[12];
     
     public RobotContainer() {
         
@@ -70,11 +71,10 @@ public class RobotContainer implements Logged {
         PIDTunerController = new PatriBoxController(OIConstants.PID_TUNER_CONTROLLER_PORT, OIConstants.PID_TUNER_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
-        limelight = new Limelight();
+        // limelight = new Limelight();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        driverUI = new DriverUI();
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
         shooter = new Shooter();
@@ -82,6 +82,7 @@ public class RobotContainer implements Logged {
         claw = new Claw();
         
         pivot = new Pivot();
+        incinerateMotors();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
         
@@ -102,31 +103,32 @@ public class RobotContainer implements Logged {
 
         calibrationControl = new CalibrationControl();
         
-        limelight.setDefaultCommand(Commands.run(() -> {
-            // Create an "Optional" object that contains the estimated pose of the robot
-            // This can be present (sees tag) or not present (does not see tag)
-            Optional<Pose2d> result = limelight.getPose2d();
-            // The skew of the tag represents how confident the camera is
-            // If the result of the estimatedRobotPose exists,
-            // and the skew of the tag is less than 3 degrees,
-            // then we can confirm that the estimated position is realistic
-            if (result.isPresent()) {
+        if (limelight.isConnected()) {
+            limelight.setDefaultCommand(Commands.run(() -> {
+                // Create an "Optional" object that contains the estimated pose of the robot
+                // This can be present (sees tag) or not present (does not see tag)
+                Optional<Pose2d> result = limelight.getPose2d();
+                // The skew of the tag represents how confident the camera is
+                // If the result of the estimatedRobotPose exists,
+                // and the skew of the tag is less than 3 degrees,
+                // then we can confirm that the estimated position is realistic
+                if (result.isPresent()) {
                 swerve.getPoseEstimator().addVisionMeasurement(
                 result.get(),
-                DriverUI.currentTimestamp - limelight.getCombinedLatencySeconds());
-            }
-        }, limelight));
+                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
+                }
+            }, limelight));
+        }
         
         swerve.setDefaultCommand(new Drive(
             swerve,
             driver::getLeftY,
             driver::getLeftX,
             () -> -driver.getRightX(),
-            () -> !driver.leftBumper().getAsBoolean(),
-            () -> (driver.leftBumper().getAsBoolean()
-                && FieldConstants.IS_BLUE_ALLIANCE())));
-
-        incinerateMotors();
+            () -> !driver.y().getAsBoolean(),
+            () -> (driver.y().getAsBoolean()
+                && Robot.isBlueAlliance())));
+              
         configureButtonBindings();
         
         prepareNamedCommands();
@@ -156,29 +158,38 @@ public class RobotContainer implements Logged {
         
         controller.povDown().onTrue(climb.toBottomCommand());
 
-        controller.povLeft().onTrue(elevator.toBottomCommand());
+        // controller.povLeft().onTrue(elevator.toBottomCommand());
 
-        controller.povRight().onTrue(elevator.toTopCommand());
+        // controller.povRight().onTrue(elevator.toTopCommand());
 
         controller.leftBumper()
-            .and(controller.rightBumper())
             .onTrue(pieceControl.noteToShoot());
 
         controller.rightBumper()
-            .and(controller.leftBumper().negate())
-            .onTrue(pieceControl.noteToTarget(() -> true));
+            .onTrue(pieceControl.ejectNote());
 
-        controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
-            .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(pieceControl.intakeToClaw());
+        controller.a()
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
-        controller.leftTrigger()
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+        controller.start().or(controller.back())
+            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(3,6.6, new Rotation2d()))));
+        
+        // controller.rightBumper()
+        //     .and(controller.leftBumper().negate())
+        //     .onTrue(pieceControl.noteToTarget(() -> true));
 
-        controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
-            .onTrue(intake.outCommand());
+        // controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
+        //     .and(intake.hasGamePieceTrigger().negate())
+        //     .onTrue(pieceControl.intakeToClaw());
 
-        controller.x().onTrue(intake.stop());
+        // controller.leftTrigger()
+        //     .onFalse(pieceControl.stopIntakeAndIndexer());
+
+        // controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
+        //     .onTrue(intake.outCommand());
+
+        // controller.x().onTrue(intake.stop());
+
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
@@ -186,12 +197,12 @@ public class RobotContainer implements Logged {
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing away from the driver station
-        controller.start().or(driver.back()).onTrue(
+        controller.start().or(controller.back()).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
                     Rotation2d.fromDegrees(
-                        FieldConstants.IS_RED_ALLIANCE()
+                        Robot.isRedAlliance()
                             ? 0
                             : 180))), 
                 swerve));
@@ -210,28 +221,29 @@ public class RobotContainer implements Logged {
             .onTrue(intake.outCommand());
         
         controller.leftBumper()
-            .toggleOnTrue(shooterCalc.prepareFireMovingCommand(() -> true, swerve::getPose));
-        
-        controller.leftTrigger()
-            .onTrue(shooterCalc.resetShooter());
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         
         controller.x()
             .onTrue(intake.stop());
         
         controller.rightStick()
-            .whileTrue(
+            .toggleOnTrue(
                 Commands.sequence(
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
+                        ;
                         return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
+
+        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
-    
+
     private void configureCalibrationBindings(PatriBoxController controller) {
         controller.leftBumper().onTrue(
             calibrationControl.incrementLeftSpeed()
@@ -296,7 +308,7 @@ public class RobotContainer implements Logged {
     }
     
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
+        return Commands.none();
     }
     
     public void onDisabled() {
@@ -338,6 +350,11 @@ public class RobotContainer implements Logged {
         for (int i = 1; i < components3d.length; i++) {
             components3d[i] = new Pose3d();
             desiredComponents3d[i] = new Pose3d();
+        }
+
+        notePose3ds[0] = new Pose3d();
+        for (int i = 1; i < notePose3ds.length; i++) {
+            notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
     }
 }

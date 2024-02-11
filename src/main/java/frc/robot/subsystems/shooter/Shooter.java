@@ -17,7 +17,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
 
         motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID);
-        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID);
+        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true);
 
         configMotors();
         shooterPID = new PIDNotConstants(motorLeft.getPID(), motorLeft.getPIDController());

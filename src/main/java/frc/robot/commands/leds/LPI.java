@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.DriverUI;
+import frc.robot.Robot;
 import frc.robot.subsystems.LedStrip;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
@@ -31,7 +31,7 @@ public class LPI extends Command implements Logged{
     Pose2d currentRobotPosition;
     Translation2d currentRobotTranslation;
     
-    @Log.NT
+    @Log
     Pose2d cardinalMagnitude;
 
     public LPI(LedStrip ledStrip, Supplier<Pose2d> positionSupplier) {
@@ -94,7 +94,7 @@ public class LPI extends Command implements Logged{
         } else {
             // Flash the LEDs based on the current timestamp
             ledStrip.setLED(
-                ((int) (DriverUI.currentTimestamp * 10) % 2 == 0) 
+                ((int) (Robot.currentTimestamp * 10) % 2 == 0) 
                     ? Color.kGreen 
                     : Color.kGold
             );
