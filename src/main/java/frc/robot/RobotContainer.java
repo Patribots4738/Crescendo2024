@@ -64,7 +64,7 @@ public class RobotContainer implements Logged {
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
-        // limelight = new Limelight();
+        limelight = new Limelight();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
