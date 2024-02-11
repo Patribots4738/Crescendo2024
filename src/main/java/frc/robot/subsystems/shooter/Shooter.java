@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,7 +15,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
 
         motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID);
-        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID);
+        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true);
 
         configMotors();
 
@@ -57,18 +56,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setSpeed(Pair<Double, Double> speeds) {
-        double speedLeft = 
-            MathUtil.clamp(
-                speeds.getFirst(), 
-                ShooterConstants.SHOOTER_RPM_UPPER_LIMIT,
-                ShooterConstants.SHOOTER_RPM_LOWER_LIMIT);
-        double speedRight = 
-            MathUtil.clamp(
-                speeds.getSecond(), 
-                ShooterConstants.SHOOTER_RPM_UPPER_LIMIT,
-                ShooterConstants.SHOOTER_RPM_LOWER_LIMIT);
-        motorLeft.setTargetVelocity(speedLeft);
-        motorRight.setTargetVelocity(speedRight);
+        motorLeft.setTargetVelocity(speeds.getFirst());
+        motorRight.setTargetVelocity(speeds.getSecond());
     }
 
     /**

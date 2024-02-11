@@ -63,21 +63,19 @@ public class Claw extends SubsystemBase {
         return hasGamePiece;
     }
 
-    public void setTargetPercent(double percent) {
+    public void setSpeed(double percent) {
         percent = 
             MathUtil.clamp(
                 percent, 
                 TrapConstants.CLAW_LOWER_PERCENT_LIMIT, 
                 TrapConstants.CLAW_UPPER_PERCENT_LIMIT);
-        claw.setTargetPercent(percent);
+        claw.set(percent);
     }
 
     public void configMotors() {
         // needs motor configs
         claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
-        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-        claw.setInverted(false);
+
         claw.setBrakeMode();
     }
 
@@ -90,11 +88,11 @@ public class Claw extends SubsystemBase {
     }
 
     public Command outtake() {
-        return runOnce(() -> setTargetPercent(TrapConstants.CLAW_OUTTAKE_PERCENT));
+        return runOnce(() -> claw.set(TrapConstants.CLAW_OUTTAKE_PERCENT));
     }
 
     public Command stop() {
-        return runOnce(() -> setTargetPercent(TrapConstants.CLAW_STOP_PERCENT));
+        return runOnce(() -> claw.set(TrapConstants.CLAW_STOP_PERCENT));
     }
     public void updateIntakingTimestamp() {
         startIntakingTimestamp = Robot.currentTimestamp;
@@ -102,7 +100,7 @@ public class Claw extends SubsystemBase {
 
     public Command intake() {
         return runOnce(() -> updateIntakingTimestamp())
-                .andThen(runOnce(() -> setTargetPercent(TrapConstants.CLAW_INTAKE_PERCENT)));
+                .andThen(runOnce(() -> claw.set(TrapConstants.CLAW_INTAKE_PERCENT)));
     }
 
 }

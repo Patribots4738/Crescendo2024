@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -14,17 +15,25 @@ import frc.robot.util.Neo;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
+import monologue.Annotations.Log;
 
 public class Climb extends SubsystemBase implements Logged {
 
     private final Neo leftMotor;
     private final Neo rightMotor;
 
+    @Log
+    public double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
+
+    @Log
+    public boolean atDesiredPos = false;
+
     public Climb() {
-        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, false);
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true);
 
         configureMotors();
     }
@@ -41,10 +50,21 @@ public class Climb extends SubsystemBase implements Logged {
 
         leftMotor.setPID(ClimbConstants.CLIMB_PID);
         rightMotor.setPID(ClimbConstants.CLIMB_PID);
+
+        // Change to brake when done testing x2
+        leftMotor.setBrakeMode();
+        rightMotor.setBrakeMode();
     }
 
     @Override
     public void periodic() {
+        targetPosLeft = leftMotor.getTargetPosition();
+        targetPosRight = rightMotor.getTargetPosition();
+        posLeft = leftMotor.getPosition();
+        posRight = rightMotor.getPosition();
+
+        atDesiredPos = atDesiredPosition().getAsBoolean();
+
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, leftMotor.getPosition(),
             new Rotation3d()
@@ -70,6 +90,7 @@ public class Climb extends SubsystemBase implements Logged {
                 pos2,
                 ClimbConstants.BOTTOM_LIMIT,
                 ClimbConstants.TOP_LIMIT);
+
         leftMotor.setTargetPosition(pos1);
         rightMotor.setTargetPosition(pos2);
 
@@ -107,4 +128,16 @@ public class Climb extends SubsystemBase implements Logged {
             this::toTop
         );
     }
+
+    public BooleanSupplier atDesiredPosition() {
+		return () -> (
+            MathUtil.applyDeadband(
+				Math.abs(
+						leftMotor.getPosition() - leftMotor.getTargetPosition()),
+				ClimbConstants.CLIMB_DEADBAND) == 0 &&
+            MathUtil.applyDeadband(
+				Math.abs(
+						rightMotor.getPosition() - rightMotor.getTargetPosition()),
+				ClimbConstants.CLIMB_DEADBAND) == 0);
+	}
 }

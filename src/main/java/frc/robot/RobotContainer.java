@@ -4,6 +4,7 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,11 +24,11 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
-import monologue.Logged;
-import frc.robot.util.Constants.NTConstants;
 import monologue.Annotations.Log;
+import monologue.Logged;
 
 public class RobotContainer implements Logged {
     
@@ -37,7 +38,7 @@ public class RobotContainer implements Logged {
     private Swerve swerve;
     private final Intake intake;
 
-    private final Limelight limelight;
+    private Limelight limelight;
     private final LedStrip ledStrip;
     private final Climb climb;
     private Indexer triggerWheel;
@@ -53,6 +54,9 @@ public class RobotContainer implements Logged {
 
     @Log
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
+
+    @Log
+    public static Pose3d[] notePose3ds = new Pose3d[12];
     
     public RobotContainer() {
         
@@ -71,6 +75,7 @@ public class RobotContainer implements Logged {
         claw = new Claw();
         
         pivot = new Pivot();
+        incinerateMotors();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
         
@@ -82,20 +87,22 @@ public class RobotContainer implements Logged {
             shooterCalc
         );
         
-        limelight.setDefaultCommand(Commands.run(() -> {
-            // Create an "Optional" object that contains the estimated pose of the robot
-            // This can be present (sees tag) or not present (does not see tag)
-            Optional<Pose2d> result = limelight.getPose2d();
-            // The skew of the tag represents how confident the camera is
-            // If the result of the estimatedRobotPose exists,
-            // and the skew of the tag is less than 3 degrees,
-            // then we can confirm that the estimated position is realistic
-            if (result.isPresent()) {
+        if (limelight.isConnected()) {
+            limelight.setDefaultCommand(Commands.run(() -> {
+                // Create an "Optional" object that contains the estimated pose of the robot
+                // This can be present (sees tag) or not present (does not see tag)
+                Optional<Pose2d> result = limelight.getPose2d();
+                // The skew of the tag represents how confident the camera is
+                // If the result of the estimatedRobotPose exists,
+                // and the skew of the tag is less than 3 degrees,
+                // then we can confirm that the estimated position is realistic
+                if (result.isPresent()) {
                 swerve.getPoseEstimator().addVisionMeasurement(
                 result.get(),
                 Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
-            }
-        }, limelight));
+                }
+            }, limelight));
+        }
         
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -106,7 +113,6 @@ public class RobotContainer implements Logged {
             () -> (driver.y().getAsBoolean()
                 && Robot.isBlueAlliance())));
               
-        incinerateMotors();
         configureButtonBindings();
         
         prepareNamedCommands();
@@ -114,12 +120,12 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        configureDriverBindings(driver);
-        configureOperatorBindings(operator);
+        // configureDriverBindings(driver);
+        configureOperatorBindings(driver);
     }
     
+    // TODO: uncomment these bindings (they are commented because we aren't testing them)
     private void configureOperatorBindings(PatriBoxController controller) {
-
 
         controller.povDown().onTrue(elevator.toBottomCommand());
 
@@ -143,7 +149,7 @@ public class RobotContainer implements Logged {
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing away from the driver station
-        controller.start().or(driver.back()).onTrue(
+        controller.start().or(controller.back()).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
@@ -165,17 +171,21 @@ public class RobotContainer implements Logged {
 
         controller.rightStick()
         // TODO: AIM AT SPEAKER/CHAIN
-            .whileTrue(
+            .toggleOnTrue(
                 Commands.sequence(
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
+                        ;
                         return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
+
+        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
     
     public Command getAutonomousCommand() {
@@ -221,6 +231,11 @@ public class RobotContainer implements Logged {
         for (int i = 1; i < components3d.length; i++) {
             components3d[i] = new Pose3d();
             desiredComponents3d[i] = new Pose3d();
+        }
+
+        notePose3ds[0] = new Pose3d();
+        for (int i = 1; i < notePose3ds.length; i++) {
+            notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
     }
 }
