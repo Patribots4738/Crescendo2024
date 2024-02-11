@@ -21,6 +21,7 @@ public class PieceControl {
 
     private ShooterCalc shooterCalc;
 
+    private boolean shooterMode;
 
     public PieceControl(
             Intake intake,
@@ -64,12 +65,12 @@ public class PieceControl {
 
     }
 
-    public Command noteToTarget(BooleanSupplier toAmp) {
+    public Command noteToTarget() {
         // maybe make setPosition a command ORR Make the Elevator Command
         return Commands.either(
                         elevator.setPositionCommand(TrapConstants.AMP_PLACE_POS),
                         elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
-                        toAmp)
+                        this::getShooterMode)
                 .andThen(
                         Commands.waitUntil(elevator.isAtTargetPosition()))
                 .andThen(claw.placeCommand())
@@ -85,6 +86,17 @@ public class PieceControl {
     public Command stopIntakeAndIndexer() {
         return intake.stop()
                 .alongWith(indexer.stop());
+    }
+
+    public boolean getShooterMode() {
+        return shooterMode;
+    }
+
+    public void setShooterMode(boolean shooterMode) {
+        this.shooterMode = shooterMode;
+    }
+    public Command setShooterModeCommand(boolean shooterMode) {
+        return Commands.runOnce(() -> setShooterMode(shooterMode));
     }
 
 }
