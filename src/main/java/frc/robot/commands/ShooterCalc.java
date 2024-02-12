@@ -317,6 +317,10 @@ public class ShooterCalc implements Logged {
             }
         );
     }
+
+    public Command stopPivotShooter() {
+        return shooter.stop().andThen(pivot.stop());
+    }
     /**
      * Calculates the shooter speeds required to reach the speaker position.
      * 
