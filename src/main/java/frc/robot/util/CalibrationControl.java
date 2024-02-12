@@ -3,10 +3,13 @@ package frc.robot.util;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.ShooterCalc;
+import frc.robot.subsystems.shooter.Shooter;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
-public class CalibrationControl implements Logged{
+public class CalibrationControl implements Logged {
+
     private SpeedAngleTriplet currentVal;
 
     @Log
@@ -19,23 +22,32 @@ public class CalibrationControl implements Logged{
     @Log
     private double distance = 0;
 
-    public CalibrationControl() {
-        currentVal = new SpeedAngleTriplet();
+    private ShooterCalc shooterCalc;
+
+    public CalibrationControl(ShooterCalc shooterCalc) {
+        currentVal = new SpeedAngleTriplet(3000.0, 3000.0, 60.0);
         leftLocked = false;
         rightLocked = false;
         pivotLocked = false;
+        this.shooterCalc = shooterCalc;
     }
     
     public Command changeLeftSpeed(double increment) {
         if(!leftLocked) {
             return Commands.runOnce(
-                () -> currentVal = SpeedAngleTriplet.of(
+                () -> {currentVal = SpeedAngleTriplet.of(
                     currentVal.getLeftSpeed() + increment,
                     currentVal.getRightSpeed(),
-                    currentVal.getAngle()));
+                    currentVal.getAngle());
+                    shooterCalc.setTriplet(currentVal); })
+        .andThen(logAll());
         } else {
             return Commands.none();
         }
+    }
+
+    public void periodic() {
+        shooterCalc.setTriplet(currentVal);
     }
 
     public Command incrementLeftSpeed() {
@@ -49,10 +61,12 @@ public class CalibrationControl implements Logged{
     public Command changeRightSpeed(double increment) {
         if(!rightLocked) {
             return Commands.runOnce(
-                () -> currentVal = SpeedAngleTriplet.of(
+                () -> {currentVal = SpeedAngleTriplet.of(
                         currentVal.getLeftSpeed(),
                         currentVal.getRightSpeed() + increment,
-                        currentVal.getAngle()));
+                        currentVal.getAngle());
+                        shooterCalc.setTriplet(currentVal); })
+            .andThen(logAll());
         } else {
             return Commands.none();
         }
@@ -89,22 +103,24 @@ public class CalibrationControl implements Logged{
     public Command logDistance() {
         return Commands.runOnce(
             () -> { 
-                System.out.println("Distance: " + Units.metersToFeet(distance) + "ft"); 
+                System.out.println("Distance: " + distance + "ft"); 
             });
     }
 
     public Command logAll() {
         return Commands.runOnce(
-                () -> System.out.println("put(" + Units.metersToFeet(distance) + ", SpeedAngleTriplet.of("+currentVal.getLeftSpeed()+", "+currentVal.getRightSpeed()+", "+currentVal.getAngle()+"));"));
+                () -> System.out.println("put(" + distance + ", SpeedAngleTriplet.of("+currentVal.getLeftSpeed()+", "+currentVal.getRightSpeed()+", "+currentVal.getAngle()+"));"));
     }
 
     public Command incrementAngle() {
         return Commands.either(
             Commands.runOnce(
-                () -> currentVal = SpeedAngleTriplet.of(
+                () -> {currentVal = SpeedAngleTriplet.of(
                         currentVal.getLeftSpeed(),
                         currentVal.getRightSpeed(),
-                        currentVal.getAngle() + 10)),
+                        currentVal.getAngle() + 2.5);
+                        shooterCalc.setTriplet(currentVal); })
+            .andThen(logAll()),
             Commands.none(),
             () -> !pivotLocked);
     }
@@ -112,67 +128,41 @@ public class CalibrationControl implements Logged{
     public Command decrementAngle() {
         return Commands.either(
             Commands.runOnce(
-                () -> currentVal = SpeedAngleTriplet.of(
+                () -> {currentVal = SpeedAngleTriplet.of(
                         currentVal.getLeftSpeed(),
                         currentVal.getRightSpeed(),
-                        currentVal.getAngle() - 10)), 
+                        currentVal.getAngle() - 2.5);
+                        shooterCalc.setTriplet(currentVal); })
+            .andThen(logAll()), 
             Commands.none(), 
             () -> !pivotLocked);
     }
 
-    public Command lockLeftSpeed() {
-        return Commands.runOnce(
-                () -> {
-                    leftLocked = true;
-                    System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
-                });
-    }
-
-    public Command unlockLeftSpeed() {
+    public Command toggleLeftSpeed() {
         return Commands.runOnce(() -> {
-            leftLocked = true;
+            leftLocked = !leftLocked;
             System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 
-    public Command lockRightSpeed() {
+    public Command toggleRightSpeed() {
         return Commands.runOnce(() -> {
-            rightLocked = true;
+            rightLocked = !rightLocked;
             System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 
-    public Command unlockRightSpeed() {
+    public Command togglePivot() {
         return Commands.runOnce(() -> {
-            rightLocked = true;
+            pivotLocked = !pivotLocked;
             System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
         });
     }
 
-    public Command lockBothSpeeds() {
+    public Command toggleBothSpeeds() {
         return Commands.sequence(
-                lockLeftSpeed(),
-                lockRightSpeed());
-    }
-
-    public Command unlockBothSpeeds() {
-        return Commands.sequence(
-                unlockLeftSpeed(),
-                unlockRightSpeed());
-    }
-
-    public Command lockPivotAngle() {
-        return Commands.runOnce(() -> {
-            pivotLocked = true;
-            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
-        });
-    }
-
-    public Command unlockPivotAngle() {
-        return Commands.runOnce(() -> {
-            pivotLocked = true;
-            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
-        });
+                toggleLeftSpeed(),
+                toggleRightSpeed());
     }
 
     public Command increaseDistance() {

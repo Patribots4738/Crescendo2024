@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -62,6 +63,11 @@ public class ShooterCalc implements Logged {
                 shooter.setSpeed(triplet.getSpeeds());
             }, pivot, shooter);
     }
+
+    public void setTriplet(SpeedAngleTriplet triplet) {
+        pivot.setAngle(triplet.getAngle());
+        shooter.setSpeed(triplet.getSpeeds());
+    }
     
     /**
      * The function prepares a fire command by calculating the speed and angle for
@@ -93,7 +99,7 @@ public class ShooterCalc implements Logged {
      */
     public Rotation2d calculatePivotAngle(Pose2d robotPose) {
         // Add the pivot offset to the robot's pose
-        robotPose = robotPose.plus(new Transform2d(0.112, 0, robotPose.getRotation()));
+        robotPose = robotPose.plus(new Transform2d(NTConstants.PIVOT_OFFSET_METERS.getX(), 0, robotPose.getRotation()));
         // Calculate the robot's pose relative to the speaker's position
         robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
 
@@ -102,7 +108,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters, 3);
+        return new Rotation2d(distanceMeters, FieldConstants.SPEAKER_HEIGHT+.1);
     }
 
     /**
@@ -345,10 +351,10 @@ public class ShooterCalc implements Logged {
         return 
             SpeedAngleTriplet.of(
                 Pair.of(
-                    velocityToRPM(newv0)+700,
-                    velocityToRPM(newv0)+300
+                    velocityToRPM(newv0)+5000,
+                    velocityToRPM(newv0)+4500
                 ),
-                newAngle.getDegrees()
+                newAngle.getDegrees()+5
             );
     }
 }

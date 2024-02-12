@@ -100,7 +100,7 @@ public class RobotContainer implements Logged {
                 claw,
                 shooterCalc);
 
-        calibrationControl = new CalibrationControl();
+        calibrationControl = new CalibrationControl(shooterCalc);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -110,7 +110,7 @@ public class RobotContainer implements Logged {
             // If the result of the estimatedRobotPose exists,
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
-            if (result.valid) {
+            if (driver.rightTrigger().getAsBoolean() && result.valid) {
                 swerve.getPoseEstimator().addVisionMeasurement( 
                     result.getBotPose2d_wpiBlue(),
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
@@ -136,6 +136,7 @@ public class RobotContainer implements Logged {
         // configureDriverBindings(driver);
         configureOperatorBindings(driver);
         // configurePIDTunerBindings(driver);
+        configureCalibrationBindings(operator);
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
@@ -273,14 +274,19 @@ public class RobotContainer implements Logged {
         );
 
         controller.leftY().whileTrue(
-            Math.signum(controller.getLeftY()) == -1.0 
-                ? calibrationControl.decrementBothSpeeds() 
-                : calibrationControl.incrementBothSpeeds()
+            Commands.either(
+                calibrationControl.decrementBothSpeeds(), 
+                calibrationControl.incrementBothSpeeds(), 
+                () -> controller.getLeftY() < 0
+            )
         );
+
         controller.rightY().whileTrue(
-            Math.signum(controller.getRightY()) == -1.0 
-                ? calibrationControl.decrementAngle() 
-                : calibrationControl.incrementAngle()
+            Commands.either(
+                calibrationControl.decrementAngle(), 
+                calibrationControl.incrementAngle(), 
+                () -> controller.getRightY() > 0
+            )
         );
 
 
@@ -288,29 +294,10 @@ public class RobotContainer implements Logged {
             calibrationControl.logAll()
         );
 
-        controller.y().toggleOnTrue(
-            calibrationControl.lockBothSpeeds()
-        ).toggleOnFalse(
-            calibrationControl.unlockBothSpeeds()
-        );
-
-        controller.x().toggleOnTrue(
-            calibrationControl.lockLeftSpeed()
-        ).toggleOnFalse(
-            calibrationControl.unlockLeftSpeed()
-        );
-
-        controller.b().toggleOnTrue(
-            calibrationControl.lockRightSpeed()
-        ).toggleOnFalse(
-            calibrationControl.unlockRightSpeed()
-        );
-
-        controller.a().toggleOnTrue(
-            calibrationControl.lockPivotAngle()
-        ).toggleOnFalse(
-            calibrationControl.unlockPivotAngle()
-        );
+        controller.y().onTrue(calibrationControl.toggleBothSpeeds());
+        controller.b().onTrue(calibrationControl.toggleRightSpeed());
+        controller.x().onTrue(calibrationControl.toggleLeftSpeed());
+        controller.a().onTrue(calibrationControl.togglePivot());
 
         controller.povLeft().onTrue(
             calibrationControl.decreaseDistance()
