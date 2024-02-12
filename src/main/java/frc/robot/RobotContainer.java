@@ -89,8 +89,8 @@ public class RobotContainer implements Logged {
                 claw,
                 shooterCalc);
 
-        limelight.isConnected();
         limelight.setDefaultCommand(Commands.run(() -> {
+            limelight.isConnected();
             // Create an "Optional" object that contains the estimated pose of the robot
             // This can be present (sees tag) or not present (does not see tag)
             LimelightHelpers.Results result = limelight.getResults();
