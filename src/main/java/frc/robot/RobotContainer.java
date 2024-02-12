@@ -100,7 +100,7 @@ public class RobotContainer implements Logged {
             // then we can confirm that the estimated position is realistic
             if (result.valid) {
                 swerve.getPoseEstimator().addVisionMeasurement( 
-                    result.getBotPose2d(),
+                    result.getBotPose2d_wpiBlue(),
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
             }
         }, limelight));

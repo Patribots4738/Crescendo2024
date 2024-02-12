@@ -67,14 +67,14 @@ public class Limelight extends SubsystemBase implements Logged{
         ArrayList<Pose3d> knownFiducials = new ArrayList<>();
 
         for (LimelightTarget_Fiducial target : fiducials) {
-            knownFiducials.add(target.getTargetPose_RobotSpace());
+            knownFiducials.add(aprilTagFieldLayout.getTagPose((int) target.fiducialID).get());
         }
 
         visableTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
     public Pose2d getPose2d() {
-        return LimelightHelpers.getBotPose2d(limelightName);
+        return LimelightHelpers.getBotPose2d_wpiBlue(limelightName);
     }
 
     public double getTagID() {
