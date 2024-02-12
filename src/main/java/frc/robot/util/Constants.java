@@ -15,10 +15,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
@@ -596,6 +599,44 @@ public final class Constants {
             System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
         }
     }
+
+    public static final class CameraConstants {
+        public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
+
+        private static final double CAM_HEIGHT = Units.inchesToMeters(16);
+        private static final double CAM_X = Units.inchesToMeters(6.6 / 2.0);
+        private static final double CAM_Y = Units.inchesToMeters(15.3 / 2.0);
+        private static final double CAM_PITCH = Units.degreesToRadians(-15);
+        private static final double CAM_YAW = Units.degreesToRadians(32);
+
+        private static final Pose3d cam1 =
+            new Pose3d(
+                new Translation3d(CAM_X, CAM_Y, CAM_HEIGHT), 
+                new Rotation3d(0, CAM_PITCH, CAM_YAW));
+        private static final Pose3d cam2 =
+            new Pose3d(
+                new Translation3d(CAM_X, -CAM_Y, CAM_HEIGHT),
+                new Rotation3d(0, CAM_PITCH, -CAM_YAW));
+        private static final Pose3d cam3 =
+            new Pose3d(
+                new Translation3d(-CAM_X, CAM_Y, CAM_HEIGHT),
+                new Rotation3d(0, CAM_PITCH, (Math.PI) - CAM_YAW));
+        private static final Pose3d cam4 =
+            new Pose3d(
+                new Translation3d(-CAM_X, -CAM_Y, CAM_HEIGHT),
+                new Rotation3d(0, CAM_PITCH, (Math.PI) + CAM_YAW));
+
+        private static final Pose3d cam5 = 
+            new Pose3d(
+                0.0508, -0.1524, 0.589701,
+                new Rotation3d(0, Units.degreesToRadians(-33), Units.degreesToRadians(15)));
+        private static final Pose3d cam6 =
+        new Pose3d(
+                -0.254, -0.155575, 0.589701,
+                new Rotation3d(0, Units.degreesToRadians(180), Units.degreesToRadians(-10)));
+
+        public static final Pose3d[] cameras = new Pose3d[] {cam5, cam6};
+    }
     
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
@@ -616,7 +657,5 @@ public final class Constants {
     }
 
     public static final double GRAVITY = 9.8;
-
-    public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
 }

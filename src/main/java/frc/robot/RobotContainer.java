@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.Optional;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
@@ -23,6 +24,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.CalibrationControl;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -68,20 +70,19 @@ public class RobotContainer implements Logged {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         
-        limelight = new Limelight();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
+        limelight = new Limelight(swerve::getPose);
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
+
         shooter = new Shooter();
         elevator = new Elevator();
         claw = new Claw();
         
         pivot = new Pivot();
         incinerateMotors();
-
-        limelight = new Limelight();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
         
@@ -93,32 +94,29 @@ public class RobotContainer implements Logged {
         });
 
         pieceControl = new PieceControl(
-            intake,
-            triggerWheel,
-            elevator,
-            claw,
-            shooterCalc
-        );
+                intake,
+                triggerWheel,
+                elevator,
+                claw,
+                shooterCalc);
 
         calibrationControl = new CalibrationControl();
-        
-        if (limelight.isConnected()) {
-            limelight.setDefaultCommand(Commands.run(() -> {
-                // Create an "Optional" object that contains the estimated pose of the robot
-                // This can be present (sees tag) or not present (does not see tag)
-                Optional<Pose2d> result = limelight.getPose2d();
-                // The skew of the tag represents how confident the camera is
-                // If the result of the estimatedRobotPose exists,
-                // and the skew of the tag is less than 3 degrees,
-                // then we can confirm that the estimated position is realistic
-                if (result.isPresent()) {
-                swerve.getPoseEstimator().addVisionMeasurement(
-                result.get(),
-                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
-                }
-            }, limelight));
-        }
-        
+
+        limelight.setDefaultCommand(Commands.run(() -> {
+            // Create an "Optional" object that contains the estimated pose of the robot
+            // This can be present (sees tag) or not present (does not see tag)
+            LimelightHelpers.Results result = limelight.getResults();
+            // The skew of the tag represents how confident the camera is
+            // If the result of the estimatedRobotPose exists,
+            // and the skew of the tag is less than 3 degrees,
+            // then we can confirm that the estimated position is realistic
+            if (result.valid) {
+                swerve.getPoseEstimator().addVisionMeasurement( 
+                    result.getBotPose2d_wpiBlue(),
+                    Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
+            }
+        }, limelight));
+
         swerve.setDefaultCommand(new Drive(
             swerve,
             driver::getLeftY,
