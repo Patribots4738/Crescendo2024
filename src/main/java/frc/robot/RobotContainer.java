@@ -106,9 +106,9 @@ public class RobotContainer implements Logged {
             // If the result of the estimatedRobotPose exists,
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
-            if (driver.rightTrigger().getAsBoolean() && result.valid) {
+            if (driver.rightTrigger().getAsBoolean() && !(result.botpose[0] == 0 && result.botpose[1] == 0) ) {
                 swerve.getPoseEstimator().addVisionMeasurement( 
-                    result.getBotPose2d_wpiBlue(),
+                    result.getBotPose2d_wpiBlue(), // TODO: change to getBotPose2d_wpiRed if on red alliance (I need to first see if this is the correct method)
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
             }
         }, limelight));
