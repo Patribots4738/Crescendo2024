@@ -1,23 +1,23 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.util.Units;
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.ShooterCalc;
-import frc.robot.subsystems.shooter.Shooter;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class CalibrationControl implements Logged {
 
-    private SpeedAngleTriplet currentVal;
+    private SpeedAngleTriplet desiredTriplet;
 
     @Log
-    private boolean leftLocked;
+    private double leftSpeed = 4000, rightSpeed = 4500, angle = 60;
+
     @Log
-    private boolean rightLocked;
-    @Log
-    private boolean pivotLocked;
+    private boolean pivotLock, leftLock, rightLock;
 
     @Log
     private double distance = 0;
@@ -25,160 +25,111 @@ public class CalibrationControl implements Logged {
     private ShooterCalc shooterCalc;
 
     public CalibrationControl(ShooterCalc shooterCalc) {
-        currentVal = new SpeedAngleTriplet(3000.0, 3000.0, 60.0);
-        leftLocked = false;
-        rightLocked = false;
-        pivotLocked = false;
         this.shooterCalc = shooterCalc;
-    }
-    
-    public Command changeLeftSpeed(double increment) {
-        if(!leftLocked) {
-            return Commands.runOnce(
-                () -> {currentVal = SpeedAngleTriplet.of(
-                    currentVal.getLeftSpeed() + increment,
-                    currentVal.getRightSpeed(),
-                    currentVal.getAngle());
-                    shooterCalc.setTriplet(currentVal); })
-        .andThen(logAll());
-        } else {
-            return Commands.none();
-        }
+        updateMotors();
     }
 
-    public void periodic() {
-        shooterCalc.setTriplet(currentVal);
+    public Command incrementDistance(int increment) {
+        return Commands.runOnce(() -> {
+            distance += increment; 
+            logDistance();
+        });
     }
 
-    public Command incrementLeftSpeed() {
-        return changeLeftSpeed(50);
+    public Command incrementSpeeds(DoubleSupplier increment) {
+        return incrementLeftSpeed(increment).alongWith(incrementRightSpeed(increment));
     }
 
-    public Command decrementLeftSpeed() {
-        return changeLeftSpeed(-50);
-    }
-    
-    public Command changeRightSpeed(double increment) {
-        if(!rightLocked) {
-            return Commands.runOnce(
-                () -> {currentVal = SpeedAngleTriplet.of(
-                        currentVal.getLeftSpeed(),
-                        currentVal.getRightSpeed() + increment,
-                        currentVal.getAngle());
-                        shooterCalc.setTriplet(currentVal); })
-            .andThen(logAll());
-        } else {
-            return Commands.none();
-        }
-    }
-
-    public Command incrementRightSpeed() {
-        return changeRightSpeed(100);
-    }
-
-    public Command decrementRightSpeed() {
-        return changeRightSpeed(-100);
-    }
-
-    public Command incrementBothSpeeds() {
-        if(!leftLocked && !rightLocked) {
-            return Commands.sequence(
-                incrementLeftSpeed(),
-                incrementRightSpeed());
-        } else {
-            return Commands.none();
-        }
-    }
-
-    public Command decrementBothSpeeds() {
-        if(!leftLocked && !rightLocked) {
-            return Commands.sequence(
-                decrementLeftSpeed(),
-                decrementRightSpeed());
-        } else {
-            return Commands.none();
-        }
-    }
-    
-    public Command logDistance() {
-        return Commands.runOnce(
-            () -> { 
-                System.out.println("Distance: " + distance + "ft"); 
-            });
-    }
-
-    public Command logAll() {
-        return Commands.runOnce(
-                () -> System.out.println("put(" + distance + ", SpeedAngleTriplet.of("+currentVal.getLeftSpeed()+", "+currentVal.getRightSpeed()+", "+currentVal.getAngle()+"));"));
-    }
-
-    public Command incrementAngle() {
+    public Command incrementLeftSpeed(DoubleSupplier increment) {
         return Commands.either(
-            Commands.runOnce(
-                () -> {currentVal = SpeedAngleTriplet.of(
-                        currentVal.getLeftSpeed(),
-                        currentVal.getRightSpeed(),
-                        currentVal.getAngle() + 2.5);
-                        shooterCalc.setTriplet(currentVal); })
-            .andThen(logAll()),
+            Commands.run(() -> {
+                leftSpeed += increment.getAsDouble();
+                updateMotors();
+                logSpeeds();
+            }),
             Commands.none(),
-            () -> !pivotLocked);
+            () -> !leftLock
+        );
     }
 
-    public Command decrementAngle() {
+    public Command incrementRightSpeed(DoubleSupplier increment) {
         return Commands.either(
-            Commands.runOnce(
-                () -> {currentVal = SpeedAngleTriplet.of(
-                        currentVal.getLeftSpeed(),
-                        currentVal.getRightSpeed(),
-                        currentVal.getAngle() - 2.5);
-                        shooterCalc.setTriplet(currentVal); })
-            .andThen(logAll()), 
-            Commands.none(), 
-            () -> !pivotLocked);
-    }
-
-    public Command toggleLeftSpeed() {
-        return Commands.runOnce(() -> {
-            leftLocked = !leftLocked;
-            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
-        });
-    }
-
-    public Command toggleRightSpeed() {
-        return Commands.runOnce(() -> {
-            rightLocked = !rightLocked;
-            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
-        });
-    }
-
-    public Command togglePivot() {
-        return Commands.runOnce(() -> {
-            pivotLocked = !pivotLocked;
-            System.out.println("Pivot: "+pivotLocked+" | Left: "+leftLocked+" | Right: "+rightLocked+"");
-        });
-    }
-
-    public Command toggleBothSpeeds() {
-        return Commands.sequence(
-                toggleLeftSpeed(),
-                toggleRightSpeed());
-    }
-
-    public Command increaseDistance() {
-        return Commands.sequence(
-            Commands.runOnce(
-                () -> { distance++; }),
-            logDistance()
+            Commands.run(() -> {
+                rightSpeed += increment.getAsDouble();
+                updateMotors();
+                logSpeeds();
+            }),
+            Commands.none(),
+            () -> !rightLock
         );
     }
 
-    public Command decreaseDistance() {
-        return Commands.sequence(
-            Commands.runOnce(
-                () -> { distance--; }),
-            logDistance()
+    public Command incrementAngle(DoubleSupplier increment) {
+        return Commands.either(
+            Commands.run(() -> {
+                angle = angle + increment.getAsDouble()/20.0;
+                updateMotors();
+                logAngle();
+            }),
+            Commands.none(),
+            () -> !pivotLock
         );
+    }
+    
+    public Command togglePivotLock() {
+        return Commands.runOnce(() -> {
+            pivotLock = !pivotLock;
+            logLocks();
+        });
+    }
+
+    public Command toggleLeftLock() {
+        return Commands.runOnce(() -> {
+            leftLock = !leftLock;
+            logLocks();
+        });
+    }
+
+    public Command toggleRightLock() {
+        return Commands.runOnce(() -> {
+            rightLock = !rightLock;
+            logLocks();
+        });
+    }
+
+    public void updateMotors() {
+        leftSpeed = MathUtil.clamp(leftSpeed, 0, 5500);
+        rightSpeed = MathUtil.clamp(rightSpeed, 0, 5500);
+        angle = MathUtil.clamp(angle, 0, 60);
+        desiredTriplet = new SpeedAngleTriplet(leftSpeed, rightSpeed, (double) Math.round(angle*10)/10.0);
+        shooterCalc.setTriplet(desiredTriplet);
+    }
+    
+    public Command updateMotorsCommand() {
+        return Commands.runOnce(this::updateMotors);
+    }
+
+    public Command logTriplet() {
+        return Commands.runOnce(
+                () -> System.out.println("put(" + (int) distance + ", SpeedAngleTriplet.of("+desiredTriplet.getLeftSpeed()+", "+desiredTriplet.getRightSpeed()+", "+desiredTriplet.getAngle()+"));"));
+    }
+
+    public void logDistance() {
+        System.out.println("Distance: " + (int) distance + "ft");
+    }
+
+    public void logSpeeds() {
+        System.out.println("Speeds: " + desiredTriplet.getLeftSpeed() + " | " + desiredTriplet.getRightSpeed());
+    }
+
+    public void logAngle() {
+        System.out.println("Angle: " + desiredTriplet.getAngle() + "°");
+    }
+
+    public void logLocks() {
+        System.out.println("Left: " + (leftLock ? "Locked  " : "Unlocked") + 
+                           " | Pivot: " + (pivotLock ? "Locked  " : "Unlocked") + 
+                           " | Right: " + (rightLock ? "Locked  " : "Unlocked"));
     }
 
 }

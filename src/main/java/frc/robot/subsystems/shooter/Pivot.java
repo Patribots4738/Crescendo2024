@@ -59,14 +59,17 @@ public class Pivot extends SubsystemBase implements Logged {
 	public void periodic() {
 
         if (FieldConstants.IS_SIMULATION) {
-            if (Math.abs(desiredAngle - realAngle) > 3) {
+            if (Math.abs(desiredAngle - realAngle) > 0.25) {
                 realAngle += (desiredAngle - realAngle) / 10;
             }
         } else {
             realAngle = -getAngle();
         }
 
-		atDesiredAngle = atDesiredAngle().getAsBoolean();
+		atDesiredAngle = 
+            MathUtil.applyDeadband(
+                Math.abs(realAngle - getTargetAngle()),
+                ShooterConstants.PIVOT_DEADBAND) == 0;
 
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -113,7 +116,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return pivotEncoder.getPosition();
+		return realAngle;
 	}
 
 	public double getTargetAngle() {
@@ -136,10 +139,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @return The method is returning a BooleanSupplier that returns true
 	 *         if the pivot is at its target rotation and false otherwise
 	 */
-	public BooleanSupplier atDesiredAngle() {
-		return () -> (MathUtil.applyDeadband(
-				Math.abs(
-						getAngle() - getTargetAngle()),
-				ShooterConstants.PIVOT_DEADBAND) == 0);
+	public boolean getAtDesiredAngle() {
+		return atDesiredAngle;
 	}
 }

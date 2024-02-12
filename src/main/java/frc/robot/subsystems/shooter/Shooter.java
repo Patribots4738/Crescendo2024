@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,6 +26,9 @@ public class Shooter extends SubsystemBase implements Logged{
     private double currentLeftSpeed = 0;
     @Log
     private double currentRightSpeed = 0;
+
+    @Log
+    private boolean atDesiredRPM = false;
 
     public Shooter() {
 
@@ -60,6 +64,16 @@ public class Shooter extends SubsystemBase implements Logged{
     public void periodic() {
         currentLeftSpeed = motorLeft.getVelocity();
         currentRightSpeed = motorRight.getVelocity();
+
+        atDesiredRPM = MathUtil.applyDeadband(
+                    Math.abs(
+                            currentLeftSpeed
+                            - targetLeftSpeed),
+                    ShooterConstants.SHOOTER_DEADBAND) == 0
+                && 
+                MathUtil.applyDeadband(
+                    Math.abs(currentRightSpeed - targetRightSpeed),
+                    ShooterConstants.SHOOTER_DEADBAND) == 0;
     }
 
     /**
@@ -114,5 +128,9 @@ public class Shooter extends SubsystemBase implements Logged{
 
     public PIDNotConstants getPIDNotConstants() {
         return this.shooterPID;
+    }
+
+    public boolean getAtDesiredRPM() {
+        return atDesiredRPM;
     }
 }

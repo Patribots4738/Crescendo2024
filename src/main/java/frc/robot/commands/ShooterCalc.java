@@ -65,6 +65,9 @@ public class ShooterCalc implements Logged {
     }
 
     public void setTriplet(SpeedAngleTriplet triplet) {
+        desiredAngle = triplet.getAngle();
+        desiredLSpeed = triplet.getSpeeds().getFirst();
+        desiredRSpeed = triplet.getSpeeds().getSecond();
         pivot.setAngle(triplet.getAngle());
         shooter.setSpeed(triplet.getSpeeds());
     }
@@ -118,31 +121,8 @@ public class ShooterCalc implements Logged {
 	 * @return The method is returning a BooleanSupplier that returns true
 	 *         if the pivot is at its target rotation and false otherwise
 	 */
-	public BooleanSupplier atDesiredAngle() {
-		return () -> (MathUtil.applyDeadband(
-				Math.abs(
-						pivot.getAngle() - desiredAngle),
-				ShooterConstants.PIVOT_DEADBAND) == 0);
-	}
-
-    /**
-     * The function is a BooleanSupplier that represents the the condition of
-     * the velocity of the motor being equal to its targetVelocity
-     * 
-     * 
-     * @return The method is returning a BooleanSupplier that returns true if
-     *         the current velocity of the motors is at the target velocity with a
-     *         small tolerance
-     */
-    public BooleanSupplier atDesiredRPM() {
-        return () -> (MathUtil.applyDeadband(
-                Math.abs(
-                        shooter.getSpeed().getFirst() - shooter.getSpeed().getFirst()),
-                ShooterConstants.SHOOTER_DEADBAND) == 0
-                && MathUtil.applyDeadband(
-                Math.abs(
-                        shooter.getSpeed().getSecond() - shooter.getSpeed().getSecond()),
-                ShooterConstants.SHOOTER_DEADBAND) == 0);
+	public BooleanSupplier readyToShootSupplier() {
+        return () -> pivot.getAtDesiredAngle() && shooter.getAtDesiredRPM();
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
@@ -162,25 +142,6 @@ public class ShooterCalc implements Logged {
 
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
-
-    /**
-     * Checks if the pivot is at the desired angle.
-     * 
-     * @return true if the pivot is at the desired angle, false otherwise.
-     */
-    public boolean pivotAtDesiredAngle() {
-        return atDesiredAngle().getAsBoolean();
-    }
-
-    /**
-     * Checks if the shooter is at the desired RPM.
-     * 
-     * @return true if the shooter is at the desired RPM, false otherwise
-     */
-    public boolean shooterAtDesiredRPM() {
-        return atDesiredRPM().getAsBoolean();
-    }
-
     
     @Log
     Rotation2d currentAngleToSpeaker;
@@ -296,7 +257,6 @@ public class ShooterCalc implements Logged {
         return rotationsPerSecond * 60.0;
     }
 
-
     /**
      * Calculates the shooter speeds required to reach the speaker position.
      * 
@@ -324,7 +284,7 @@ public class ShooterCalc implements Logged {
         );
     }
 
-    public Command stopPivotShooter() {
+    public Command stopAllMotors() {
         return shooter.stop().andThen(pivot.stop());
     }
     /**

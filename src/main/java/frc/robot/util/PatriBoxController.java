@@ -40,25 +40,19 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public Trigger leftY() {
-        return new Trigger(
-            () -> getLeftY() != 0.0
-        );
+        return new Trigger(() -> Math.abs(getLeftY()) > .3);
     }
 
     public Trigger leftX() {
-        return new Trigger(
-            () -> getLeftX() != 0.0
-        );
+        return new Trigger(() -> Math.abs(getLeftX()) > .3);
     }
 
     public Trigger rightY() {
-        return new Trigger(
-                () -> getRightY() != 0.0);
+        return new Trigger(() -> Math.abs(getRightY()) > .3);
     }
 
     public Trigger rightX() {
-        return new Trigger(
-                () -> getRightX() != 0.0);
+        return new Trigger(() -> Math.abs(getRightX()) > .3);
     }
 
     @Override

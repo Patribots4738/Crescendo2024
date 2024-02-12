@@ -1,9 +1,6 @@
 package frc.robot;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -136,7 +132,7 @@ public class RobotContainer implements Logged {
         // configureDriverBindings(driver);
         configureOperatorBindings(driver);
         // configurePIDTunerBindings(driver);
-        configureCalibrationBindings(operator);
+        configureCalibrationBindings(driver);
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
@@ -153,7 +149,7 @@ public class RobotContainer implements Logged {
   
 
     private void configureOperatorBindings(PatriBoxController controller) {
-        controller.b().onTrue(shooterCalc.stopPivotShooter().alongWith(pieceControl.stopAllMotors()));
+        controller.b().onTrue(shooterCalc.stopAllMotors().alongWith(pieceControl.stopAllMotors()));
         controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
         controller.povDown().onTrue(climb.toBottomCommand());
@@ -259,52 +255,24 @@ public class RobotContainer implements Logged {
     }
 
     private void configureCalibrationBindings(PatriBoxController controller) {
-        controller.leftBumper().onTrue(
-            calibrationControl.incrementLeftSpeed()
-        );
-        controller.back().onTrue(
-            calibrationControl.decrementLeftSpeed()
-        );
+        controller.leftBumper().onTrue(pieceControl.stopAllMotors().alongWith(shooterCalc.stopAllMotors()));
+        controller.rightBumper().onTrue(calibrationControl.updateMotorsCommand());
+        controller.rightTrigger().onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
 
-        controller.rightBumper().onTrue(
-            calibrationControl.incrementRightSpeed()
-        );
-        controller.start().onTrue(
-            calibrationControl.decrementRightSpeed()
-        );
+        controller.leftY().whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
+        controller.rightY().whileTrue(calibrationControl.incrementAngle(() -> -controller.getRightY()));
 
-        controller.leftY().whileTrue(
-            Commands.either(
-                calibrationControl.decrementBothSpeeds(), 
-                calibrationControl.incrementBothSpeeds(), 
-                () -> controller.getLeftY() < 0
-            )
-        );
+        controller.leftX().whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
+        controller.rightX().whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
 
-        controller.rightY().whileTrue(
-            Commands.either(
-                calibrationControl.decrementAngle(), 
-                calibrationControl.incrementAngle(), 
-                () -> controller.getRightY() > 0
-            )
-        );
+        controller.back().onTrue(calibrationControl.incrementDistance(-1));
+        controller.start().onTrue(calibrationControl.incrementDistance(1));
 
+        controller.a().onTrue(calibrationControl.logTriplet());
 
-        controller.povDown().onTrue(
-            calibrationControl.logAll()
-        );
-
-        controller.y().onTrue(calibrationControl.toggleBothSpeeds());
-        controller.b().onTrue(calibrationControl.toggleRightSpeed());
-        controller.x().onTrue(calibrationControl.toggleLeftSpeed());
-        controller.a().onTrue(calibrationControl.togglePivot());
-
-        controller.povLeft().onTrue(
-            calibrationControl.decreaseDistance()
-        );
-        controller.povRight().onTrue(
-            calibrationControl.increaseDistance()
-        );
+        controller.x().onTrue(calibrationControl.toggleLeftLock());
+        controller.b().onTrue(calibrationControl.toggleRightLock());
+        controller.y().onTrue(calibrationControl.togglePivotLock());
     }
     
     public Command getAutonomousCommand() {
@@ -312,7 +280,7 @@ public class RobotContainer implements Logged {
     }
     
     public void onDisabled() {
-            }
+    }
     
     public void onEnabled() {
     }

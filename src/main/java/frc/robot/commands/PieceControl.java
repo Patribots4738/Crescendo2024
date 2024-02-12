@@ -1,14 +1,16 @@
 package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
 
 public class PieceControl {
@@ -34,16 +36,18 @@ public class PieceControl {
         this.shooterCalc = shooterCalc;
     }
 
-    public Trigger readyToShoot() {
-        return new Trigger(() -> shooterCalc.pivotAtDesiredAngle() && shooterCalc.shooterAtDesiredRPM());
-    }
-
     public Command stopAllMotors() {
         return Commands.parallel(
                 intake.stop(),
                 indexer.stop(),
                 elevator.stop(),
                 claw.stop());
+    }
+
+    public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        return Commands.waitUntil(shooterCalc.readyToShootSupplier())
+                .andThen(noteToShoot()
+                    .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier)));
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
