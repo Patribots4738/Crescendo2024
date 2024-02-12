@@ -134,8 +134,8 @@ public final class Constants {
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
-        public static final double PIVOT_DEADBAND = .5;
-        public static final double SHOOTER_DEADBAND = 0.3;
+        public static final double PIVOT_DEADBAND = 1;
+        public static final double SHOOTER_RPM_DEADBAND = 50;
 
         // These are in %
         public static final double SHOOTER_MIN_OUTPUT = -1;
@@ -164,7 +164,8 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(3000.0, 3000.0, 45.0));
+                put(6, SpeedAngleTriplet.of(4000.0, 4500.0, 48.0));
+                put(7, SpeedAngleTriplet.of(4000.0, 4500.0, 48.0));
                 put(10, SpeedAngleTriplet.of(4000.0, 4000.0, 45.0));
                 put(15, SpeedAngleTriplet.of(6000.0, 4000.0, 40.0));
                 put(20, SpeedAngleTriplet.of(6000.0, 4000.0, 30.0));

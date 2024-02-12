@@ -69,11 +69,11 @@ public class Shooter extends SubsystemBase implements Logged{
                     Math.abs(
                             currentLeftSpeed
                             - targetLeftSpeed),
-                    ShooterConstants.SHOOTER_DEADBAND) == 0
+                    ShooterConstants.SHOOTER_RPM_DEADBAND) == 0
                 && 
                 MathUtil.applyDeadband(
                     Math.abs(currentRightSpeed - targetRightSpeed),
-                    ShooterConstants.SHOOTER_DEADBAND) == 0;
+                    ShooterConstants.SHOOTER_RPM_DEADBAND) == 0;
     }
 
     /**

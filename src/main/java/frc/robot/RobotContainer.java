@@ -120,7 +120,7 @@ public class RobotContainer implements Logged {
             () -> -driver.getRightX(),
             () -> !driver.y().getAsBoolean(),
             () -> (driver.y().getAsBoolean()
-                && Robot.isBlueAlliance())));
+                && Robot.isRedAlliance())));
               
         configureButtonBindings();
         
@@ -132,7 +132,7 @@ public class RobotContainer implements Logged {
         // configureDriverBindings(driver);
         configureOperatorBindings(driver);
         // configurePIDTunerBindings(driver);
-        configureCalibrationBindings(driver);
+        configureCalibrationBindings(operator);
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
@@ -178,8 +178,8 @@ public class RobotContainer implements Logged {
                     () -> {
                         ;
                         return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
@@ -242,10 +242,9 @@ public class RobotContainer implements Logged {
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
-                        ;
                         return new ChassisSpeeds(
-                            -controller.getLeftY(),
-                            -controller.getLeftX(),
+                            controller.getLeftY(),
+                            controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
@@ -273,6 +272,15 @@ public class RobotContainer implements Logged {
         controller.x().onTrue(calibrationControl.toggleLeftLock());
         controller.b().onTrue(calibrationControl.toggleRightLock());
         controller.y().onTrue(calibrationControl.togglePivotLock());
+
+        controller.povLeft()
+            .onTrue(pieceControl.noteToTrap());
+
+        controller.povRight()
+            .onTrue(pieceControl.ejectNote());
+
+        controller.povDown()
+            .onTrue(pieceControl.stopIntakeAndIndexer());
     }
     
     public Command getAutonomousCommand() {

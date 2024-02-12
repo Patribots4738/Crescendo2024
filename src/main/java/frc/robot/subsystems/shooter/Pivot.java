@@ -68,7 +68,7 @@ public class Pivot extends SubsystemBase implements Logged {
 
 		atDesiredAngle = 
             MathUtil.applyDeadband(
-                Math.abs(realAngle - getTargetAngle()),
+                Math.abs(realAngle + desiredAngle),
                 ShooterConstants.PIVOT_DEADBAND) == 0;
 
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
@@ -116,7 +116,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return realAngle;
+		return pivotEncoder.getPosition();
 	}
 
 	public double getTargetAngle() {

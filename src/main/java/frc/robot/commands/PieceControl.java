@@ -46,8 +46,8 @@ public class PieceControl {
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCalc.readyToShootSupplier())
-                .andThen(noteToShoot()
-                    .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier)));
+                .andThen(noteToShoot());
+                    // .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier)));
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
@@ -61,7 +61,21 @@ public class PieceControl {
                 intake.inCommand(),
                 claw.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(2),
+                Commands.waitSeconds(.75),
+                stopAllMotors());
+
+    }
+
+    public Command noteToTrap() {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from claw into indexer and then into 
+        // shooter before stopping claw and indexer
+        return Commands.sequence(
+                intake.inCommand(),
+                claw.intake(),
+                indexer.stop(),
+                Commands.waitSeconds(.75),
                 stopAllMotors());
 
     }
@@ -75,7 +89,7 @@ public class PieceControl {
                 intake.outCommand(),
                 claw.outtake(),
                 indexer.toElevator(),
-                Commands.waitSeconds(2),
+                Commands.waitSeconds(.75),
                 stopAllMotors());
 
     }
@@ -100,7 +114,8 @@ public class PieceControl {
 
     public Command stopIntakeAndIndexer() {
         return intake.stop()
-                .alongWith(indexer.stop());
+                .alongWith(indexer.stop())
+                .alongWith(claw.stop());
     }
 
 }

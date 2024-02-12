@@ -26,7 +26,6 @@ public class CalibrationControl implements Logged {
 
     public CalibrationControl(ShooterCalc shooterCalc) {
         this.shooterCalc = shooterCalc;
-        updateMotors();
     }
 
     public Command incrementDistance(int increment) {
