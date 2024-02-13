@@ -111,7 +111,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters, FieldConstants.SPEAKER_HEIGHT);
+        return new Rotation2d(distanceMeters, FieldConstants.SPEAKER_HEIGHT-NTConstants.PIVOT_OFFSET_Z-.3);
     }
 
     /**
@@ -311,8 +311,8 @@ public class ShooterCalc implements Logged {
         return 
             SpeedAngleTriplet.of(
                 Pair.of(
-                    velocityToRPM(newv0)*1.15,
-                    velocityToRPM(newv0)*0.85
+                    velocityToRPM(newv0),
+                    velocityToRPM(newv0)
                 ),
                 newAngle.getDegrees()+5
             );
