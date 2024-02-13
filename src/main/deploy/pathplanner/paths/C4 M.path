@@ -8,27 +8,11 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.851466275184506,
-        "y": 3.74373952535472
+        "x": 7.0535215356145,
+        "y": 3.2104212779854135
       },
       "isLocked": false,
       "linkedName": "C4"
-    },
-    {
-      "anchor": {
-        "x": 6.557642691242567,
-        "y": 4.063790622435095
-      },
-      "prevControl": {
-        "x": 6.887260238990961,
-        "y": 4.323089759997164
-      },
-      "nextControl": {
-        "x": 6.046922855476011,
-        "y": 3.6620243516320716
-      },
-      "isLocked": false,
-      "linkedName": null
     },
     {
       "anchor": {
@@ -36,8 +20,8 @@
         "y": 4.806186572471635
       },
       "prevControl": {
-        "x": 5.161675140147316,
-        "y": 4.5064144800994415
+        "x": 5.001197430966291,
+        "y": 4.515113030226061
       },
       "nextControl": null,
       "isLocked": false,
@@ -72,7 +56,7 @@
     },
     {
       "name": "End",
-      "waypointRelativePos": 2.0,
+      "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -89,7 +73,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.4,
+    "maxVelocity": 3.87,
     "maxAcceleration": 8.12,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -102,8 +86,8 @@
   "reversed": false,
   "folder": "Center Line",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -179.85511438110993,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -24,7 +24,7 @@ import java.util.function.BooleanSupplier;
  * with each segment having its own method 
  * to make sure that the modularity stays clean
  */
-public class AutoPathStorage implements Logged {
+public class ChoreoStorage implements Logged {
 
     private final BooleanSupplier hasPieceSupplier;
     private final Map<String, PathPlannerPath> pathCache = new HashMap<>();
@@ -36,7 +36,7 @@ public class AutoPathStorage implements Logged {
      * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
      *                         This could be a sensor, motor current, or other system.
      */
-    public AutoPathStorage(BooleanSupplier hasPieceSupplier) {
+    public ChoreoStorage(BooleanSupplier hasPieceSupplier) {
         this.hasPieceSupplier = hasPieceSupplier;
         preloadPaths();
         generateSendableChooser();

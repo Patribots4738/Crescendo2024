@@ -3,47 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.288642422749572,
-        "y": 2.436296745792339
+        "x": 4.461157776932109,
+        "y": 4.806186572471635
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.994467829199142,
-        "y": 2.1571032355732886
+        "x": 6.273638375848179,
+        "y": 3.028644000145144
       },
       "isLocked": false,
-      "linkedName": "C4"
+      "linkedName": "M"
     },
     {
       "anchor": {
-        "x": 8.293238893308695,
-        "y": 0.7722070539325854
+        "x": 8.288642422749572,
+        "y": 5.773167022257897
       },
       "prevControl": {
-        "x": 6.528191172750587,
-        "y": 0.5542999240055222
+        "x": 7.5871258028230315,
+        "y": 5.467977793098444
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C5"
+      "linkedName": "C2"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Start",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": []
-        }
-      }
-    },
-    {
-      "name": "End",
-      "waypointRelativePos": 0.75,
+      "name": "Halfway",
+      "waypointRelativePos": 0.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -67,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": -155.91267342187007,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Center Line",
+  "folder": "Stage",
   "previewStartingState": {
-    "rotation": 178.87079442536069,
+    "rotation": 170.00564606567553,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -21,8 +21,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -175,7 +173,7 @@ public final class Constants {
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int CLAW_CAN_ID = 15;
-        public static final double ELEVATOR_DEADBAND = .003;
+        public static final double ELEVATOR_DEADBAND = .05;
         public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
@@ -457,7 +455,7 @@ public final class Constants {
     public static final class FieldConstants {
 
         public static boolean IS_SIMULATION = Robot.isSimulation();
-        public static final double CENTER_NOTE_COUNT = 5;
+        public static final int CENTER_NOTE_COUNT = 5;
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
