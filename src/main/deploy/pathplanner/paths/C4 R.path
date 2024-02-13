@@ -3,34 +3,75 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.28973292584782,
-        "y": 2.4345481668424793
+        "x": 8.293238893308695,
+        "y": 2.4407258668940637
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.289732925847815,
-        "y": 2.4345481668424793
+        "x": 7.69484552554272,
+        "y": 1.6600025954327322
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "C4"
     },
     {
       "anchor": {
-        "x": 5.903875722342193,
-        "y": 2.0547586528150523
+        "x": 5.880091849769366,
+        "y": 1.8431846942081342
       },
       "prevControl": {
-        "x": 4.903875722342193,
-        "y": 2.0547586528150523
+        "x": 5.723516679253472,
+        "y": 1.7684797339006313
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "R"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "StopIntake & PrepareShooterR",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "PrepareShooterR"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.87,
     "maxAcceleration": 8.12,
@@ -39,11 +80,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 148.48861254929685,
+    "rotation": 145.7116884401603,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Center Line",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0

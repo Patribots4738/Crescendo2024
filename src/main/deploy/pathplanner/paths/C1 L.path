@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Start",
+      "name": "StopIntake & PrepareShooterL",
       "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
@@ -55,7 +55,7 @@
       }
     },
     {
-      "name": "End",
+      "name": "Shoot",
       "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
@@ -86,7 +86,7 @@
   "reversed": false,
   "folder": "Center Line",
   "previewStartingState": {
-    "rotation": -147.6279551719741,
+    "rotation": -179.2648316228425,
     "velocity": 0
   },
   "useDefaultConstraints": true

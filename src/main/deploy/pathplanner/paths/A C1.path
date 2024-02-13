@@ -70,7 +70,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Halfway",
+      "name": "Intake",
       "waypointRelativePos": 1.85,
       "command": {
         "type": "parallel",

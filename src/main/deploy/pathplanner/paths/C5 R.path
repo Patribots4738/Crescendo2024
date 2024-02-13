@@ -30,7 +30,48 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "StopIntake & PrepareShooterR",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PrepareShooterR"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "StopIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.87,
     "maxAcceleration": 8.12,
@@ -43,7 +84,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Center Line",
   "previewStartingState": {
     "rotation": -179.4569283062762,
     "velocity": 0

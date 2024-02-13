@@ -32,17 +32,24 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Start",
+      "name": "StopIntake",
       "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
-          "commands": []
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "StopIntake"
+              }
+            }
+          ]
         }
       }
     },
     {
-      "name": "End",
+      "name": "PlaceAmp",
       "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
