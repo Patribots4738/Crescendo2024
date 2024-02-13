@@ -166,6 +166,7 @@ public final class Constants {
             {
                 put(6, SpeedAngleTriplet.of(4000.0, 4500.0, 48.0));
                 put(7, SpeedAngleTriplet.of(4000.0, 4500.0, 48.0));
+                put(8, SpeedAngleTriplet.of(4240.0, 4600.0, 44.1));
                 put(10, SpeedAngleTriplet.of(4000.0, 4000.0, 45.0));
                 put(15, SpeedAngleTriplet.of(6000.0, 4000.0, 40.0));
                 put(20, SpeedAngleTriplet.of(6000.0, 4000.0, 30.0));

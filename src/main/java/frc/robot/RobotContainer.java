@@ -108,7 +108,7 @@ public class RobotContainer implements Logged {
             // then we can confirm that the estimated position is realistic
             if (driver.rightTrigger().getAsBoolean() && !(result.botpose[0] == 0 && result.botpose[1] == 0) ) {
                 swerve.getPoseEstimator().addVisionMeasurement( 
-                    result.getBotPose2d_wpiBlue(), // TODO: change to getBotPose2d_wpiRed if on red alliance (I need to first see if this is the correct method)
+                    result.getBotPose2d_wpiBlue(),
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
             }
         }, limelight));
@@ -176,10 +176,9 @@ public class RobotContainer implements Logged {
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
-                        ;
                         return new ChassisSpeeds(
-                            -controller.getLeftY(),
-                            -controller.getLeftX(),
+                            controller.getLeftY(),
+                            controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
