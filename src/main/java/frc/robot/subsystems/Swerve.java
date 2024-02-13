@@ -216,30 +216,6 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(swerveModuleStates);
     }
 
-    public void driveHDC(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
-        xSpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        ySpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * speedMultiplier);
-
-        HolonomicDriveController HDC = AutoConstants.HDC;
-
-        ChassisSpeeds HDCSpeeds = new ChassisSpeeds(
-            HDC.getXController().calculate(xSpeed), 
-            HDC.getYController().calculate(ySpeed), 
-            HDC.getThetaController().calculate(rotSpeed));
-
-        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-            fieldRelative
-            ?   ChassisSpeeds.discretize(
-                    ChassisSpeeds.fromFieldRelativeSpeeds(HDCSpeeds, getPose().getRotation()), 
-                    (Timer.getFPGATimestamp() - Robot.previousTimestamp))
-            :   ChassisSpeeds.discretize(
-                    HDCSpeeds,
-                    (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
-            
-        setModuleStates(swerveModuleStates);
-    }
-
     public ChassisSpeeds getRobotRelativeVelocity() {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
     }
