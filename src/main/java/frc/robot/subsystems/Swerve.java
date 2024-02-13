@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -32,8 +33,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.commands.Drive;
+import frc.robot.commands.DriveHDC;
 import frc.robot.util.MAXSwerveModule;
-import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -215,6 +216,30 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(swerveModuleStates);
     }
 
+    public void driveHDC(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
+        xSpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+        ySpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
+        rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * speedMultiplier);
+
+        HolonomicDriveController HDC = AutoConstants.HDC;
+
+        ChassisSpeeds HDCSpeeds = new ChassisSpeeds(
+            HDC.getXController().calculate(xSpeed), 
+            HDC.getYController().calculate(ySpeed), 
+            HDC.getThetaController().calculate(rotSpeed));
+
+        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+            fieldRelative
+            ?   ChassisSpeeds.discretize(
+                    ChassisSpeeds.fromFieldRelativeSpeeds(HDCSpeeds, getPose().getRotation()), 
+                    (Timer.getFPGATimestamp() - Robot.previousTimestamp))
+            :   ChassisSpeeds.discretize(
+                    HDCSpeeds,
+                    (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
+            
+        setModuleStates(swerveModuleStates);
+    }
+
     public ChassisSpeeds getRobotRelativeVelocity() {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
     }
@@ -349,6 +374,10 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
         return new Drive(this, speeds, fieldRelative, () -> false);
+    }
+    
+    public DriveHDC getDriveHDCCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
+        return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {
