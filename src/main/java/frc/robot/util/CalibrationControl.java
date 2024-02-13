@@ -14,7 +14,7 @@ public class CalibrationControl implements Logged {
     private SpeedAngleTriplet desiredTriplet;
 
     @Log
-    private double leftSpeed = 4000, rightSpeed = 4500, angle = 60;
+    private double leftSpeed = 3200, rightSpeed = 3800, angle = 26;
 
     @Log
     private boolean pivotLock, leftLock, rightLock;
@@ -43,7 +43,6 @@ public class CalibrationControl implements Logged {
         return Commands.either(
             Commands.run(() -> {
                 leftSpeed += increment.getAsDouble();
-                updateMotors();
                 logSpeeds();
             }),
             Commands.none(),
@@ -55,7 +54,6 @@ public class CalibrationControl implements Logged {
         return Commands.either(
             Commands.run(() -> {
                 rightSpeed += increment.getAsDouble();
-                updateMotors();
                 logSpeeds();
             }),
             Commands.none(),
@@ -67,7 +65,6 @@ public class CalibrationControl implements Logged {
         return Commands.either(
             Commands.run(() -> {
                 angle = angle + increment.getAsDouble()/20.0;
-                updateMotors();
                 logAngle();
             }),
             Commands.none(),
@@ -118,11 +115,11 @@ public class CalibrationControl implements Logged {
     }
 
     public void logSpeeds() {
-        System.out.println("Speeds: " + desiredTriplet.getLeftSpeed() + " | " + desiredTriplet.getRightSpeed());
+        System.out.println("Speeds: " + leftSpeed + " | " + rightSpeed);
     }
 
     public void logAngle() {
-        System.out.println("Angle: " + desiredTriplet.getAngle() + "°");
+        System.out.println("Angle: " + angle + "°");
     }
 
     public void logLocks() {
