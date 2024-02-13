@@ -124,10 +124,7 @@ public class Swerve extends SubsystemBase implements Logged {
                 this::getRobotRelativeVelocity,
                 this::drive,
                 AutoConstants.HPFC,
-                () -> {
-                    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-                    return alliance.isPresent() && alliance.get().equals(Alliance.Red);
-                },
+                Robot::isRedAlliance,
                 this);
 
         resetEncoders();
