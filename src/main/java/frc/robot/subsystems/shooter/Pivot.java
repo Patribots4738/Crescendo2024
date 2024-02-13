@@ -60,7 +60,7 @@ public class Pivot extends SubsystemBase implements Logged {
 
         if (FieldConstants.IS_SIMULATION) {
             if (Math.abs(desiredAngle - realAngle) > 0.25) {
-                realAngle += (desiredAngle - realAngle) / 10;
+                realAngle += (-desiredAngle - realAngle) / 10;
             }
         } else {
             realAngle = -getAngle();
