@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -15,6 +16,7 @@ import frc.robot.subsystems.Swerve;
 //import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
+import monologue.Annotations.Log;
 
 public class DriveHDC  extends Command {
 
@@ -75,23 +77,29 @@ public class DriveHDC  extends Command {
             y *= -1;
         }
 
+        // if (x == 0 && y == 0 && rotationSupplier.getAsDouble() == 0) {
+        //     swerve.drive(new ChassisSpeeds());
+        //     return;
+        // }
+
         HolonomicDriveController HDC = AutoConstants.HDC;
 
+        ChassisSpeeds desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotationSupplier.getAsDouble(), swerve.getPose().getRotation());
+
         // integrate the speeds to positions with exp and twist
-        Pose2d pose = swerve.getPose().exp(
+        Pose2d desiredPose = swerve.getPose().exp(
             new Twist2d(
-                x * DriveConstants.MAX_SPEED_METERS_PER_SECOND * 0.02, 
-                y * DriveConstants.MAX_SPEED_METERS_PER_SECOND * 0.02, 
-                rotationSupplier.getAsDouble() * DriveConstants.MAX_SPEED_METERS_PER_SECOND * 0.02
+                desiredSpeeds.vxMetersPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .1,
+                desiredSpeeds.vyMetersPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .1,
+                desiredSpeeds.omegaRadiansPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .1
             )
         );
 
         swerve.drive(
-            HDC.getXController().calculate(pose.getX()), 
-            HDC.getYController().calculate(pose.getY()), 
-            HDC.getThetaController().calculate(pose.getRotation().getRadians()), 
-            fieldRelativeSupplier.getAsBoolean()
+            HDC.calculate(swerve.getPose(), desiredPose, 0, desiredPose.getRotation())
         );
+
+        swerve.setDesriredPose(desiredPose);
     }
 
     @Override

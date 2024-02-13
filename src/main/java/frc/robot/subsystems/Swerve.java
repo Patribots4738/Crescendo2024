@@ -216,6 +216,12 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(swerveModuleStates);
     }
 
+    @Log
+    Pose2d desiredHDCPose = new Pose2d();
+    public void setDesriredPose(Pose2d pose) {
+        desiredHDCPose = pose;
+    }
+
     public ChassisSpeeds getRobotRelativeVelocity() {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
     }
