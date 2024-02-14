@@ -35,7 +35,6 @@ public class PatriBoxController extends CommandXboxController {
     public Translation2d getLeftAxis() {
         Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
                 MathUtil.applyDeadband(super.getLeftY(), deadband));
-
         return driverLeftAxis;
     }
 

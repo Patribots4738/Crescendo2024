@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
 
         DataLogManager.start();
         URCL.start();
-}
+    }
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
      * diagnostics
@@ -88,6 +88,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        DriverStation.refreshData();
+        FieldConstants.ALLIANCE = DriverStation.getAlliance();
         FieldConstants.GAME_MODE = GameMode.AUTONOMOUS;
         autonomousCommand = robotContainer.getAutonomousCommand();
 

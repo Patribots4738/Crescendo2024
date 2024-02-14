@@ -1,7 +1,6 @@
 package frc.robot.subsystems.elevator;
 
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,19 +27,15 @@ public class Claw extends SubsystemBase {
     }
 
     public Command placeCommand() {
-        return runOnce(this::outtake)
-                .andThen(
-                        Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-                .andThen(
-                        runOnce(this::stop));
+        return outtake()
+                .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
+                .andThen(stop());
     }
 
     public Command intakeFromHandoff() {
-        return runOnce(this::intake)
-                .andThen(
-                        Commands.waitSeconds(TrapConstants.INTAKE_TIME))
-                .andThen(
-                        runOnce(this::stop));
+        return intake()
+                .andThen(Commands.waitSeconds(TrapConstants.INTAKE_TIME))
+                .andThen(stop());
     }
 
     public boolean hasGamePiece() {
@@ -62,12 +57,19 @@ public class Claw extends SubsystemBase {
         return hasGamePiece;
     }
 
+    public void setSpeed(double percent) {
+        percent = 
+            MathUtil.clamp(
+                percent, 
+                TrapConstants.CLAW_LOWER_PERCENT_LIMIT, 
+                TrapConstants.CLAW_UPPER_PERCENT_LIMIT);
+        claw.set(percent);
+    }
+
     public void configMotors() {
         // needs motor configs
         claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
-        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
-        claw.setInverted(false);
+
         claw.setBrakeMode();
     }
 
@@ -80,16 +82,20 @@ public class Claw extends SubsystemBase {
     }
 
     public Command outtake() {
-        return Commands.runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE));
+        return runOnce(() -> claw.set(TrapConstants.CLAW_OUTTAKE_PERCENT));
     }
 
     public Command stop() {
-        return Commands.runOnce(() -> claw.setTargetVelocity(0));
+        return runOnce(() -> claw.set(TrapConstants.CLAW_STOP_PERCENT));
+    }
+    
+    public void updateIntakingTimestamp() {
+        startIntakingTimestamp = Robot.currentTimestamp;
     }
 
     public Command intake() {
-        startIntakingTimestamp = Robot.currentTimestamp;
-        return runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_INTAKE));
+        return runOnce(() -> updateIntakingTimestamp())
+                .andThen(runOnce(() -> claw.set(TrapConstants.CLAW_INTAKE_PERCENT)));
     }
 
 }
