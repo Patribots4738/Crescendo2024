@@ -20,8 +20,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.CalibrationControl;
+import frc.robot.util.HDCTuner;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
@@ -51,6 +53,8 @@ public class RobotContainer implements Logged {
     private PieceControl pieceControl;
     private CalibrationControl calibrationControl;
     private PIDTunerCommands PIDTuner;
+
+    public static HDCTuner HDCTuner;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -78,6 +82,11 @@ public class RobotContainer implements Logged {
         claw = new Claw();
         
         pivot = new Pivot();
+
+        HDCTuner = new HDCTuner(
+            AutoConstants.HDC.getXController(),
+            AutoConstants.HDC.getThetaController());
+
         incinerateMotors();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
@@ -146,7 +155,19 @@ public class RobotContainer implements Logged {
         controller.x().onTrue(PIDTuner.multiplyPIDCommand(2));
         controller.b().onTrue(PIDTuner.multiplyPIDCommand(.5));
     }
-  
+    
+    private void configureHIDTuner(PatriBoxController controller) {
+        controller.povRight().onTrue(HDCTuner.incrementHIDControllerIndexCommand());
+        controller.povLeft().onTrue(HDCTuner.decreaseHIDControllerIndexCommand());
+        controller.rightBumper().onTrue(HDCTuner.incrementPIDCommand());
+        controller.leftBumper().onTrue(HDCTuner.decreasePIDCommand());
+        controller.povUp().onTrue(HDCTuner.incrementPIDCommand(.001));
+        controller.povDown().onTrue(HDCTuner.incrementPIDCommand(.001));
+        controller.a().onTrue(HDCTuner.logCommand());
+        controller.x().onTrue(HDCTuner.multiplyPIDCommand(2));
+        controller.b().onTrue(HDCTuner.multiplyPIDCommand(.5));
+        
+    }
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.b().onTrue(shooterCalc.stopAllMotors().alongWith(pieceControl.stopAllMotors()));

@@ -32,8 +32,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
+import frc.robot.util.HDCTuner;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -359,7 +361,7 @@ public class Swerve extends SubsystemBase implements Logged {
     }
     
     public DriveHDC getDriveHDCCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
-        return new DriveHDC(this, speeds, fieldRelative, () -> false);
+        return new DriveHDC(this, speeds, fieldRelative, () -> false, RobotContainer.HDCTuner);
     }
 
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {

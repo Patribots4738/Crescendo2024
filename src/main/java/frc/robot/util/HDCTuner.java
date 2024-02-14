@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
-public class HIDTuner extends SubsystemBase implements Logged {
+public class HDCTuner extends SubsystemBase implements Logged {
 
     @Log
     public double XYkP;
@@ -47,7 +47,7 @@ public class HIDTuner extends SubsystemBase implements Logged {
         thetaController
     );
 
-    public HIDTuner(double XYkP, double XYkI, double XYkD, double thetaKp, double thetaKi, double thetaKd, double thetaMaxV, double thetaMaxA) {
+    public HDCTuner(double XYkP, double XYkI, double XYkD, double thetaKp, double thetaKi, double thetaKd, double thetaMaxV, double thetaMaxA) {
         this.XYkP = XYkP;
         this.XYkI = XYkI;
         this.XYkD = XYkD;
@@ -65,15 +65,15 @@ public class HIDTuner extends SubsystemBase implements Logged {
         this.HIDControllerIndex = 0;
     }
 
-    public HIDTuner(PIDController XYController, ProfiledPIDController thetaController) {
+    public HDCTuner(PIDController XYController, ProfiledPIDController thetaController) {
         this(XYController.getP(), XYController.getI(), XYController.getD(), thetaController.getP(), thetaController.getI(), thetaController.getD(), thetaController.getConstraints().maxVelocity, thetaController.getConstraints().maxAcceleration);
     }
 
-    public HIDTuner(double XYkP, double XYkI, double XYkD, ProfiledPIDController thetaController) {
+    public HDCTuner(double XYkP, double XYkI, double XYkD, ProfiledPIDController thetaController) {
         this(XYkP, XYkI, XYkD, thetaController.getP(), thetaController.getI(), thetaController.getD(), thetaController.getConstraints().maxVelocity, thetaController.getConstraints().maxAcceleration);
     }
 
-    public HIDTuner(PIDController XYController, double thetaKp, double thetaKi, double thetaKd, TrapezoidProfile.Constraints thetaConstraints) {
+    public HDCTuner(PIDController XYController, double thetaKp, double thetaKi, double thetaKd, TrapezoidProfile.Constraints thetaConstraints) {
         this(XYController.getP(), XYController.getI(), XYController.getD(), thetaKp, thetaKi, thetaKd, thetaConstraints.maxVelocity, thetaConstraints.maxAcceleration);
     }
 
