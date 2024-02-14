@@ -282,7 +282,7 @@ public final class Constants {
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
-        public static final HolonomicDriveController HDC = new HolonomicDriveController(
+        public static HolonomicDriveController HDC = new HolonomicDriveController(
                 new PIDController(
                         AutoConstants.X_CORRECTION_P,
                         AutoConstants.X_CORRECTION_I,

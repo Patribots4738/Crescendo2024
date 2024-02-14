@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.Drive;
+import frc.robot.commands.DriveHDC;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
@@ -122,14 +122,15 @@ public class RobotContainer implements Logged {
             }
         }, limelight));
 
-        swerve.setDefaultCommand(new Drive(
+        swerve.setDefaultCommand(new DriveHDC(
             swerve,
             driver::getLeftY,
             driver::getLeftX,
             () -> -driver.getRightX(),
             () -> !driver.getHID().getYButton(),
             () -> (driver.getHID().getYButton()
-                && Robot.isRedAlliance())));
+                && Robot.isRedAlliance()),
+            HDCTuner));
               
         configureButtonBindings();
         
@@ -141,7 +142,8 @@ public class RobotContainer implements Logged {
         // configureDriverBindings(driver);
         configureOperatorBindings(driver);
         // configurePIDTunerBindings(driver);
-        configureCalibrationBindings(operator);
+        // configureCalibrationBindings(operator);
+        configureHIDTuner(driver);
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
@@ -149,20 +151,20 @@ public class RobotContainer implements Logged {
         controller.povLeft().onTrue(PIDTuner.decreaseSubsystemCommand());
         controller.rightBumper().onTrue(PIDTuner.PIDIncrementCommand());
         controller.leftBumper().onTrue(PIDTuner.PIDDecreaseCommand());
-        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.001));
-        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(.001));
+        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.1));
+        controller.povDown().onTrue(PIDTuner.increaseCurrentPIDCommand(-.1));
         controller.a().onTrue(PIDTuner.logCommand());
         controller.x().onTrue(PIDTuner.multiplyPIDCommand(2));
         controller.b().onTrue(PIDTuner.multiplyPIDCommand(.5));
     }
     
     private void configureHIDTuner(PatriBoxController controller) {
-        controller.povRight().onTrue(HDCTuner.incrementHIDControllerIndexCommand());
-        controller.povLeft().onTrue(HDCTuner.decreaseHIDControllerIndexCommand());
-        controller.rightBumper().onTrue(HDCTuner.incrementPIDCommand());
-        controller.leftBumper().onTrue(HDCTuner.decreasePIDCommand());
-        controller.povUp().onTrue(HDCTuner.incrementPIDCommand(.001));
-        controller.povDown().onTrue(HDCTuner.incrementPIDCommand(.001));
+        controller.povRight().onTrue(HDCTuner.controllerIncrementCommand());
+        controller.povLeft().onTrue(HDCTuner.controllerDecrementCommand());
+        controller.rightBumper().onTrue(HDCTuner.constantIncrementCommand());
+        controller.leftBumper().onTrue(HDCTuner.constantDecrementCommand());
+        controller.povUp().onTrue(HDCTuner.increaseCurrentConstantCommand(.1));
+        controller.povDown().onTrue(HDCTuner.increaseCurrentConstantCommand(-.1));
         controller.a().onTrue(HDCTuner.logCommand());
         controller.x().onTrue(HDCTuner.multiplyPIDCommand(2));
         controller.b().onTrue(HDCTuner.multiplyPIDCommand(.5));

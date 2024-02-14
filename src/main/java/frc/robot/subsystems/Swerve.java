@@ -361,7 +361,7 @@ public class Swerve extends SubsystemBase implements Logged {
     }
     
     public DriveHDC getDriveHDCCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
-        return new DriveHDC(this, speeds, fieldRelative, () -> false, RobotContainer.HDCTuner);
+        return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {

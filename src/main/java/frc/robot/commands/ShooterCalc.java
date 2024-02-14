@@ -151,6 +151,8 @@ public class ShooterCalc implements Logged {
     double desiredMPSForNote = 0;
     @Log
     double degreesToSpeakerReferenced = 0;
+    @Log
+    double angleDifference = 0;
 
     /**
      * Calculates the angle to the speaker based on the robot's pose and velocity.
@@ -177,9 +179,11 @@ public class ShooterCalc implements Logged {
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
-        Rotation2d desiredRotation2d = Rotation2d.fromRadians(
+        Rotation2d desiredRotation2d = Rotation2d.fromRadians(MathUtil.angleModulus(
             currentAngleToSpeaker.getRadians() + velocityArcTan + Math.PI
-        );
+        ));
+
+        angleDifference = Math.abs(desiredRotation2d.getRadians() - robotPose.getRotation().getRadians());
 
         // Update the robot's pose with the desired rotation
         desiredSWDPose = new Pose2d(robotPose.getTranslation(), desiredRotation2d);
