@@ -1,23 +1,28 @@
 package frc.robot;
 
-import java.util.Optional;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
+import frc.robot.commands.autonomous.ChoreoStorage;
+import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
@@ -50,6 +55,8 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
+    private ChoreoStorage choreoPathStorage;
+    private PathPlannerStorage pathPlannerStorage;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -90,7 +97,6 @@ public class RobotContainer implements Logged {
                 shooterCalc);
 
         limelight.setDefaultCommand(Commands.run(() -> {
-            limelight.isConnected();
             // Create an "Optional" object that contains the estimated pose of the robot
             // This can be present (sees tag) or not present (does not see tag)
             LimelightHelpers.Results result = limelight.getResults();
@@ -98,9 +104,9 @@ public class RobotContainer implements Logged {
             // If the result of the estimatedRobotPose exists,
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
-            if (!(result.botpose[0] == 0 && result.botpose[1] == 0)) {
+            if (result.valid) {
                 swerve.getPoseEstimator().addVisionMeasurement( 
-                    result.getBotPose2d_wpiBlue(),// TODO: change to getBotPose2d_wpiRed if on red alliance (I need to first see if this is the correct method)
+                    result.getBotPose2d_wpiBlue(),
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
             }
         }, limelight));
@@ -116,8 +122,13 @@ public class RobotContainer implements Logged {
 
         configureButtonBindings();
         
-        prepareNamedCommands();
         initializeArrays();
+        
+        pathPlannerStorage = new PathPlannerStorage(driver.y());
+        registerNamedCommands();
+        // choreoPathStorage = new ChoreoStorage(driver.y());
+        // setupChoreoChooser();
+        pathPlannerStorage.configureAutoChooser();
     }
     
     private void configureButtonBindings() {
@@ -233,23 +244,50 @@ public class RobotContainer implements Logged {
     }
     
     public Command getAutonomousCommand() {
-        return Commands.none();
+        return driver.y().getAsBoolean() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
     }
-    
+
+    @Log.NT
+    public static SendableChooser<Command> choreoChooser = new SendableChooser<>();
+    // PathPlannerPath starting = PathPlannerPath.fromChoreoTrajectory("S W3-1S C1");
+    private void setupChoreoChooser() {
+        // // TODO: Autos currently start at C1-5, we need to integrate the other paths
+        // // with the center line schenanigans to make full autos
+        // choreoChooser.setDefaultOption("Do Nothing", Commands.none());
+        // choreoChooser.addOption("W3-1 C1-5", 
+        //     swerve.resetOdometryCommand(
+        //         () -> starting.getPreviewStartingHolonomicPose()
+        //             .plus(new Transform2d(
+        //                     new Translation2d(), 
+        //                     Rotation2d.fromDegrees(180))))
+        //     .andThen(
+        //         AutoBuilder.followPath(starting)
+        //         .andThen(choreoPathStorage.generateCenterLineComplete(1, 5, false))));
+    }
+
     public void onDisabled() {
+        swerve.stopMotors();
     }
-    
-    public void onEnabled() {
-    }
-    
-    public void prepareNamedCommands() {
+
+    public void onEnabled() {}
+
+    public void registerNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
-        NamedCommands.registerCommand("intake", intake.inCommand());
-        NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
-        NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
+        NamedCommands.registerCommand("Intake", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
+        NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("PlaceAmp", pieceControl.noteToTarget());
+        NamedCommands.registerCommand("PrepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
+        NamedCommands.registerCommand("PrepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
+        NamedCommands.registerCommand("PrepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
+        for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
+            for (int j = 1; j <= FieldConstants.CENTER_NOTE_COUNT; j++) {
+                if (i == j) {
+                    continue;
+                }
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
+            }
+        }
     }
     
     private void incinerateMotors() {
@@ -283,4 +321,3 @@ public class RobotContainer implements Logged {
         }
     }
 }
-
