@@ -12,8 +12,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
+import frc.robot.util.Constants;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.LimelightHelpers.LimelightTarget_Fiducial;
@@ -30,14 +33,18 @@ public class Limelight extends SubsystemBase implements Logged{
     @Log
     Pose3d[] visableTags;
 
+    private static NetworkTableEntry timingTestEntry;
+    private static boolean timingTestEntryValue = false;
+
     @Log
     public boolean isConnected = false;
 
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
-
     public Limelight(Supplier<Pose2d> robotPoseSupplier) {
+        // Uses network tables to check status of limelight
+        timingTestEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName,"TIMING_TEST_ENTRY");
         this.robotPoseSupplier = robotPoseSupplier;
         loadAprilTagFieldLayout();
     }
@@ -145,5 +152,22 @@ public class Limelight extends SubsystemBase implements Logged{
         boolean isFacing = Math.signum(tagPose.getRotation().toRotation2d().minus(cameraPose.getRotation().toRotation2d()).getDegrees()) == -1;
         
         return angleCheck && distanceCheck && isFacing;
+    }
+
+    // https://github.com/StuyPulse/Alfred/blob/c7ebcdf0e586a32e6e28b5b808fb6aee6deee325/src/main/java/frc/util/Limelight.java#L28
+    public boolean isConnected() {
+        // Force an update and get current time
+        timingTestEntryValue = !timingTestEntryValue; // flip test value
+        timingTestEntry.setBoolean(timingTestEntryValue);
+        long currentTime = timingTestEntry.getLastChange();
+
+        // Get most recent update from limelight
+        long lastUpdate = LimelightHelpers.getLimelightNTTableEntry(limelightName, "tl").getLastChange();
+
+        // Calculate limelights last update
+        timeDifference = currentTime - lastUpdate;
+        isConnected = timeDifference < Constants.LIMELIGHT_MAX_UPDATE_TIME;
+
+        return isConnected;
     }
 }

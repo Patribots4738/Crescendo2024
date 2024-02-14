@@ -636,5 +636,6 @@ public final class Constants {
     }
 
     public static final double GRAVITY = 9.8;
+    public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000;
 
 }

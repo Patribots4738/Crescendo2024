@@ -1,7 +1,5 @@
 package frc.robot;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -121,7 +119,7 @@ public class RobotContainer implements Logged {
             () -> !driver.y().getAsBoolean(),
             () -> (driver.y().getAsBoolean()
                 && Robot.isBlueAlliance())));
-              
+
         configureButtonBindings();
         
         initializeArrays();
