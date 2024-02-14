@@ -322,25 +322,34 @@ public class ShooterCalc implements Logged {
             // );
             getGravityTriplet(pose, newv0, newAngle);
     }
-
+    // finds the height the not should go 
     private double getRealHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
         double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
+        // D/V
         double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
         double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
+        // final height of the note should be where it starts + the average vy * time
         double vzFinal = v0z - (time * Constants.GRAVITY);
         double vzAverage = (v0z + vzFinal) / 2;
         double heightFinal = NTConstants.PIVOT_OFFSET_Z + (vzAverage * time);
         
         return heightFinal;
     }
+    // Compensates for gravity by solving for the extra velocity we need to reach the height
+    // based on our time (which is the main inaccuracy of this because of drag) and 
     private SpeedAngleTriplet getGravityTriplet(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-        double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
+        double v0x = shooterSpeeds * initialAngle.getCos();
         double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
-        double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
-        double compensation = (FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z - v0z*time + 4.9*Math.pow(time, 2))/time;
+        // should be sqrt(9.8 * 2 * speaker height):
+        double v0z = shooterSpeeds * initialAngle.getSin();
+        // integral of (compensation + v0y - 9.8t)  = speaker height - pivot offset
+        // solved for compensation
+        double compensation = ((FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z) - (v0z*time + 4.9)*Math.pow(time, 2))/time;
+        // solve for new angle with added v0z and the same v0x
         Rotation2d newAngle = new Rotation2d(v0x, v0z + compensation);
+        // get new speed with the same v0x and the added v0z
         double newSpeed = Math.hypot(v0x, (v0z + compensation));
         return SpeedAngleTriplet.of(Pair.of(velocityToRPM(newSpeed), velocityToRPM(newSpeed)), newAngle.getDegrees());
     }
