@@ -309,14 +309,29 @@ public class ShooterCalc implements Logged {
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
-
+        System.out.println("height: " + compensatePivotAngleForGrav(pose, newv0, newAngle));
         return 
             SpeedAngleTriplet.of(
                 Pair.of(
                     velocityToRPM(newv0),
                     velocityToRPM(newv0)
                 ),
-                newAngle.getDegrees()+5
+                newAngle.getDegrees()
             );
     }
+
+    private double compensatePivotAngleForGrav(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
+        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+        double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
+        double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
+        double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
+        double vzFinal = v0z - (time * Constants.GRAVITY);
+        double vzAverage = (v0z + vzFinal) / 2;
+        double heightFinal = NTConstants.PIVOT_OFFSET_Z + (vzAverage * time);
+        
+        return heightFinal;
+    }
 }
+
+
+
