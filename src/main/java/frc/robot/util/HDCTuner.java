@@ -77,8 +77,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
         this(XYController.getP(), XYController.getI(), XYController.getD(), thetaKp, thetaKi, thetaKd, thetaConstraints.maxVelocity, thetaConstraints.maxAcceleration);
     }
 
-    @Override
-    public void periodic() {
+    public void updateValues() {
         this.HDC = new HolonomicDriveController(
             XYController,
             XYController,
@@ -210,6 +209,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
                     break;
             }
             System.out.println(this.toString());
+            updateValues();
         });
     }
 
@@ -230,6 +230,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
                     break;
             }
             System.out.println(this.toString());
+            updateValues();
         });
     }
 
@@ -250,6 +251,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
                     break;
             }
             System.out.println(this.toString());
+            updateValues();
         });
     }
 
@@ -294,6 +296,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
                     break;
             }
             System.out.println(this.toString());
+            updateValues();
         });
     }
 
@@ -314,6 +317,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
                     break;
             }
             System.out.println(this.toString());
+            updateValues();
         });
     }
 
@@ -335,6 +339,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
 
             }
             System.out.println(this.toString());
+            updateValues();
         });
     }
 
