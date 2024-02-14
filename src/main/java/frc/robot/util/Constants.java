@@ -14,13 +14,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
@@ -176,7 +173,7 @@ public final class Constants {
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int CLAW_CAN_ID = 15;
-        public static final double ELEVATOR_DEADBAND = .003;
+        public static final double ELEVATOR_DEADBAND = .05;
         public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
@@ -252,52 +249,52 @@ public final class Constants {
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 1.6;// 7;
-        public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0;
-
-        public static final double Y_CORRECTION_P = 1.6;// 6.03;
-        public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0;
-
-        public static final double ROTATION_CORRECTION_P = .63;
-        public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0.0025;
-
-        // Constraint for the motion-profiled robot angle controller
+        public static final PIDConstants X_PID =          new PIDConstants(4, 0, .01);
+        public static final PIDConstants HPFC_THETA_PID = new PIDConstants(2.8, 0, 0.011);
+        
+        public static final PIDConstants Y_PID = new PIDConstants(1.6, 0, 0);
+        public static final PIDConstants HDC_THETA_PID = new PIDConstants(0.63, 0, 0.0025);
+        
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
         public static final HolonomicDriveController HDC = new HolonomicDriveController(
                 new PIDController(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
+                    AutoConstants.X_PID.kP,
+                    AutoConstants.X_PID.kI,
+                    AutoConstants.X_PID.kD),
                 new PIDController(
-                        AutoConstants.Y_CORRECTION_P,
-                        AutoConstants.Y_CORRECTION_I,
-                        AutoConstants.Y_CORRECTION_D),
+                    AutoConstants.Y_PID.kP,
+                    AutoConstants.Y_PID.kI,
+                    AutoConstants.Y_PID.kD),
                 new ProfiledPIDController(
-                        AutoConstants.ROTATION_CORRECTION_P,
-                        AutoConstants.ROTATION_CORRECTION_I,
-                        AutoConstants.ROTATION_CORRECTION_D,
+                    AutoConstants.HDC_THETA_PID.kP,
+                    AutoConstants.HDC_THETA_PID.kI,
+                    AutoConstants.HDC_THETA_PID.kD,
                         new TrapezoidProfile.Constraints(
                                 AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
                                 AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
 
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
-                new PIDConstants(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
-                new PIDConstants(
-                        AutoConstants.ROTATION_CORRECTION_P,
-                        AutoConstants.ROTATION_CORRECTION_I,
-                        AutoConstants.ROTATION_CORRECTION_D),
+                X_PID,
+                HPFC_THETA_PID,
                 MAX_SPEED_METERS_PER_SECOND,
                 Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH),
                 new ReplanningConfig());
 
+        // In choreo, there is one path, "C1-5S", 
+        // that shoots every piece.
+        // There is a setting that splits the trajectories
+        // by each stop point, and the auto generated
+        // name by default is (PATH_NAME + "." + index)
+        // so this represents that "." :>
+        private static final String PATH_EXTENSION = ".";
+
+        public static final String SHOOTING_DOWN_PATH_NAME = "C1-5S" + PATH_EXTENSION;
+        public static final String SHOOTING_UP_PATH_NAME   = "C5-1S" + PATH_EXTENSION;
+
+        public static final String SKIPPING_DOWN_PATH_NAME = "C1-5"  + PATH_EXTENSION;
+        public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
     }
 
     public static final class ModuleConstants {
@@ -457,6 +454,7 @@ public final class Constants {
     public static final class FieldConstants {
 
         public static boolean IS_SIMULATION = Robot.isSimulation();
+        public static final int CENTER_NOTE_COUNT = 5;
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;

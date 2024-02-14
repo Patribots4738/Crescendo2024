@@ -49,7 +49,8 @@ public class Elevator extends SubsystemBase implements Logged {
         pos = elevator.getPosition();
         desiredPos = elevator.getTargetPosition();
 
-        atDesiredPos = atDesiredPosition().getAsBoolean();
+        atDesiredPos = atDesiredPosition();
+
         RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
             0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
             new Rotation3d()
@@ -62,13 +63,6 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public double getPosition() {
         return elevator.getPosition();
-    }
-
-    public BooleanSupplier isAtTargetPosition() {
-        return () -> MathUtil.applyDeadband(
-                Math.abs(
-                        this.getPosition() - elevator.getTargetPosition()),
-                TrapConstants.ELEVATOR_DEADBAND) == 0;
     }
 
     public void setPosition(double pos) {
@@ -89,7 +83,7 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public Command setPositionCommand(double pos) {
         return runOnce(() -> this.setPosition(pos))
-                .andThen(Commands.waitUntil(this.isAtTargetPosition()));
+                .andThen(Commands.waitUntil(this::atDesiredPosition));
     }
 
     private void toTop() {
@@ -112,11 +106,7 @@ public class Elevator extends SubsystemBase implements Logged {
         return runOnce(() -> elevator.stopMotor());
     }
 
-    public BooleanSupplier atDesiredPosition() {
-		return () -> (
-            MathUtil.applyDeadband(
-				Math.abs(
-						elevator.getPosition() - elevator.getTargetPosition()),
-				TrapConstants.ELEVATOR_DEADBAND) == 0);
+    public boolean atDesiredPosition() {
+		return MathUtil.applyDeadband(pos - desiredPos, TrapConstants.ELEVATOR_DEADBAND) == 0;
 	}
 }
