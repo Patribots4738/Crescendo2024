@@ -50,7 +50,7 @@ public class PathPlannerStorage implements Logged {
 
         // Good news! 
         // This auto caches our paths so we don't need to manually load them
-        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser.addOption("Theonlyone", AutoBuilder.buildAuto("S W3-1 S"));
     }
 
     public Command getSelectedAuto() {
