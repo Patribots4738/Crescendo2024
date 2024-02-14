@@ -101,8 +101,6 @@ public class ShooterCalc implements Logged {
      * @return The calculated pivot angle.
      */
     public Rotation2d calculatePivotAngle(Pose2d robotPose) {
-        // Add the pivot offset to the robot's pose
-        robotPose = robotPose.plus(new Transform2d(NTConstants.PIVOT_OFFSET_METERS.getX(), 0, robotPose.getRotation()));
         // Calculate the robot's pose relative to the speaker's position
         robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
 
@@ -111,12 +109,12 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters, FieldConstants.SPEAKER_HEIGHT);
+        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT);
     }
 
     /**
 	 * Determines if the pivot rotation is at its target with a small
-	 * toleranne
+	 * tolerance
 	 * 
 	 * @return The method is returning a BooleanSupplier that returns true
 	 *         if the pivot is at its target rotation and false otherwise
