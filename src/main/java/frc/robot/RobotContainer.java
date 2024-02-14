@@ -3,6 +3,7 @@ package frc.robot;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.revrobotics.CANSparkBase;
@@ -29,6 +30,7 @@ import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -73,12 +75,13 @@ public class RobotContainer implements Logged {
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         DriverStation.silenceJoystickConnectionWarning(true);
         
-        limelight = new Limelight();
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
+        limelight = new Limelight(swerve::getPose);
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
+
         shooter = new Shooter();
         elevator = new Elevator();
         claw = new Claw();
@@ -89,31 +92,27 @@ public class RobotContainer implements Logged {
         shooterCalc = new ShooterCalc(shooter, pivot);
         
         pieceControl = new PieceControl(
-            intake,
-            triggerWheel,
-            elevator,
-            claw,
-            shooterCalc
-        );
-        
-        limelight = new Limelight();
-        if (limelight.isConnected()) {
-            limelight.setDefaultCommand(Commands.run(() -> {
-                // Create an "Optional" object that contains the estimated pose of the robot
-                // This can be present (sees tag) or not present (does not see tag)
-                Optional<Pose2d> result = limelight.getPose2d();
-                // The skew of the tag represents how confident the camera is
-                // If the result of the estimatedRobotPose exists,
-                // and the skew of the tag is less than 3 degrees,
-                // then we can confirm that the estimated position is realistic
-                if (result.isPresent()) {
-                swerve.getPoseEstimator().addVisionMeasurement(
-                result.get(),
-                Robot.currentTimestamp - limelight.getCombinedLatencySeconds());
-                }
-            }, limelight));
-        }
-        
+                intake,
+                triggerWheel,
+                elevator,
+                claw,
+                shooterCalc);
+
+        limelight.setDefaultCommand(Commands.run(() -> {
+            // Create an "Optional" object that contains the estimated pose of the robot
+            // This can be present (sees tag) or not present (does not see tag)
+            LimelightHelpers.Results result = limelight.getResults();
+            // The skew of the tag represents how confident the camera is
+            // If the result of the estimatedRobotPose exists,
+            // and the skew of the tag is less than 3 degrees,
+            // then we can confirm that the estimated position is realistic
+            if (result.valid) {
+                swerve.getPoseEstimator().addVisionMeasurement( 
+                    result.getBotPose2d_wpiBlue(),
+                    Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
+            }
+        }, limelight));
+
         swerve.setDefaultCommand(new Drive(
             swerve,
             driver::getLeftY,
@@ -135,13 +134,13 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        // configureDriverBindings(driver);
-        configureOperatorBindings(driver);
+        configureDriverBindings(driver);
+        configureOperatorBindings(operator);
     }
     
     // TODO: uncomment these bindings (they are commented because we aren't testing them)
     private void configureOperatorBindings(PatriBoxController controller) {
-
+        controller.b().onTrue(shooterCalc.stopPivotShooter().alongWith(pieceControl.stopAllMotors()));
         controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
         controller.povDown().onTrue(climb.toBottomCommand());
@@ -160,8 +159,21 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.start().or(controller.back())
-            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(3,6.6, new Rotation2d()))));
+            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(1.332, 5.587, new Rotation2d()))));
         
+        controller.rightStick()
+            .toggleOnTrue(
+                Commands.sequence(
+                swerve.resetHDC(),
+                swerve.getDriveCommand(
+                    () -> {
+                        ;
+                        return new ChassisSpeeds(
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                    },
+                    () -> true)));
         // controller.rightBumper()
         //     .and(controller.leftBumper().negate())
         //     .onTrue(pieceControl.noteToTarget(() -> true));
@@ -197,6 +209,7 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
+        
         
         controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());
