@@ -35,6 +35,8 @@ public class ShooterCalc implements Logged {
 
     @Log 
     boolean atDesiredAngle = false , atDesiredRPM = false;
+
+    private SpeedAngleTriplet desiredTriplet;
     
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.pivot = pivot;
@@ -57,19 +59,21 @@ public class ShooterCalc implements Logged {
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
         return Commands.runOnce(() -> {
-                SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
+                desiredTriplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
 
-                pivot.setAngle(triplet.getAngle());
-                shooter.setSpeed(triplet.getSpeeds());
+                pivot.setAngle(desiredTriplet.getAngle());
+                shooter.setSpeed(desiredTriplet.getSpeeds());
             }, pivot, shooter);
     }
 
     public void setTriplet(SpeedAngleTriplet triplet) {
-        desiredAngle = triplet.getAngle();
-        desiredLSpeed = triplet.getSpeeds().getFirst();
-        desiredRSpeed = triplet.getSpeeds().getSecond();
+        desiredTriplet = triplet;
         pivot.setAngle(triplet.getAngle());
         shooter.setSpeed(triplet.getSpeeds());
+    }
+
+    public SpeedAngleTriplet getTriplet() {
+        return desiredTriplet;
     }
     
     /**
@@ -88,9 +92,9 @@ public class ShooterCalc implements Logged {
      */
     public Command prepareSWDCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
         return Commands.run(() -> {
-            SpeedAngleTriplet triplet = calculateSWDTriplet(robotPose.get(), speeds.get());
-            pivot.setAngle(triplet.getAngle());
-            shooter.setSpeed(triplet.getSpeeds());
+            desiredTriplet = calculateSWDTriplet(robotPose.get(), speeds.get());
+            pivot.setAngle(desiredTriplet.getAngle());
+            shooter.setSpeed(desiredTriplet.getSpeeds());
         }, pivot, shooter);
     }
 

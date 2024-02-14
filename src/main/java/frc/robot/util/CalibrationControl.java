@@ -28,6 +28,18 @@ public class CalibrationControl implements Logged {
         this.shooterCalc = shooterCalc;
     }
 
+    public Command copyCalcTriplet() {
+        return Commands.runOnce(() -> {
+            SpeedAngleTriplet triplet = shooterCalc.getTriplet();
+            desiredTriplet = triplet;
+            leftSpeed = triplet.getLeftSpeed();
+            rightSpeed = triplet.getRightSpeed();
+            angle = triplet.getAngle();
+            logSpeeds();
+            logAngle();
+        });
+    }
+
     public Command incrementDistance(int increment) {
         return Commands.runOnce(() -> {
             distance += increment; 

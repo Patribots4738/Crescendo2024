@@ -280,6 +280,9 @@ public class RobotContainer implements Logged {
 
         controller.povDown()
             .onTrue(pieceControl.stopIntakeAndIndexer());
+
+        controller.povUp()
+            .onTrue(calibrationControl.copyCalcTriplet());
     }
     
     public Command getAutonomousCommand() {
