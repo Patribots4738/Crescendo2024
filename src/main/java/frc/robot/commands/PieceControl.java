@@ -58,6 +58,7 @@ public class PieceControl {
         // rotation and speed before sending note from claw into indexer and then into 
         // shooter before stopping claw and indexer
         return Commands.sequence(
+                intake.inCommand(),
                 claw.intake(),
                 indexer.toShooter(),
                 Commands.waitSeconds(.75),

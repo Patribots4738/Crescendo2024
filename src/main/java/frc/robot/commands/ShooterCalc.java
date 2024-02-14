@@ -309,15 +309,18 @@ public class ShooterCalc implements Logged {
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
-        System.out.println("height: " + getRealHeight(pose, newv0, newAngle));
+        System.out.println("\nheight: " + getRealHeight(pose, newv0, newAngle));
+        System.out.println("\nSpeed: " + getGravityTriplet(pose, newv0, newAngle).getLeftSpeed());
+        System.out.println("\nNew Angle: " + getGravityTriplet(pose, newv0, newAngle).getAngle());
         return 
-            SpeedAngleTriplet.of(
-                Pair.of(
-                    velocityToRPM(newv0),
-                    velocityToRPM(newv0)
-                ),
-                newAngle.getDegrees()
-            );
+            // SpeedAngleTriplet.of(
+            //     Pair.of(
+            //         velocityToRPM(newv0),
+            //         velocityToRPM(newv0)
+            //     ),
+            //     newAngle.getDegrees()
+            // );
+            getGravityTriplet(pose, newv0, newAngle);
     }
 
     private double getRealHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
@@ -331,14 +334,16 @@ public class ShooterCalc implements Logged {
         
         return heightFinal;
     }
-    // private SpeedAngleTriplet getGravityTriplet(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
-    //     Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-    //     double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
-    //     double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
-    //     double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
-    //     double compensation = (FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z - v0z*time + 4.9*Math.pow(time, 2))/time;
-        
-    // }
+    private SpeedAngleTriplet getGravityTriplet(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
+        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+        double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
+        double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
+        double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
+        double compensation = (FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z - v0z*time + 4.9*Math.pow(time, 2))/time;
+        Rotation2d newAngle = new Rotation2d(v0x, v0z + compensation);
+        double newSpeed = Math.hypot(v0x, (v0z + compensation));
+        return SpeedAngleTriplet.of(Pair.of(velocityToRPM(newSpeed), velocityToRPM(newSpeed)), newAngle.getDegrees());
+    }
 
 
 }
