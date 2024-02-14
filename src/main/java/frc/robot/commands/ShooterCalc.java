@@ -309,9 +309,9 @@ public class ShooterCalc implements Logged {
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
-        System.out.println("\nheight: " + getRealHeight(pose, newv0, newAngle));
-        System.out.println("\nSpeed: " + getGravityTriplet(pose, newv0, newAngle).getLeftSpeed());
-        System.out.println("\nNew Angle: " + getGravityTriplet(pose, newv0, newAngle).getAngle());
+        System.out.println("\nheight: " + getOriginalEstimatedImpactHeight(pose, newv0, newAngle));
+        System.out.println("\nSpeed: " + getGravityCompensatedTriplet(pose, newv0, newAngle).getLeftSpeed());
+        System.out.println("\nNew Angle: " + getGravityCompensatedTriplet(pose, newv0, newAngle).getAngle());
         return 
             // SpeedAngleTriplet.of(
             //     Pair.of(
@@ -320,10 +320,10 @@ public class ShooterCalc implements Logged {
             //     ),
             //     newAngle.getDegrees()
             // );
-            getGravityTriplet(pose, newv0, newAngle);
+            getGravityCompensatedTriplet(pose, newv0, newAngle);
     }
     // finds the height the not should go 
-    private double getRealHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
+    private double getOriginalEstimatedImpactHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
         double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
         // D/V
@@ -338,7 +338,7 @@ public class ShooterCalc implements Logged {
     }
     // Compensates for gravity by solving for the extra velocity we need to reach the height
     // based on our time (which is the main inaccuracy of this because of drag) and 
-    private SpeedAngleTriplet getGravityTriplet(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
+    private SpeedAngleTriplet getGravityCompensatedTriplet(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
         double v0x = shooterSpeeds * initialAngle.getCos();
         double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
