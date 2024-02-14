@@ -126,8 +126,8 @@ public class RobotContainer implements Logged {
         
         pathPlannerStorage = new PathPlannerStorage(driver.y());
         registerNamedCommands();
-        choreoPathStorage = new ChoreoStorage(driver.y());
-        setupChoreoChooser();
+        // choreoPathStorage = new ChoreoStorage(driver.y());
+        // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
     }
     
@@ -249,20 +249,20 @@ public class RobotContainer implements Logged {
 
     @Log.NT
     public static SendableChooser<Command> choreoChooser = new SendableChooser<>();
-    PathPlannerPath starting = PathPlannerPath.fromChoreoTrajectory("S W3-1S C1");
+    // PathPlannerPath starting = PathPlannerPath.fromChoreoTrajectory("S W3-1S C1");
     private void setupChoreoChooser() {
-        // TODO: Autos currently start at C1-5, we need to integrate the other paths
-        // with the center line schenanigans to make full autos
-        choreoChooser.setDefaultOption("Do Nothing", Commands.none());
-        choreoChooser.addOption("W3-1 C1-5", 
-            swerve.resetOdometryCommand(
-                () -> starting.getPreviewStartingHolonomicPose()
-                    .plus(new Transform2d(
-                            new Translation2d(), 
-                            Rotation2d.fromDegrees(180))))
-            .andThen(
-                AutoBuilder.followPath(starting)
-                .andThen(choreoPathStorage.generateCenterLineComplete(1, 5, false))));
+        // // TODO: Autos currently start at C1-5, we need to integrate the other paths
+        // // with the center line schenanigans to make full autos
+        // choreoChooser.setDefaultOption("Do Nothing", Commands.none());
+        // choreoChooser.addOption("W3-1 C1-5", 
+        //     swerve.resetOdometryCommand(
+        //         () -> starting.getPreviewStartingHolonomicPose()
+        //             .plus(new Transform2d(
+        //                     new Translation2d(), 
+        //                     Rotation2d.fromDegrees(180))))
+        //     .andThen(
+        //         AutoBuilder.followPath(starting)
+        //         .andThen(choreoPathStorage.generateCenterLineComplete(1, 5, false))));
     }
 
     public void onDisabled() {
