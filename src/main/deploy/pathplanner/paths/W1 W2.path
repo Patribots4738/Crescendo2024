@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4439624534344255,
-        "y": 6.8257587802969555
+        "x": 2.4327389304274694,
+        "y": 6.747618780791873
       },
       "isLocked": false,
       "linkedName": "W1"
@@ -20,8 +20,8 @@
         "y": 5.561729376538261
       },
       "prevControl": {
-        "x": 3.8392589215189634,
-        "y": 7.4600717174558655
+        "x": 1.8168118755050504,
+        "y": 6.0351658441278815
       },
       "nextControl": null,
       "isLocked": false,
@@ -74,13 +74,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 59.91584344122488,
+    "rotation": 158.37463844416257,
     "rotateFast": true
   },
   "reversed": false,
   "folder": "Wings",
   "previewStartingState": {
-    "rotation": 179.73764324354653,
+    "rotation": 179.34683901291848,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.1237047894028604,
-        "y": 6.205235254815414
+        "x": 2.890547398116074,
+        "y": 5.561729376538261
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.28661184086086,
-        "y": 6.214428195933659
+        "x": 2.4511248126639593,
+        "y": 5.892675256795083
       },
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "W2"
     },
     {
       "anchor": {
-        "x": 8.288642422749572,
-        "y": 4.100051738737296
+        "x": 2.890547398116074,
+        "y": 6.997339122054029
       },
       "prevControl": {
-        "x": 7.2314541941513895,
-        "y": 4.049490562586948
+        "x": 2.317827166449406,
+        "y": 6.733829369114505
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C3"
+      "linkedName": "W1"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 0.65,
+      "waypointRelativePos": 0.75,
       "command": {
         "type": "parallel",
         "data": {
@@ -57,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 178.37502364247518,
+    "rotation": -155.69859023688946,
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "Stage",
+  "folder": "Wings",
   "previewStartingState": {
-    "rotation": -173.86919389160926,
+    "rotation": 179.34683901291848,
     "velocity": 0
   },
   "useDefaultConstraints": true

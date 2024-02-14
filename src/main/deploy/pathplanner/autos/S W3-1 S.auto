@@ -2,49 +2,37 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3070140425995143,
-      "y": 6.301761136557157
+      "x": 1.2514459967329792,
+      "y": 4.481558795144466
     },
-    "rotation": -149.77686787793002
+    "rotation": 136.71493019552656
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "S C1"
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C1 L"
+            "pathName": "S W3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "L C2"
+            "pathName": "W3 W2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C2 L"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L C3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C3 M"
+            "pathName": "W2 W1"
           }
         }
       ]
