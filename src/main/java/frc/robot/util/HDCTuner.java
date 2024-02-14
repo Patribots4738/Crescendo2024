@@ -7,6 +7,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Constants.AutoConstants;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
@@ -33,19 +34,13 @@ public class HDCTuner extends SubsystemBase implements Logged {
     @Log
     public int HIDControllerIndex = 0;
 
-    public TrapezoidProfile.Constraints thetaConstraints = new TrapezoidProfile.Constraints(0,0);
+    public TrapezoidProfile.Constraints thetaConstraints = AutoConstants.HDC.getThetaController().getConstraints();
 
-    public PIDController XYController = new PIDController(0,0,0);
+    public PIDController XYController = AutoConstants.HDC.getXController();
 
-    public ProfiledPIDController thetaController = 
-            new ProfiledPIDController( 0, 0, 0,
-            new TrapezoidProfile.Constraints(0,0));
+    public ProfiledPIDController thetaController = AutoConstants.HDC.getThetaController();
 
-    public HolonomicDriveController HDC = new HolonomicDriveController(
-        XYController,
-        XYController,
-        thetaController
-    );
+    public HolonomicDriveController HDC = AutoConstants.HDC;
 
     public HDCTuner(double XYkP, double XYkI, double XYkD, double thetaKp, double thetaKi, double thetaKd, double thetaMaxV, double thetaMaxA) {
         this.XYkP = XYkP;
