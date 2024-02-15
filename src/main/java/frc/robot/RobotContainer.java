@@ -106,7 +106,13 @@ public class RobotContainer implements Logged {
             // If the result of the estimatedRobotPose exists,
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
-            if (driver.getHID().getRightTriggerAxis() > 0 && !(result.botpose[0] == 0 && result.botpose[1] == 0) ) {
+            if ( // check validity
+                ((driver.getHID().getRightTriggerAxis() > 0 && !(result.botpose[0] == 0 && result.botpose[1] == 0) )
+                // check if good tag
+                && (LimelightHelpers.getTA("limelight") >= 0.3 
+                    || result.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
+                && limelight.getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25
+            ) {
                 swerve.getPoseEstimator().addVisionMeasurement( 
                     result.getBotPose2d_wpiBlue(),
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
@@ -177,8 +183,8 @@ public class RobotContainer implements Logged {
                 swerve.getDriveCommand(
                     () -> {
                         return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
@@ -306,10 +312,10 @@ public class RobotContainer implements Logged {
     }
     
     private void incinerateMotors() {
-        Timer.delay(0.25);
+        Timer.delay(1);
         for (CANSparkBase neo : NeoMotorConstants.MOTOR_LIST) {
             neo.burnFlash();
-            Timer.delay(0.005);
+            Timer.delay(0.05);
         }
         Timer.delay(0.25);
     }
