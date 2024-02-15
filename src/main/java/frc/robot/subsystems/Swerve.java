@@ -255,6 +255,11 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public void resetOdometry(Pose2d pose) {
+
+        if (Double.isNaN(pose.getX()) || Double.isNaN(pose.getY()) || Double.isNaN(pose.getRotation().getRadians())) {
+            return;
+        }
+
         poseEstimator.resetPosition(
                 gyro.getRotation2d(),
                 getModulePositions(),

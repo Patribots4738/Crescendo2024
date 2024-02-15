@@ -100,8 +100,14 @@ public class RobotContainer implements Logged {
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
             if (result.valid) {
+                Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
+                if (Double.isNaN(estimatedRobotPose.getX()) 
+                    || Double.isNaN(estimatedRobotPose.getY()) 
+                    || Double.isNaN(estimatedRobotPose.getRotation().getRadians())) {
+                    return;
+                }
                 swerve.getPoseEstimator().addVisionMeasurement( 
-                    result.getBotPose2d_wpiBlue(),
+                    estimatedRobotPose,
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
             }
         }, limelight));
