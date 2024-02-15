@@ -105,12 +105,12 @@ public final class Constants {
         // degrees
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
-        public static final double SHOOTER_P = 0.3;
+        public static final double SHOOTER_P = .1;
         public static final double SHOOTER_I = 0;
         public static final double SHOOTER_D = 0;
 
         // TODO: tune pid further
-        public static final double PIVOT_P = 0.05;
+        public static final double PIVOT_P = 0.1;
         public static final double PIVOT_I = 0;
         public static final double PIVOT_D = 0.002;
 
@@ -132,7 +132,7 @@ public final class Constants {
         public static final double PIVOT_LOWER_LIMIT_DEGREES_WRONG = 343.5;
         public static final double PIVOT_UPPER_LIMIT_DEGREES_WRONG = 300;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 43;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -173,7 +173,7 @@ public final class Constants {
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int CLAW_CAN_ID = 15;
-        public static final double ELEVATOR_DEADBAND = .003;
+        public static final double ELEVATOR_DEADBAND = .05;
         public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
@@ -249,52 +249,52 @@ public final class Constants {
         public static final double PY_CONTROLLER = 1;
         public static final double P_THETA_CONTROLLER = 1;
 
-        public static final double X_CORRECTION_P = 1.6;// 7;
-        public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0;
-
-        public static final double Y_CORRECTION_P = 1.6;// 6.03;
-        public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0;
-
-        public static final double ROTATION_CORRECTION_P = .63;
-        public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0.0025;
-
-        // Constraint for the motion-profiled robot angle controller
+        public static final PIDConstants X_PID =          new PIDConstants(4, 0, .01);
+        public static final PIDConstants HPFC_THETA_PID = new PIDConstants(2.8, 0, 0.011);
+        
+        public static final PIDConstants Y_PID = new PIDConstants(1.6, 0, 0);
+        public static final PIDConstants HDC_THETA_PID = new PIDConstants(0.63, 0, 0.0025);
+        
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
         public static final HolonomicDriveController HDC = new HolonomicDriveController(
                 new PIDController(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
+                    AutoConstants.X_PID.kP,
+                    AutoConstants.X_PID.kI,
+                    AutoConstants.X_PID.kD),
                 new PIDController(
-                        AutoConstants.Y_CORRECTION_P,
-                        AutoConstants.Y_CORRECTION_I,
-                        AutoConstants.Y_CORRECTION_D),
+                    AutoConstants.Y_PID.kP,
+                    AutoConstants.Y_PID.kI,
+                    AutoConstants.Y_PID.kD),
                 new ProfiledPIDController(
-                        AutoConstants.ROTATION_CORRECTION_P,
-                        AutoConstants.ROTATION_CORRECTION_I,
-                        AutoConstants.ROTATION_CORRECTION_D,
+                    AutoConstants.HDC_THETA_PID.kP,
+                    AutoConstants.HDC_THETA_PID.kI,
+                    AutoConstants.HDC_THETA_PID.kD,
                         new TrapezoidProfile.Constraints(
                                 AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
                                 AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
 
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
-                new PIDConstants(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
-                new PIDConstants(
-                        AutoConstants.ROTATION_CORRECTION_P,
-                        AutoConstants.ROTATION_CORRECTION_I,
-                        AutoConstants.ROTATION_CORRECTION_D),
+                X_PID,
+                HPFC_THETA_PID,
                 MAX_SPEED_METERS_PER_SECOND,
                 Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH),
                 new ReplanningConfig());
 
+        // In choreo, there is one path, "C1-5S", 
+        // that shoots every piece.
+        // There is a setting that splits the trajectories
+        // by each stop point, and the auto generated
+        // name by default is (PATH_NAME + "." + index)
+        // so this represents that "." :>
+        private static final String PATH_EXTENSION = ".";
+
+        public static final String SHOOTING_DOWN_PATH_NAME = "C1-5S" + PATH_EXTENSION;
+        public static final String SHOOTING_UP_PATH_NAME   = "C5-1S" + PATH_EXTENSION;
+
+        public static final String SKIPPING_DOWN_PATH_NAME = "C1-5"  + PATH_EXTENSION;
+        public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
     }
 
     public static final class ModuleConstants {
@@ -446,8 +446,7 @@ public final class Constants {
         public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
         // TODO: Add these to the robot
-        public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 7;
-        public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 15;
+        public static final int TRIGGER_WHEEL_CURRENT_LIMIT_AMPS = 30;
         public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = -1;
         public static final double TRAP_TRIGGER_WHEEL_PERCENT = 1;
     }
@@ -455,6 +454,7 @@ public final class Constants {
     public static final class FieldConstants {
 
         public static boolean IS_SIMULATION = Robot.isSimulation();
+        public static final int CENTER_NOTE_COUNT = 5;
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
@@ -578,6 +578,44 @@ public final class Constants {
             System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
         }
     }
+
+    public static final class CameraConstants {
+        public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
+
+        private static final double CAM_HEIGHT = Units.inchesToMeters(16);
+        private static final double CAM_X = Units.inchesToMeters(6.6 / 2.0);
+        private static final double CAM_Y = Units.inchesToMeters(15.3 / 2.0);
+        private static final double CAM_PITCH = Units.degreesToRadians(-15);
+        private static final double CAM_YAW = Units.degreesToRadians(32);
+
+        private static final Pose3d cam1 =
+            new Pose3d(
+                new Translation3d(CAM_X, CAM_Y, CAM_HEIGHT), 
+                new Rotation3d(0, CAM_PITCH, CAM_YAW));
+        private static final Pose3d cam2 =
+            new Pose3d(
+                new Translation3d(CAM_X, -CAM_Y, CAM_HEIGHT),
+                new Rotation3d(0, CAM_PITCH, -CAM_YAW));
+        private static final Pose3d cam3 =
+            new Pose3d(
+                new Translation3d(-CAM_X, CAM_Y, CAM_HEIGHT),
+                new Rotation3d(0, CAM_PITCH, (Math.PI) - CAM_YAW));
+        private static final Pose3d cam4 =
+            new Pose3d(
+                new Translation3d(-CAM_X, -CAM_Y, CAM_HEIGHT),
+                new Rotation3d(0, CAM_PITCH, (Math.PI) + CAM_YAW));
+
+        private static final Pose3d cam5 = 
+            new Pose3d(
+                0.0508, -0.1524, 0.589701,
+                new Rotation3d(0, Units.degreesToRadians(-33), Units.degreesToRadians(15)));
+        private static final Pose3d cam6 =
+        new Pose3d(
+                -0.254, -0.155575, 0.589701,
+                new Rotation3d(0, Units.degreesToRadians(180), Units.degreesToRadians(-10)));
+
+        public static final Pose3d[] cameras = new Pose3d[] {cam5, cam6};
+    }
     
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
@@ -598,7 +636,6 @@ public final class Constants {
     }
 
     public static final double GRAVITY = 9.8;
-
-    public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
+    public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000;
 
 }
