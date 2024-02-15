@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
@@ -51,16 +52,18 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_D,
 				ShooterConstants.PIVOT_MIN_OUTPUT,
 				ShooterConstants.PIVOT_MAX_OUTPUT);
-
-		// Change to brake when done testing
-		pivot.setCoastMode();
 	}
 
 	@Override
 	public void periodic() {
 
-		realAngle = getAngle();
-		desiredAngle = getTargetAngle();
+        if (FieldConstants.IS_SIMULATION) {
+            if (Math.abs(desiredAngle - realAngle) > 3) {
+                realAngle += (desiredAngle - realAngle) / 10;
+            }
+        } else {
+            realAngle = getAngle();
+        }
 
 		atDesiredAngle = atDesiredAngle().getAsBoolean();
 
@@ -68,7 +71,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				NTConstants.PIVOT_OFFSET_METERS.getX(),
 				0,
 				NTConstants.PIVOT_OFFSET_METERS.getZ(),
-				new Rotation3d(0, -Units.degreesToRadians(getAngle()), 0));
+				new Rotation3d(0, -Units.degreesToRadians(realAngle), 0));
 	}
 
 	/**
@@ -84,6 +87,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
 
         pivot.setTargetPosition(angle);
+        desiredAngle = angle;
 		
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 				NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -118,7 +122,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @return The method is returning a Command object.
 	 */
 	public Command stop() {
-		return runOnce(() -> pivot.stopMotor());
+		return runOnce(() -> pivot.set(0));
 	}
 
 	/**
