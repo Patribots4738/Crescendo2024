@@ -262,21 +262,13 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;
 
-        public static final double PX_CONTROLLER = 1;
-        public static final double PY_CONTROLLER = 1;
-        public static final double P_THETA_CONTROLLER = 1;
+        public static final double XY_CORRECTION_P = 5.4;
+        public static final double XY_CORRECTION_I = .125;
+        public static final double XY_CORRECTION_D = 0.075;
 
-        public static final double X_CORRECTION_P = 1.6;// 7;
-        public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0;
-
-        public static final double Y_CORRECTION_P = 1.6;// 6.03;
-        public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0;
-
-        public static final double ROTATION_CORRECTION_P = .63;
-        public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0.0025;
+        public static final double ROTATION_CORRECTION_P = 1.165;
+        public static final double ROTATION_CORRECTION_I = 0.05;
+        public static final double ROTATION_CORRECTION_D = 0.08;
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
@@ -284,13 +276,13 @@ public final class Constants {
 
         public static HolonomicDriveController HDC = new HolonomicDriveController(
                 new PIDController(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
+                        AutoConstants.XY_CORRECTION_P,
+                        AutoConstants.XY_CORRECTION_I,
+                        AutoConstants.XY_CORRECTION_D),
                 new PIDController(
-                        AutoConstants.Y_CORRECTION_P,
-                        AutoConstants.Y_CORRECTION_I,
-                        AutoConstants.Y_CORRECTION_D),
+                        AutoConstants.XY_CORRECTION_P,
+                        AutoConstants.XY_CORRECTION_I,
+                        AutoConstants.XY_CORRECTION_D),
                 new ProfiledPIDController(
                         AutoConstants.ROTATION_CORRECTION_P,
                         AutoConstants.ROTATION_CORRECTION_I,
@@ -301,9 +293,9 @@ public final class Constants {
 
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
                 new PIDConstants(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
+                        AutoConstants.XY_CORRECTION_P,
+                        AutoConstants.XY_CORRECTION_I,
+                        AutoConstants.XY_CORRECTION_D),
                 new PIDConstants(
                         AutoConstants.ROTATION_CORRECTION_P,
                         AutoConstants.ROTATION_CORRECTION_I,
