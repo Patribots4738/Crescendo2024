@@ -327,6 +327,7 @@ public class ShooterCalc implements Logged {
             // );
             getGravityCompensatedTriplet(pose, newv0, newAngle);
     }
+    
     // finds the height the not should go 
     private double getOriginalEstimatedImpactHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
