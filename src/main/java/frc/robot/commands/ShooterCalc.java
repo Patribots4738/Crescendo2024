@@ -181,7 +181,7 @@ public class ShooterCalc implements Logged {
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
         Rotation2d desiredRotation2d = Rotation2d.fromRadians(
             currentAngleToSpeaker.getRadians() + velocityArcTan + Math.PI
-        );
+        ).plus(Rotation2d.fromDegrees(6));
 
         // Update the robot's pose with the desired rotation
         desiredSWDPose = new Pose2d(robotPose.getTranslation(), desiredRotation2d);
@@ -289,6 +289,11 @@ public class ShooterCalc implements Logged {
     public Command stopAllMotors() {
         return shooter.stop().andThen(pivot.stop());
     }
+
+    @Log
+    double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
+
+
     /**
      * Calculates the shooter speeds required to reach the speaker position.
      * 
@@ -309,9 +314,9 @@ public class ShooterCalc implements Logged {
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
-        System.out.println("\nheight: " + getRealHeight(pose, newv0, newAngle));
-        System.out.println("\nSpeed: " + getGravityTriplet(pose, newv0, newAngle).getLeftSpeed());
-        System.out.println("\nNew Angle: " + getGravityTriplet(pose, newv0, newAngle).getAngle());
+        realHeight = getRealHeight(pose, newv0, newAngle);
+        gravitySpeedL = getGravityTriplet(pose, newv0, newAngle).getLeftSpeed();
+        gravityAngle = getGravityTriplet(pose, newv0, newAngle).getAngle();
         return 
             // SpeedAngleTriplet.of(
             //     Pair.of(
