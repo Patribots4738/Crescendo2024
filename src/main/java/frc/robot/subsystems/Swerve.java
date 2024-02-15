@@ -108,7 +108,7 @@ public class Swerve extends SubsystemBase implements Logged {
             // State measurement
             // standard deviations
             // X, Y, theta
-            VecBuilder.fill(1.0, 1.0, 2.5)
+            VecBuilder.fill(0.3, 0.3, 1.5)
     // Vision measurement
     // standard deviations
     // X, Y, theta
