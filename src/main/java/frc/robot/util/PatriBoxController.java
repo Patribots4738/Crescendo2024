@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,84 +27,8 @@ public class PatriBoxController extends CommandXboxController {
         return getLeftAxis().getX();
     }
 
-    @Override
-    public Trigger povUp() {
-        return super.getHID().getPOV() == 0 ? new Trigger(() -> true) : new Trigger(() -> false);
-    }
-    
-    @Override
-    public Trigger povDown() {
-        return new Trigger(() -> super.getHID().getPOV() == 180);
-    }
-
-    @Override
-    public Trigger povRight() {
-        return new Trigger(() -> super.getHID().getPOV() == 90);
-    }
-
-    @Override
-    public Trigger povLeft() {
-        return new Trigger(() -> super.getHID().getPOV() == 270);
-    }
-
-    @Override
-    public Trigger leftBumper() {
-        return new Trigger(super.getHID()::getLeftBumper);
-    }
-
-    @Override
-    public Trigger rightBumper() {
-        return new Trigger(super.getHID()::getRightBumper);
-    }
-
-    @Override
-    public Trigger b() {
-        return new Trigger(super.getHID()::getBButton);
-    }
-
-    @Override
-    public Trigger y() {
-        return new Trigger(super.getHID()::getYButton);
-    }
-
-    @Override
-    public Trigger x() {
-        return new Trigger(super.getHID()::getXButton);
-    }
-
-    @Override
-    public Trigger a() {
-        return new Trigger(super.getHID()::getAButton);
-    }
-
-    @Override
-    public Trigger start() {
-        return new Trigger(super.getHID()::getStartButton);
-    }
-
-    @Override
-    public Trigger back() {
-        return new Trigger(super.getHID()::getBackButton);
-    }
-
-    @Override
-    public Trigger leftTrigger() {
-        return leftTrigger(0.5);
-    }
-
-    @Override
-    public Trigger leftTrigger(double threshold) {
-        return new Trigger(() -> super.getHID().getLeftTriggerAxis() > threshold);
-    }
-
-    @Override
-    public Trigger rightTrigger(double threshold) {
-        return new Trigger(() -> super.getHID().getRightTriggerAxis() > threshold);
-    }
-
-    @Override
-    public Trigger rightTrigger() {
-        return rightTrigger(0.5);
+    public boolean getYButton() {
+        return super.getHID().getYButton();
     }
 
     @Override
@@ -114,8 +39,8 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public Translation2d getLeftAxis() {
-        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getHID().getLeftX(), deadband),
-                MathUtil.applyDeadband(super.getHID().getLeftY(), deadband));
+        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
+                MathUtil.applyDeadband(super.getLeftY(), deadband));
         return driverLeftAxis;
     }
 
@@ -130,8 +55,8 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public Translation2d getRightAxis() {
-        return toCircle(MathUtil.applyDeadband(super.getHID().getRightX(), deadband),
-                MathUtil.applyDeadband(super.getHID().getRightY(), deadband));
+        return toCircle(MathUtil.applyDeadband(super.getRightX(), deadband),
+                MathUtil.applyDeadband(super.getRightY(), deadband));
     }
 
     // All calculations can be referenced here

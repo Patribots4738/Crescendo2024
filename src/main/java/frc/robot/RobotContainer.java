@@ -108,10 +108,10 @@ public class RobotContainer implements Logged {
             driver::getLeftY,
             driver::getLeftX,
             () -> -driver.getRightX(),
-            () -> !driver.y().getAsBoolean(),
-            () -> (driver.y().getAsBoolean()
+            () -> !driver.getYButton(),
+            () -> (driver.getYButton()
                 && Robot.isBlueAlliance())));
-              
+
         configureButtonBindings();
         
         prepareNamedCommands();
@@ -204,7 +204,6 @@ public class RobotContainer implements Logged {
                 swerve.resetHDC(),
                 swerve.getDriveCommand(
                     () -> {
-                        ;
                         return new ChassisSpeeds(
                             -controller.getLeftY(),
                             -controller.getLeftX(),
