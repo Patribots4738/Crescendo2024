@@ -314,9 +314,10 @@ public class ShooterCalc implements Logged {
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
-        realHeight = getRealHeight(pose, newv0, newAngle);
-        gravitySpeedL = getGravityTriplet(pose, newv0, newAngle).getLeftSpeed();
-        gravityAngle = getGravityTriplet(pose, newv0, newAngle).getAngle();
+        realHeight = getOriginalEstimatedImpactHeight(pose, newv0, newAngle);
+        gravitySpeedL = getGravityCompensatedTriplet(pose, newv0, newAngle).getLeftSpeed();
+        gravitySpeedR = getGravityCompensatedTriplet(pose, newv0, newAngle).getRightSpeed();
+        gravityAngle = getGravityCompensatedTriplet(pose, newv0, newAngle).getAngle();
         return 
             // SpeedAngleTriplet.of(
             //     Pair.of(
@@ -327,7 +328,6 @@ public class ShooterCalc implements Logged {
             // );
             getGravityCompensatedTriplet(pose, newv0, newAngle);
     }
-    
     // finds the height the not should go 
     private double getOriginalEstimatedImpactHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
         Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
