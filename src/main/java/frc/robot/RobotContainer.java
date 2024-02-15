@@ -1,9 +1,6 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,8 +8,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -192,10 +187,10 @@ public class RobotContainer implements Logged {
     
     private void configureDriverBindings(PatriBoxController controller) {
         
-        // Upon hitting start or back,
+        // Upon hitting start button
         // reset the orientation of the robot
-        // to be facing away from the driver station
-        controller.start().or(controller.back()).onTrue(
+        // to be facing AWAY FROM the driver station
+        controller.start().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
@@ -203,6 +198,19 @@ public class RobotContainer implements Logged {
                         Robot.isRedAlliance()
                             ? 0
                             : 180))), 
+                swerve));
+
+        // Upon hitting start button
+        // reset the orientation of the robot
+        // to be facing TOWARDS the driver station
+        controller.back().onTrue(
+            Commands.runOnce(() -> swerve.resetOdometry(
+                new Pose2d(
+                    swerve.getPose().getTranslation(),
+                    Rotation2d.fromDegrees(
+                        Robot.isRedAlliance()
+                            ? 180
+                            : 0))), 
                 swerve));
 
         controller.b()
