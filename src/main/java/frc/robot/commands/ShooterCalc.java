@@ -57,9 +57,9 @@ public class ShooterCalc implements Logged {
      *                       of the robot. It is of type `Supplier<Pose2d>`.
      * @return The method is returning a Command object.
      */
-    public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
+    public Command prepareFireCommand(Supplier<Pose2d> robotPose) {
         return Commands.runOnce(() -> {
-                desiredTriplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
+                desiredTriplet = calculateTriplet(robotPose.get());
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
@@ -113,7 +113,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT - NTConstants.PIVOT_OFFSET_METERS.getZ());
+        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT+.3);
     }
 
     /**
@@ -129,18 +129,14 @@ public class ShooterCalc implements Logged {
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
     // known required speeds and angles for certain poses
-    public SpeedAngleTriplet calculateSpeed(Pose2d robotPose, boolean shootingAtSpeaker) {
+    public SpeedAngleTriplet calculateTriplet(Pose2d robotPose) {
         // Get our position relative to the desired field element
-        if (shootingAtSpeaker) {
-            robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-        } else {
-            robotPose = robotPose.relativeTo(FieldConstants.GET_AMP_POSITION());
-        }
+        robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
 
         // Use the distance as our key for interpolation
         double distanceFeet = Units.metersToFeet(robotPose.getTranslation().getNorm());
 
-        this.distance = robotPose.getX();
+        this.distance = distanceFeet;
 
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
@@ -277,10 +273,20 @@ public class ShooterCalc implements Logged {
                 SpeedAngleTriplet calculationTriplet = calculateSWDTriplet(pose.get(), speeds.get());
 
                 new NoteTrajectory(
-                    desiredSWDPose,
+                    pose.get(),
                     speeds.get(),
                     rpmToVelocity(calculationTriplet.getSpeeds()), 
                     calculationTriplet.getAngle()
+                ).andThen(
+                    Commands.waitSeconds(.2)
+                    .andThen(
+                            new NoteTrajectory(
+                                pose.get(),
+                                speeds.get(),
+                                rpmToVelocity(shooter.getSpeed()), 
+                                pivot.getAngle()
+                            )
+                        )
                 ).schedule();
             }
         );
@@ -304,8 +310,7 @@ public class ShooterCalc implements Logged {
      */
     private SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
-        Rotation2d pivotAngle = calculatePivotAngle(currentPose);
-        SpeedAngleTriplet currentTriplet = SpeedAngleTriplet.of(calculateShooterSpeedsForApex(currentPose, pivotAngle), pivotAngle.getDegrees());
+        SpeedAngleTriplet currentTriplet = calculateTriplet(pose);
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
@@ -319,14 +324,14 @@ public class ShooterCalc implements Logged {
         gravitySpeedR = getGravityCompensatedTriplet(pose, newv0, newAngle).getRightSpeed();
         gravityAngle = getGravityCompensatedTriplet(pose, newv0, newAngle).getAngle();
         return 
-            // SpeedAngleTriplet.of(
-            //     Pair.of(
-            //         velocityToRPM(newv0),
-            //         velocityToRPM(newv0)
-            //     ),
-            //     newAngle.getDegrees()
-            // );
-            getGravityCompensatedTriplet(pose, newv0, newAngle);
+            SpeedAngleTriplet.of(
+                Pair.of(
+                    velocityToRPM(newv0),
+                    velocityToRPM(newv0)
+                ),
+                newAngle.getDegrees()
+            );
+            // getGravityCompensatedTriplet(pose, newv0, newAngle);
     }
     // finds the height the not should go 
     private double getOriginalEstimatedImpactHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {

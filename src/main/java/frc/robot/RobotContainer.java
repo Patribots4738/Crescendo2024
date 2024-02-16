@@ -46,7 +46,7 @@ public class RobotContainer implements Logged {
     private Pivot pivot;
     private Shooter shooter;
     private Claw claw;
-    private Elevator elevator;
+   private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
     private CalibrationControl calibrationControl;
@@ -85,7 +85,7 @@ public class RobotContainer implements Logged {
         PIDTuner = new PIDTunerCommands(new PIDNotConstants[] {
             pivot.getPIDNotConstants(),
             shooter.getPIDNotConstants(),
-            elevator.getPIDNotConstants(),
+           elevator.getPIDNotConstants(),
             climb.getPidNotConstants()
         });
 
@@ -125,7 +125,7 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX(),
             () -> !driver.getHID().getYButton(),
-            () -> (driver.getHID().getYButton()
+            () -> !(driver.getHID().getYButton()
                 && Robot.isRedAlliance())));
               
         configureButtonBindings();
@@ -135,7 +135,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        // configureDriverBindings(driver);
+        // configureDriverBindings(operator);
         configureOperatorBindings(driver);
         // configurePIDTunerBindings(driver);
         configureCalibrationBindings(operator);
@@ -171,7 +171,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.ejectNote());
 
         controller.a()
-            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .toggleOnTrue(shooterCalc.prepareFireCommand(swerve::getPose));
 
         controller.start().or(controller.back())
             .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(1.332, 5.587, Rotation2d.fromDegrees(180)))));
@@ -306,9 +306,9 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> FieldConstants.R_POSE));
     }
     
     private void incinerateMotors() {
