@@ -64,6 +64,30 @@ public class PatriBoxController extends CommandXboxController {
         return super.getHID().getRightTriggerAxis();
     }
 
+    public boolean getStartButton() {
+        return super.getHID().getStartButton();
+    }
+
+    public boolean getBackButton() {
+        return super.getHID().getBackButton();
+    }
+
+    public boolean getPOVUp() {
+        return super.getHID().getPOV() == 0;
+    }
+
+    public boolean getPOVRight() {
+        return super.getHID().getPOV() == 90;
+    }
+
+    public boolean getPOVDown() {
+        return super.getHID().getPOV() == 180;
+    }
+
+    public boolean getPOVLeft() {
+        return super.getHID().getPOV() == 270;
+    }
+
     public boolean getLeftBumper() {
         return super.getHID().getLeftBumper();
     }
