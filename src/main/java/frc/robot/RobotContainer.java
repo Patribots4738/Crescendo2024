@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
+import frc.robot.commands.DriveHDC;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
@@ -22,8 +23,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.CalibrationControl;
+import frc.robot.util.HDCTuner;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
@@ -55,6 +58,8 @@ public class RobotContainer implements Logged {
     private PieceControl pieceControl;
     private CalibrationControl calibrationControl;
     private PIDTunerCommands PIDTuner;
+
+    public static HDCTuner HDCTuner;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -82,6 +87,11 @@ public class RobotContainer implements Logged {
         claw = new Claw();
         
         pivot = new Pivot();
+
+        HDCTuner = new HDCTuner(
+            AutoConstants.HDC.getXController(),
+            AutoConstants.HDC.getThetaController());
+
         incinerateMotors();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
@@ -152,37 +162,6 @@ public class RobotContainer implements Logged {
         configureCalibrationBindings(operator);
     }
     
-    private void configurePIDTunerBindings(PatriBoxController controller) {
-        controller.pov(0, 270, testButtonBindingLoop)
-            .onTrue(PIDTuner.decreaseSubsystemCommand());
-
-        controller.pov(0, 90, testButtonBindingLoop)
-            .onTrue(PIDTuner.incrementSubsystemCommand());
-            
-        controller.pov(0, 180, testButtonBindingLoop)
-            .onTrue(PIDTuner.decreaseCurrentPIDCommand(.001));
-            
-        controller.pov(0, 0, testButtonBindingLoop)
-            .onTrue(PIDTuner.increaseCurrentPIDCommand(.001));
-            
-        controller.rightBumper(testButtonBindingLoop)
-            .onTrue(PIDTuner.PIDIncrementCommand());
-            
-        controller.leftBumper(testButtonBindingLoop)
-            .onTrue(PIDTuner.PIDDecreaseCommand());
-            
-        controller.a(testButtonBindingLoop)
-            .onTrue(PIDTuner.logCommand());
-            
-        controller.x(testButtonBindingLoop)
-            .onTrue(PIDTuner.multiplyPIDCommand(2));
-            
-        controller.b(testButtonBindingLoop)
-            .onTrue(PIDTuner.multiplyPIDCommand(.5));
-            
-    }
-  
-
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.b().onTrue(shooterCalc.stopAllMotors().alongWith(pieceControl.stopAllMotors()));
         controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
@@ -286,7 +265,37 @@ public class RobotContainer implements Logged {
         controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
+    
+    private void configurePIDTunerBindings(PatriBoxController controller) {
+        controller.pov(0, 270, testButtonBindingLoop)
+            .onTrue(PIDTuner.incrementSubsystemCommand());
 
+        controller.pov(0, 90, testButtonBindingLoop)
+            .onTrue(PIDTuner.decreaseSubsystemCommand());
+            
+        controller.pov(0, 180, testButtonBindingLoop)
+            .onTrue(PIDTuner.increaseCurrentPIDCommand(.1));
+            
+        controller.pov(0, 0, testButtonBindingLoop)
+            .onTrue(PIDTuner.increaseCurrentPIDCommand(-.1));
+            
+        controller.rightBumper(testButtonBindingLoop)
+            .onTrue(PIDTuner.PIDIncrementCommand());
+            
+        controller.leftBumper(testButtonBindingLoop)
+            .onTrue(PIDTuner.PIDDecreaseCommand());
+            
+        controller.a(testButtonBindingLoop)
+            .onTrue(PIDTuner.logCommand());
+            
+        controller.x(testButtonBindingLoop)
+            .onTrue(PIDTuner.multiplyPIDCommand(2));
+            
+        controller.b(testButtonBindingLoop)
+            .onTrue(PIDTuner.multiplyPIDCommand(.5));
+            
+    }
+    
     private void configureCalibrationBindings(PatriBoxController controller) {
         controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().alongWith(shooterCalc.stopAllMotors()));
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
@@ -320,6 +329,27 @@ public class RobotContainer implements Logged {
             .onTrue(calibrationControl.copyCalcTriplet());
     }
     
+    private void configureHDCTuner(PatriBoxController controller) {
+        controller.pov(0, 270, testButtonBindingLoop)
+            .onTrue(HDCTuner.controllerDecrementCommand());
+        controller.pov(0, 90, testButtonBindingLoop)
+            .onTrue(HDCTuner.controllerIncrementCommand());
+        controller.pov(0, 180, testButtonBindingLoop)
+            .onTrue(HDCTuner.increaseCurrentConstantCommand(.1));
+        controller.pov(0, 0, testButtonBindingLoop)
+            .onTrue(HDCTuner.increaseCurrentConstantCommand(-.1));
+        controller.rightBumper(testButtonBindingLoop)
+            .onTrue(HDCTuner.constantIncrementCommand());
+        controller.leftBumper(testButtonBindingLoop)
+            .onTrue(HDCTuner.constantDecrementCommand());
+        controller.a(testButtonBindingLoop)
+            .onTrue(HDCTuner.logCommand());
+        controller.x(testButtonBindingLoop)
+            .onTrue(HDCTuner.multiplyPIDCommand(2));
+        controller.b(testButtonBindingLoop)
+            .onTrue(HDCTuner.multiplyPIDCommand(.5));
+    }
+
     public Command getAutonomousCommand() {
         return Commands.none();
     }
