@@ -74,7 +74,10 @@ public class Limelight extends SubsystemBase implements Logged{
         ArrayList<Pose3d> knownFiducials = new ArrayList<>();
 
         for (LimelightTarget_Fiducial target : fiducials) {
-            knownFiducials.add(aprilTagFieldLayout.getTagPose((int) target.fiducialID).get());
+            int tagID = (int) target.fiducialID;
+            if (tagID < aprilTagFieldLayout.getTags().size()) {
+                knownFiducials.add(aprilTagFieldLayout.getTagPose(tagID).get());
+            }
         }
 
         visableTags = knownFiducials.toArray(new Pose3d[0]);
@@ -169,5 +172,9 @@ public class Limelight extends SubsystemBase implements Logged{
         isConnected = timeDifference < Constants.LIMELIGHT_MAX_UPDATE_TIME;
 
         return isConnected;
+    }
+
+    public Pose2d getRobotPoseTargetSpace() {
+        return LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
     }
 }

@@ -5,9 +5,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
@@ -36,6 +39,38 @@ public class PatriBoxController extends CommandXboxController {
         Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
                 MathUtil.applyDeadband(super.getLeftY(), deadband));
         return driverLeftAxis;
+    }
+
+    public Trigger leftY() {
+        return leftY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger leftX() {
+        return leftX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger rightY() {
+        return rightY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger rightX() {
+        return rightX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger leftY(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getLeftY()) > threshold);
+    }
+
+    public Trigger leftX(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getLeftX()) > threshold);
+    }
+
+    public Trigger rightY(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getRightY()) > threshold);
+    }
+
+    public Trigger rightX(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getRightX()) > threshold);
     }
 
     @Override
