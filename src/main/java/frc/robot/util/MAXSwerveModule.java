@@ -44,12 +44,12 @@ public class MAXSwerveModule {
         turningEncoder = turningSpark.getAbsoluteEncoder(Type.kDutyCycle);
         drivingPIDController = drivingSpark.getPIDController();
         turningPIDController = turningSpark.getPIDController();
+        drivingEncoder.setPosition(0);
 
         configMotors();
 
         this.chassisAngularOffset = chassisAngularOffset;
         desiredState.angle = new Rotation2d(turningEncoder.getPosition());
-        drivingEncoder.setPosition(0);
     }
 
     /**
@@ -152,9 +152,6 @@ public class MAXSwerveModule {
     }
 
     public void configMotors() {
-        turningSpark.restoreFactoryDefaults();
-        drivingSpark.restoreFactoryDefaults();
-        Timer.delay(0.25);
         // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
         drivingPIDController.setFeedbackDevice(drivingEncoder);
         turningPIDController.setFeedbackDevice(turningEncoder);

@@ -4,19 +4,15 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 //import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
-//import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.HDCTuner;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
-import monologue.Annotations.Log;
 
 public class DriveHDC  extends Command {
 
@@ -25,8 +21,9 @@ public class DriveHDC  extends Command {
     private final DoubleSupplier xSupplier;
     private final DoubleSupplier ySupplier;
     private final DoubleSupplier rotationSupplier;
-    private final BooleanSupplier fieldRelativeSupplier;
     private final BooleanSupplier shouldMirror;
+
+    private Pose2d desiredPose = new Pose2d();
 
     public DriveHDC (
             Swerve swerve,
@@ -34,7 +31,8 @@ public class DriveHDC  extends Command {
             DoubleSupplier ySupplier,
             DoubleSupplier rotationsSupplier,
             BooleanSupplier fieldRelativeSupplier,
-            BooleanSupplier shouldMirror) {
+            BooleanSupplier shouldMirror,
+            HDCTuner HDCCalibration) {
 
         this.swerve = swerve;
 
@@ -42,7 +40,6 @@ public class DriveHDC  extends Command {
         this.ySupplier = ySupplier;
         this.rotationSupplier = rotationsSupplier;
 
-        this.fieldRelativeSupplier = fieldRelativeSupplier;
         this.shouldMirror = shouldMirror;
 
         addRequirements(swerve);
@@ -55,8 +52,6 @@ public class DriveHDC  extends Command {
         this.xSupplier = () -> speeds.get().vxMetersPerSecond;
         this.ySupplier = () -> speeds.get().vyMetersPerSecond;
         this.rotationSupplier = () -> speeds.get().omegaRadiansPerSecond;
-
-        this.fieldRelativeSupplier = fieldRelativeSupplier;
         this.shouldMirror = shouldMirror;
 
         addRequirements(swerve);
@@ -82,21 +77,19 @@ public class DriveHDC  extends Command {
         //     return;
         // }
 
-        HolonomicDriveController HDC = AutoConstants.HDC;
-
         ChassisSpeeds desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotationSupplier.getAsDouble(), swerve.getPose().getRotation());
 
         // integrate the speeds to positions with exp and twist
-        Pose2d desiredPose = swerve.getPose().exp(
+        desiredPose = desiredPose.exp(
             new Twist2d(
-                desiredSpeeds.vxMetersPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .1,
-                desiredSpeeds.vyMetersPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .1,
-                desiredSpeeds.omegaRadiansPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .1
+                desiredSpeeds.vxMetersPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .02,
+                desiredSpeeds.vyMetersPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .02,
+                desiredSpeeds.omegaRadiansPerSecond * DriveConstants.MAX_SPEED_METERS_PER_SECOND * .015
             )
         );
 
         swerve.drive(
-            HDC.calculate(swerve.getPose(), desiredPose, 0, desiredPose.getRotation())
+            AutoConstants.HDC.calculate(swerve.getPose(), desiredPose, 0, desiredPose.getRotation())
         );
 
         swerve.setDesriredPose(desiredPose);

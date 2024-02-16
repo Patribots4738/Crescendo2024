@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.Drive;
+import frc.robot.commands.DriveHDC;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.subsystems.*;
@@ -20,8 +20,10 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.CalibrationControl;
+import frc.robot.util.HDCTuner;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
@@ -51,6 +53,8 @@ public class RobotContainer implements Logged {
     private PieceControl pieceControl;
     private CalibrationControl calibrationControl;
     private PIDTunerCommands PIDTuner;
+
+    public static HDCTuner HDCTuner;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -78,6 +82,11 @@ public class RobotContainer implements Logged {
         claw = new Claw();
         
         pivot = new Pivot();
+
+        HDCTuner = new HDCTuner(
+            AutoConstants.HDC.getXController(),
+            AutoConstants.HDC.getThetaController());
+
         incinerateMotors();
         
         shooterCalc = new ShooterCalc(shooter, pivot);
@@ -119,7 +128,7 @@ public class RobotContainer implements Logged {
             }
         }, limelight));
 
-        swerve.setDefaultCommand(new Drive(
+        swerve.setDefaultCommand(new DriveHDC(
             swerve,
             driver::getLeftY,
             driver::getLeftX,
@@ -138,7 +147,8 @@ public class RobotContainer implements Logged {
         // configureDriverBindings(operator);
         configureOperatorBindings(driver);
         // configurePIDTunerBindings(driver);
-        configureCalibrationBindings(operator);
+        // configureCalibrationBindings(operator);
+        configureHIDTuner(driver);
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
@@ -146,13 +156,25 @@ public class RobotContainer implements Logged {
         controller.povLeft().onTrue(PIDTuner.decreaseSubsystemCommand());
         controller.rightBumper().onTrue(PIDTuner.PIDIncrementCommand());
         controller.leftBumper().onTrue(PIDTuner.PIDDecreaseCommand());
-        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.001));
-        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(.001));
+        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.1));
+        controller.povDown().onTrue(PIDTuner.increaseCurrentPIDCommand(-.1));
         controller.a().onTrue(PIDTuner.logCommand());
         controller.x().onTrue(PIDTuner.multiplyPIDCommand(2));
         controller.b().onTrue(PIDTuner.multiplyPIDCommand(.5));
     }
-  
+    
+    private void configureHIDTuner(PatriBoxController controller) {
+        controller.povRight().onTrue(HDCTuner.controllerIncrementCommand());
+        controller.povLeft().onTrue(HDCTuner.controllerDecrementCommand());
+        controller.rightBumper().onTrue(HDCTuner.constantIncrementCommand());
+        controller.leftBumper().onTrue(HDCTuner.constantDecrementCommand());
+        controller.povUp().onTrue(HDCTuner.increaseCurrentConstantCommand(.1));
+        controller.povDown().onTrue(HDCTuner.increaseCurrentConstantCommand(-.1));
+        controller.a().onTrue(HDCTuner.logCommand());
+        controller.x().onTrue(HDCTuner.multiplyPIDCommand(2));
+        controller.b().onTrue(HDCTuner.multiplyPIDCommand(.5));
+        
+    }
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.b().onTrue(shooterCalc.stopAllMotors().alongWith(pieceControl.stopAllMotors()));

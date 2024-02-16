@@ -27,7 +27,7 @@ public class PIDTunerCommands {
         }
     }
 
-    public void decrease() {
+    public void decrement() {
         if (subsystemIndex > 0) {
             this.subsystemIndex--;
             System.out.println("\n\nSubsystem: " + subsystemToString(subsystemIndex));
@@ -42,7 +42,7 @@ public class PIDTunerCommands {
         }
     }
 
-    public void PIDDecrease() {
+    public void PIDDecrement() {
         if (PIDIndex > 0) {
             this.PIDIndex--;
             System.out.println("Currently editing: " + (PIDIndex == 0 ? "P" : PIDIndex == 1 ? "D" : "I"));
@@ -125,17 +125,12 @@ public class PIDTunerCommands {
     }
     public Command decreaseSubsystemCommand() {
         return Commands.runOnce(() -> {
-            decrease();
+            decrement();
         });
     }
     public Command increaseCurrentPIDCommand(double value) {
         return Commands.runOnce(() -> {
             this.increasePID(value);
-        });
-    }
-    public Command decreaseCurrentPIDCommand(double value) {
-        return Commands.runOnce(() -> {
-            this.increasePID(-value);
         });
     }
 
@@ -152,7 +147,7 @@ public class PIDTunerCommands {
     }
     public Command PIDDecreaseCommand() {
         return Commands.runOnce(() -> {
-            PIDDecrease();
+            PIDDecrement();
         });
     }
     public Command logCommand() {
