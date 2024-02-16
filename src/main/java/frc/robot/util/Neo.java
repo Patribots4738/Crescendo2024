@@ -80,12 +80,12 @@ public class Neo extends CANSparkMax {
         // this requires the code to configure the sparks after construction
         restoreFactoryDefaults();
         // Add a delay to let the spark reset
-        Timer.delay(0.05);
-
         // If a parameter set fails, this will add more time 
         // to minimize any bus traffic.
         // Default is 20ms
         setCANTimeout(50);
+        Timer.delay(0.25);
+
 
         // Turn off alternate and analog encoders
         // we never use them
