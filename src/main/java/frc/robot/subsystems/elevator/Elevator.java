@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
 import monologue.Logged;
@@ -20,7 +21,7 @@ import monologue.Annotations.Log;
 
 public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
-
+    private final PIDNotConstants elevatorPID;
     @Log
     public double pos = 0, desiredPos = 0;
 
@@ -31,6 +32,7 @@ public class Elevator extends SubsystemBase implements Logged {
     public Elevator() {
         elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID);
         configMotors();
+        elevatorPID = new PIDNotConstants(elevator.getPID(), elevator.getPIDController());
     }
 
     public void configMotors() {
@@ -39,15 +41,12 @@ public class Elevator extends SubsystemBase implements Logged {
         elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         elevator.setPID(TrapConstants.TRAP_PID);
-
-        // Change to brake when done testing
-        elevator.setCoastMode();
     }
 
     @Override
     public void periodic() {
-        pos = elevator.getPosition();
-        desiredPos = elevator.getTargetPosition();
+        // pos = elevator.getPosition();
+        // desiredPos = elevator.getTargetPosition();
 
         atDesiredPos = atDesiredPosition();
 
@@ -109,4 +108,8 @@ public class Elevator extends SubsystemBase implements Logged {
     public boolean atDesiredPosition() {
 		return MathUtil.applyDeadband(pos - desiredPos, TrapConstants.ELEVATOR_DEADBAND) == 0;
 	}
+
+    public PIDNotConstants getPIDNotConstants() {
+        return this.elevatorPID;
+    }
 }

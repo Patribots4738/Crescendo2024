@@ -48,8 +48,8 @@ public class Robot extends TimedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
-        URCL.start();
-    }
+        // URCL.start();
+}
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
      * diagnostics
@@ -140,6 +140,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testExit() {
+        // Switch back to the normal button loop!
+        CommandScheduler.getInstance().setActiveButtonLoop(CommandScheduler.getInstance().getDefaultButtonLoop());
     }
 
     @Override
@@ -151,7 +153,7 @@ public class Robot extends TimedRobot {
         REVPhysicsSim.getInstance().run();
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
 
-        for (Neo neo : NeoMotorConstants.motors) {
+        for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
             neo.tick();
         }
     }
