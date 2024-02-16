@@ -11,7 +11,7 @@ import monologue.Annotations.Log;
 
 public class CalibrationControl implements Logged {
 
-    private SpeedAngleTriplet desiredTriplet;
+    private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet(0.0,0.0,0.0);
 
     @Log
     private double leftSpeed = 3200, rightSpeed = 3800, angle = 26;
@@ -119,7 +119,7 @@ public class CalibrationControl implements Logged {
 
     public Command logTriplet() {
         return Commands.runOnce(
-                () -> System.out.println("put(" + (int) distance + ", SpeedAngleTriplet.of("+desiredTriplet.getLeftSpeed()+", "+desiredTriplet.getRightSpeed()+", "+desiredTriplet.getAngle()+"));"));
+                () -> System.out.println("put(" + (int) distance + ", SpeedAngleTriplet.of("+Math.round(desiredTriplet.getLeftSpeed())+".0, "+Math.round(desiredTriplet.getRightSpeed())+".0, "+desiredTriplet.getAngle()+"));"));
     }
 
     public void logDistance() {

@@ -149,4 +149,8 @@ public class Limelight extends SubsystemBase implements Logged{
         
         return angleCheck && distanceCheck && isFacing;
     }
+
+    public Pose2d getRobotPoseTargetSpace() {
+        return LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
+    }
 }

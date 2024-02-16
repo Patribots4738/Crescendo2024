@@ -46,8 +46,8 @@ public class PieceControl {
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCalc.readyToShootSupplier())
-                .andThen(noteToShoot());
-                    // .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier)));
+                .andThen(noteToShoot())
+                    .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier));
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
@@ -61,7 +61,7 @@ public class PieceControl {
                 intake.inCommand(),
                 claw.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(.75),
+                Commands.waitSeconds(1.5),
                 stopAllMotors());
 
     }
@@ -97,9 +97,9 @@ public class PieceControl {
     public Command noteToTarget(BooleanSupplier toAmp) {
         // maybe make setPosition a command ORR Make the Elevator Command
         return Commands.either(
-                        elevator.setPositionCommand(TrapConstants.AMP_PLACE_POS),
-                        elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
-                        toAmp)
+                elevator.setPositionCommand(TrapConstants.AMP_PLACE_POS),
+                elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
+                toAmp)
                 .andThen(
                         Commands.waitUntil(elevator.isAtTargetPosition()))
                 .andThen(claw.placeCommand())

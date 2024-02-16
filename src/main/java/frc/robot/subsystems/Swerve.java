@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -110,7 +111,7 @@ public class Swerve extends SubsystemBase implements Logged {
             // State measurement
             // standard deviations
             // X, Y, theta
-            VecBuilder.fill(1.0, 1.0, 2.5)
+            VecBuilder.fill(0.8, 0.8, 2.5)
     // Vision measurement
     // standard deviations
     // X, Y, theta
@@ -365,9 +366,9 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {
-        return AutoConstants.HDC.getThetaController().calculate(
+        return MathUtil.applyDeadband(AutoConstants.HDC.getThetaController().calculate(
             getPose().getRotation().getRadians(),
-            desiredAngle.getRadians());
+            desiredAngle.getRadians()),  0.02);
     }
 
     public Command resetHDC() {

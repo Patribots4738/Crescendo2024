@@ -48,7 +48,7 @@ public class RobotContainer implements Logged {
     private Pivot pivot;
     private Shooter shooter;
     private Claw claw;
-    private Elevator elevator;
+   private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
     private CalibrationControl calibrationControl;
@@ -94,7 +94,7 @@ public class RobotContainer implements Logged {
         PIDTuner = new PIDTunerCommands(new PIDNotConstants[] {
             pivot.getPIDNotConstants(),
             shooter.getPIDNotConstants(),
-            elevator.getPIDNotConstants(),
+           elevator.getPIDNotConstants(),
             climb.getPidNotConstants()
         });
 
@@ -115,7 +115,13 @@ public class RobotContainer implements Logged {
             // If the result of the estimatedRobotPose exists,
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
-            if (driver.getHID().getRightTriggerAxis() > 0 && !(result.botpose[0] == 0 && result.botpose[1] == 0) ) {
+            if ( // check validity
+                ((driver.getHID().getRightTriggerAxis() > 0 && !(result.botpose[0] == 0 && result.botpose[1] == 0) )
+                // check if good tag
+                && (LimelightHelpers.getTA("limelight") >= 0.3 
+                    || result.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
+                && limelight.getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25
+            ) {
                 swerve.getPoseEstimator().addVisionMeasurement( 
                     result.getBotPose2d_wpiBlue(),
                     Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
@@ -128,9 +134,8 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX(),
             () -> !driver.getHID().getYButton(),
-            () -> (driver.getHID().getYButton()
-                && Robot.isRedAlliance()),
-            HDCTuner));
+            () -> !(driver.getHID().getYButton()
+                && Robot.isRedAlliance())));
               
         configureButtonBindings();
         
@@ -139,7 +144,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        // configureDriverBindings(driver);
+        // configureDriverBindings(operator);
         configureOperatorBindings(driver);
         // configurePIDTunerBindings(driver);
         // configureCalibrationBindings(operator);
@@ -188,7 +193,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.ejectNote());
 
         controller.a()
-            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .toggleOnTrue(shooterCalc.prepareFireCommand(swerve::getPose));
 
         controller.start().or(controller.back())
             .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(1.332, 5.587, Rotation2d.fromDegrees(180)))));
@@ -200,8 +205,8 @@ public class RobotContainer implements Logged {
                 swerve.getDriveCommand(
                     () -> {
                         return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
+                            -controller.getLeftY(),
+                            -controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
@@ -323,16 +328,16 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("intake", intake.inCommand());
         NamedCommands.registerCommand("shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("placeAmp", pieceControl.noteToTarget(() -> true));
-        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> true, () -> FieldConstants.R_POSE));
+        NamedCommands.registerCommand("prepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
+        NamedCommands.registerCommand("prepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
+        NamedCommands.registerCommand("prepareShooterR", shooterCalc.prepareFireCommand(() -> FieldConstants.R_POSE));
     }
     
     private void incinerateMotors() {
-        Timer.delay(0.25);
+        Timer.delay(1);
         for (CANSparkBase neo : NeoMotorConstants.MOTOR_LIST) {
             neo.burnFlash();
-            Timer.delay(0.005);
+            Timer.delay(0.05);
         }
         Timer.delay(0.25);
     }
