@@ -179,7 +179,7 @@ public class ShooterCalc implements Logged {
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
         Rotation2d desiredRotation2d = Rotation2d.fromRadians(MathUtil.angleModulus(
             currentAngleToSpeaker.getRadians() + velocityArcTan + Math.PI
-        ).plus(Rotation2d.fromDegrees(6));
+        )).plus(Rotation2d.fromDegrees(6));
 
         // Update the robot's pose with the desired rotation
         desiredSWDPose = new Pose2d(robotPose.getTranslation(), desiredRotation2d);
