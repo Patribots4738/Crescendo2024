@@ -138,6 +138,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testExit() {
+        // Switch back to the normal button loop!
+        CommandScheduler.getInstance().setActiveButtonLoop(CommandScheduler.getInstance().getDefaultButtonLoop());
     }
 
     @Override

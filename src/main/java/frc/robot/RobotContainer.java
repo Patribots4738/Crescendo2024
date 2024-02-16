@@ -9,7 +9,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
@@ -32,6 +34,8 @@ import frc.robot.util.PIDTunerCommands;
 import monologue.Logged;
 
 public class RobotContainer implements Logged {
+
+    private EventLoop testButtonBindingLoop = new EventLoop();
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
@@ -46,7 +50,7 @@ public class RobotContainer implements Logged {
     private Pivot pivot;
     private Shooter shooter;
     private Claw claw;
-   private Elevator elevator;
+    private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
     private CalibrationControl calibrationControl;
@@ -135,22 +139,47 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        // configureDriverBindings(operator);
+        configureDriverBindings(operator);
         configureOperatorBindings(driver);
-        // configurePIDTunerBindings(driver);
+        configureTestBindings();
+    }
+
+    private void configureTestBindings() {
+        // Warning: these buttons are not on the default loop!
+        // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
+        // for more information 
+        configurePIDTunerBindings(driver);
         configureCalibrationBindings(operator);
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
-        controller.povRight().onTrue(PIDTuner.incrementSubsystemCommand());
-        controller.povLeft().onTrue(PIDTuner.decreaseSubsystemCommand());
-        controller.rightBumper().onTrue(PIDTuner.PIDIncrementCommand());
-        controller.leftBumper().onTrue(PIDTuner.PIDDecreaseCommand());
-        controller.povUp().onTrue(PIDTuner.increaseCurrentPIDCommand(.001));
-        controller.povDown().onTrue(PIDTuner.decreaseCurrentPIDCommand(.001));
-        controller.a().onTrue(PIDTuner.logCommand());
-        controller.x().onTrue(PIDTuner.multiplyPIDCommand(2));
-        controller.b().onTrue(PIDTuner.multiplyPIDCommand(.5));
+        controller.pov(0, 270, testButtonBindingLoop)
+            .onTrue(PIDTuner.decreaseSubsystemCommand());
+
+        controller.pov(0, 90, testButtonBindingLoop)
+            .onTrue(PIDTuner.incrementSubsystemCommand());
+            
+        controller.pov(0, 180, testButtonBindingLoop)
+            .onTrue(PIDTuner.decreaseCurrentPIDCommand(.001));
+            
+        controller.pov(0, 0, testButtonBindingLoop)
+            .onTrue(PIDTuner.increaseCurrentPIDCommand(.001));
+            
+        controller.rightBumper(testButtonBindingLoop)
+            .onTrue(PIDTuner.PIDIncrementCommand());
+            
+        controller.leftBumper(testButtonBindingLoop)
+            .onTrue(PIDTuner.PIDDecreaseCommand());
+            
+        controller.a(testButtonBindingLoop)
+            .onTrue(PIDTuner.logCommand());
+            
+        controller.x(testButtonBindingLoop)
+            .onTrue(PIDTuner.multiplyPIDCommand(2));
+            
+        controller.b(testButtonBindingLoop)
+            .onTrue(PIDTuner.multiplyPIDCommand(.5));
+            
     }
   
 
@@ -259,35 +288,35 @@ public class RobotContainer implements Logged {
     }
 
     private void configureCalibrationBindings(PatriBoxController controller) {
-        controller.leftBumper().onTrue(pieceControl.stopAllMotors().alongWith(shooterCalc.stopAllMotors()));
-        controller.rightBumper().onTrue(calibrationControl.updateMotorsCommand());
-        controller.rightTrigger().onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().alongWith(shooterCalc.stopAllMotors()));
+        controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
+        controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
 
-        controller.leftY().whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
-        controller.rightY().whileTrue(calibrationControl.incrementAngle(() -> -controller.getRightY()));
+        controller.leftY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
+        controller.rightY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementAngle(() -> -controller.getRightY()));
 
-        controller.leftX().whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
-        controller.rightX().whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
+        controller.leftX(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
+        controller.rightX(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
 
-        controller.back().onTrue(calibrationControl.incrementDistance(-1));
-        controller.start().onTrue(calibrationControl.incrementDistance(1));
+        controller.back(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(-1));
+        controller.start(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(1));
 
-        controller.a().onTrue(calibrationControl.logTriplet());
+        controller.a(testButtonBindingLoop).onTrue(calibrationControl.logTriplet());
 
-        controller.x().onTrue(calibrationControl.toggleLeftLock());
-        controller.b().onTrue(calibrationControl.toggleRightLock());
-        controller.y().onTrue(calibrationControl.togglePivotLock());
+        controller.x(testButtonBindingLoop).onTrue(calibrationControl.toggleLeftLock());
+        controller.b(testButtonBindingLoop).onTrue(calibrationControl.toggleRightLock());
+        controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
-        controller.povLeft()
+        controller.pov(0, 270, testButtonBindingLoop)
             .onTrue(pieceControl.noteToTrap());
 
-        controller.povRight()
+        controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(pieceControl.ejectNote());
 
-        controller.povDown()
+        controller.pov(0, 180, testButtonBindingLoop)
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
-        controller.povUp()
+        controller.pov(0, 0, testButtonBindingLoop)
             .onTrue(calibrationControl.copyCalcTriplet());
     }
     
@@ -299,6 +328,12 @@ public class RobotContainer implements Logged {
     }
     
     public void onEnabled() {
+    }
+
+    public void onTest() {
+        CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
+        configurePIDTunerBindings(driver);
+        configureCalibrationBindings(operator);
     }
     
     public void prepareNamedCommands() {
