@@ -27,6 +27,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import frc.robot.util.Constants.AutoConstants;
 import monologue.Logged;
 
 /**
@@ -164,14 +165,19 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(6, SpeedAngleTriplet.of(4000.0, 4500.0, 48.0));
-                put(7, SpeedAngleTriplet.of(4000.0, 4500.0, 48.0));
-                put(8, SpeedAngleTriplet.of(4240.0, 4600.0, 44.1));
-                put(10, SpeedAngleTriplet.of(4000.0, 4000.0, 45.0));
-                put(15, SpeedAngleTriplet.of(6000.0, 4000.0, 40.0));
-                put(20, SpeedAngleTriplet.of(6000.0, 4000.0, 30.0));
-                put(25, SpeedAngleTriplet.of(6000.0, 4000.0, 20.0));
-                put(30, SpeedAngleTriplet.of(6000.0, 4000.0, 10.0));
+                put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
+                put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
+                put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
+                put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
+                put(9, SpeedAngleTriplet.of(2465.0, 2465.0, 40.5));
+                put(10, SpeedAngleTriplet.of(2633.0, 2633.0, 38.1));
+                put(11, SpeedAngleTriplet.of(2795.0, 2795.0, 35.8));
+                put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
+                put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
+                put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
+                put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
+                put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
+                put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
             }
         };
 
@@ -188,7 +194,7 @@ public final class Constants {
     }
 
     public static final class TrapConstants {
-        public static final int ELEVATOR_CAN_ID = 14;
+        //public static final int ELEVATOR_CAN_ID = 14;
         public static final int CLAW_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = .003;
         public static final double OUTTAKE_SECONDS = 1;
@@ -262,35 +268,27 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;
 
-        public static final double PX_CONTROLLER = 1;
-        public static final double PY_CONTROLLER = 1;
-        public static final double P_THETA_CONTROLLER = 1;
+        public static final double XY_CORRECTION_P = 5.4;
+        public static final double XY_CORRECTION_I = .125;
+        public static final double XY_CORRECTION_D = 0.075;
 
-        public static final double X_CORRECTION_P = 1.6;// 7;
-        public static final double X_CORRECTION_I = 0;
-        public static final double X_CORRECTION_D = 0;
-
-        public static final double Y_CORRECTION_P = 1.6;// 6.03;
-        public static final double Y_CORRECTION_I = 0;
-        public static final double Y_CORRECTION_D = 0;
-
-        public static final double ROTATION_CORRECTION_P = .63;
-        public static final double ROTATION_CORRECTION_I = 0;
-        public static final double ROTATION_CORRECTION_D = 0.0025;
+        public static final double ROTATION_CORRECTION_P = 1.165;
+        public static final double ROTATION_CORRECTION_I = 0.05;
+        public static final double ROTATION_CORRECTION_D = 0.08;
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
-        public static final HolonomicDriveController HDC = new HolonomicDriveController(
+        public static HolonomicDriveController HDC = new HolonomicDriveController(
                 new PIDController(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
+                        AutoConstants.XY_CORRECTION_P,
+                        AutoConstants.XY_CORRECTION_I,
+                        AutoConstants.XY_CORRECTION_D),
                 new PIDController(
-                        AutoConstants.Y_CORRECTION_P,
-                        AutoConstants.Y_CORRECTION_I,
-                        AutoConstants.Y_CORRECTION_D),
+                        AutoConstants.XY_CORRECTION_P,
+                        AutoConstants.XY_CORRECTION_I,
+                        AutoConstants.XY_CORRECTION_D),
                 new ProfiledPIDController(
                         AutoConstants.ROTATION_CORRECTION_P,
                         AutoConstants.ROTATION_CORRECTION_I,
@@ -301,9 +299,9 @@ public final class Constants {
 
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
                 new PIDConstants(
-                        AutoConstants.X_CORRECTION_P,
-                        AutoConstants.X_CORRECTION_I,
-                        AutoConstants.X_CORRECTION_D),
+                        AutoConstants.XY_CORRECTION_P,
+                        AutoConstants.XY_CORRECTION_I,
+                        AutoConstants.XY_CORRECTION_D),
                 new PIDConstants(
                         AutoConstants.ROTATION_CORRECTION_P,
                         AutoConstants.ROTATION_CORRECTION_I,
@@ -552,11 +550,11 @@ public final class Constants {
         };
 
         public static Pose2d GET_SPEAKER_POSITION() {
-            return SPEAKER_POSITIONS[ALLIANCE.isPresent() && ALLIANCE.get().equals(Alliance.Red) ? 1 : 0];
+            return SPEAKER_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
         } 
 
         public static Pose2d GET_AMP_POSITION() {
-            return AMP_POSITIONS[ALLIANCE.isPresent() && ALLIANCE.get().equals(Alliance.Red) ? 1 : 0];
+            return AMP_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
         }
 
         // TODO: make real constants
