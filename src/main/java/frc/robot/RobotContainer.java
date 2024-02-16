@@ -110,11 +110,11 @@ public class RobotContainer implements Logged {
         });
 
         pieceControl = new PieceControl(
-                intake,
-                triggerWheel,
-                elevator,
-                claw,
-                shooterCalc);
+            intake,
+            triggerWheel,
+            elevator,
+            claw,
+            shooterCalc);
 
         calibrationControl = new CalibrationControl(shooterCalc);
 
@@ -159,7 +159,7 @@ public class RobotContainer implements Logged {
         initializeArrays();
         
         pathPlannerStorage = new PathPlannerStorage(driver.y());
-        registerNamedCommands();
+        prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
