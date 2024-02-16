@@ -48,12 +48,12 @@ public final class Constants {
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
-        public static final double TRACK_WIDTH = Units.inchesToMeters(21.5);
+        public static final double TRACK_WIDTH = Units.inchesToMeters(25.5);
         // Distance between front and back wheels on robot
         // Easiest measured from the center of the bore of the vortex
-        public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
+        public static final double WHEEL_BASE = Units.inchesToMeters(25.5);
 
-        public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(25);
+        public static final double ROBOT_LENGTH_METERS = Units.inchesToMeters(29);
         public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
 
         // Front positive, left positive
@@ -245,42 +245,63 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;
 
-        public static final double PX_CONTROLLER = 1;
-        public static final double PY_CONTROLLER = 1;
-        public static final double P_THETA_CONTROLLER = 1;
+        /*
+         * XY:
+         *  P: 5.2
+         *  I: 0.125
+         *  D: 0.0125
+         * 
+         * Theta:
+         *   P: 1.3325
+         *   I: 1 (izone on 20 degrees)
+         *   D: 0.0375
+         */
+        public static final double XY_CORRECTION_P = 5.2;
+        public static final double XY_CORRECTION_I = 0.125;
+        public static final double XY_CORRECTION_D = 0.0125;
 
-        public static final PIDConstants X_PID =          new PIDConstants(4, 0, .01);
-        public static final PIDConstants HPFC_THETA_PID = new PIDConstants(2.8, 0, 0.011);
-        
-        public static final PIDConstants Y_PID = new PIDConstants(1.6, 0, 0);
-        public static final PIDConstants HDC_THETA_PID = new PIDConstants(0.63, 0, 0.0025);
-        
+        private static final PIDController XY_PID = new PIDController(
+                AutoConstants.XY_CORRECTION_P,
+                AutoConstants.XY_CORRECTION_I,
+                AutoConstants.XY_CORRECTION_D);
+
+        public static final double ROTATION_CORRECTION_P = 1.3325;
+        public static final double ROTATION_CORRECTION_I = 1.0;
+        public static final double ROTATION_CORRECTION_D = 0.0375;
+
+        private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
+            AutoConstants.ROTATION_CORRECTION_P,
+            AutoConstants.ROTATION_CORRECTION_I,
+            AutoConstants.ROTATION_CORRECTION_D,
+            new TrapezoidProfile.Constraints(
+                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)) 
+            {{
+                setIZone(Units.degreesToRadians(20));
+            }};
+
+        // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
                 MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
-        public static final HolonomicDriveController HDC = new HolonomicDriveController(
-                new PIDController(
-                    AutoConstants.X_PID.kP,
-                    AutoConstants.X_PID.kI,
-                    AutoConstants.X_PID.kD),
-                new PIDController(
-                    AutoConstants.Y_PID.kP,
-                    AutoConstants.Y_PID.kI,
-                    AutoConstants.Y_PID.kD),
-                new ProfiledPIDController(
-                    AutoConstants.HDC_THETA_PID.kP,
-                    AutoConstants.HDC_THETA_PID.kI,
-                    AutoConstants.HDC_THETA_PID.kD,
-                        new TrapezoidProfile.Constraints(
-                                AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                                AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)));
+        public static HolonomicDriveController HDC = new HolonomicDriveController(
+                XY_PID,
+                XY_PID,
+                THETA_PID
+            );
 
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
-                X_PID,
-                HPFC_THETA_PID,
-                MAX_SPEED_METERS_PER_SECOND,
-                Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH),
-                new ReplanningConfig());
+            new PIDConstants(
+                AutoConstants.XY_CORRECTION_P,
+                AutoConstants.XY_CORRECTION_I,
+                AutoConstants.XY_CORRECTION_D),
+            new PIDConstants(
+                    AutoConstants.ROTATION_CORRECTION_P,
+                    AutoConstants.ROTATION_CORRECTION_I,
+                    AutoConstants.ROTATION_CORRECTION_D),
+            MAX_SPEED_METERS_PER_SECOND,
+            Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0,
+            new ReplanningConfig());
 
         // In choreo, there is one path, "C1-5S", 
         // that shoots every piece.
