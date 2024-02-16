@@ -64,6 +64,14 @@ public class PatriBoxController extends CommandXboxController {
         return super.getHID().getRightTriggerAxis();
     }
 
+    public boolean getLeftBumper() {
+        return super.getHID().getLeftBumper();
+    }
+
+    public boolean getRightBumper() {
+        return super.getHID().getRightBumper();
+    }
+
     @Override
     public double getRightX() {
         return getRightAxis().getX();
