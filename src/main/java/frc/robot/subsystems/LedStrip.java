@@ -72,6 +72,7 @@ public class LedStrip extends SubsystemBase {
             case (3) -> loading();
             case (5) -> alliance(() -> FieldConstants.IS_RED_ALLIANCE());
             case (6) -> flash();
+            case (7) -> rainbow();
             default -> runOnce(() -> {
             });
         };
@@ -139,10 +140,10 @@ public class LedStrip extends SubsystemBase {
         }
     }
 
-    public void oohShiny(Color blinkI, Color blinkII, int blinkAmount, int setIndexs) {
+    public void oohShiny(Color blinkI, Color blinkII, int blinkAmount, int setIndexI, int setIndexII) {
         for (int j = blinkAmount; j > 0; j--) {
             Color blinkColor = (j % 2 == 0) ? blinkI : blinkII;
-            ledBuffer.setLED(setIndexs, blinkColor);
+            setLED(setIndexI, setIndexII, blinkColor);
         }
     }
 
@@ -151,8 +152,8 @@ public class LedStrip extends SubsystemBase {
     }
 
     private int rainbowOffset = 0;
-    private Command rainbow() {
-        return runOnce(() -> {
+    public Command rainbow() {
+        return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
                 int hue = (this.rainbowOffset + (i * 180 / ledBuffer.getLength())) % 180;
                 setLED(i, Color.fromHSV(hue / 2, 255, 255));
@@ -225,15 +226,21 @@ public class LedStrip extends SubsystemBase {
     Color GreerYeller = new Color(50, 250, 0);
     Color TurnOff = new Color(0, 0, 0);
 
-    public Command elevatorGradientLED() {
+    public Command upwardsElevatorGradientLED() {
         return Commands.run(() -> {
             setLEDGradient(Orange, GreerYeller, 1, 10);
         });
     }
 
-    public Command elevatorTOPLED() {
+    public Command backwardsElevatorGradientLED() {
         return Commands.run(() -> {
-            oohShiny(GreerYeller, TurnOff, currentPatternIndex, allianceOffset);
+            setLEDGradient(GreerYeller, Orange, 10, 1);
+        });
+    }
+
+    public Command elevatorTOPLED() {
+        return Commands.runOnce(() -> {
+            oohShiny(GreerYeller, TurnOff, 10, 1, 10);
         });
     }
 
@@ -244,7 +251,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     public Command cautionLED() {
-        return runOnce(() -> {
+        return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
                 final Color color = (i % 2 == 0) ? Color.kYellow : Color.kDarkGray;
                 setLED(i, color);
@@ -265,12 +272,12 @@ public class LedStrip extends SubsystemBase {
     }
 
     public Command almmondLED() {
-        return Commands.runOnce(() -> {
+        return Commands.run(() -> {
             setLED(Color.kBlanchedAlmond);});
     }
 
     public Command blueLED() {
-        return Commands.runOnce(() -> {
+        return Commands.run(() -> {
             setLED(Color.kBlue);
         });
     }

@@ -128,18 +128,21 @@ public class RobotContainer implements Logged {
         
         controller.povDown().onTrue(climb.toBottomCommand().andThen(ledStrip.greerLED()));
         
-        controller.povLeft().onTrue(elevator.toBottomCommand());
+        controller.povLeft().onTrue(elevator.toBottomCommand())
+        .onTrue(ledStrip.backwardsElevatorGradientLED());
 
         controller.povRight().onTrue(pieceControl.placeTrapCommand())
-        .onTrue(ledStrip.elevatorGradientLED());
+        .onTrue(ledStrip.upwardsElevatorGradientLED());
 
         controller.leftBumper()
             .and(controller.rightBumper())
-            .onTrue(pieceControl.noteToShoot());
+            .onTrue(pieceControl.noteToShoot())
+            .whileTrue(ledStrip.cautionLED());
 
         controller.rightBumper()
             .and(controller.leftBumper().negate())
-            .onTrue(pieceControl.noteToTarget(() -> true));
+            .onTrue(pieceControl.noteToTarget(() -> true))
+            .whileTrue(ledStrip.cautionLED());
 
         controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
             .and(intake.hasGamePieceTrigger().negate())
@@ -150,8 +153,9 @@ public class RobotContainer implements Logged {
             .onTrue(intake.outCommand())
             .whileTrue(ledStrip.almmondLED());
 
-        controller.x().onTrue(intake.stop())
-        .whileTrue(ledStrip.redLED());
+        controller.x()
+        .onTrue(intake.stop())
+        .onTrue(ledStrip.redLED());
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
@@ -203,10 +207,9 @@ public class RobotContainer implements Logged {
                             controller.getLeftX(),
                             swerve.getAlignmentSpeeds(Rotation2d.fromDegrees(270)));
                     },
-                    () -> true)));
-
+                    () -> true)))
+            .whileTrue(ledStrip.rainbow());
         }
-    
     
     public Command getAutonomousCommand() {
         return new PathPlannerAuto(DriverUI.autoChooser.getSelected().toString());
