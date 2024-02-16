@@ -27,6 +27,18 @@ public class PatriBoxController extends CommandXboxController {
         return getLeftAxis().getX();
     }
 
+    public boolean getAButton() {
+        return super.getHID().getAButton();
+    }
+
+    public boolean getBButton() {
+        return super.getHID().getBButton();
+    }
+
+    public boolean getXButton() {
+        return super.getHID().getXButton();
+    }
+
     public boolean getYButton() {
         return super.getHID().getYButton();
     }
@@ -42,6 +54,10 @@ public class PatriBoxController extends CommandXboxController {
         Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
                 MathUtil.applyDeadband(super.getLeftY(), deadband));
         return driverLeftAxis;
+    }
+
+    public double getLeftTriggerAxis() {
+        return super.getHID().getLeftTriggerAxis();
     }
 
     public double getRightTriggerAxis() {
