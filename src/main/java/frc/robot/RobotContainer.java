@@ -108,10 +108,8 @@ public class RobotContainer implements Logged {
         shooterCalc = new ShooterCalc(shooter, pivot);
         
         PIDTuner = new PIDTunerCommands(new PIDNotConstants[] {
-            pivot.getPIDNotConstants(),
-            shooter.getPIDNotConstants(),
-           elevator.getPIDNotConstants(),
-            climb.getPidNotConstants()
+            swerve.getDrivingPidNotConstants(),
+            swerve.getTurningPidNotConstants()
         });
 
         pieceControl = new PieceControl(
@@ -179,7 +177,7 @@ public class RobotContainer implements Logged {
         // Warning: these buttons are not on the default loop!
         // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
         // for more information 
-        configurePIDTunerBindings(driver);
+        configureHDCTuner(driver);
         configureCalibrationBindings(operator);
     }
     
@@ -189,6 +187,7 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .onTrue(pieceControl.noteToTrap());
+
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote());
@@ -204,6 +203,7 @@ public class RobotContainer implements Logged {
         
         controller.povUp()
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+
         controller.povDown()
             .onTrue(climb.toBottomCommand());
 
@@ -264,9 +264,9 @@ public class RobotContainer implements Logged {
         controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());
         
-        controller.leftBumper()
-            .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(intake.inCommand());
+        // controller.leftBumper()
+        //     .and(intake.hasGamePieceTrigger().negate())
+        //     .onTrue(intake.inCommand());$
         
         controller.rightTrigger()
             .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -279,10 +279,10 @@ public class RobotContainer implements Logged {
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(PIDTuner.decreaseSubsystemCommand());
             
-        controller.pov(0, 180, testButtonBindingLoop)
+        controller.pov(0, 0, testButtonBindingLoop)
             .onTrue(PIDTuner.increaseCurrentPIDCommand(.1));
             
-        controller.pov(0, 0, testButtonBindingLoop)
+        controller.pov(0, 180, testButtonBindingLoop)
             .onTrue(PIDTuner.increaseCurrentPIDCommand(-.1));
             
         controller.rightBumper(testButtonBindingLoop)
@@ -328,10 +328,10 @@ public class RobotContainer implements Logged {
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(pieceControl.ejectNote());
 
-        controller.pov(0, 180, testButtonBindingLoop)
+        controller.pov(0, 0, testButtonBindingLoop)
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
-        controller.pov(0, 0, testButtonBindingLoop)
+        controller.pov(0, 180, testButtonBindingLoop)
             .onTrue(calibrationControl.copyCalcTriplet());
     }
     
@@ -340,9 +340,9 @@ public class RobotContainer implements Logged {
             .onTrue(HDCTuner.controllerDecrementCommand());
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(HDCTuner.controllerIncrementCommand());
-        controller.pov(0, 180, testButtonBindingLoop)
-            .onTrue(HDCTuner.increaseCurrentConstantCommand(.1));
         controller.pov(0, 0, testButtonBindingLoop)
+            .onTrue(HDCTuner.increaseCurrentConstantCommand(.1));
+        controller.pov(0, 180, testButtonBindingLoop)
             .onTrue(HDCTuner.increaseCurrentConstantCommand(-.1));
         controller.rightBumper(testButtonBindingLoop)
             .onTrue(HDCTuner.constantIncrementCommand());
@@ -390,8 +390,6 @@ public class RobotContainer implements Logged {
 
     public void onTest() {
         CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
-        configurePIDTunerBindings(driver);
-        configureCalibrationBindings(operator);
     }
     
     public void prepareNamedCommands() {
