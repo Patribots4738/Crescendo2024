@@ -280,8 +280,8 @@ public final class Constants {
          *   I: 1 (izone on 20 degrees)
          *   D: 0.0375
          */
-        public static final double XY_CORRECTION_P = 5.2;
-        public static final double XY_CORRECTION_I = 0.125;
+        public static final double XY_CORRECTION_P = 2;
+        public static final double XY_CORRECTION_I = 0.0125;
         public static final double XY_CORRECTION_D = 0.0125;
 
         private static final PIDController XY_PID = new PIDController(
@@ -289,9 +289,9 @@ public final class Constants {
                 AutoConstants.XY_CORRECTION_I,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = 1.3325;
-        public static final double ROTATION_CORRECTION_I = 1.0;
-        public static final double ROTATION_CORRECTION_D = 0.0375;
+        public static final double ROTATION_CORRECTION_P = .725;
+        public static final double ROTATION_CORRECTION_I = 1;
+        public static final double ROTATION_CORRECTION_D = 0;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
@@ -301,7 +301,7 @@ public final class Constants {
                     AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
                     AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)) 
             {{
-                setIZone(Units.degreesToRadians(20));
+                setIZone(Units.degreesToRadians(45));
             }};
 
         // Constraint for the motion-profiled robot angle controller
@@ -387,19 +387,31 @@ public final class Constants {
         public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
         public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT = TURNING_ENCODER_POSITION_FACTOR; // radians
 
-        public static final double DRIVING_P = 0.04;
+        public static final double DRIVING_P = 0.256;
         public static final double DRIVING_I = 0;
-        public static final double DRIVING_D = 0;
-        public static final double DRIVING_FF = 1 / DRIVE_WHEEL_FREE_SPEED_RPS;
+        public static final double DRIVING_D = 0.255;
+        public static final double DRIVING_FF = 0.20217;
         public static final double DRIVING_MIN_OUTPUT = -1;
         public static final double DRIVING_MAX_OUTPUT = 1;
+        public static final PatrIDConstants DRIVING_PID = new PatrIDConstants(
+            DRIVING_P,
+            DRIVING_I,
+            DRIVING_D,
+            DRIVING_FF
+        );
 
-        public static final double TURNING_P = Robot.isSimulation() ? 0.5 : 1;
+        public static final double TURNING_P = Robot.isSimulation() ? 0.5 : 1.5;
         public static final double TURNING_I = 0;
-        public static final double TURNING_D = 0;
+        public static final double TURNING_D = 1;
         public static final double TURNING_FF = 0;
         public static final double TURNING_MIN_OUTPUT = -1;
         public static final double TURNING_MAX_OUTPUT = 1;
+        public static final PatrIDConstants TURNING_PID = new PatrIDConstants(
+            TURNING_P,
+            TURNING_I,
+            TURNING_D,
+            TURNING_FF
+        );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
         public static final int VORTEX_CURRENT_LIMIT = 80; // amps
