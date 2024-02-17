@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4511248126639593,
-        "y": 5.892675256795083
+        "x": 1.6559354059357616,
+        "y": 5.635272905484221
       },
       "isLocked": false,
       "linkedName": "W2"
@@ -20,8 +20,8 @@
         "y": 6.997339122054029
       },
       "prevControl": {
-        "x": 2.317827166449406,
-        "y": 6.733829369114505
+        "x": 1.6513389353766392,
+        "y": 6.398287018298562
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.5,
       "command": {
         "type": "parallel",
         "data": {
@@ -50,8 +50,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.87,
-    "maxAcceleration": 8.12,
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
