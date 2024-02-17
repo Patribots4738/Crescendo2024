@@ -165,8 +165,8 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        configureDriverBindings(operator);
-        configureOperatorBindings(driver);
+        configureDriverBindings(driver);
+        configureOperatorBindings(operator);
         configureTestBindings();
     }
 
@@ -197,9 +197,12 @@ public class RobotContainer implements Logged {
         controller.a()
             .toggleOnTrue(shooterCalc.prepareFireCommand(swerve::getPose));
 
-        controller.start().or(controller.back())
-            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(1.332, 5.587, Rotation2d.fromDegrees(180)))));
+        // controller.start().or(controller.back())
+        //     .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(1.332, 5.587, Rotation2d.fromDegrees(180)))));
         
+        controller.back()
+            .onTrue(pieceControl.sourceShooterIntake(controller.start()));
+
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
@@ -259,8 +262,7 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.b()
-            .whileTrue(Commands.runOnce(swerve::getSetWheelsX));
-        
+            .whileTrue(Commands.run(swerve::getSetWheelsX));
         
         controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());

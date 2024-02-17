@@ -11,7 +11,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.SpeedAngleTriplet;
 
 public class PieceControl {
 
@@ -102,7 +102,17 @@ public class PieceControl {
                 .andThen(elevator.toBottomCommand());
     }
 
-    public Command intakeToClaw() {
+    public Command sourceShooterIntake(BooleanSupplier v1Mode) {
+        return Commands.sequence(
+            Commands.runOnce(() -> shooterCalc.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, v1Mode.getAsBoolean() ? 60.0 : 45.0))),
+            indexer.toElevator(),
+            claw.outtake(),
+            Commands.waitSeconds(3),
+            stopAllMotors()
+        ); 
+    }
+
+    public Command intakeToClaw() { 
         return intake.inCommand()
                 .alongWith(indexer.toElevator());
     }
