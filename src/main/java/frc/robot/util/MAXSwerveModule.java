@@ -13,22 +13,27 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class MAXSwerveModule {
+public class MAXSwerveModule implements Logged{
     private final Neo drivingSpark;
     private final Neo turningSpark;
 
     private final RelativeEncoder drivingEncoder;
     private final AbsoluteEncoder turningEncoder;
 
-    private final SparkPIDController drivingPIDController;
-    private final SparkPIDController turningPIDController;
+    public final SparkPIDController drivingPIDController;
+    public final SparkPIDController turningPIDController;
 
     private double chassisAngularOffset = 0;
+    @Log
     private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
+
+    private PIDNotConstants turningPID;
+    private PIDNotConstants drivingPID;
 
     /**
      * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -47,7 +52,6 @@ public class MAXSwerveModule {
         drivingEncoder.setPosition(0);
 
         configMotors();
-
         this.chassisAngularOffset = chassisAngularOffset;
         desiredState.angle = new Rotation2d(turningEncoder.getPosition());
     }
@@ -73,6 +77,13 @@ public class MAXSwerveModule {
         return new SwerveModuleState(drivingSpark.getVelocity(),
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
 
+    }
+
+    public PIDNotConstants getTurningPIDNotConstants() {
+        return turningPID;
+    }
+    public PIDNotConstants getDrivingPIDNotConstnats() {
+        return drivingPID;
     }
 
     /**
@@ -125,7 +136,7 @@ public class MAXSwerveModule {
                     CANSparkBase.ControlType.kVelocity);
         }
 
-        this.desiredState = desiredState;
+        this.desiredState = optimizedDesiredState;
     }
 
     /**

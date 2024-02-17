@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -13,7 +12,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -25,22 +23,20 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
-import frc.robot.util.HDCTuner;
 import frc.robot.util.MAXSwerveModule;
+import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -68,6 +64,20 @@ public class Swerve extends SubsystemBase implements Logged {
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
+
+    private PIDNotConstants drivingConstants = new PIDNotConstants(
+        ModuleConstants.DRIVING_PID, 
+        frontLeft.drivingPIDController, 
+        frontRight.drivingPIDController, 
+        rearLeft.drivingPIDController,
+        rearRight.drivingPIDController);
+        
+    private PIDNotConstants turningConstants = new PIDNotConstants(
+        ModuleConstants.TURNING_PID, 
+        frontLeft.turningPIDController, 
+        frontRight.turningPIDController, 
+        rearLeft.turningPIDController,
+        rearRight.turningPIDController);
 
     @Log
     SwerveModuleState[] swerveMeasuredStates;
@@ -146,7 +156,6 @@ public class Swerve extends SubsystemBase implements Logged {
         logPositions();
 
     }
-
     public void logPositions() {
 
         Pose2d currentPose = getPose();
@@ -191,7 +200,12 @@ public class Swerve extends SubsystemBase implements Logged {
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
-
+    public PIDNotConstants getTurningPidNotConstants() {
+        return turningConstants;
+    }
+    public PIDNotConstants getDrivingPidNotConstants() {
+        return drivingConstants;
+    }
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
@@ -238,10 +252,13 @@ public class Swerve extends SubsystemBase implements Logged {
      * Sets the wheels into an X formation to prevent movement.
      */
     public void setWheelsX() {
-        frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        SwerveModuleState[] desiredStates = new SwerveModuleState[4];
+        desiredStates[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+        desiredStates[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+        desiredStates[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+        desiredStates[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+
+        setModuleStates(desiredStates);
     }
 
     public Command getSetWheelsX() {
@@ -255,7 +272,9 @@ public class Swerve extends SubsystemBase implements Logged {
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
-                desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
+            desiredStates, 
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND
+        );
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         rearLeft.setDesiredState(desiredStates[2]);
@@ -307,7 +326,9 @@ public class Swerve extends SubsystemBase implements Logged {
         return positions;
 
     }
-
+    public PIDNotConstants getTurningModulePID() {
+        return this.frontLeft.getTurningPIDNotConstants();
+    }
     public void resetEncoders() {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
             mSwerveMod.resetEncoders();

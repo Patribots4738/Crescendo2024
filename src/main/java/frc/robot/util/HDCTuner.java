@@ -74,7 +74,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
                     XYController.setP(XYController.getP() + value);
                     break;
                 case 1:
-                    XYController.setD(XYController.getD() + value);
+                    XYController.setD(XYController.getD() + value * 0.1);
                     break;
                 case 2:
                     XYController.setI(XYController.getI() + value);
@@ -126,9 +126,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
     }
 
     public Command logCommand() {
-        return Commands.runOnce(() -> {
-            System.out.println(this.toString());
-        });
+        return Commands.runOnce(this::log);
     }
     
     public Command multiplyPIDCommand(double d) {

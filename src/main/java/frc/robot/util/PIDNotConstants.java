@@ -20,14 +20,14 @@ public class PIDNotConstants implements Logged {
     /** Integral range */
     public final double iZone = 0;
 
-    private final SparkPIDController PIDController;
+    private final SparkPIDController[] PIDControllers;
 
-    public PIDNotConstants(double kP, double kI, double kD, double ff, SparkPIDController PIDController) {
+    public PIDNotConstants(double kP, double kI, double kD, double ff, SparkPIDController... PIDControllers) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         this.kFF= ff;
-        this.PIDController = PIDController;
+        this.PIDControllers = PIDControllers;
     }
 
     /**
@@ -37,8 +37,8 @@ public class PIDNotConstants implements Logged {
      * @param kI I
      * @param kD D
      */
-    public PIDNotConstants(double kP, double kI, double kD, SparkPIDController PIDController) {
-        this(kP, kI, kD, 0, PIDController);
+    public PIDNotConstants(double kP, double kI, double kD, SparkPIDController... PIDControllers) {
+        this(kP, kI, kD, 0, PIDControllers);
     }
 
     /**
@@ -64,12 +64,12 @@ public class PIDNotConstants implements Logged {
         this(kP, 0, 0, PIDController);
     }
 
-    public PIDNotConstants(PatrIDConstants PID, double ff, SparkPIDController PIDController) {
-        this(PID.getP(), PID.getI(), PID.getD(), ff, PIDController);
+    public PIDNotConstants(PatrIDConstants PID, double ff, SparkPIDController... PIDControllers) {
+        this(PID.getP(), PID.getI(), PID.getD(), ff, PIDControllers);
     }
 
-    public PIDNotConstants(PatrIDConstants PID, SparkPIDController PIDController) {
-        this(PID.getP(), PID.getI(), PID.getD(), 0, PIDController);
+    public PIDNotConstants(PatrIDConstants PID, SparkPIDController... PIDControllers) {
+        this(PID.getP(), PID.getI(), PID.getD(), PID.getFF(), PIDControllers);
     }
 
 
@@ -79,22 +79,30 @@ public class PIDNotConstants implements Logged {
 
     public void setP(double value) {
         kP = value;
-        this.PIDController.setP(value);
+        for (SparkPIDController controller : PIDControllers) {
+            controller.setP(value);
+        }
     }
 
     public void setI(double value) {
         kI = value;
-        this.PIDController.setI(value);
+        for (SparkPIDController controller : PIDControllers) {
+            controller.setI(value);
+        }
     }
 
     public void setD(double value) {
         kD = value;
-        this.PIDController.setD(value);
+        for (SparkPIDController controller : PIDControllers) {
+            controller.setD(value);
+        }
     }
 
     public void setFF(double value) {
         kFF = value;
-        this.PIDController.setFF(value);
+        for (SparkPIDController controller : PIDControllers) {
+            controller.setFF(value);
+        }
     }
 
     public double getP() {

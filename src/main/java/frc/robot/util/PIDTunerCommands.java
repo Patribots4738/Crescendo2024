@@ -73,14 +73,18 @@ public class PIDTunerCommands {
 
     public String subsystemToString(int index) {
         switch (index) {
-            case 0: 
-                return "Pivot";
-            case 1: 
-                return "Shooter";
-            case 2:
-                return "Elevator";
-            case 3:
-                return "Climb";
+            // case 0: 
+            //     return "Pivot";
+            // case 1: 
+            //     return "Shooter";
+            // case 2:
+            //     return "Elevator";
+            // case 3:
+            //     return "Climb";
+            case 0:
+                return "Driving";
+            case 1:
+                return "Turning";
         }
         return "";
     }
@@ -97,7 +101,7 @@ public class PIDTunerCommands {
                 subsystems[subsystemIndex].setI(subsystems[subsystemIndex].getI() + .01 * value);
                 break;
             case 3:
-                subsystems[subsystemIndex].setFF(subsystems[subsystemIndex].getFF() + .0001 * value);
+                subsystems[subsystemIndex].setFF(subsystems[subsystemIndex].getFF() + .01 * value);
                 break;
         }
         System.out.println(subsystems[subsystemIndex].toString());
@@ -113,6 +117,9 @@ public class PIDTunerCommands {
                 break;
             case 2: 
                 subsystems[subsystemIndex].setI(subsystems[subsystemIndex].getI() * value);
+                break;
+            case 3:
+                subsystems[subsystemIndex].setFF(subsystems[subsystemIndex].getFF() * value);
                 break;
         }
         System.out.println(subsystems[subsystemIndex].toString());
