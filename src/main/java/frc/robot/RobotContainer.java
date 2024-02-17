@@ -150,12 +150,11 @@ public class RobotContainer implements Logged {
             driver::getLeftY,
             driver::getLeftX,
             () -> -driver.getRightX(),
-            () -> !driver.getHID().getYButton(),
-            () -> (driver.getHID().getYButton()
-                && Robot.isRedAlliance())));
-              
-        configureButtonBindings();
+            () -> !driver.getYButton(),
+            () -> (driver.getYButton()
+                && Robot.isBlueAlliance()))); 
         
+        configureButtonBindings();
         initializeArrays();
         
         pathPlannerStorage = new PathPlannerStorage(driver.y());

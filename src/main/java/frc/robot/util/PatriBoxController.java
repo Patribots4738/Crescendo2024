@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,6 +29,22 @@ public class PatriBoxController extends CommandXboxController {
         return getLeftAxis().getX();
     }
 
+    public boolean getAButton() {
+        return super.getHID().getAButton();
+    }
+
+    public boolean getBButton() {
+        return super.getHID().getBButton();
+    }
+
+    public boolean getXButton() {
+        return super.getHID().getXButton();
+    }
+
+    public boolean getYButton() {
+        return super.getHID().getYButton();
+    }
+
     @Override
     // This is inverted because for some reason when you
     // go forward on the controller, it returns a negative value
@@ -41,36 +58,44 @@ public class PatriBoxController extends CommandXboxController {
         return driverLeftAxis;
     }
 
-    public Trigger leftY() {
-        return leftY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    public double getLeftTriggerAxis() {
+        return super.getHID().getLeftTriggerAxis();
     }
 
-    public Trigger leftX() {
-        return leftX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    public double getRightTriggerAxis() {
+        return super.getHID().getRightTriggerAxis();
     }
 
-    public Trigger rightY() {
-        return rightY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    public boolean getStartButton() {
+        return super.getHID().getStartButton();
     }
 
-    public Trigger rightX() {
-        return rightX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    public boolean getBackButton() {
+        return super.getHID().getBackButton();
     }
 
-    public Trigger leftY(double threshold, EventLoop loop) {
-        return new Trigger(loop, () -> Math.abs(getLeftY()) > threshold);
+    public boolean getPOVUp() {
+        return super.getHID().getPOV() == 0;
     }
 
-    public Trigger leftX(double threshold, EventLoop loop) {
-        return new Trigger(loop, () -> Math.abs(getLeftX()) > threshold);
+    public boolean getPOVRight() {
+        return super.getHID().getPOV() == 90;
     }
 
-    public Trigger rightY(double threshold, EventLoop loop) {
-        return new Trigger(loop, () -> Math.abs(getRightY()) > threshold);
+    public boolean getPOVDown() {
+        return super.getHID().getPOV() == 180;
     }
 
-    public Trigger rightX(double threshold, EventLoop loop) {
-        return new Trigger(loop, () -> Math.abs(getRightX()) > threshold);
+    public boolean getPOVLeft() {
+        return super.getHID().getPOV() == 270;
+    }
+
+    public boolean getLeftBumper() {
+        return super.getHID().getLeftBumper();
+    }
+
+    public boolean getRightBumper() {
+        return super.getHID().getRightBumper();
     }
 
     @Override
