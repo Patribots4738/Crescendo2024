@@ -48,16 +48,16 @@ public class Elevator extends SubsystemBase implements Logged {
         // pos = elevator.getPosition();
         // desiredPos = elevator.getTargetPosition();
 
-        atDesiredPos = atDesiredPosition();
+        // atDesiredPos = atDesiredPosition();
 
-        RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
-            0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
-            new Rotation3d()
-        );
-        RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
-            0, 0, elevator.getPosition(),
-            new Rotation3d()
-        );
+        // RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
+        //     0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
+        //     new Rotation3d()
+        // );
+        // RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+        //     0, 0, elevator.getPosition(),
+        //     new Rotation3d()
+        // );
     }
 
     public double getPosition() {
