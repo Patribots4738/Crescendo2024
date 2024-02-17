@@ -117,6 +117,8 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         FieldConstants.GAME_MODE = GameMode.TELEOP;
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+        robotContainer.onEnabled();
+
     }
 
     @Override
