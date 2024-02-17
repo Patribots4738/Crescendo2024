@@ -24,11 +24,6 @@ public class PatriBoxController extends CommandXboxController {
         this.deadband = deadband;
     }
 
-    @Override
-    public double getLeftX() {
-        return getLeftAxis().getX();
-    }
-
     public boolean getAButton() {
         return super.getHID().getAButton();
     }
@@ -43,19 +38,6 @@ public class PatriBoxController extends CommandXboxController {
 
     public boolean getYButton() {
         return super.getHID().getYButton();
-    }
-
-    @Override
-    // This is inverted because for some reason when you
-    // go forward on the controller, it returns a negative value
-    public double getLeftY() {
-        return -getLeftAxis().getY();
-    }
-
-    public Translation2d getLeftAxis() {
-        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
-                MathUtil.applyDeadband(super.getLeftY(), deadband));
-        return driverLeftAxis;
     }
 
     public double getLeftTriggerAxis() {
@@ -98,6 +80,50 @@ public class PatriBoxController extends CommandXboxController {
         return super.getHID().getRightBumper();
     }
 
+    public Trigger leftY() {
+        return leftY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger leftX() {
+        return leftX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger rightY() {
+        return rightY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger rightX() {
+        return rightX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger leftY(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getLeftY()) > threshold);
+    }
+
+    public Trigger leftX(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getLeftX()) > threshold);
+    }
+
+    public Trigger rightY(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getRightY()) > threshold);
+    }
+
+    public Trigger rightX(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getRightX()) > threshold);
+    }
+
+    @Override
+    public double getLeftX() {
+        return getLeftAxis().getX();
+    }
+
+    @Override
+    // This is inverted because for some reason when you
+    // go forward on the controller, it returns a negative value
+    public double getLeftY() {
+        return -getLeftAxis().getY();
+    }
+
     @Override
     public double getRightX() {
         return getRightAxis().getX();
@@ -105,7 +131,13 @@ public class PatriBoxController extends CommandXboxController {
 
     @Override
     public double getRightY() {
-        return getRightAxis().getY();
+        return -getRightAxis().getY();
+    }
+
+    public Translation2d getLeftAxis() {
+        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
+                MathUtil.applyDeadband(super.getLeftY(), deadband));
+        return driverLeftAxis;
     }
 
     public Translation2d getRightAxis() {
