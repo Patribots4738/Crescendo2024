@@ -151,8 +151,8 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX(),
             () -> !driver.getYButton(),
-            () -> (driver.getYButton()
-                && Robot.isBlueAlliance()))); 
+            () -> (!driver.getYButton()
+                && Robot.isRedAlliance()))); 
         
         configureButtonBindings();
         initializeArrays();
