@@ -134,6 +134,7 @@ public class Robot extends TimedRobot {
         // Cancels all running commands at the start of test mode.
         FieldConstants.GAME_MODE = GameMode.TEST;
         CommandScheduler.getInstance().cancelAll();
+        robotContainer.onTest();
     }
 
     @Override
