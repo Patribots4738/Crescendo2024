@@ -21,6 +21,7 @@ import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
+import frc.robot.commands.leds.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Claw;
 import frc.robot.subsystems.elevator.Elevator;
@@ -35,6 +36,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
 import monologue.Annotations.Log;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PIDTunerCommands;
@@ -127,7 +129,7 @@ public class RobotContainer implements Logged {
             // and the skew of the tag is less than 3 degrees,
             // then we can confirm that the estimated position is realistic
             if ( // check validity
-                ((driver.getHID().getRightTriggerAxis() > 0 && !(result.botpose[0] == 0 && result.botpose[1] == 0) )
+                ((driver.getHID().getLeftTriggerAxis() > 0 && !(result.botpose[0] == 0 && result.botpose[1] == 0) )
                 // check if good tag
                 && (LimelightHelpers.getTA("limelight") >= 0.3 
                     || result.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
@@ -179,14 +181,28 @@ public class RobotContainer implements Logged {
     }
     
     private void configureOperatorBindings(PatriBoxController controller) {
-        controller.b().onTrue(shooterCalc.stopAllMotors().alongWith(pieceControl.stopAllMotors()));
-        controller.povUp().toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        controller.start().or(controller.back())
+            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(FieldConstants.FIELD_WIDTH_METERS - 1.332, 5.587, Rotation2d.fromDegrees(180)))));
+
+        controller.leftBumper()
+            .onTrue(pieceControl.noteToTrap());
+
+        controller.rightBumper()
+            .onTrue(pieceControl.ejectNote());
+
+        controller.b()
+            .onTrue(pieceControl.stopIntakeAndIndexer());
+    }
+    
+    private void configureDriverBindings(PatriBoxController controller) {
+        controller.b()
+            .onTrue(shooterCalc.stopAllMotors()
+                .alongWith(pieceControl.stopAllMotors()));
         
-        controller.povDown().onTrue(climb.toBottomCommand());
-
-        // controller.povLeft().onTrue(elevator.toBottomCommand());
-
-        // controller.povRight().onTrue(elevator.toTopCommand());
+        controller.povUp()
+            .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+        controller.povDown()
+            .onTrue(climb.toBottomCommand());
 
         controller.leftBumper()
             .onTrue(pieceControl.noteToShoot());
@@ -196,9 +212,6 @@ public class RobotContainer implements Logged {
 
         controller.a()
             .toggleOnTrue(shooterCalc.prepareFireCommand(swerve::getPose));
-
-        // controller.start().or(controller.back())
-        //     .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(1.332, 5.587, Rotation2d.fromDegrees(180)))));
         
         controller.back()
             .onTrue(pieceControl.sourceShooterIntake(controller.start()));
@@ -210,35 +223,16 @@ public class RobotContainer implements Logged {
                 swerve.getDriveCommand(
                     () -> {
                         return new ChassisSpeeds(
-                            -controller.getLeftY(),
-                            -controller.getLeftX(),
+                            controller.getLeftY(),
+                            controller.getLeftX(),
                             swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
                     },
                     () -> true)));
-        // controller.rightBumper()
-        //     .and(controller.leftBumper().negate())
-        //     .onTrue(pieceControl.noteToTarget(() -> true));
 
-        // controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
-        //     .and(intake.hasGamePieceTrigger().negate())
-        //     .onTrue(pieceControl.intakeToClaw());
-
-        // controller.leftTrigger()
-        //     .onFalse(pieceControl.stopIntakeAndIndexer());
-
-        // controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
-        //     .onTrue(intake.outCommand());
-
-        // controller.x().onTrue(intake.stop());
-
-    }
-    
-    private void configureDriverBindings(PatriBoxController controller) {
-        
         // Upon hitting start button
         // reset the orientation of the robot
         // to be facing AWAY FROM the driver station
-        controller.start().onTrue(
+        controller.back().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
@@ -251,7 +245,7 @@ public class RobotContainer implements Logged {
         // Upon hitting start button
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
-        controller.back().onTrue(
+        controller.start().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
                     swerve.getPose().getTranslation(),
@@ -267,34 +261,12 @@ public class RobotContainer implements Logged {
         controller.leftStick()
             .toggleOnTrue(swerve.toggleSpeed());
         
-        controller.a()
+        controller.leftBumper()
             .and(intake.hasGamePieceTrigger().negate())
             .onTrue(intake.inCommand());
         
-        controller.y()
-            .onTrue(intake.outCommand());
-        
-        controller.leftBumper()
-            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-        
-        controller.x()
-            .onTrue(intake.stop());
-        
-        controller.rightStick()
-            .toggleOnTrue(
-                Commands.sequence(
-                swerve.resetHDC(),
-                swerve.getDriveCommand(
-                    () -> {
-                        return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
-                    },
-                    () -> true)));
-
-        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-        controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.rightTrigger()
+            .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {
@@ -408,6 +380,8 @@ public class RobotContainer implements Logged {
     }
     
     public void onEnabled() {
+        if (FieldConstants.GAME_MODE == GameMode.TELEOP)
+            new LPI(ledStrip, swerve::getPose, operator, swerve::setDesriredPose).schedule();
     }
 
     public void onTest() {
@@ -420,7 +394,9 @@ public class RobotContainer implements Logged {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.noteToShoot());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
+        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("PlaceAmp", pieceControl.noteToTarget());
         NamedCommands.registerCommand("PrepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
         NamedCommands.registerCommand("PrepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
