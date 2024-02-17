@@ -77,6 +77,9 @@ public class RobotContainer implements Logged {
 
     @Log
     public static Pose3d[] notePose3ds = new Pose3d[12];
+
+    @Log
+    private boolean freshCode = true;
     
     public RobotContainer() {
         
@@ -382,6 +385,7 @@ public class RobotContainer implements Logged {
     public void onEnabled() {
         if (FieldConstants.GAME_MODE == GameMode.TELEOP)
             new LPI(ledStrip, swerve::getPose, operator, swerve::setDesriredPose).schedule();
+        this.freshCode = false;
     }
 
     public void onTest() {
