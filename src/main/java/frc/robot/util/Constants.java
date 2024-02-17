@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -27,7 +29,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
-import frc.robot.util.Constants.AutoConstants;
 import monologue.Logged;
 
 /**
@@ -339,6 +340,15 @@ public final class Constants {
 
         public static final String SKIPPING_DOWN_PATH_NAME = "C1-5"  + PATH_EXTENSION;
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
+
+        public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>() {
+            {
+                for (int i = 0; i < AutoBuilder.getAllAutoNames().size(); i++) {
+                    Pose2d startingPosition = PathPlannerAuto.getStaringPoseFromAutoFile(AutoBuilder.getAllAutoNames().get(i));
+                    add(startingPosition);
+                }
+            }
+        };
     }
 
     public static final class ModuleConstants {
@@ -417,15 +427,6 @@ public final class Constants {
         public static final int PWM_PORT = 9;
         public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
 
-        public static final Pose2d[] startingPositions = new Pose2d[] {
-            new Pose2d(),
-            new Pose2d(1, 1, new Rotation2d(Units.degreesToRadians(120))),
-            new Pose2d(2, 1, Rotation2d.fromDegrees(10)),
-            new Pose2d(3, 1, Rotation2d.fromRadians(Math.PI)),
-            new Pose2d(new Translation2d(1, 2), new Rotation2d()),
-            new Pose2d(2, 2, new Rotation2d()),
-            new Pose2d(3, 3, new Rotation2d(Units.degreesToRadians(160))),
-        };
         public static final Integer patternMap = null;
 
         public static final double OUTER_ZONE = 2.262;
