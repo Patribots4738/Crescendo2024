@@ -348,7 +348,7 @@ public class Swerve extends SubsystemBase implements Logged {
         this.speedMultiplier = speedMultiplier;
     }
 
-    public Command setAlignemntSpeed() {
+    public Command setAlignmentSpeed() {
         return runOnce(() -> {
             DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
         });
@@ -426,15 +426,13 @@ public class Swerve extends SubsystemBase implements Logged {
                             desiredPose.getRotation()
                         );
                 }, 
-                () -> {
-                    return 
-                        ChassisSpeeds.fromFieldRelativeSpeeds(
-                            0,
-                            driverX.getAsDouble(),
-                            0,
+                () -> 
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                        0,
+                        driverX.getAsDouble(),
+                        0,
                             getPose().getRotation()
-                        );
-                }
+                    )
             );
     }
 

@@ -224,6 +224,7 @@ public class RobotContainer implements Logged {
             .whileTrue(
                 Commands.sequence(
                     swerve.resetHDC(),
+                    swerve.setAlignmentSpeed(),
                     swerve.ampAlignmentCommand(() -> driver.getLeftX())));
 
         controller.rightStick()
