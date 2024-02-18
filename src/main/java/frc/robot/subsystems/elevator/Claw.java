@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class Claw extends SubsystemBase {
     private final Neo claw;
@@ -75,8 +76,9 @@ public class Claw extends SubsystemBase {
     public void configMotors() {
         // needs motor configs
         claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
-
+        claw.setInverted(false);
         claw.setBrakeMode();
+        claw.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
     }
 
     public void updateOutputCurrent() {

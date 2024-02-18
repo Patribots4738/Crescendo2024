@@ -38,6 +38,7 @@ import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class Swerve extends SubsystemBase implements Logged {
 
@@ -359,5 +360,4 @@ public class Swerve extends SubsystemBase implements Logged {
     public Command resetHDC() {
         return runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians()));
     }
-
 }
