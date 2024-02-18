@@ -11,6 +11,7 @@ import frc.robot.util.Neo.TelemetryPreference;
 
 public class Intake extends SubsystemBase {
     private final Neo intakeMotor;
+    private double desiredSpeed = 0;
 
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID);
@@ -24,12 +25,12 @@ public class Intake extends SubsystemBase {
     }
 
     public void setPercent(double desiredPercent) {
-        desiredPercent = 
+        desiredSpeed = 
             MathUtil.clamp(
                 desiredPercent, 
                 IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
                 IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
-        intakeMotor.setTargetPercent(desiredPercent);
+        intakeMotor.setTargetPercent(desiredSpeed);
     }
 
     public Command setPercentCommand(double desiredPercent) {
@@ -44,18 +45,8 @@ public class Intake extends SubsystemBase {
         return setPercentCommand(IntakeConstants.OUTTAKE_PERCENT);
     }
 
-    public Command toggleInCommand() {
-        return Commands.either(
-            inCommand(), 
-            stopCommand(), 
-            () -> intakeMotor.get() > 0);
-    }
-
-    public Command toggleOutCommand() {
-        return Commands.either(
-            outCommand(), 
-            stopCommand(), 
-            () -> intakeMotor.get() < 0);
+    public boolean isStopped() {
+        return desiredSpeed != 0;
     }
 
     public Command stopCommand() {

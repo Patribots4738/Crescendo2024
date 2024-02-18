@@ -136,10 +136,10 @@ public class RobotContainer implements Logged {
             .onTrue(elevator.toBottomCommand());
 
         controller.leftBumper()
-            .onTrue(intake.toggleInCommand());
+            .onTrue(pieceControl.toggleIn());
 
         controller.rightBumper()
-            .onTrue(intake.toggleOutCommand());
+            .onTrue(pieceControl.toggleOut());
 
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true));

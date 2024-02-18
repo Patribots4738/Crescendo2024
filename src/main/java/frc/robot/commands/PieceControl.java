@@ -1,6 +1,10 @@
 package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -36,8 +40,10 @@ public class PieceControl {
         this.shooterCalc = shooterCalc;
     }
 
-    public Trigger readyToShoot() {
-        return new Trigger(() -> shooterCalc.pivotAtDesiredAngle() && shooterCalc.shooterAtDesiredRPM());
+    public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        return Commands.waitUntil(shooterCalc.readyToShootSupplier())
+                .andThen(noteToShoot())
+                    .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier));
     }
 
     public Command stopAllMotors() {
@@ -62,6 +68,28 @@ public class PieceControl {
                 Commands.waitSeconds(2),
                 stopAllMotors());
 
+    }
+
+    public Command toggleIn() {
+        return Commands.either(
+            // onTrue,
+            noteToShoot(),
+            // onFalse,
+            stopIntakeAndIndexer(),
+            // condition
+            intake::isStopped
+        );
+    }
+
+    public Command toggleOut() {
+        return Commands.either(
+            // onTrue,
+            ejectNote(),
+            // onFalse,
+            stopIntakeAndIndexer(),
+            // condition
+            intake::isStopped
+        );
     }
 
     public Command ejectNote() {
