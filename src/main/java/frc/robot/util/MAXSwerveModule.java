@@ -10,12 +10,15 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
+
+import edu.wpi.first.cscore.CameraServerJNI.TelemetryKind;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 
 public class MAXSwerveModule {
     private final Neo drivingSpark;
@@ -211,8 +214,7 @@ public class MAXSwerveModule {
 
         // See
         // https://docs.revrobotics.com/Spark/operating-modes/control-interfaces#periodic-status-5-default-rate-200ms
-        drivingSpark.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        turningSpark.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        turningSpark.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+        drivingSpark.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+        turningSpark.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
     }
 }

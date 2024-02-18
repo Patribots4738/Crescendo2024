@@ -28,11 +28,9 @@ public class Elevator extends SubsystemBase {
 
     public void configMotors() {
         elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         elevator.setPID(TrapConstants.TRAP_PID);
-        elevator.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+        elevator.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
     }
 
     @Override

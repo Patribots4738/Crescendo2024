@@ -31,8 +31,8 @@ public class Shooter extends SubsystemBase {
                 ShooterConstants.SHOOTER_D,
                 ShooterConstants.SHOOTER_MIN_OUTPUT,
                 ShooterConstants.SHOOTER_MAX_OUTPUT);
-                motorLeft.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-                motorRight.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+                motorLeft.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+                motorRight.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
 
         motorRight.setPID(
                 ShooterConstants.SHOOTER_P,

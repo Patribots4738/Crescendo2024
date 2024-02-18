@@ -66,11 +66,9 @@ public class Claw extends SubsystemBase {
     public void configMotors() {
         // needs motor configs
         claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
-        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        claw.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         claw.setInverted(false);
         claw.setBrakeMode();
-        claw.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+        claw.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
     }
 
     public void updateOutputCurrent() {

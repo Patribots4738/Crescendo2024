@@ -357,12 +357,4 @@ public class Swerve extends SubsystemBase implements Logged {
     public Command resetHDC() {
         return runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians()));
     }
-
-    public void configMotors() {
-        rearRight.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-        rearLeft.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-        frontLeft.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-        frontRight.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-    }
-
 }

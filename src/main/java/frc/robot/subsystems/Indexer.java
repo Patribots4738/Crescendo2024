@@ -28,7 +28,7 @@ public class Indexer extends SubsystemBase {
         // sets brake mode
         triggerWheel.setBrakeMode();
 
-        triggerWheel.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+        triggerWheel.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
     }
 
     public double getDesiredPercent() {
