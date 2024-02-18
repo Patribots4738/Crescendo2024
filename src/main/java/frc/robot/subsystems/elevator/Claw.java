@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,19 +28,15 @@ public class Claw extends SubsystemBase {
     }
 
     public Command placeCommand() {
-        return runOnce(this::outtake)
-                .andThen(
-                        Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-                .andThen(
-                        runOnce(this::stopCommand));
+        return outtake()
+                .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
+                .andThen(stopCommand());
     }
 
     public Command intakeFromHandoff() {
-        return runOnce(this::intake)
-                .andThen(
-                        Commands.waitSeconds(TrapConstants.INTAKE_TIME))
-                .andThen(
-                        runOnce(this::stopCommand));
+        return intake()
+                .andThen(Commands.waitSeconds(TrapConstants.INTAKE_TIME))
+                .andThen(stopCommand());
     }
 
     public boolean hasGamePiece() {
@@ -96,6 +90,7 @@ public class Claw extends SubsystemBase {
     public Command stopCommand() {
         return runOnce(() -> claw.set(TrapConstants.CLAW_STOP_PERCENT));
     }
+    
     public void updateIntakingTimestamp() {
         startIntakingTimestamp = Robot.currentTimestamp;
     }

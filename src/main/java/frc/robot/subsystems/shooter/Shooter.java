@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -7,11 +8,28 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.PIDNotConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements Logged{
     /** Creates a new shooter. */
     private final Neo motorLeft;
     private final Neo motorRight;
+
+    public PIDNotConstants shooterPID;
+    @Log
+    private double targetLeftSpeed = 0;
+    @Log
+    private double targetRightSpeed = 0;
+
+    @Log
+    private double currentLeftSpeed = 0;
+    @Log
+    private double currentRightSpeed = 0;
+
+    @Log
+    private boolean atDesiredRPM = false;
 
     public Shooter() {
 
@@ -19,32 +37,46 @@ public class Shooter extends SubsystemBase {
         motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true);
 
         configMotors();
-
+        shooterPID = new PIDNotConstants(ShooterConstants.SHOOTER_PID, ShooterConstants.SHOOTER_FF, motorLeft.getPIDController());
     }
 
     public void configMotors() {
         motorLeft.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
         motorRight.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
         motorLeft.setPID(
-                ShooterConstants.SHOOTER_P,
-                ShooterConstants.SHOOTER_I,
-                ShooterConstants.SHOOTER_D,
+                ShooterConstants.SHOOTER_PID,
                 ShooterConstants.SHOOTER_MIN_OUTPUT,
                 ShooterConstants.SHOOTER_MAX_OUTPUT);
                 motorLeft.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
                 motorRight.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
 
+        motorLeft.setFF(ShooterConstants.SHOOTER_FF);
+
         motorRight.setPID(
-                ShooterConstants.SHOOTER_P,
-                ShooterConstants.SHOOTER_I,
-                ShooterConstants.SHOOTER_D,
+                ShooterConstants.SHOOTER_PID,
                 ShooterConstants.SHOOTER_MIN_OUTPUT,
                 ShooterConstants.SHOOTER_MAX_OUTPUT);
+
+        motorRight.setFF(ShooterConstants.SHOOTER_FF);
+
+        motorLeft.setCoastMode();
+        motorRight.setCoastMode();
     }
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
+        currentLeftSpeed = motorLeft.getVelocity();
+        currentRightSpeed = motorRight.getVelocity();
+
+        atDesiredRPM = MathUtil.applyDeadband(
+                    Math.abs(
+                            currentLeftSpeed
+                            - targetLeftSpeed),
+                    ShooterConstants.SHOOTER_RPM_DEADBAND) == 0
+                && 
+                MathUtil.applyDeadband(
+                    Math.abs(currentRightSpeed - targetRightSpeed),
+                    ShooterConstants.SHOOTER_RPM_DEADBAND) == 0;
     }
 
     /**
@@ -56,11 +88,15 @@ public class Shooter extends SubsystemBase {
     public void setSpeed(double speed) {
         motorLeft.setTargetVelocity(speed);
         motorRight.setTargetVelocity(speed);
+        targetLeftSpeed = speed;
+        targetRightSpeed = speed;
     }
 
     public void setSpeed(Pair<Double, Double> speeds) {
         motorLeft.setTargetVelocity(speeds.getFirst());
         motorRight.setTargetVelocity(speeds.getSecond());
+        targetLeftSpeed = speeds.getFirst();
+        targetRightSpeed = speeds.getSecond();
     }
 
     /**
@@ -89,6 +125,15 @@ public class Shooter extends SubsystemBase {
      * @return The method is returning a Command object.
      */
     public Command stop() {
-        return Commands.runOnce(() -> motorLeft.stopMotor());
+        return runOnce(() -> motorLeft.set(0))
+            .andThen(runOnce(() -> motorRight.set(0)));
+    }
+
+    public PIDNotConstants getPIDNotConstants() {
+        return this.shooterPID;
+    }
+
+    public boolean getAtDesiredRPM() {
+        return atDesiredRPM;
     }
 }

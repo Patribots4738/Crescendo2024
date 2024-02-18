@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.Neo.TelemetryPreference;
@@ -21,7 +22,7 @@ import monologue.Annotations.Log;
 
 public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
-
+    private final PIDNotConstants elevatorPID;
     @Log
     public double pos = 0, desiredPos = 0;
 
@@ -32,6 +33,7 @@ public class Elevator extends SubsystemBase implements Logged {
     public Elevator() {
         elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID);
         configMotors();
+        elevatorPID = new PIDNotConstants(elevator.getPID(), elevator.getPIDController());
     }
 
     public void configMotors() {
@@ -46,29 +48,23 @@ public class Elevator extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        pos = elevator.getPosition();
-        desiredPos = elevator.getTargetPosition();
+        // pos = elevator.getPosition();
+        // desiredPos = elevator.getTargetPosition();
 
-        atDesiredPos = atDesiredPosition().getAsBoolean();
-        RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
-            0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
-            new Rotation3d()
-        );
-        RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
-            0, 0, elevator.getPosition(),
-            new Rotation3d()
-        );
+        // atDesiredPos = atDesiredPosition();
+
+        // RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
+        //     0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
+        //     new Rotation3d()
+        // );
+        // RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+        //     0, 0, elevator.getPosition(),
+        //     new Rotation3d()
+        // );
     }
 
     public double getPosition() {
         return elevator.getPosition();
-    }
-
-    public BooleanSupplier isAtTargetPosition() {
-        return () -> MathUtil.applyDeadband(
-                Math.abs(
-                        this.getPosition() - elevator.getTargetPosition()),
-                TrapConstants.ELEVATOR_DEADBAND) == 0;
     }
 
     public void setPosition(double pos) {
@@ -89,7 +85,7 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public Command setPositionCommand(double pos) {
         return runOnce(() -> this.setPosition(pos))
-                .andThen(Commands.waitUntil(this.isAtTargetPosition()));
+                .andThen(Commands.waitUntil(this::atDesiredPosition));
     }
 
     private void toTop() {
@@ -112,11 +108,11 @@ public class Elevator extends SubsystemBase implements Logged {
         return runOnce(() -> elevator.stopMotor());
     }
 
-    public BooleanSupplier atDesiredPosition() {
-		return () -> (
-            MathUtil.applyDeadband(
-				Math.abs(
-						elevator.getPosition() - elevator.getTargetPosition()),
-				TrapConstants.ELEVATOR_DEADBAND) == 0);
+    public boolean atDesiredPosition() {
+		return MathUtil.applyDeadband(pos - desiredPos, TrapConstants.ELEVATOR_DEADBAND) == 0;
 	}
+
+    public PIDNotConstants getPIDNotConstants() {
+        return this.elevatorPID;
+    }
 }
