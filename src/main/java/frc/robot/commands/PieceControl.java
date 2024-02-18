@@ -77,7 +77,7 @@ public class PieceControl {
         return Commands.sequence(
                 intake.inCommand(),
                 claw.intake(),
-                indexer.stop(),
+                indexer.stopCommand(),
                 Commands.waitSeconds(.75),
                 stopAllMotors());
 
