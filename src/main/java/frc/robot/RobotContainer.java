@@ -221,30 +221,23 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.sourceShooterIntake(controller.start()));
 
         controller.a()
-            .toggleOnTrue(
+            .whileTrue(
                 Commands.sequence(
-                swerve.resetHDC(),
-                swerve.getDriveCommand(
-                    () -> {
-                        return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(new Rotation2d(FieldConstants.AMP_ALIGNMENT_RADIANS)));
-                    },
-                    () -> true)));
+                    swerve.resetHDC(),
+                    swerve.ampAlignmentCommand(() -> driver.getLeftX())));
 
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
-                swerve.resetHDC(),
-                swerve.getDriveCommand(
-                    () -> {
-                        return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
-                    },
-                    () -> true)));
+                    swerve.resetHDC(),
+                    swerve.getDriveCommand(
+                        () -> {
+                            return new ChassisSpeeds(
+                                controller.getLeftY(),
+                                controller.getLeftX(),
+                                swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                        },
+                        () -> true)));
 
         // Upon hitting start button
         // reset the orientation of the robot
@@ -398,7 +391,7 @@ public class RobotContainer implements Logged {
     
     public void onEnabled() {
         if (FieldConstants.GAME_MODE == GameMode.TELEOP)
-            new LPI(ledStrip, swerve::getPose, operator, swerve::setDesriredPose).schedule();
+            new LPI(ledStrip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
         this.freshCode = false;
     }
 

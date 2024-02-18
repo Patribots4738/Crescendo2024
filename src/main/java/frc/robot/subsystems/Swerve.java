@@ -5,7 +5,10 @@
 package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.ejml.sparse.csc.factory.FillReductionFactory_DSCC;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -27,12 +30,14 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
+import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -236,7 +241,7 @@ public class Swerve extends SubsystemBase implements Logged {
     
     @Log
     Pose2d desiredHDCPose = new Pose2d();
-    public void setDesriredPose(Pose2d pose) {
+    public void setDesiredPose(Pose2d pose) {
         desiredHDCPose = pose;
     }
 
@@ -376,14 +381,13 @@ public class Swerve extends SubsystemBase implements Logged {
         }
     }
 
-    public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds,
-            Supplier<ChassisSpeeds> controllerSpeeds) {
+    public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds, Supplier<ChassisSpeeds> controllerSpeeds) {
         return new Drive(this, () -> {
             ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
             ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
             return new ChassisSpeeds(
-                    controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond,
-                    controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond,
+                    (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond),
+                    -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond),
                     controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
         }, () -> false, () -> false);
     }
@@ -402,8 +406,44 @@ public class Swerve extends SubsystemBase implements Logged {
             desiredAngle.getRadians()),  0.02);
     }
 
+    public Command ampAlignmentCommand(DoubleSupplier driverX) {
+
+        return 
+            getAutoAlignmentCommand(
+                () -> {
+                    Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
+                    Pose2d desiredPose = new Pose2d(
+                        ampPose.getX(),
+                        getPose().getY(),
+                        ampPose.getRotation()
+                    );
+                    setDesiredPose(desiredPose);
+                    return
+                        AutoConstants.HDC.calculate(
+                            getPose(),
+                            desiredPose,
+                            0,
+                            desiredPose.getRotation()
+                        );
+                }, 
+                () -> {
+                    return 
+                        ChassisSpeeds.fromFieldRelativeSpeeds(
+                            0,
+                            driverX.getAsDouble(),
+                            0,
+                            getPose().getRotation()
+                        );
+                }
+            );
+    }
+
     public Command resetHDC() {
-        return runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians()));
+        return Commands.sequence(
+            runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),
+            runOnce(() -> AutoConstants.HDC.getXController().reset()),
+            runOnce(() -> AutoConstants.HDC.getYController().reset())
+        );
     }
 
 }
