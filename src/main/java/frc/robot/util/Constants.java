@@ -341,10 +341,18 @@ public final class Constants {
         public static final String SKIPPING_DOWN_PATH_NAME = "C1-5"  + PATH_EXTENSION;
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
+        public static final String[] AUTO_NAMES = new String[] {
+            "A W1A C1-5 S",
+            "S C1-3 S",
+            "S C1-5 S",
+            "S W1A C1-5",
+            "S W3-1 S",
+        };
+
         public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>() {
             {
-                for (int i = 0; i < AutoBuilder.getAllAutoNames().size(); i++) {
-                    Pose2d startingPosition = PathPlannerAuto.getStaringPoseFromAutoFile(AutoBuilder.getAllAutoNames().get(i));
+                for (int i = 0; i < AUTO_NAMES.length; i++) {
+                    Pose2d startingPosition = PathPlannerAuto.getStaringPoseFromAutoFile(AUTO_NAMES[i]);
                     add(startingPosition);
                 }
             }
