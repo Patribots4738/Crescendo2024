@@ -12,17 +12,25 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.Neo.TelemetryPreference;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Elevator extends SubsystemBase {
+public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
 
+    @Log
+    public double pos = 0, desiredPos = 0;
+
+    @Log
+    public boolean atDesiredPos = false;
 
     /** Creates a new Elevator. */
     public Elevator() {
-        elevator = new Neo(TrapConstants.LEFT_ELEVATOR_CAN_ID);
+        elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID);
         configMotors();
     }
 
@@ -31,10 +39,17 @@ public class Elevator extends SubsystemBase {
         elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         elevator.setPID(TrapConstants.TRAP_PID);
         elevator.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+
+        // Change to brake when done testing
+        elevator.setCoastMode();
     }
 
     @Override
     public void periodic() {
+        pos = elevator.getPosition();
+        desiredPos = elevator.getTargetPosition();
+
+        atDesiredPos = atDesiredPosition().getAsBoolean();
         RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
             0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
             new Rotation3d()
@@ -57,6 +72,10 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setPosition(double pos) {
+        pos = MathUtil.clamp(
+            pos,
+            TrapConstants.ELEVATOR_BOTTOM_LIMIT,
+            TrapConstants.ELEVATOR_TOP_LIMIT);
         elevator.setTargetPosition(pos);
         RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
             0, 0, pos,
@@ -89,8 +108,15 @@ public class Elevator extends SubsystemBase {
         return runOnce(this::toTop);
     }
 
-    public Command stop() {
+    public Command stopCommand() {
         return runOnce(() -> elevator.stopMotor());
     }
 
+    public BooleanSupplier atDesiredPosition() {
+		return () -> (
+            MathUtil.applyDeadband(
+				Math.abs(
+						elevator.getPosition() - elevator.getTargetPosition()),
+				TrapConstants.ELEVATOR_DEADBAND) == 0);
+	}
 }

@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Neo;
@@ -21,8 +23,17 @@ public class Intake extends SubsystemBase {
         intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
+    public void setPercent(double desiredPercent) {
+        desiredPercent = 
+            MathUtil.clamp(
+                desiredPercent, 
+                IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
+                IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
+        intakeMotor.setTargetPercent(desiredPercent);
+    }
+
     public Command setPercentCommand(double desiredPercent) {
-        return runOnce(() -> intakeMotor.setTargetPercent(desiredPercent));
+        return runOnce(() -> setPercent(desiredPercent));
     }
 
     public Command inCommand() {
@@ -33,7 +44,21 @@ public class Intake extends SubsystemBase {
         return setPercentCommand(IntakeConstants.OUTTAKE_PERCENT);
     }
 
-    public Command stop() {
+    public Command toggleInCommand() {
+        return Commands.either(
+            inCommand(), 
+            stopCommand(), 
+            () -> intakeMotor.get() > 0);
+    }
+
+    public Command toggleOutCommand() {
+        return Commands.either(
+            outCommand(), 
+            stopCommand(), 
+            () -> intakeMotor.get() < 0);
+    }
+
+    public Command stopCommand() {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 

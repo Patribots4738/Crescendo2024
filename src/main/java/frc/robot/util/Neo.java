@@ -261,8 +261,8 @@ public class Neo extends CANSparkMax {
      */
     public void tick() {
         if (shouldCache) {
-            position = encoder.getPosition();
-            velo = encoder.getVelocity();
+            position = encoder.getPosition() * inversionMultiplier;
+            velo = encoder.getVelocity() * inversionMultiplier;
         }
 
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
@@ -291,6 +291,8 @@ public class Neo extends CANSparkMax {
         
         double pos = shouldCache ? position : encoder.getPosition();
 
+        pos *= inversionMultiplier;
+
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.VELOCITY) {
             pos /= encoder.getVelocityConversionFactor();
         }
@@ -303,7 +305,7 @@ public class Neo extends CANSparkMax {
      * @return The instantaneous velocity of the Neo in rotations per minute.
      */
     public double getVelocity() {
-        return shouldCache ? velo : encoder.getVelocity(); 
+        return shouldCache ? velo : encoder.getVelocity() * inversionMultiplier; 
     }
 
     /**
@@ -311,7 +313,7 @@ public class Neo extends CANSparkMax {
      * 
      * @param position the desired position to set
      */
-    public void setPosition(double position) {
+    public void resetEncoder(double position) {
         encoder.setPosition(position * inversionMultiplier);
     }
 
@@ -365,6 +367,14 @@ public class Neo extends CANSparkMax {
      */
     public void setPID(PIDConstants constants) {
         setPID(constants, 0);
+    }
+
+    public void setPID(PIDConstants constants, double minOutput, double maxOutput) {
+        setPID(constants.kP, constants.kI, constants.kD, minOutput, maxOutput, 0);
+    }
+
+    public void setPID(PIDConstants constants, double minOutput, double maxOutput, int slotID) {
+        setPID(constants.kP, constants.kI, constants.kD, minOutput, maxOutput, slotID);
     }
 
     /**
@@ -567,7 +577,7 @@ public class Neo extends CANSparkMax {
      * This will make it try to stop when not power.
      */
     public void setBrakeMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kCoast);
+        this.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
     /**
@@ -575,9 +585,10 @@ public class Neo extends CANSparkMax {
      * This will make it spin freely when not powered.
      */
     public void setCoastMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        this.setIdleMode(CANSparkBase.IdleMode.kCoast);
     }
 
+    
     public enum TelemetryPreference {
         DEFAULT,
         ONLY_ABSOLUTE_ENCODER,

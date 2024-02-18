@@ -21,6 +21,7 @@ public class PieceControl {
 
     private ShooterCalc shooterCalc;
 
+    private boolean shooterMode;
 
     public PieceControl(
             Intake intake,
@@ -41,11 +42,10 @@ public class PieceControl {
 
     public Command stopAllMotors() {
         return Commands.parallel(
-                intake.stop(),
-                indexer.stop(),
-                shooterCalc.stopMotors(),
-                elevator.stop(),
-                claw.stop());
+                intake.stopCommand(),
+                indexer.stopCommand(),
+                elevator.stopCommand(),
+                claw.stopCommand());
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
@@ -55,26 +55,46 @@ public class PieceControl {
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from claw into indexer and then into 
         // shooter before stopping claw and indexer
-        return indexer.toShooter()
-                .andThen(Commands.waitUntil(readyToShoot()))
-                .andThen(claw.intake())
-                .andThen(Commands.waitSeconds(ShooterConstants.SHOOTER_PASS_SECONDS)) // TODO: Change this to a wait until the note is in the shooter?
-                .andThen(claw.stop())
-                .andThen(indexer.stop());
+        return Commands.sequence(
+                intake.inCommand(),
+                claw.intake(),
+                indexer.toShooter(),
+                Commands.waitSeconds(2),
+                stopAllMotors());
 
     }
 
-    public Command noteToTarget(BooleanSupplier toAmp) {
+    public Command ejectNote() {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from claw into indexer and then into 
+        // shooter before stopping claw and indexer
+        return Commands.sequence(
+                intake.outCommand(),
+                claw.outtake(),
+                indexer.toElevator(),
+                Commands.waitSeconds(2),
+                stopAllMotors());
+
+    }
+
+    public Command noteToTarget() {
         // maybe make setPosition a command ORR Make the Elevator Command
         return Commands.either(
-                        elevator.setPositionCommand(TrapConstants.AMP_PLACE_POS),
-                        elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
-                        toAmp)
-                .andThen(
-                        Commands.waitUntil(elevator.isAtTargetPosition()))
-                .andThen(claw.placeCommand())
-                .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-                .andThen(elevator.toBottomCommand());
+            elevatorPlacementCommand(),
+            noteToShoot(),
+            this::getShooterMode
+        );
+    }
+
+    public Command elevatorPlacementCommand() {
+        return Commands.sequence(
+            elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
+            Commands.waitUntil(elevator.isAtTargetPosition()),
+            claw.placeCommand(),
+            Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
+            elevator.toBottomCommand()
+        );
     }
 
     public Command intakeToClaw() {
@@ -83,8 +103,19 @@ public class PieceControl {
     }
 
     public Command stopIntakeAndIndexer() {
-        return intake.stop()
-                .alongWith(indexer.stop());
+        return intake.stopCommand()
+                .alongWith(indexer.stopCommand());
+    }
+
+    public boolean getShooterMode() {
+        return shooterMode;
+    }
+
+    public void setShooterMode(boolean shooterMode) {
+        this.shooterMode = shooterMode;
+    }
+    public Command setShooterModeCommand(boolean shooterMode) {
+        return Commands.runOnce(() -> setShooterMode(shooterMode));
     }
 
 }

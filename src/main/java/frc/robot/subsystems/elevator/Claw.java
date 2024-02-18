@@ -2,10 +2,11 @@ package frc.robot.subsystems.elevator;
 
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.DriverUI;
+import frc.robot.Robot;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.Neo.TelemetryPreference;
@@ -33,7 +34,7 @@ public class Claw extends SubsystemBase {
                 .andThen(
                         Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
                 .andThen(
-                        runOnce(this::stop));
+                        runOnce(this::stopCommand));
     }
 
     public Command intakeFromHandoff() {
@@ -41,7 +42,7 @@ public class Claw extends SubsystemBase {
                 .andThen(
                         Commands.waitSeconds(TrapConstants.INTAKE_TIME))
                 .andThen(
-                        runOnce(this::stop));
+                        runOnce(this::stopCommand));
     }
 
     public boolean hasGamePiece() {
@@ -58,9 +59,18 @@ public class Claw extends SubsystemBase {
                             claw.getOutputCurrent() > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT)
                     &&
                     (claw.getTargetVelocity() > TrapConstants.CLAW_HAS_PIECE_MIN_TARGET_VELO) &&
-                    (DriverUI.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
+                    (Robot.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
         }
         return hasGamePiece;
+    }
+
+    public void setSpeed(double percent) {
+        percent = 
+            MathUtil.clamp(
+                percent, 
+                TrapConstants.CLAW_LOWER_PERCENT_LIMIT, 
+                TrapConstants.CLAW_UPPER_PERCENT_LIMIT);
+        claw.set(percent);
     }
 
     public void configMotors() {
@@ -80,16 +90,19 @@ public class Claw extends SubsystemBase {
     }
 
     public Command outtake() {
-        return Commands.runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_OUTTAKE));
+        return runOnce(() -> claw.set(TrapConstants.CLAW_OUTTAKE_PERCENT));
     }
 
-    public Command stop() {
-        return Commands.runOnce(() -> claw.setTargetVelocity(0));
+    public Command stopCommand() {
+        return runOnce(() -> claw.set(TrapConstants.CLAW_STOP_PERCENT));
+    }
+    public void updateIntakingTimestamp() {
+        startIntakingTimestamp = Robot.currentTimestamp;
     }
 
     public Command intake() {
-        startIntakingTimestamp = DriverUI.currentTimestamp;
-        return runOnce(() -> claw.setTargetVelocity(TrapConstants.CLAW_INTAKE));
+        return runOnce(() -> updateIntakingTimestamp())
+                .andThen(runOnce(() -> claw.set(TrapConstants.CLAW_INTAKE_PERCENT)));
     }
 
 }
