@@ -38,7 +38,6 @@ import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
-import frc.robot.util.Neo.TelemetryPreference;
 
 public class Swerve extends SubsystemBase implements Logged {
 
