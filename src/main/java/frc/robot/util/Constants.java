@@ -516,6 +516,7 @@ public final class Constants {
         public static final int CENTER_NOTE_COUNT = 5;
 
         public static final double ALIGNMENT_SPEED = 3;
+        public static final double AMP_ALIGNMENT_RADIANS = Math.PI / 2;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
 
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);

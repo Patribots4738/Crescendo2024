@@ -32,6 +32,7 @@ import frc.robot.util.HDCTuner;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
@@ -213,11 +214,24 @@ public class RobotContainer implements Logged {
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote());
 
-        controller.a()
+        controller.x()
             .toggleOnTrue(shooterCalc.prepareFireCommand(swerve::getPose));
         
         controller.back()
             .onTrue(pieceControl.sourceShooterIntake(controller.start()));
+
+        controller.a()
+            .toggleOnTrue(
+                Commands.sequence(
+                swerve.resetHDC(),
+                swerve.getDriveCommand(
+                    () -> {
+                        return new ChassisSpeeds(
+                            controller.getLeftY(),
+                            controller.getLeftX(),
+                            swerve.getAlignmentSpeeds(new Rotation2d(FieldConstants.AMP_ALIGNMENT_RADIANS)));
+                    },
+                    () -> true)));
 
         controller.rightStick()
             .toggleOnTrue(
