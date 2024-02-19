@@ -192,6 +192,7 @@ public final class Constants {
         }};
 
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
+        public static final double GRAVITY = 9.8;
 
     }
 
@@ -492,26 +493,28 @@ public final class Constants {
         public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
       
+        // This gets filled out as motors are created on the robot
         public static ArrayList<Neo> MOTOR_LIST = new ArrayList<>();
+
         public static final HashMap<Integer, String> CAN_ID_MAP = new HashMap<Integer, String>() {{
-            /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "Front Right Drive");
-            /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "Front Right Turn");
-            /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "Front Left Drive");
-            /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "Front Left Turn");
-            /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "Rear Left Drive");
-            /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "Rear Left Turn");
-            /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "Rear Right Drive");
-            /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "Rear Right Turn");
-            /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
-            /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "Trigger Wheel"); 
-            /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "Left Shooter"); 
-            /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "Right Shooter"); 
-            /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "Shooter Pivot"); 
-            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator"); 
-            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap"); 
-            /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "Left Climb"); 
-            /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "Right Climb"); 
-        }};
+                /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "Front Right Drive");
+                /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "Front Right Turn");
+                /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "Front Left Drive");
+                /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "Front Left Turn");
+                /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "Rear Left Drive");
+                /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "Rear Left Turn");
+                /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "Rear Right Drive");
+                /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "Rear Right Turn");
+                /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
+                /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "Trigger Wheel");
+                /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "Left Shooter");
+                /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "Right Shooter");
+                /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "Shooter Pivot");
+                /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
+                /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
+                /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "Left Climb");
+                /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "Right Climb");
+            }};
     }
 
     public static final class IntakeConstants {
@@ -722,8 +725,4 @@ public final class Constants {
             PIVOT_OFFSET_Z);
         
     }
-
-    public static final double GRAVITY = 9.8;
-    public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000;
-
 }

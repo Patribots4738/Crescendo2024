@@ -169,7 +169,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
         // Calculate limelights last update
         timeDifference = currentTime - lastUpdate;
-        isConnected = timeDifference < Constants.LIMELIGHT_MAX_UPDATE_TIME;
+        isConnected = timeDifference < CameraConstants.LIMELIGHT_MAX_UPDATE_TIME;
 
         return isConnected;
     }
