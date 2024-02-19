@@ -173,7 +173,7 @@ public class RobotContainer implements Logged {
             .onTrue(Commands.runOnce(() -> freshCode = true))
             .onFalse(Commands.runOnce(() -> freshCode = false));
         // configureOperatorBindings(operator);
-        // }
+        configureTestBindings();
     }
 
     private void configureTestBindings() {
