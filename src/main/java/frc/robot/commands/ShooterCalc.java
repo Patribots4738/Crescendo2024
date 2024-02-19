@@ -66,6 +66,15 @@ public class ShooterCalc implements Logged {
             }, pivot, shooter);
     }
 
+    public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {
+        return Commands.run(() -> {
+                desiredTriplet = calculateTriplet(robotPose.get());
+
+                pivot.setAngle(desiredTriplet.getAngle());
+                shooter.setSpeed(desiredTriplet.getSpeeds());
+            }, pivot, shooter);
+    }
+
     public void setTriplet(SpeedAngleTriplet triplet) {
         desiredTriplet = triplet;
         pivot.setAngle(triplet.getAngle());

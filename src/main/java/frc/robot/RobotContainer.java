@@ -357,7 +357,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return driver.y().getAsBoolean() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
+        return driver.getYButton() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
     }
 
     @Log.NT
@@ -380,6 +380,7 @@ public class RobotContainer implements Logged {
 
     public void onDisabled() {
         swerve.stopMotors();
+        pieceControl.stopAllMotors().ignoringDisable(true).schedule();;
     }
     
     public void onEnabled() {
@@ -394,9 +395,9 @@ public class RobotContainer implements Logged {
     
     public void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
-        NamedCommands.registerCommand("Intake", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
-        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(swerve::getPose));
+        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("PlaceAmp", pieceControl.noteToTarget());

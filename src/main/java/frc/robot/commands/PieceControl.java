@@ -61,7 +61,7 @@ public class PieceControl {
                 intake.inCommand(),
                 claw.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(1.5),
+                Commands.waitSeconds(.75),
                 stopAllMotors());
 
     }
@@ -91,6 +91,14 @@ public class PieceControl {
                 indexer.toElevator(),
                 Commands.waitSeconds(.75),
                 stopAllMotors());
+
+    }
+
+    public Command intakeAuto() {
+        return Commands.sequence(
+                intake.inCommand(),
+                claw.intake(),
+                indexer.stop());
 
     }
 
