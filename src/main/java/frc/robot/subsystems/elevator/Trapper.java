@@ -29,13 +29,13 @@ public class Trapper extends SubsystemBase {
     public Command placeCommand() {
         return outtake()
                 .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-                .andThen(stop());
+                .andThen(stopCommand());
     }
 
     public Command intakeFromHandoff() {
         return intake()
                 .andThen(Commands.waitSeconds(TrapConstants.INTAKE_TIME))
-                .andThen(stop());
+                .andThen(stopCommand());
     }
 
     public boolean hasGamePiece() {
@@ -85,7 +85,7 @@ public class Trapper extends SubsystemBase {
         return runOnce(() -> trapper.set(TrapConstants.TRAPPER_OUTTAKE_PERCENT));
     }
 
-    public Command stop() {
+    public Command stopCommand() {
         return runOnce(() -> trapper.set(TrapConstants.TRAPPER_STOP_PERCENT));
     }
     
