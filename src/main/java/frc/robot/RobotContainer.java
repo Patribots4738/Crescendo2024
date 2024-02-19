@@ -160,7 +160,7 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
         initializeArrays();
         
-        pathPlannerStorage = new PathPlannerStorage(driver.y());
+        pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
@@ -408,7 +408,7 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j).asProxy());
             }
         }
     }
