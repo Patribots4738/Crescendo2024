@@ -241,7 +241,7 @@ public class RobotContainer implements Logged {
         // TODO: AMP ALIGN
         
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget());
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.rightStick()
         // TODO: AIM AT CHAIN IF HOOKS UP
@@ -398,7 +398,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("PlaceAmp", pieceControl.noteToTarget());
+        NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
         NamedCommands.registerCommand("PrepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
         NamedCommands.registerCommand("PrepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
         NamedCommands.registerCommand("PrepareShooterR", shooterCalc.prepareFireCommand(() -> FieldConstants.R_POSE));

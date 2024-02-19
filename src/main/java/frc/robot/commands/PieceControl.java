@@ -119,28 +119,27 @@ public class PieceControl {
 
     }
 
-    public Command noteToTarget() {
+    public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // maybe make setPosition a command ORR Make the Elevator Command
         return Commands.either(
+            shootWhenReady(poseSupplier, speedSupplier),
             elevatorPlacementCommand(),
-            noteToShoot(),
             this::getShooterMode
         );
     }
 
     public Command elevatorPlacementCommand() {
         return Commands.sequence(
-            elevator.setPositionCommand(TrapConstants.TRAP_PLACE_POS),
-            Commands.waitUntil(elevator::atDesiredPosition),
+            elevator.toTopCommand(),
             claw.placeCommand(),
             Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
             elevator.toBottomCommand()
         );
     }
 
-    public Command sourceShooterIntake(BooleanSupplier v1Mode) {
+    public Command sourceShooterIntake() {
         return Commands.sequence(
-            Commands.runOnce(() -> shooterCalc.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, v1Mode.getAsBoolean() ? 60.0 : 45.0))),
+            Commands.runOnce(() -> shooterCalc.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, 45.0))),
             indexer.toElevator(),
             claw.outtake(),
             Commands.waitSeconds(3),
