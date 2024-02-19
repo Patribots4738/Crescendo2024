@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.ejml.sparse.csc.factory.FillReductionFactory_DSCC;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.fasterxml.jackson.databind.ser.std.CalendarSerializer;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
@@ -407,26 +408,27 @@ public class Swerve extends SubsystemBase implements Logged {
             desiredAngle.getRadians()),  0.02);
     }
 
-    public Command ampAlignmentCommand(DoubleSupplier driverX) {
+    public ChassisSpeeds getAmpAlignmentSpeeds() {
+        Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
+        Pose2d desiredPose = new Pose2d(
+            ampPose.getX(),
+            getPose().getY(),
+            ampPose.getRotation()
+        );
+        setDesiredPose(desiredPose);
+        return
+            AutoConstants.HDC.calculate(
+                getPose(),
+                desiredPose,
+                0,
+                desiredPose.getRotation()
+            );
+    }
 
+    public Command ampAlignmentCommand(DoubleSupplier driverX) {
         return 
             getAutoAlignmentCommand(
-                () -> {
-                    Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
-                    Pose2d desiredPose = new Pose2d(
-                        ampPose.getX(),
-                        getPose().getY(),
-                        ampPose.getRotation()
-                    );
-                    setDesiredPose(desiredPose);
-                    return
-                        AutoConstants.HDC.calculate(
-                            getPose(),
-                            desiredPose,
-                            0,
-                            desiredPose.getRotation()
-                        );
-                }, 
+                () -> getAmpAlignmentSpeeds(), 
                 () -> 
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         0,
@@ -435,6 +437,27 @@ public class Swerve extends SubsystemBase implements Logged {
                         getPose().getRotation()
                     )
             );
+    }
+
+    public ChassisSpeeds getChainRotationalSpeeds(double driverX, double driverY) {
+        Pose2d[] chainPoses = FieldConstants.GET_CHAIN_POSITIONS();
+        Pose2d closestChain = chainPoses[0];
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (Pose2d pose : chainPoses) {
+            if (getPose().relativeTo(pose).getTranslation().getNorm() < minDistance) {
+                minDistance = getPose().relativeTo(pose).getTranslation().getNorm();
+                closestChain = pose;
+            }
+        }
+        return new ChassisSpeeds(
+            driverY * (Robot.isRedAlliance() ? -1 : 1),
+            driverX * (Robot.isRedAlliance() ? -1 : 1),
+            getAlignmentSpeeds(closestChain.getRotation())
+        );
+    }
+
+    public Command chainRotationalAlign(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return getDriveCommand(() -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
     }
 
     public Command resetHDC() {

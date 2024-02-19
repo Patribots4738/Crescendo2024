@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -579,13 +580,13 @@ public final class Constants {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Stage
-                new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(60)),
-                new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(180)),
-                new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(-60)),
+                new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(-120)),
+                new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0)),
+                new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120)),
                 // Red Stage
-                new Pose2d(12.07, 3.237, Rotation2d.fromDegrees(120)),
-                new Pose2d(10.638, 4.204, Rotation2d.fromDegrees(0)),
-                new Pose2d(12.2, 5, Rotation2d.fromDegrees(-120))
+                new Pose2d(12.07, 3.237, Rotation2d.fromDegrees(-60)),
+                new Pose2d(10.638, 4.204, Rotation2d.fromDegrees(180)),
+                new Pose2d(12.2, 5, Rotation2d.fromDegrees(60))
         };
 
         public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
@@ -630,6 +631,11 @@ public final class Constants {
 
         public static Pose2d GET_AMP_POSITION() {
             return AMP_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+        }
+
+        public static Pose2d[] GET_CHAIN_POSITIONS() {
+            int startIndex = Robot.isRedAlliance() ? 3 : 0;
+            return Arrays.copyOfRange(CHAIN_POSITIONS, startIndex, startIndex + 3);
         }
 
         // TODO: make real constants

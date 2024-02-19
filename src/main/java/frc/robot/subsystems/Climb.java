@@ -15,6 +15,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
@@ -31,11 +32,12 @@ public class Climb extends SubsystemBase implements Logged {
     public double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
 
     @Log
-    public boolean atDesiredPos = false;
+    public boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, false);
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true);
+        // invert right motor in real life, not in sim
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, !FieldConstants.IS_SIMULATION);
 
         configureMotors();
         climbPID = new PIDNotConstants(leftMotor.getPID(), leftMotor.getPIDController());
@@ -67,6 +69,7 @@ public class Climb extends SubsystemBase implements Logged {
         posRight = rightMotor.getPosition();
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
+        hooksUp = hooksUpSupplier().getAsBoolean();
 
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, leftMotor.getPosition(),
@@ -148,4 +151,8 @@ public class Climb extends SubsystemBase implements Logged {
 						rightMotor.getPosition() - rightMotor.getTargetPosition()),
 				ClimbConstants.CLIMB_DEADBAND) == 0);
 	}
+
+    public BooleanSupplier hooksUpSupplier() {
+        return () -> (leftMotor.getPosition() >= 0.05 || rightMotor.getPosition() >= 0.05);
+    }
 }
