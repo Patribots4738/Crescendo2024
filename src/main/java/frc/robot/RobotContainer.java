@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,14 +14,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
-import frc.robot.commands.DriveHDC;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.leds.LPI;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.elevator.Claw;
+import frc.robot.subsystems.elevator.Trapper;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
@@ -57,7 +55,7 @@ public class RobotContainer implements Logged {
     private Indexer triggerWheel;
     private Pivot pivot;
     private Shooter shooter;
-    private Claw claw;
+    private Trapper trapper;
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
@@ -94,7 +92,7 @@ public class RobotContainer implements Logged {
 
         shooter = new Shooter();
         elevator = new Elevator();
-        claw = new Claw();
+        trapper = new Trapper();
         
         pivot = new Pivot();
 
@@ -115,7 +113,7 @@ public class RobotContainer implements Logged {
             intake,
             triggerWheel,
             elevator,
-            claw,
+            trapper,
             shooterCalc);
 
         calibrationControl = new CalibrationControl(shooterCalc);
@@ -159,7 +157,7 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
         initializeArrays();
         
-        pathPlannerStorage = new PathPlannerStorage(driver.y());
+        pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
@@ -171,8 +169,12 @@ public class RobotContainer implements Logged {
             configureSimulationBindings(driver);
         } else {
             configureDriverBindings(driver);
-            configureOperatorBindings(operator);
         }
+        operator.a()
+            .onTrue(Commands.runOnce(() -> freshCode = true))
+            .onFalse(Commands.runOnce(() -> freshCode = false));
+        // configureOperatorBindings(operator);
+        // }
     }
 
     private void configureTestBindings() {
@@ -356,7 +358,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return driver.y().getAsBoolean() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
+        return driver.getYButton() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
     }
 
     @Log.NT
@@ -379,6 +381,7 @@ public class RobotContainer implements Logged {
 
     public void onDisabled() {
         swerve.stopMotors();
+        pieceControl.stopAllMotors().ignoringDisable(true).schedule();;
     }
     
     public void onEnabled() {
@@ -393,9 +396,9 @@ public class RobotContainer implements Logged {
     
     public void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
-        NamedCommands.registerCommand("Intake", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
-        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(swerve::getPose));
+        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
@@ -407,7 +410,7 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j).asProxy());
             }
         }
     }

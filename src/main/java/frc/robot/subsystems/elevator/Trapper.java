@@ -7,17 +7,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.TrapConstants;
-import frc.robot.util.Neo.TelemetryPreference;
 
-public class Claw extends SubsystemBase {
-    private final Neo claw;
+public class Trapper extends SubsystemBase {
+    private final Neo trapper;
     private boolean hasGamePiece = false;
     private double current = 0;
     private double startIntakingTimestamp = 0;
 
-    /** Creates a new Claw. */
-    public Claw() {
-        claw = new Neo(TrapConstants.CLAW_CAN_ID);
+    /** Creates a new Trapper. */
+    public Trapper() {
+        trapper = new Neo(TrapConstants.TRAP_CAN_ID);
         configMotors();
     }
 
@@ -30,13 +29,13 @@ public class Claw extends SubsystemBase {
     public Command placeCommand() {
         return outtake()
                 .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-                .andThen(stopCommand());
+                .andThen(stop());
     }
 
     public Command intakeFromHandoff() {
         return intake()
                 .andThen(Commands.waitSeconds(TrapConstants.INTAKE_TIME))
-                .andThen(stopCommand());
+                .andThen(stop());
     }
 
     public boolean hasGamePiece() {
@@ -45,15 +44,15 @@ public class Claw extends SubsystemBase {
         // desired speed > constant
         // we've been intaking over .25 seconds (make constant);
         if (hasGamePiece) {
-            this.hasGamePiece = claw.getTargetVelocity() > 0;
+            this.hasGamePiece = trapper.getTargetVelocity() > 0;
         } else {
-            this.hasGamePiece = (TrapConstants.CLAW_HAS_PIECE_LOWER_LIMIT < claw.getAppliedOutput() &&
-                    claw.getAppliedOutput() < TrapConstants.CLAW_HAS_PIECE_UPPER_LIMIT) &&
-                    (current > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT &&
-                            claw.getOutputCurrent() > TrapConstants.CLAW_HAS_PIECE_MIN_CURRENT)
+            this.hasGamePiece = (TrapConstants.TRAPPER_HAS_PIECE_LOWER_LIMIT < trapper.getAppliedOutput() &&
+                    trapper.getAppliedOutput() < TrapConstants.TRAPPER_HAS_PIECE_UPPER_LIMIT) &&
+                    (current > TrapConstants.TRAPPER_HAS_PIECE_MIN_CURRENT &&
+                            trapper.getOutputCurrent() > TrapConstants.TRAPPER_HAS_PIECE_MIN_CURRENT)
                     &&
-                    (claw.getTargetVelocity() > TrapConstants.CLAW_HAS_PIECE_MIN_TARGET_VELO) &&
-                    (Robot.currentTimestamp - startIntakingTimestamp > TrapConstants.CLAW_HAS_PIECE_MIN_TIMESTAMP);
+                    (trapper.getTargetVelocity() > TrapConstants.TRAPPER_HAS_PIECE_MIN_TARGET_VELO) &&
+                    (Robot.currentTimestamp - startIntakingTimestamp > TrapConstants.TRAPPER_HAS_PIECE_MIN_TIMESTAMP);
         }
         return hasGamePiece;
     }
@@ -62,21 +61,20 @@ public class Claw extends SubsystemBase {
         percent = 
             MathUtil.clamp(
                 percent, 
-                TrapConstants.CLAW_LOWER_PERCENT_LIMIT, 
-                TrapConstants.CLAW_UPPER_PERCENT_LIMIT);
-        claw.set(percent);
+                TrapConstants.TRAPPER_LOWER_PERCENT_LIMIT, 
+                TrapConstants.TRAPPER_UPPER_PERCENT_LIMIT);
+        trapper.set(percent);
     }
 
     public void configMotors() {
         // needs motor configs
-        claw.setSmartCurrentLimit(TrapConstants.CLAW_CURRENT_LIMIT);
-        claw.setInverted(false);
-        claw.setBrakeMode();
-        claw.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+        trapper.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
+
+        trapper.setBrakeMode();
     }
 
     public void updateOutputCurrent() {
-        current = claw.getOutputCurrent();
+        current = trapper.getOutputCurrent();
     }
 
     public boolean getHasGamePiece() {
@@ -84,11 +82,11 @@ public class Claw extends SubsystemBase {
     }
 
     public Command outtake() {
-        return runOnce(() -> claw.set(TrapConstants.CLAW_OUTTAKE_PERCENT));
+        return runOnce(() -> trapper.set(TrapConstants.TRAPPER_OUTTAKE_PERCENT));
     }
 
-    public Command stopCommand() {
-        return runOnce(() -> claw.set(TrapConstants.CLAW_STOP_PERCENT));
+    public Command stop() {
+        return runOnce(() -> trapper.set(TrapConstants.TRAPPER_STOP_PERCENT));
     }
     
     public void updateIntakingTimestamp() {
@@ -97,7 +95,7 @@ public class Claw extends SubsystemBase {
 
     public Command intake() {
         return runOnce(() -> updateIntakingTimestamp())
-                .andThen(runOnce(() -> claw.set(TrapConstants.CLAW_INTAKE_PERCENT)));
+                .andThen(runOnce(() -> trapper.set(TrapConstants.TRAPPER_INTAKE_PERCENT)));
     }
 
 }
