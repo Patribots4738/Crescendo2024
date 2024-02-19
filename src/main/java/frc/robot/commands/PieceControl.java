@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.elevator.Claw;
+import frc.robot.subsystems.elevator.Trapper;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.SpeedAngleTriplet;
 
@@ -19,7 +19,7 @@ public class PieceControl {
     private Indexer indexer;
 
     private Elevator elevator;
-    private Claw claw;
+    private Trapper trapper;
 
     private ShooterCalc shooterCalc;
 
@@ -27,12 +27,12 @@ public class PieceControl {
             Intake intake,
             Indexer indexer,
             Elevator elevator,
-            Claw claw,
+            Trapper trapper,
             ShooterCalc shooterCalc) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
-        this.claw = claw;
+        this.trapper = trapper;
         this.shooterCalc = shooterCalc;
     }
 
@@ -41,7 +41,7 @@ public class PieceControl {
                 intake.stop(),
                 indexer.stop(),
                 elevator.stop(),
-                claw.stop());
+                trapper.stop());
     }
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
@@ -55,58 +55,79 @@ public class PieceControl {
     public Command noteToShoot() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from claw into indexer and then into 
-        // shooter before stopping claw and indexer
+        // rotation and speed before sending note from trapper into indexer and then into 
+        // shooter before stopping trapper and indexer
         return Commands.sequence(
                 intake.inCommand(),
-                claw.intake(),
+                trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(.75),
-                stopAllMotors());
+                Commands.waitUntil(intake.possessionTrigger()),
+                indexCommand());
 
     }
 
     public Command noteToTrap() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from claw into indexer and then into 
-        // shooter before stopping claw and indexer
+        // rotation and speed before sending note from trapper into indexer and then into 
+        // shooter before stopping trapper and indexer
         return Commands.sequence(
                 intake.inCommand(),
-                claw.intake(),
+                trapper.intake(),
                 indexer.stop(),
-                Commands.waitSeconds(.75),
-                stopAllMotors());
+                Commands.waitUntil(intake.possessionTrigger()),
+                indexCommand());
 
     }
 
     public Command ejectNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from claw into indexer and then into 
-        // shooter before stopping claw and indexer
+        // rotation and speed before sending note from trapper into indexer and then into 
+        // shooter before stopping trapper and indexer
         return Commands.sequence(
-                intake.outCommand(),
-                claw.outtake(),
-                indexer.toElevator(),
-                Commands.waitSeconds(.75),
-                stopAllMotors());
+            intake.stop(),
+            trapper.outtake(),
+            indexer.toElevator(),
+            Commands.waitSeconds(.75),
+            stopAllMotors());
 
+        // return Commands.sequence(
+        //     intake.stop(),
+        //     indexer.toElevator(),
+        //     dropPieceCommand(),
+        //     stopAllMotors()
+        // );
+
+    }
+
+    public Command dropPieceCommand() {
+        return Commands.sequence(
+            elevator.indexCommand(),
+            trapper.outtake(),
+            Commands.waitSeconds(0.1),
+            elevator.toBottomCommand()
+        );
+    }
+
+    public Command indexCommand() {
+        return elevator.indexCommand()
+            .andThen(elevator.toBottomCommand())
+            .alongWith(intake.stop());
     }
 
     public Command intakeAuto() {
         return Commands.sequence(
                 intake.inCommand(),
-                claw.intake(),
+                trapper.intake(),
                 indexer.stop());
-
     }
 
     public Command noteToTarget() {
         // maybe make setPosition a command ORR Make the Elevator Command
         return elevator.toTopCommand()
                 .andThen(Commands.waitUntil(elevator::atDesiredPosition))
-                .andThen(claw.placeCommand())
+                .andThen(trapper.placeCommand())
                 .andThen(elevator.toBottomCommand());
     }
 
@@ -114,13 +135,13 @@ public class PieceControl {
         return Commands.sequence(
             Commands.runOnce(() -> shooterCalc.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, v1Mode.getAsBoolean() ? 60.0 : 45.0))),
             indexer.toElevator(),
-            claw.outtake(),
+            trapper.outtake(),
             Commands.waitSeconds(3),
             stopAllMotors()
         ); 
     }
 
-    public Command intakeToClaw() { 
+    public Command intakeToTrapper() { 
         return intake.inCommand()
                 .alongWith(indexer.toElevator());
     }
@@ -128,7 +149,6 @@ public class PieceControl {
     public Command stopIntakeAndIndexer() {
         return intake.stop()
                 .alongWith(indexer.stop())
-                .alongWith(claw.stop());
+                .alongWith(trapper.stop());
     }
-
 }

@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,14 +15,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.Drive;
-import frc.robot.commands.DriveHDC;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
 import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.leds.LPI;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.elevator.Claw;
+import frc.robot.subsystems.elevator.Trapper;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
@@ -58,7 +56,7 @@ public class RobotContainer implements Logged {
     private Indexer triggerWheel;
     private Pivot pivot;
     private Shooter shooter;
-    private Claw claw;
+    private Trapper trapper;
     private Elevator elevator;
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
@@ -95,7 +93,7 @@ public class RobotContainer implements Logged {
 
         shooter = new Shooter();
         elevator = new Elevator();
-        claw = new Claw();
+        trapper = new Trapper();
         
         pivot = new Pivot();
 
@@ -116,7 +114,7 @@ public class RobotContainer implements Logged {
             intake,
             triggerWheel,
             elevator,
-            claw,
+            trapper,
             shooterCalc);
 
         calibrationControl = new CalibrationControl(shooterCalc);
@@ -187,7 +185,6 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .onTrue(pieceControl.noteToTrap());
-
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote());

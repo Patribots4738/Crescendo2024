@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import java.util.function.BooleanSupplier;
-
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
-import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
@@ -50,8 +47,8 @@ public class Elevator extends SubsystemBase implements Logged {
 
         // atDesiredPos = atDesiredPosition();
 
-        // RobotContainer.components3d[NTConstants.CLAW_INDEX] = new Pose3d(
-        //     0, 0, elevator.getPosition() * TrapConstants.CLAW_POSITION_MULTIPLIER, 
+        // RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
+        //     0, 0, elevator.getPosition() * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
         //     new Rotation3d()
         // );
         // RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
@@ -74,8 +71,8 @@ public class Elevator extends SubsystemBase implements Logged {
             0, 0, pos,
             new Rotation3d()
         );
-        RobotContainer.desiredComponents3d[NTConstants.CLAW_INDEX] = new Pose3d(
-            0, 0, pos*TrapConstants.CLAW_POSITION_MULTIPLIER,
+        RobotContainer.desiredComponents3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
+            0, 0, pos*TrapConstants.TRAPPER_POSITION_MULTIPLIER,
             new Rotation3d()
         );
     }
@@ -85,20 +82,16 @@ public class Elevator extends SubsystemBase implements Logged {
                 .andThen(Commands.waitUntil(this::atDesiredPosition));
     }
 
-    private void toTop() {
-        this.setPosition(TrapConstants.TRAP_PLACE_POS);
-    }
-
-    private void toBottom() {
-        this.setPosition(TrapConstants.RESET_POS);
-    }
-
     public Command toBottomCommand() {
-        return runOnce(this::toBottom);
+        return setPositionCommand(TrapConstants.RESET_POS);
     }
 
     public Command toTopCommand() {
-        return runOnce(this::toTop);
+        return setPositionCommand(TrapConstants.TRAP_PLACE_POS);
+    }
+
+    public Command indexCommand() {
+        return setPositionCommand(TrapConstants.INDEX_POS);
     }
 
     public Command stop() {

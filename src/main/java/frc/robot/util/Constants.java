@@ -196,12 +196,12 @@ public final class Constants {
 
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
-        public static final int CLAW_CAN_ID = 15;
+        public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = .05;
         public static final double OUTTAKE_SECONDS = 1;
-        public static final double CLAW_POSITION_MULTIPLIER = 1.83;
+        public static final double TRAPPER_POSITION_MULTIPLIER = 1.83;
 
-        public static final int CLAW_CURRENT_LIMIT = 15;
+        public static final int TRAP_CURRENT_LIMIT = 15;
 
         public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
         public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;
@@ -215,26 +215,26 @@ public final class Constants {
         // TODO: set these values
         public static final double RESET_POS = 0;
         public static final double INTAKE_TIME = 0;
-        public static final double CLAW_OUTTAKE_PERCENT = -1;
-        public static final double CLAW_INTAKE_PERCENT = 1;
-        public static final double CLAW_STOP_PERCENT = 0;
+        public static final double TRAPPER_OUTTAKE_PERCENT = -1;
+        public static final double TRAPPER_INTAKE_PERCENT = 1;
+        public static final double TRAPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.48;
-        public static final double AMP_PLACE_POS = 0.48;
+        public static final double INDEX_POS = 0.07;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.48;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
-        public static final double CLAW_LOWER_PERCENT_LIMIT = 1;
-        public static final double CLAW_UPPER_PERCENT_LIMIT = -1;
+        public static final double TRAPPER_LOWER_PERCENT_LIMIT = 1;
+        public static final double TRAPPER_UPPER_PERCENT_LIMIT = -1;
 
-        public static final double CLAW_HAS_PIECE_UPPER_LIMIT = 0;
-        public static final double CLAW_HAS_PIECE_LOWER_LIMIT = -0.25;
+        public static final double TRAPPER_HAS_PIECE_UPPER_LIMIT = 0;
+        public static final double TRAPPER_HAS_PIECE_LOWER_LIMIT = -0.25;
 
-        public static final double CLAW_HAS_PIECE_MIN_TIMESTAMP = 0.25;
+        public static final double TRAPPER_HAS_PIECE_MIN_TIMESTAMP = 0.25;
 
-        public static final double CLAW_HAS_PIECE_MIN_CURRENT = 15;
+        public static final double TRAPPER_HAS_PIECE_MIN_CURRENT = 15;
 
-        public static final double CLAW_HAS_PIECE_MIN_TARGET_VELO = 0.45;
+        public static final double TRAPPER_HAS_PIECE_MIN_TARGET_VELO = 0.45;
     }
 
     public static final class ClimbConstants {
@@ -687,7 +687,7 @@ public final class Constants {
     
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
-        public static final int CLAW_INDEX = 1;
+        public static final int TRAPPER_INDEX = 1;
         public static final int ELEVATOR_INDEX = 2;
         public static final int LEFT_CLIMB_INDEX = 4;
         public static final int RIGHT_CLIMB_INDEX = 3;
