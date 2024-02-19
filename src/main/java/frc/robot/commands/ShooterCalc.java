@@ -66,15 +66,6 @@ public class ShooterCalc implements Logged {
             }, pivot, shooter);
     }
 
-    public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {
-        return Commands.run(() -> {
-                desiredTriplet = calculateTriplet(robotPose.get());
-
-                pivot.setAngle(desiredTriplet.getAngle());
-                shooter.setSpeed(desiredTriplet.getSpeeds());
-            }, pivot, shooter);
-    }
-
     public void setTriplet(SpeedAngleTriplet triplet) {
         desiredTriplet = triplet;
         pivot.setAngle(triplet.getAngle());
@@ -274,7 +265,7 @@ public class ShooterCalc implements Logged {
      * @return              a pair of shooter speeds (left and right) required to reach the speaker position
      */
     private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, Rotation2d pivotAngle) {
-        double desiredRPM = velocityToRPM(Math.sqrt(2 * ShooterConstants.GRAVITY * FieldConstants.SPEAKER_HEIGHT) / (pivotAngle.getSin()));
+        double desiredRPM = velocityToRPM(Math.sqrt(2 * Constants.GRAVITY * FieldConstants.SPEAKER_HEIGHT) / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
 
@@ -325,7 +316,7 @@ public class ShooterCalc implements Logged {
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);
+        double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);
         double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
 
         double newv0 = Math.hypot(v0x, v0z);
@@ -350,9 +341,9 @@ public class ShooterCalc implements Logged {
         double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
         // D/V
         double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
-        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
+        double v0z = Math.sqrt(Constants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
         // final height of the note should be where it starts + the average vy * time
-        double vzFinal = v0z - (time * ShooterConstants.GRAVITY);
+        double vzFinal = v0z - (time * Constants.GRAVITY);
         double vzAverage = (v0z + vzFinal) / 2;
         double heightFinal = NTConstants.PIVOT_OFFSET_Z + (vzAverage * time);
         

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import frc.robot.util.Neo;
-import frc.robot.util.Neo.TelemetryPreference;
 
 public class Indexer extends SubsystemBase {
     private final Neo triggerWheel;
@@ -49,7 +48,7 @@ public class Indexer extends SubsystemBase {
         return setPercentCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_PERCENT);
     }
 
-    public Command stopCommand() {
+    public Command stop() {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 }

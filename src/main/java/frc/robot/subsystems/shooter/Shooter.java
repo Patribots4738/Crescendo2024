@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Neo.TelemetryPreference;
 import frc.robot.util.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -47,8 +46,6 @@ public class Shooter extends SubsystemBase implements Logged{
                 ShooterConstants.SHOOTER_PID,
                 ShooterConstants.SHOOTER_MIN_OUTPUT,
                 ShooterConstants.SHOOTER_MAX_OUTPUT);
-                motorLeft.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-                motorRight.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
 
         motorLeft.setFF(ShooterConstants.SHOOTER_FF);
 

@@ -38,7 +38,6 @@ public class Robot extends TimedRobot {
 
     public static double currentTimestamp = 0;
     public static double previousTimestamp = 0;
-    private boolean hasStartedURCL = false;
 
     @Override
     public void robotInit() {
@@ -49,6 +48,7 @@ public class Robot extends TimedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
+        // URCL.start();
 }
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
@@ -86,9 +86,6 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledExit() {
         robotContainer.onEnabled();
-        if (!hasStartedURCL) {
-            URCL.start(NeoMotorConstants.CAN_ID_MAP);
-        }
     }
 
     @Override
