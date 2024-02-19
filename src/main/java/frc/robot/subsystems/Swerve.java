@@ -40,6 +40,7 @@ import frc.robot.commands.DriveHDC;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -440,15 +441,7 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public ChassisSpeeds getChainRotationalSpeeds(double driverX, double driverY) {
-        Pose2d[] chainPoses = FieldConstants.GET_CHAIN_POSITIONS();
-        Pose2d closestChain = chainPoses[0];
-        double minDistance = Double.POSITIVE_INFINITY;
-        for (Pose2d pose : chainPoses) {
-            if (getPose().relativeTo(pose).getTranslation().getNorm() < minDistance) {
-                minDistance = getPose().relativeTo(pose).getTranslation().getNorm();
-                closestChain = pose;
-            }
-        }
+        Pose2d closestChain = PoseCalculations.getClosestChain(getPose());
         return new ChassisSpeeds(
             driverY * (Robot.isRedAlliance() ? -1 : 1),
             driverX * (Robot.isRedAlliance() ? -1 : 1),
@@ -456,7 +449,7 @@ public class Swerve extends SubsystemBase implements Logged {
         );
     }
 
-    public Command chainRotationalAlign(DoubleSupplier driverX, DoubleSupplier driverY) {
+    public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return getDriveCommand(() -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
     }
 

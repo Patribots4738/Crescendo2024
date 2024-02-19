@@ -254,7 +254,10 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDC(),
                     Commands.either(
-                        swerve.chainRotationalAlign(() -> controller.getLeftX(), () -> controller.getLeftY()),
+                        Commands.sequence(
+                            swerve.setAlignmentSpeed(),
+                            swerve.chainRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY())
+                        ),
                         Commands.parallel(
                             shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity),
                             swerve.getDriveCommand(
