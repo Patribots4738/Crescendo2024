@@ -615,7 +615,7 @@ public final class Constants {
 
         public static final double SPEAKER_HEIGHT = 2.08;
 
-        private static final Pose2d[] AMP_POSITIONS = new Pose2d[] {
+        public static final Pose2d[] AMP_POSITIONS = new Pose2d[] {
                 // All points are in meters and radians
                 // All relative to the blue origin
                 // Blue Amp

@@ -238,8 +238,12 @@ public class RobotContainer implements Logged {
         
         controller.povDown().onTrue(climb.toBottomCommand());
         
-        controller.a();
-        // TODO: AMP ALIGN
+        controller.a().whileTrue(
+            Commands.sequence(
+                swerve.resetHDC(),
+                swerve.setAlignmentSpeed(),
+                swerve.ampAlignmentCommand(() -> driver.getLeftX())));
+        
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -385,7 +389,7 @@ public class RobotContainer implements Logged {
     
     public void onEnabled() {
         if (FieldConstants.GAME_MODE == GameMode.TELEOP)
-            new LPI(ledStrip, swerve::getPose, operator, swerve::setDesriredPose).schedule();
+            new LPI(ledStrip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
         this.freshCode = false;
     }
 
