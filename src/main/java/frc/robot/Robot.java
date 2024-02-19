@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
 
     public static double currentTimestamp = 0;
     public static double previousTimestamp = 0;
+    private boolean hasStartedURCL = false;
 
     @Override
     public void robotInit() {
@@ -45,7 +46,9 @@ public class Robot extends TimedRobot {
         Monologue.setupMonologue(robotContainer, "Robot", false, false);
 
         DataLogManager.start();
-        URCL.start();
+        DataLogManager.logNetworkTables(true);
+        DriverStation.startDataLog(DataLogManager.getLog(), true);
+        DriverStation.silenceJoystickConnectionWarning(true);
 }
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
@@ -74,7 +77,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        // Now while this may not necesarily be a constant...
+        // Now while this may not necessarily be a constant...
         // it needs to be updated.
         DriverStation.refreshData();
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
@@ -83,11 +86,16 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledExit() {
         robotContainer.onEnabled();
+        if (!hasStartedURCL) {
+            URCL.start(NeoMotorConstants.CAN_ID_MAP);
+        }
     }
 
     @Override
     public void autonomousInit() {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        DriverStation.refreshData();
+        FieldConstants.ALLIANCE = DriverStation.getAlliance();
         FieldConstants.GAME_MODE = GameMode.AUTONOMOUS;
         autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -112,6 +120,8 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         FieldConstants.GAME_MODE = GameMode.TELEOP;
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
+        robotContainer.onEnabled();
+
     }
 
     @Override
@@ -127,6 +137,7 @@ public class Robot extends TimedRobot {
         // Cancels all running commands at the start of test mode.
         FieldConstants.GAME_MODE = GameMode.TEST;
         CommandScheduler.getInstance().cancelAll();
+        robotContainer.onTest();
     }
 
     @Override
@@ -135,6 +146,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testExit() {
+        // Switch back to the normal button loop!
+        CommandScheduler.getInstance().setActiveButtonLoop(CommandScheduler.getInstance().getDefaultButtonLoop());
     }
 
     @Override
@@ -146,7 +159,7 @@ public class Robot extends TimedRobot {
         REVPhysicsSim.getInstance().run();
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
 
-        for (Neo neo : NeoMotorConstants.motors) {
+        for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
             neo.tick();
         }
     }

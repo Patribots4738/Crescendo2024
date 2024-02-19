@@ -1,13 +1,17 @@
 package frc.robot.util;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
@@ -18,6 +22,94 @@ public class PatriBoxController extends CommandXboxController {
         super(port);
 
         this.deadband = deadband;
+    }
+
+    public boolean getAButton() {
+        return super.getHID().getAButton();
+    }
+
+    public boolean getBButton() {
+        return super.getHID().getBButton();
+    }
+
+    public boolean getXButton() {
+        return super.getHID().getXButton();
+    }
+
+    public boolean getYButton() {
+        return super.getHID().getYButton();
+    }
+
+    public double getLeftTriggerAxis() {
+        return super.getHID().getLeftTriggerAxis();
+    }
+
+    public double getRightTriggerAxis() {
+        return super.getHID().getRightTriggerAxis();
+    }
+
+    public boolean getStartButton() {
+        return super.getHID().getStartButton();
+    }
+
+    public boolean getBackButton() {
+        return super.getHID().getBackButton();
+    }
+
+    public boolean getPOVUp() {
+        return super.getHID().getPOV() == 0;
+    }
+
+    public boolean getPOVRight() {
+        return super.getHID().getPOV() == 90;
+    }
+
+    public boolean getPOVDown() {
+        return super.getHID().getPOV() == 180;
+    }
+
+    public boolean getPOVLeft() {
+        return super.getHID().getPOV() == 270;
+    }
+
+    public boolean getLeftBumper() {
+        return super.getHID().getLeftBumper();
+    }
+
+    public boolean getRightBumper() {
+        return super.getHID().getRightBumper();
+    }
+
+    public Trigger leftY() {
+        return leftY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger leftX() {
+        return leftX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger rightY() {
+        return rightY(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger rightX() {
+        return rightX(0.3, CommandScheduler.getInstance().getDefaultButtonLoop());
+    }
+
+    public Trigger leftY(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getLeftY()) > threshold);
+    }
+
+    public Trigger leftX(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getLeftX()) > threshold);
+    }
+
+    public Trigger rightY(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getRightY()) > threshold);
+    }
+
+    public Trigger rightX(double threshold, EventLoop loop) {
+        return new Trigger(loop, () -> Math.abs(getRightX()) > threshold);
     }
 
     @Override
@@ -32,12 +124,6 @@ public class PatriBoxController extends CommandXboxController {
         return -getLeftAxis().getY();
     }
 
-    public Translation2d getLeftAxis() {
-        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
-                MathUtil.applyDeadband(super.getLeftY(), deadband));
-        return driverLeftAxis;
-    }
-
     @Override
     public double getRightX() {
         return getRightAxis().getX();
@@ -45,7 +131,13 @@ public class PatriBoxController extends CommandXboxController {
 
     @Override
     public double getRightY() {
-        return getRightAxis().getY();
+        return -getRightAxis().getY();
+    }
+
+    public Translation2d getLeftAxis() {
+        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
+                MathUtil.applyDeadband(super.getLeftY(), deadband));
+        return driverLeftAxis;
     }
 
     public Translation2d getRightAxis() {

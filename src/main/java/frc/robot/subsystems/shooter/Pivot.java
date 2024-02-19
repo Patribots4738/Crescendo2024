@@ -14,14 +14,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Neo;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
+import frc.robot.util.PIDNotConstants;
 import monologue.Annotations.Log;
 
 public class Pivot extends SubsystemBase implements Logged {
 	private Neo pivot;
+    private PIDNotConstants pivotPID;
 	private AbsoluteEncoder pivotEncoder;
 	private SparkPIDController pivotPIDController;
 
@@ -36,6 +39,7 @@ public class Pivot extends SubsystemBase implements Logged {
 		this.pivotEncoder = pivot.getAbsoluteEncoder(Type.kDutyCycle);
 		this.pivotPIDController = pivot.getPIDController();
 		configMotor();
+        pivotPID = new PIDNotConstants(ShooterConstants.PIVOT_PID, pivot.getPIDController());
 	}
 
 	public void configMotor() {
@@ -46,29 +50,33 @@ public class Pivot extends SubsystemBase implements Logged {
 		pivotEncoder.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
 		pivot.setPID(
-				ShooterConstants.PIVOT_P,
-				ShooterConstants.PIVOT_I,
-				ShooterConstants.PIVOT_D,
-				ShooterConstants.PIVOT_MIN_OUTPUT,
-				ShooterConstants.PIVOT_MAX_OUTPUT);
-
-		// Change to brake when done testing
-		pivot.setCoastMode();
+            ShooterConstants.PIVOT_PID,
+            ShooterConstants.PIVOT_MIN_OUTPUT,
+            ShooterConstants.PIVOT_MAX_OUTPUT);
 	}
 
 	@Override
 	public void periodic() {
 
-		realAngle = getAngle();
-		desiredAngle = getTargetAngle();
+        if (FieldConstants.IS_SIMULATION) {
+            if (Math.abs(desiredAngle - realAngle) > 0.25) {
+                realAngle += (-desiredAngle - realAngle) / 10;
+            }
+        } else {
+            realAngle = -getAngle();
+        }
 
-		atDesiredAngle = atDesiredAngle().getAsBoolean();
+		atDesiredAngle = 
+            MathUtil.applyDeadband(
+                Math.abs(realAngle + desiredAngle),
+                ShooterConstants.PIVOT_DEADBAND) == 0;
 
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
-				NTConstants.PIVOT_OFFSET_METERS.getX(),
-				0,
-				NTConstants.PIVOT_OFFSET_METERS.getZ(),
-				new Rotation3d(0, -Units.degreesToRadians(getAngle()), 0));
+			NTConstants.PIVOT_OFFSET_METERS.getX(),
+			0,
+			NTConstants.PIVOT_OFFSET_METERS.getZ(),
+			new Rotation3d(0, Units.degreesToRadians(realAngle), 0)
+		);
 	}
 
 	/**
@@ -84,6 +92,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
 
         pivot.setTargetPosition(angle);
+        desiredAngle = angle;
 		
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 				NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -91,7 +100,9 @@ public class Pivot extends SubsystemBase implements Logged {
 				NTConstants.PIVOT_OFFSET_METERS.getZ(),
 				new Rotation3d(0, -Units.degreesToRadians(angle), 0));
 	}
-
+    public PIDNotConstants getPIDNotConstants() {
+        return this.pivotPID;
+    }
 	/**
 	 * The function takes an angle in degrees and returns a command that sets
 	 * the pivot to the angle converted to a position
@@ -118,7 +129,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @return The method is returning a Command object.
 	 */
 	public Command stop() {
-		return runOnce(() -> pivot.stopMotor());
+		return runOnce(() -> pivot.set(0));
 	}
 
 	/**
@@ -128,10 +139,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @return The method is returning a BooleanSupplier that returns true
 	 *         if the pivot is at its target rotation and false otherwise
 	 */
-	public BooleanSupplier atDesiredAngle() {
-		return () -> (MathUtil.applyDeadband(
-				Math.abs(
-						getAngle() - getTargetAngle()),
-				ShooterConstants.PIVOT_DEADBAND) == 0);
+	public boolean getAtDesiredAngle() {
+		return atDesiredAngle;
 	}
 }

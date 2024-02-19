@@ -2,7 +2,6 @@
 
 package frc.robot.util;
 
-import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
@@ -80,12 +79,12 @@ public class Neo extends CANSparkMax {
         // this requires the code to configure the sparks after construction
         restoreFactoryDefaults();
         // Add a delay to let the spark reset
-        Timer.delay(0.05);
-
         // If a parameter set fails, this will add more time 
         // to minimize any bus traffic.
         // Default is 20ms
         setCANTimeout(50);
+        Timer.delay(0.25);
+
 
         // Turn off alternate and analog encoders
         // we never use them
@@ -278,7 +277,7 @@ public class Neo extends CANSparkMax {
      * if in simulation.
      */
     public void register() {
-        NeoMotorConstants.motors.add(this);
+        NeoMotorConstants.MOTOR_LIST.add(this);
         if (FieldConstants.IS_SIMULATION)
             REVPhysicsSim.getInstance().addSparkMax(this, DCMotor.getNEO(1));  
     }
@@ -365,16 +364,16 @@ public class Neo extends CANSparkMax {
      * 
      * @param constants the PID constants to set
      */
-    public void setPID(PIDConstants constants) {
+    public void setPID(PatrIDConstants constants) {
         setPID(constants, 0);
     }
 
-    public void setPID(PIDConstants constants, double minOutput, double maxOutput) {
-        setPID(constants.kP, constants.kI, constants.kD, minOutput, maxOutput, 0);
+    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, 0);
     }
 
-    public void setPID(PIDConstants constants, double minOutput, double maxOutput, int slotID) {
-        setPID(constants.kP, constants.kI, constants.kD, minOutput, maxOutput, slotID);
+    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput, int slotID) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, slotID);
     }
 
     /**
@@ -383,8 +382,8 @@ public class Neo extends CANSparkMax {
      * @param constants the PID constants to set
      * @param slotID    the slot ID of the PID controller
      */
-    public void setPID(PIDConstants constants, int slotID) {
-        setPID(constants.kP, constants.kI, constants.kD, -1, 1, slotID);
+    public void setPID(PatrIDConstants constants, int slotID) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), -1, 1, slotID);
     }
 
     /**
@@ -416,6 +415,10 @@ public class Neo extends CANSparkMax {
         pidController.setD(D, slotID);
 
         pidController.setOutputRange(minOutput, maxOutput, slotID);
+    }
+
+    public void setFF(double ff) {
+        pidController.setFF(ff);
     }
 
     /**
@@ -460,6 +463,10 @@ public class Neo extends CANSparkMax {
      */
     public double getD() {
         return pidController.getD();
+    }
+
+    public PatrIDConstants getPID() {
+        return new PatrIDConstants(pidController.getP(), pidController.getI(), pidController.getD());
     }
 
     /**
