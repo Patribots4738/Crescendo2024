@@ -264,10 +264,10 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4.377;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.344;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
         /*
          * XY:
@@ -317,11 +317,11 @@ public final class Constants {
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
             new PIDConstants(
                 AutoConstants.XY_CORRECTION_P,
-                AutoConstants.XY_CORRECTION_I,
+                0,
                 AutoConstants.XY_CORRECTION_D),
             new PIDConstants(
                     AutoConstants.ROTATION_CORRECTION_P,
-                    AutoConstants.ROTATION_CORRECTION_I,
+                    0,
                     AutoConstants.ROTATION_CORRECTION_D),
             MAX_SPEED_METERS_PER_SECOND,
             Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0,
