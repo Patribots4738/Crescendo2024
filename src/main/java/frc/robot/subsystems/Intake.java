@@ -2,14 +2,23 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.PieceControl;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo.TelemetryPreference;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements Logged {
     private final Neo intakeMotor;
+
+    @Log
+    private double desiredSpeed = 0;
+    @Log
+    private boolean notePossession = true; 
 
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID);
@@ -23,12 +32,12 @@ public class Intake extends SubsystemBase {
     }
 
     public void setPercent(double desiredPercent) {
-        desiredPercent = 
+        desiredSpeed = 
             MathUtil.clamp(
                 desiredPercent, 
                 IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
                 IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
-        intakeMotor.setTargetPercent(desiredPercent);
+        intakeMotor.setTargetPercent(desiredSpeed);
     }
 
     public Command setPercentCommand(double desiredPercent) {
@@ -43,12 +52,24 @@ public class Intake extends SubsystemBase {
         return setPercentCommand(IntakeConstants.OUTTAKE_PERCENT);
     }
 
-    public Command stop() {
+    public boolean isStopped() {
+        return desiredSpeed != 0;
+    }
+
+    public Command stopCommand() {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 
-    public Trigger hasGamePieceTrigger() {
-        return new Trigger(() -> intakeMotor.getOutputCurrent() > IntakeConstants.HAS_PIECE_CURRENT_THRESHOLD);
+    public boolean getPossession() {
+        return this.notePossession;
+    }
+
+    public void setPossession(boolean possession) {
+        this.notePossession = possession;
+    }
+
+    public Trigger possessionTrigger() {
+        return new Trigger(this::getPossession);
     }
 
 }
