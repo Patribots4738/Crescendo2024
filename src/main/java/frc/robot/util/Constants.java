@@ -347,6 +347,7 @@ public final class Constants {
             "S C1-5 S",
             "S W1A C1-5",
             "S W3-1 S",
+            "S W3-1 S C1-3 S"
         };
 
         public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>() {

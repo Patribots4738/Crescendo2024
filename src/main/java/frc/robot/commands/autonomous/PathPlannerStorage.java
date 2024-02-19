@@ -89,7 +89,7 @@ public class PathPlannerStorage implements Logged {
 
             PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
 
-            if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown) {
+            if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
                 commandGroup.addCommands(
                     AutoBuilder.followPath(shootNote)
                 );
