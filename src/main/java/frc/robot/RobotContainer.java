@@ -167,8 +167,12 @@ public class RobotContainer implements Logged {
     
     private void configureButtonBindings() {
         configureDriverBindings(driver);
-        configureOperatorBindings(operator);
-        configureTestBindings();
+
+        operator.a()
+            .onTrue(Commands.runOnce(() -> freshCode = true))
+            .onFalse(Commands.runOnce(() -> freshCode = false));
+        // configureOperatorBindings(operator);
+        // configureTestBindings();
     }
 
     private void configureTestBindings() {
