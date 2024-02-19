@@ -167,9 +167,8 @@ public class RobotContainer implements Logged {
     private void configureButtonBindings() {
         if (FieldConstants.IS_SIMULATION) {
             configureSimulationBindings(driver);
-        } else {
-            configureDriverBindings(driver);
         }
+        configureDriverBindings(driver);
         operator.a()
             .onTrue(Commands.runOnce(() -> freshCode = true))
             .onFalse(Commands.runOnce(() -> freshCode = false));
