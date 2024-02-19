@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.lang.reflect.Field;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -429,9 +430,9 @@ public class Swerve extends SubsystemBase implements Logged {
                 () -> 
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         0,
-                        driverX.getAsDouble(),
+                        driverX.getAsDouble() * (Robot.isRedAlliance() ? 1 : -1),
                         0,
-                            getPose().getRotation()
+                        getPose().getRotation()
                     )
             );
     }
