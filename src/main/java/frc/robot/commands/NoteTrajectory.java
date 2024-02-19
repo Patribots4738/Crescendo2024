@@ -15,9 +15,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.util.Constants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 
 public class NoteTrajectory extends Command implements Logged {
@@ -67,7 +67,7 @@ public class NoteTrajectory extends Command implements Logged {
       
         ax = 0;
         ay = 0;
-        az = -Constants.GRAVITY;
+        az = -ShooterConstants.GRAVITY;
     }
 
     // Called every time the scheduler runs while the command is scheduled.

@@ -29,6 +29,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import frc.robot.commands.Drive;
 import monologue.Logged;
 
 /**
@@ -191,17 +192,18 @@ public final class Constants {
         }};
 
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
+        public static final double GRAVITY = 9.8;
 
     }
 
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
-        public static final int CLAW_CAN_ID = 15;
+        public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = .05;
         public static final double OUTTAKE_SECONDS = 1;
-        public static final double CLAW_POSITION_MULTIPLIER = 1.83;
+        public static final double TRAPPER_POSITION_MULTIPLIER = 1.83;
 
-        public static final int CLAW_CURRENT_LIMIT = 15;
+        public static final int TRAP_CURRENT_LIMIT = 15;
 
         public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
         public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;
@@ -215,26 +217,26 @@ public final class Constants {
         // TODO: set these values
         public static final double RESET_POS = 0;
         public static final double INTAKE_TIME = 0;
-        public static final double CLAW_OUTTAKE_PERCENT = -1;
-        public static final double CLAW_INTAKE_PERCENT = 1;
-        public static final double CLAW_STOP_PERCENT = 0;
+        public static final double TRAPPER_OUTTAKE_PERCENT = -1;
+        public static final double TRAPPER_INTAKE_PERCENT = 1;
+        public static final double TRAPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.48;
-        public static final double AMP_PLACE_POS = 0.48;
+        public static final double INDEX_POS = 0.07;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.48;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
-        public static final double CLAW_LOWER_PERCENT_LIMIT = 1;
-        public static final double CLAW_UPPER_PERCENT_LIMIT = -1;
+        public static final double TRAPPER_LOWER_PERCENT_LIMIT = 1;
+        public static final double TRAPPER_UPPER_PERCENT_LIMIT = -1;
 
-        public static final double CLAW_HAS_PIECE_UPPER_LIMIT = 0;
-        public static final double CLAW_HAS_PIECE_LOWER_LIMIT = -0.25;
+        public static final double TRAPPER_HAS_PIECE_UPPER_LIMIT = 0;
+        public static final double TRAPPER_HAS_PIECE_LOWER_LIMIT = -0.25;
 
-        public static final double CLAW_HAS_PIECE_MIN_TIMESTAMP = 0.25;
+        public static final double TRAPPER_HAS_PIECE_MIN_TIMESTAMP = 0.25;
 
-        public static final double CLAW_HAS_PIECE_MIN_CURRENT = 15;
+        public static final double TRAPPER_HAS_PIECE_MIN_CURRENT = 15;
 
-        public static final double CLAW_HAS_PIECE_MIN_TARGET_VELO = 0.45;
+        public static final double TRAPPER_HAS_PIECE_MIN_TARGET_VELO = 0.45;
     }
 
     public static final class ClimbConstants {
@@ -264,10 +266,10 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4.377;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.344;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 10.468;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 37.053;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
         /*
          * XY:
@@ -317,11 +319,11 @@ public final class Constants {
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
             new PIDConstants(
                 AutoConstants.XY_CORRECTION_P,
-                AutoConstants.XY_CORRECTION_I,
+                0,
                 AutoConstants.XY_CORRECTION_D),
             new PIDConstants(
                     AutoConstants.ROTATION_CORRECTION_P,
-                    AutoConstants.ROTATION_CORRECTION_I,
+                    0,
                     AutoConstants.ROTATION_CORRECTION_D),
             MAX_SPEED_METERS_PER_SECOND,
             Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0,
@@ -341,10 +343,19 @@ public final class Constants {
         public static final String SKIPPING_DOWN_PATH_NAME = "C1-5"  + PATH_EXTENSION;
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
+        public static final String[] AUTO_NAMES = new String[] {
+            "A W1A C1-5 S",
+            "S C1-3 S",
+            "S C1-5 S",
+            "S W1A C1-5",
+            "S W3-1 S",
+            "S W3-1 S C1-3 S"
+        };
+
         public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>() {
             {
-                for (int i = 0; i < AutoBuilder.getAllAutoNames().size(); i++) {
-                    Pose2d startingPosition = PathPlannerAuto.getStaringPoseFromAutoFile(AutoBuilder.getAllAutoNames().get(i));
+                for (int i = 0; i < AUTO_NAMES.length; i++) {
+                    Pose2d startingPosition = PathPlannerAuto.getStaringPoseFromAutoFile(AUTO_NAMES[i]);
                     add(startingPosition);
                 }
             }
@@ -482,7 +493,28 @@ public final class Constants {
         public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
       
+        // This gets filled out as motors are created on the robot
         public static ArrayList<Neo> MOTOR_LIST = new ArrayList<>();
+
+        public static final HashMap<Integer, String> CAN_ID_MAP = new HashMap<Integer, String>() {{
+                /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "Front Right Drive");
+                /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "Front Right Turn");
+                /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "Front Left Drive");
+                /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "Front Left Turn");
+                /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "Rear Left Drive");
+                /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "Rear Left Turn");
+                /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "Rear Right Drive");
+                /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "Rear Right Turn");
+                /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
+                /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "Trigger Wheel");
+                /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "Left Shooter");
+                /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "Right Shooter");
+                /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "Shooter Pivot");
+                /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
+                /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
+                /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "Left Climb");
+                /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "Right Climb");
+            }};
     }
 
     public static final class IntakeConstants {
@@ -678,7 +710,7 @@ public final class Constants {
     
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
-        public static final int CLAW_INDEX = 1;
+        public static final int TRAPPER_INDEX = 1;
         public static final int ELEVATOR_INDEX = 2;
         public static final int LEFT_CLIMB_INDEX = 4;
         public static final int RIGHT_CLIMB_INDEX = 3;
@@ -693,8 +725,4 @@ public final class Constants {
             PIVOT_OFFSET_Z);
         
     }
-
-    public static final double GRAVITY = 9.8;
-    public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000;
-
 }
