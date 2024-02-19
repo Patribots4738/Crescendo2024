@@ -13,6 +13,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -34,10 +35,12 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public void configMotors() {
         elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535);
-        elevator.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535);
         elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         elevator.setPID(TrapConstants.TRAP_PID);
+        elevator.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+
+        // Change to brake when done testing
+        elevator.setCoastMode();
     }
 
     @Override
@@ -94,7 +97,7 @@ public class Elevator extends SubsystemBase implements Logged {
         return setPositionCommand(TrapConstants.INDEX_POS);
     }
 
-    public Command stop() {
+    public Command stopCommand() {
         return runOnce(() -> elevator.stopMotor());
     }
 

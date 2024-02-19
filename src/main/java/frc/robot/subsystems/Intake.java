@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.PieceControl;
@@ -13,6 +14,7 @@ import monologue.Annotations.Log;
 
 public class Intake extends SubsystemBase implements Logged {
     private final Neo intakeMotor;
+
     @Log
     private double desiredSpeed = 0;
     @Log
@@ -50,7 +52,11 @@ public class Intake extends SubsystemBase implements Logged {
         return setPercentCommand(IntakeConstants.OUTTAKE_PERCENT);
     }
 
-    public Command stop() {
+    public boolean isStopped() {
+        return desiredSpeed != 0;
+    }
+
+    public Command stopCommand() {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 

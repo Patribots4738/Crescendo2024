@@ -12,6 +12,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Trapper;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.SpeedAngleTriplet;
+import frc.robot.util.Constants.TrapConstants;
 
 public class PieceControl {
 
@@ -22,6 +23,8 @@ public class PieceControl {
     private Trapper trapper;
 
     private ShooterCalc shooterCalc;
+
+    private boolean shooterMode;
 
     public PieceControl(
             Intake intake,
@@ -38,10 +41,10 @@ public class PieceControl {
 
     public Command stopAllMotors() {
         return Commands.parallel(
-                intake.stop(),
-                indexer.stop(),
-                elevator.stop(),
-                trapper.stop());
+                intake.stopCommand(),
+                indexer.stopCommand(),
+                elevator.stopCommand(),
+                trapper.stopCommand());
     }
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
@@ -74,10 +77,26 @@ public class PieceControl {
         return Commands.sequence(
                 intake.inCommand(),
                 trapper.intake(),
-                indexer.stop(),
+                indexer.stopCommand(),
                 Commands.waitUntil(intake.possessionTrigger()),
                 indexCommand());
 
+    }
+
+    public Command toggleIn() {
+        return Commands.either(
+            noteToShoot(),
+            stopIntakeAndIndexer(),
+            intake::isStopped
+        );
+    }
+
+    public Command toggleOut() {
+        return Commands.either(
+            ejectNote(),
+            stopIntakeAndIndexer(),
+            intake::isStopped
+        );
     }
 
     public Command ejectNote() {
@@ -86,7 +105,7 @@ public class PieceControl {
         // rotation and speed before sending note from trapper into indexer and then into 
         // shooter before stopping trapper and indexer
         return Commands.sequence(
-            intake.stop(),
+            intake.stopCommand(),
             trapper.outtake(),
             indexer.toElevator(),
             Commands.waitSeconds(.75),
@@ -113,27 +132,37 @@ public class PieceControl {
     public Command indexCommand() {
         return elevator.indexCommand()
             .andThen(elevator.toBottomCommand())
-            .alongWith(intake.stop());
+            .alongWith(intake.stopCommand());
     }
 
     public Command intakeAuto() {
         return Commands.sequence(
                 intake.inCommand(),
                 trapper.intake(),
-                indexer.stop());
+                indexer.stopCommand());
     }
 
-    public Command noteToTarget() {
+    public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // maybe make setPosition a command ORR Make the Elevator Command
-        return elevator.toTopCommand()
-                .andThen(Commands.waitUntil(elevator::atDesiredPosition))
-                .andThen(trapper.placeCommand())
-                .andThen(elevator.toBottomCommand());
+        return Commands.either(
+            shootWhenReady(poseSupplier, speedSupplier),
+            elevatorPlacementCommand(),
+            this::getShooterMode
+        );
     }
 
-    public Command sourceShooterIntake(BooleanSupplier v1Mode) {
+    public Command elevatorPlacementCommand() {
         return Commands.sequence(
-            Commands.runOnce(() -> shooterCalc.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, v1Mode.getAsBoolean() ? 60.0 : 45.0))),
+            elevator.toTopCommand(),
+            trapper.placeCommand(),
+            Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
+            elevator.toBottomCommand()
+        );
+    }
+
+    public Command sourceShooterIntake() {
+        return Commands.sequence(
+            Commands.runOnce(() -> shooterCalc.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, 45.0))),
             indexer.toElevator(),
             trapper.outtake(),
             Commands.waitSeconds(3),
@@ -147,8 +176,19 @@ public class PieceControl {
     }
 
     public Command stopIntakeAndIndexer() {
-        return intake.stop()
-                .alongWith(indexer.stop())
-                .alongWith(trapper.stop());
+        return intake.stopCommand()
+                .alongWith(indexer.stopCommand())
+                .alongWith(trapper.stopCommand());
+    }
+
+    public boolean getShooterMode() {
+        return shooterMode;
+    }
+
+    public void setShooterMode(boolean shooterMode) {
+        this.shooterMode = shooterMode;
+    }
+    public Command setShooterModeCommand(boolean shooterMode) {
+        return Commands.runOnce(() -> setShooterMode(shooterMode));
     }
 }

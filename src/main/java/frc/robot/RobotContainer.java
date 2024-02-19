@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.CANSparkBase;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -166,13 +165,16 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        configureDriverBindings(driver);
-
+        if (FieldConstants.IS_SIMULATION) {
+            configureSimulationBindings(driver);
+        } else {
+            configureDriverBindings(driver);
+        }
         operator.a()
             .onTrue(Commands.runOnce(() -> freshCode = true))
             .onFalse(Commands.runOnce(() -> freshCode = false));
         // configureOperatorBindings(operator);
-        // configureTestBindings();
+        // }
     }
 
     private void configureTestBindings() {
@@ -184,56 +186,29 @@ public class RobotContainer implements Logged {
     }
     
     private void configureOperatorBindings(PatriBoxController controller) {
-        controller.start().or(controller.back())
-            .onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(FieldConstants.FIELD_WIDTH_METERS - 1.332, 5.587, Rotation2d.fromDegrees(180)))));
+
+        controller.povUp()
+            .onTrue(elevator.toTopCommand());
+        
+        controller.povDown()
+            .onTrue(elevator.toBottomCommand());
 
         controller.leftBumper()
-            .onTrue(pieceControl.noteToTrap());
+            .onTrue(pieceControl.toggleIn());
 
         controller.rightBumper()
-            .onTrue(pieceControl.ejectNote());
+            .onTrue(pieceControl.toggleOut());
+
+        controller.x()
+            .onTrue(pieceControl.setShooterModeCommand(true));
 
         controller.b()
-            .onTrue(pieceControl.stopIntakeAndIndexer());
+            .onTrue(pieceControl.setShooterModeCommand(false));
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
-        controller.b()
-            .onTrue(shooterCalc.stopAllMotors()
-                .alongWith(pieceControl.stopAllMotors()));
         
-        controller.povUp()
-            .toggleOnTrue(climb.povUpCommand(swerve::getPose));
-
-        controller.povDown()
-            .onTrue(climb.toBottomCommand());
-
-        controller.leftBumper()
-            .onTrue(pieceControl.noteToShoot());
-
-        controller.rightBumper()
-            .onTrue(pieceControl.ejectNote());
-
-        controller.a()
-            .toggleOnTrue(shooterCalc.prepareFireCommand(swerve::getPose));
-        
-        controller.back()
-            .onTrue(pieceControl.sourceShooterIntake(controller.start()));
-
-        controller.rightStick()
-            .toggleOnTrue(
-                Commands.sequence(
-                swerve.resetHDC(),
-                swerve.getDriveCommand(
-                    () -> {
-                        return new ChassisSpeeds(
-                            controller.getLeftY(),
-                            controller.getLeftX(),
-                            swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
-                    },
-                    () -> true)));
-
-        // Upon hitting start button
+        // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing AWAY FROM the driver station
         controller.back().onTrue(
@@ -259,16 +234,41 @@ public class RobotContainer implements Logged {
                             : 0))), 
                 swerve));
 
-        controller.b()
-            .whileTrue(Commands.run(swerve::getSetWheelsX));
+        controller.povUp()
+            .toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        controller.leftStick()
-            .toggleOnTrue(swerve.toggleSpeed());
+        controller.povDown().onTrue(climb.toBottomCommand());
         
-        // controller.leftBumper()
-        //     .and(intake.hasGamePieceTrigger().negate())
-        //     .onTrue(intake.inCommand());$
+        controller.a();
+        // TODO: AMP ALIGN
         
+        controller.rightTrigger()
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
+
+        controller.rightStick()
+        // TODO: AIM AT CHAIN IF HOOKS UP
+            .toggleOnTrue(
+                Commands.parallel(
+                    Commands.sequence(
+                        swerve.resetHDC(),
+                        swerve.getDriveCommand(
+                            () -> {
+                                return new ChassisSpeeds(
+                                    -controller.getLeftY(),
+                                    -controller.getLeftX(),
+                                    swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                            },
+                            () -> true
+                        )
+                    ),
+                    shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                )
+            );
+    }
+    
+    private void configureSimulationBindings(PatriBoxController controller) {
+        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger()
             .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
@@ -401,7 +401,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("PlaceAmp", pieceControl.noteToTarget());
+        NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
         NamedCommands.registerCommand("PrepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
         NamedCommands.registerCommand("PrepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
         NamedCommands.registerCommand("PrepareShooterR", shooterCalc.prepareFireCommand(() -> FieldConstants.R_POSE));
