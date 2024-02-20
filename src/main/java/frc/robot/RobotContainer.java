@@ -242,7 +242,10 @@ public class RobotContainer implements Logged {
             Commands.sequence(
                 swerve.resetHDC(),
                 swerve.setAlignmentSpeed(),
-                swerve.ampAlignmentCommand(() -> driver.getLeftX())));
+                Commands.either(
+                    swerve.trapAlignmentCommand(() -> driver.getLeftX(), () -> driver.getLeftY()), 
+                    swerve.ampAlignmentCommand(() -> driver.getLeftX()), 
+                    climb.hooksUpSupplier())));
         
         
         controller.rightTrigger()

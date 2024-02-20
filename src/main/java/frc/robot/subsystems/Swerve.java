@@ -453,6 +453,41 @@ public class Swerve extends SubsystemBase implements Logged {
         return getDriveCommand(() -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
     }
 
+    public ChassisSpeeds getTrapAlignmentSpeeds(double driverX, double driverY) {
+        Pose2d closestTrap = PoseCalculations.getClosestChain(getPose());
+        Pose2d stage = FieldConstants.GET_STAGE_POSITION();
+        double distance = getPose().relativeTo(stage).getTranslation().getNorm();
+        double x = stage.getX() + distance * closestTrap.getRotation().getCos();
+        double y = stage.getY() + distance * closestTrap.getRotation().getSin();
+        Pose2d desiredPose = new Pose2d(
+            x,
+            y,
+            closestTrap.getRotation()
+        );
+        setDesiredPose(desiredPose);
+        return
+            AutoConstants.HDC.calculate(
+                getPose(),
+                desiredPose,
+                0,
+                desiredPose.getRotation()
+            );
+    }
+
+    public Command trapAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return 
+            getAutoAlignmentCommand(
+                () -> getTrapAlignmentSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), 
+                () -> 
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                        driverY.getAsDouble() * getPose().getRotation().getCos() * -1,
+                        driverY.getAsDouble() * getPose().getRotation().getSin() * -1,
+                        0,
+                        getPose().getRotation()
+                    )
+            );
+    }
+
     public Command resetHDC() {
         return Commands.sequence(
             runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),

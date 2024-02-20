@@ -589,6 +589,11 @@ public final class Constants {
                 new Pose2d(12.2, 5, Rotation2d.fromDegrees(60))
         };
 
+        public static final Pose2d[] STAGE_POSITIONS = new Pose2d[] {
+            new Pose2d(4.897, 4.064, new Rotation2d()),
+            new Pose2d(11.655, 4.064, new Rotation2d())
+        };
+
         public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
             new Pose3d(CHAIN_POSITIONS[0]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
             new Pose3d(CHAIN_POSITIONS[1]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
@@ -631,6 +636,10 @@ public final class Constants {
 
         public static Pose2d GET_AMP_POSITION() {
             return AMP_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+        }
+
+        public static Pose2d GET_STAGE_POSITION() {
+            return STAGE_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
         }
 
         public static Pose2d[] GET_CHAIN_POSITIONS() {
