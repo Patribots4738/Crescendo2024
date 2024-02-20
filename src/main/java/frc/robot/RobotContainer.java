@@ -242,7 +242,10 @@ public class RobotContainer implements Logged {
             Commands.sequence(
                 swerve.resetHDC(),
                 swerve.setAlignmentSpeed(),
-                swerve.ampAlignmentCommand(() -> driver.getLeftX())));
+                Commands.either(
+                    swerve.trapAlignmentCommand(() -> driver.getLeftX(), () -> driver.getLeftY()), 
+                    swerve.ampAlignmentCommand(() -> driver.getLeftX()), 
+                    climb.hooksUpSupplier())));
         
         
         controller.rightTrigger()
@@ -251,20 +254,27 @@ public class RobotContainer implements Logged {
         controller.rightStick()
         // TODO: AIM AT CHAIN IF HOOKS UP
             .toggleOnTrue(
-                Commands.parallel(
-                    Commands.sequence(
-                        swerve.resetHDC(),
-                        swerve.getDriveCommand(
-                            () -> {
-                                return new ChassisSpeeds(
-                                    -controller.getLeftY(),
-                                    -controller.getLeftX(),
-                                    swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
-                            },
-                            () -> true
-                        )
-                    ),
-                    shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                Commands.sequence(
+                    swerve.resetHDC(),
+                    Commands.either(
+                        Commands.sequence(
+                            swerve.setAlignmentSpeed(),
+                            swerve.chainRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY())
+                        ),
+                        Commands.parallel(
+                            shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity),
+                            swerve.getDriveCommand(
+                                () -> {
+                                    return new ChassisSpeeds(
+                                        controller.getLeftY() * (Robot.isRedAlliance() ? -1 : 1),
+                                        controller.getLeftX() * (Robot.isRedAlliance() ? -1 : 1),
+                                        swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+                                },
+                                () -> true
+                            )
+                        ),
+                        climb.hooksUpSupplier()
+                    )
                 )
             );
     }

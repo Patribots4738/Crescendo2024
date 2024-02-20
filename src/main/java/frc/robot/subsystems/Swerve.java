@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.ejml.sparse.csc.factory.FillReductionFactory_DSCC;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.fasterxml.jackson.databind.ser.std.CalendarSerializer;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
@@ -39,6 +40,7 @@ import frc.robot.commands.DriveHDC;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PatriBoxController;
+import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -407,30 +409,79 @@ public class Swerve extends SubsystemBase implements Logged {
             desiredAngle.getRadians()),  0.02);
     }
 
-    public Command ampAlignmentCommand(DoubleSupplier driverX) {
+    public ChassisSpeeds getAmpAlignmentSpeeds() {
+        Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
+        Pose2d desiredPose = new Pose2d(
+            ampPose.getX(),
+            getPose().getY(),
+            ampPose.getRotation()
+        );
+        setDesiredPose(desiredPose);
+        return
+            AutoConstants.HDC.calculate(
+                getPose(),
+                desiredPose,
+                0,
+                desiredPose.getRotation()
+            );
+    }
 
+    public Command ampAlignmentCommand(DoubleSupplier driverX) {
         return 
             getAutoAlignmentCommand(
-                () -> {
-                    Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
-                    Pose2d desiredPose = new Pose2d(
-                        ampPose.getX(),
-                        getPose().getY(),
-                        ampPose.getRotation()
-                    );
-                    setDesiredPose(desiredPose);
-                    return
-                        AutoConstants.HDC.calculate(
-                            getPose(),
-                            desiredPose,
-                            0,
-                            desiredPose.getRotation()
-                        );
-                }, 
+                () -> getAmpAlignmentSpeeds(), 
                 () -> 
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         0,
                         driverX.getAsDouble() * (Robot.isRedAlliance() ? 1 : -1),
+                        0,
+                        getPose().getRotation()
+                    )
+            );
+    }
+
+    public ChassisSpeeds getChainRotationalSpeeds(double driverX, double driverY) {
+        Pose2d closestChain = PoseCalculations.getClosestChain(getPose());
+        return new ChassisSpeeds(
+            driverY * (Robot.isRedAlliance() ? -1 : 1),
+            driverX * (Robot.isRedAlliance() ? -1 : 1),
+            getAlignmentSpeeds(closestChain.getRotation())
+        );
+    }
+
+    public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return getDriveCommand(() -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
+    }
+
+    public ChassisSpeeds getTrapAlignmentSpeeds(double driverX, double driverY) {
+        Pose2d closestTrap = PoseCalculations.getClosestChain(getPose());
+        Pose2d stage = FieldConstants.GET_STAGE_POSITION();
+        double distance = getPose().relativeTo(stage).getTranslation().getNorm();
+        double x = stage.getX() + distance * closestTrap.getRotation().getCos();
+        double y = stage.getY() + distance * closestTrap.getRotation().getSin();
+        Pose2d desiredPose = new Pose2d(
+            x,
+            y,
+            closestTrap.getRotation()
+        );
+        setDesiredPose(desiredPose);
+        return
+            AutoConstants.HDC.calculate(
+                getPose(),
+                desiredPose,
+                0,
+                desiredPose.getRotation()
+            );
+    }
+
+    public Command trapAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return 
+            getAutoAlignmentCommand(
+                () -> getTrapAlignmentSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), 
+                () -> 
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                        driverY.getAsDouble() * getPose().getRotation().getCos() * -1,
+                        driverY.getAsDouble() * getPose().getRotation().getSin() * -1,
                         0,
                         getPose().getRotation()
                     )
