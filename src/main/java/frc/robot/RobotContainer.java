@@ -172,7 +172,7 @@ public class RobotContainer implements Logged {
         operator.a()
             .onTrue(Commands.runOnce(() -> freshCode = true))
             .onFalse(Commands.runOnce(() -> freshCode = false));
-        // configureOperatorBindings(operator);
+        configureOperatorBindings(operator);
         configureTestBindings();
     }
 
@@ -213,7 +213,8 @@ public class RobotContainer implements Logged {
         controller.back().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
-                    swerve.getPose().getTranslation(),
+                    1.31,
+                    5.53, 
                     Rotation2d.fromDegrees(
                         Robot.isRedAlliance()
                             ? 0
@@ -223,6 +224,7 @@ public class RobotContainer implements Logged {
         // Upon hitting start button
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
+        // TODO: for testing reset odometry to speaker
         controller.start().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
@@ -263,10 +265,21 @@ public class RobotContainer implements Logged {
                             },
                             () -> true
                         )
-                    ),
-                    shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                    )
                 )
             );
+
+        controller.b()
+            .onTrue(pieceControl.stopAllMotors());
+
+        controller.x()
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+
+        controller.leftBumper()
+            .onTrue(pieceControl.toggleIn());
+
+        controller.rightBumper()
+            .onTrue(pieceControl.toggleOut());
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
@@ -307,7 +320,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
-        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().alongWith(shooterCalc.stopAllMotors()));
+        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors());
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
         controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
 
@@ -384,7 +397,7 @@ public class RobotContainer implements Logged {
 
     public void onDisabled() {
         swerve.stopMotors();
-        pieceControl.stopAllMotors().ignoringDisable(true).schedule();;
+        pieceControl.stopAllMotors().ignoringDisable(true).schedule();
     }
     
     public void onEnabled() {
@@ -401,6 +414,7 @@ public class RobotContainer implements Logged {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
+        NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -408,6 +422,8 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
         NamedCommands.registerCommand("PrepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
         NamedCommands.registerCommand("PrepareShooterR", shooterCalc.prepareFireCommand(() -> FieldConstants.R_POSE));
+        NamedCommands.registerCommand("PrepareShooterW3", shooterCalc.prepareFireCommand(() -> FieldConstants.W3_POSE));
+        NamedCommands.registerCommand("PrepareSWD", shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
             for (int j = 1; j <= FieldConstants.CENTER_NOTE_COUNT; j++) {
                 if (i == j) {
