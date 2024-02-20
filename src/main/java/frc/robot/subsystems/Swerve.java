@@ -4,12 +4,9 @@
 
 package frc.robot.subsystems;
 
-import java.lang.reflect.Field;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
-import org.ejml.sparse.csc.factory.FillReductionFactory_DSCC;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -183,7 +180,16 @@ public class Swerve extends SubsystemBase implements Logged {
         field2d.setRobotPose(currentPose);
         SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
-        robotPose2d = currentPose;
+        if (! (Double.isNaN(currentPose.getX())
+            || Double.isNaN(currentPose.getY())
+            || Double.isNaN(currentPose.getRotation().getDegrees())))
+        {
+            robotPose2d = currentPose;
+        } else {
+            // Something in our pose was NaN...
+            resetOdometry(robotPose2d);
+            resetHDC();
+        }
 
         robotPose3d = new Pose3d(
                 new Translation3d(
@@ -258,11 +264,12 @@ public class Swerve extends SubsystemBase implements Logged {
      * Sets the wheels into an X formation to prevent movement.
      */
     public void setWheelsX() {
-        SwerveModuleState[] desiredStates = new SwerveModuleState[4];
-        desiredStates[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
-        desiredStates[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-        desiredStates[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-        desiredStates[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+        SwerveModuleState[] desiredStates = new SwerveModuleState[] {
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+        };
 
         setModuleStates(desiredStates);
     }
