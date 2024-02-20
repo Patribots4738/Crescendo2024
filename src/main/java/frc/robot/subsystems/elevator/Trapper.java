@@ -82,11 +82,11 @@ public class Trapper extends SubsystemBase {
     }
 
     public Command outtake() {
-        return runOnce(() -> trapper.set(TrapConstants.TRAPPER_OUTTAKE_PERCENT));
+        return runOnce(() -> setSpeed(TrapConstants.TRAPPER_OUTTAKE_PERCENT));
     }
 
     public Command stopCommand() {
-        return runOnce(() -> trapper.set(TrapConstants.TRAPPER_STOP_PERCENT));
+        return runOnce(() -> setSpeed(TrapConstants.TRAPPER_STOP_PERCENT));
     }
     
     public void updateIntakingTimestamp() {
@@ -95,7 +95,7 @@ public class Trapper extends SubsystemBase {
 
     public Command intake() {
         return runOnce(() -> updateIntakingTimestamp())
-                .andThen(runOnce(() -> trapper.set(TrapConstants.TRAPPER_INTAKE_PERCENT)));
+                .andThen(runOnce(() -> setSpeed(TrapConstants.TRAPPER_INTAKE_PERCENT)));
     }
 
 }
