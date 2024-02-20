@@ -28,10 +28,10 @@ public class Climb extends SubsystemBase implements Logged {
     private final PIDNotConstants climbPID;
 
     @Log
-    public double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
+    private double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
 
     @Log
-    public boolean atDesiredPos = false;
+    private boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, false);
@@ -67,6 +67,7 @@ public class Climb extends SubsystemBase implements Logged {
         posRight = rightMotor.getPosition();
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
+        hooksUp = hooksUp();
 
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, leftMotor.getPosition(),
@@ -148,4 +149,8 @@ public class Climb extends SubsystemBase implements Logged {
 						rightMotor.getPosition() - rightMotor.getTargetPosition()),
 				ClimbConstants.CLIMB_DEADBAND) == 0);
 	}
+
+    public boolean hooksUp() {
+        return (leftMotor.getPosition() >= 0.05 || rightMotor.getPosition() >= 0.05);
+    }
 }

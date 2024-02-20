@@ -29,10 +29,10 @@ public class Pivot extends SubsystemBase implements Logged {
 	private SparkPIDController pivotPIDController;
 
 	@Log
-	public double realAngle = 0, desiredAngle = 0;
+	private double realAngle = 0, desiredAngle = 0;
 	
 	@Log
-	public boolean atDesiredAngle = false;
+	private boolean atDesiredAngle = false;
 
 	public Pivot() {
 		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
