@@ -153,6 +153,6 @@ public class Climb extends SubsystemBase implements Logged {
 	}
 
     public boolean hooksUp() {
-        return (leftMotor.getPosition() >= 0.05 || rightMotor.getPosition() >= 0.05);
+        return (leftMotor.getTargetPosition() > 0 || rightMotor.getTargetPosition() > 0);
     }
 }
