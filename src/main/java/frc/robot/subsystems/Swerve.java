@@ -198,6 +198,14 @@ public class Swerve extends SubsystemBase implements Logged {
 
     }
 
+    public Field2d getField2d() {
+        return field2d;
+    }
+
+    public void setField2d(Field2d field2d) {
+        this.field2d = field2d;
+    }
+
     /**
      * Returns the currently-estimated pose of the robot.
      *

@@ -3,24 +3,32 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.*;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
-import frc.robot.util.Constants;
 import frc.robot.util.SpeedAngleTriplet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShooterCalc implements Logged {
 
@@ -64,6 +72,58 @@ public class ShooterCalc implements Logged {
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
             }, pivot, shooter);
+    }
+
+    public Pose2d getPathEndPose(PathPlannerPath path) {
+        List<Pose2d> poses = path.getPathPoses();
+        Pose2d lastPose = poses.get(poses.size()-1);
+        return lastPose;
+    }
+
+    public List<Pose2d> getAutoEndPoses(String name) {
+        List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(name);
+        List<Pose2d> endPoses = new ArrayList<Pose2d>();
+        paths.forEach(path -> {
+            endPoses.add(getPathEndPose(path));
+        });
+
+        return endPoses;
+    }
+
+    public double[] getAutoEndDouble(String name) {
+        List<Pose2d> endPoses = getAutoEndPoses(name);
+
+        // convert to double array in the format of [x,y,rot,x,y,rot...]
+        double[] endPosesArray = new double[endPoses.size()*3];
+        for (int i = 0; i < endPoses.size(); i++) {
+            Pose2d pose = endPoses.get(i);
+            endPosesArray[i*3] = pose.getTranslation().getX();
+            endPosesArray[i*3+1] = pose.getTranslation().getY();
+            endPosesArray[i*3+2] = pose.getRotation().getDegrees();
+        }
+
+        return endPosesArray;
+    }
+
+    public Translation2d getActiveEndTraj() {
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        double[] activeTraj = inst.getTable("PathPlanner").getEntry("activePath").getDoubleArray(new double[0]);
+        int activeTrajLength = activeTraj.length;
+        double endX = activeTraj[activeTrajLength - 3];
+        double endY = activeTraj[activeTrajLength - 2];
+        Translation2d endPose = new Translation2d(endX, endY);
+
+        return endPose;
+    }
+
+    public Trajectory getActiveTrajectory() {
+        return TrajectoryGenerator.generateTrajectory(
+            getAutoEndPoses(""), 
+            new TrajectoryConfig(
+                AutoConstants.MAX_SPEED_METERS_PER_SECOND, 
+                AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
+            )
+        );
     }
 
     public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {

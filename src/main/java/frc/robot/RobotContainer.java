@@ -162,6 +162,8 @@ public class RobotContainer implements Logged {
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
+
+        swerve.getField2d().getObject("traj").setTrajectory(shooterCalc.getActiveTrajectory());
     }
     
     private void configureButtonBindings() {
