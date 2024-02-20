@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.ejml.sparse.csc.factory.FillReductionFactory_DSCC;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.fasterxml.jackson.databind.ser.std.CalendarSerializer;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
@@ -410,26 +411,27 @@ public class Swerve extends SubsystemBase implements Logged {
             desiredAngle.getRadians()),  0.02);
     }
 
-    public Command ampAlignmentCommand(DoubleSupplier driverX) {
+    public ChassisSpeeds getAmpAlignmentSpeeds() {
+        Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
+        Pose2d desiredPose = new Pose2d(
+            ampPose.getX(),
+            getPose().getY(),
+            ampPose.getRotation()
+        );
+        setDesiredPose(desiredPose);
+        return
+            AutoConstants.HDC.calculate(
+                getPose(),
+                desiredPose,
+                0,
+                desiredPose.getRotation()
+            );
+    }
 
+    public Command ampAlignmentCommand(DoubleSupplier driverX) {
         return 
             getAutoAlignmentCommand(
-                () -> {
-                    Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
-                    Pose2d desiredPose = new Pose2d(
-                        ampPose.getX(),
-                        getPose().getY(),
-                        ampPose.getRotation()
-                    );
-                    setDesiredPose(desiredPose);
-                    return
-                        AutoConstants.HDC.calculate(
-                            getPose(),
-                            desiredPose,
-                            0,
-                            desiredPose.getRotation()
-                        );
-                }, 
+                () -> getAmpAlignmentSpeeds(), 
                 () -> 
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         0,

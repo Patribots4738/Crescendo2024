@@ -15,6 +15,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Neo.TelemetryPreference;
@@ -35,7 +36,8 @@ public class Climb extends SubsystemBase implements Logged {
 
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, false);
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true);
+        // invert right motor in real life, not in sim
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, !FieldConstants.IS_SIMULATION);
 
         configureMotors();
         climbPID = new PIDNotConstants(leftMotor.getPID(), leftMotor.getPIDController());
