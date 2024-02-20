@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -80,7 +81,7 @@ public class ShooterCalc implements Logged {
         return lastPose;
     }
 
-    public List<Pose2d> getAutoEndPoses(String name) {
+    public List<Pose2d> getAutoPoses(String name) {
         List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(name);
         List<Pose2d> endPoses = new ArrayList<Pose2d>();
         paths.forEach(path -> {
@@ -90,19 +91,29 @@ public class ShooterCalc implements Logged {
         return endPoses;
     }
 
-    public double[] getAutoEndDouble(String name) {
-        List<Pose2d> endPoses = getAutoEndPoses(name);
+    @Log
+    double[] autoPoses = new double[0];
+    public Consumer<Command> setAutoPoses() {
+        return (selectedAuto) -> Commands.deferredProxy(
+            () -> Commands.runOnce(
+                () -> {
+                    System.out.println("Setting auto poses");
+                    System.out.println("Selected auto: " + selectedAuto.getName());
 
-        // convert to double array in the format of [x,y,rot,x,y,rot...]
-        double[] endPosesArray = new double[endPoses.size()*3];
-        for (int i = 0; i < endPoses.size(); i++) {
-            Pose2d pose = endPoses.get(i);
-            endPosesArray[i*3] = pose.getTranslation().getX();
-            endPosesArray[i*3+1] = pose.getTranslation().getY();
-            endPosesArray[i*3+2] = pose.getRotation().getDegrees();
-        }
+                    List<Pose2d> endPoses = getAutoPoses(selectedAuto.getName());
+                    // convert to double array in the format of [x,y,rot,x,y,rot...]
+                    double[] endPosesArray = new double[endPoses.size() * 3];
+                    for (int i = 0; i < endPoses.size(); i++) {
+                        Pose2d pose = endPoses.get(i);
+                        endPosesArray[i * 3] = pose.getTranslation().getX();
+                        endPosesArray[i * 3 + 1] = pose.getTranslation().getY();
+                        endPosesArray[i * 3 + 2] = pose.getRotation().getDegrees();
+                    }
 
-        return endPosesArray;
+                    autoPoses = endPosesArray;
+                }
+            )
+        );
     }
 
     public Translation2d getActiveEndTraj() {
@@ -116,9 +127,12 @@ public class ShooterCalc implements Logged {
         return endPose;
     }
 
-    public Trajectory getActiveTrajectory() {
+    public Trajectory getActiveTrajectory(String name) {
+        
+        System.out.println("Getting auto double");
+        System.out.println("Name: " + name + "\n\n\n\n\n\n");
         return TrajectoryGenerator.generateTrajectory(
-            getAutoEndPoses(""), 
+            getAutoPoses(name), 
             new TrajectoryConfig(
                 AutoConstants.MAX_SPEED_METERS_PER_SECOND, 
                 AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED

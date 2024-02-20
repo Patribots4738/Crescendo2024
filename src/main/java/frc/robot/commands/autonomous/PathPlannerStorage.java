@@ -13,6 +13,7 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 /**
  * This file represents all of the auto paths that we will have
@@ -58,6 +59,10 @@ public class PathPlannerStorage implements Logged {
 
     public Command getSelectedAuto() {
         return autoChooser.getSelected();
+    }
+
+    public void bindListener(Consumer<Command> consumer) {
+        autoChooser.onChange(consumer);
     }
 
     /**

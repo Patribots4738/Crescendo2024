@@ -162,8 +162,7 @@ public class RobotContainer implements Logged {
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
-
-        swerve.getField2d().getObject("traj").setTrajectory(shooterCalc.getActiveTrajectory());
+        pathPlannerStorage.bindListener(shooterCalc.setAutoPoses());
     }
     
     private void configureButtonBindings() {
@@ -363,6 +362,11 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
+
+        // if (!pathPlannerStorage.getSelectedAutoName().equals("")) {
+        //     swerve.getField2d().getObject("traj")
+        //     .setTrajectory(shooterCalc.getActiveTrajectory(pathPlannerStorage.getSelectedAutoName()));
+        // }
         return driver.getYButton() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
     }
 
