@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -29,7 +28,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
-import frc.robot.commands.Drive;
 import monologue.Logged;
 
 /**
@@ -138,7 +136,7 @@ public final class Constants {
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
         public static final double PIVOT_DEADBAND = 1;
-        public static final double SHOOTER_RPM_DEADBAND = 50;
+        public static final double SHOOTER_RPM_DEADBAND = 150;
 
         // These are in %
         public static final double SHOOTER_MIN_OUTPUT = -1;
@@ -226,8 +224,8 @@ public final class Constants {
         public static final double ELEVATOR_TOP_LIMIT = 0.48;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
-        public static final double TRAPPER_LOWER_PERCENT_LIMIT = 1;
-        public static final double TRAPPER_UPPER_PERCENT_LIMIT = -1;
+        public static final double TRAPPER_LOWER_PERCENT_LIMIT = -1;
+        public static final double TRAPPER_UPPER_PERCENT_LIMIT = 1;
 
         public static final double TRAPPER_HAS_PIECE_UPPER_LIMIT = 0;
         public static final double TRAPPER_HAS_PIECE_LOWER_LIMIT = -0.25;
@@ -267,7 +265,7 @@ public final class Constants {
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 3;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
@@ -318,9 +316,9 @@ public final class Constants {
 
         public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
             new PIDConstants(
-                AutoConstants.XY_CORRECTION_P,
+                AutoConstants.XY_CORRECTION_P*3,
                 0,
-                AutoConstants.XY_CORRECTION_D),
+                AutoConstants.XY_CORRECTION_D*2),
             new PIDConstants(
                     AutoConstants.ROTATION_CORRECTION_P,
                     0,
@@ -497,23 +495,23 @@ public final class Constants {
         public static ArrayList<Neo> MOTOR_LIST = new ArrayList<>();
 
         public static final HashMap<Integer, String> CAN_ID_MAP = new HashMap<Integer, String>() {{
-                /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "Front Right Drive");
-                /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "Front Right Turn");
-                /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "Front Left Drive");
-                /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "Front Left Turn");
-                /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "Rear Left Drive");
-                /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "Rear Left Turn");
-                /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "Rear Right Drive");
-                /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "Rear Right Turn");
+                /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "FrontRightDrive");
+                /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "FrontRightTurn");
+                /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "FrontLeftDrive");
+                /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "FrontLeftTurn");
+                /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "RearLeftDrive");
+                /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "RearLeftTurn");
+                /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "RearRightDrive");
+                /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "RearRightTurn");
                 /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
-                /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "Trigger Wheel");
-                /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "Left Shooter");
-                /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "Right Shooter");
-                /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "Shooter Pivot");
+                /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "TriggerWheel");
+                /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
+                /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
+                /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
                 /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
                 /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
-                /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "Left Climb");
-                /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "Right Climb");
+                /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
+                /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
             }};
     }
 
@@ -632,11 +630,6 @@ public final class Constants {
             return AMP_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
         }
 
-        // TODO: make real constants
-        public static final Pose2d L_POSE = new Pose2d();
-        public static final Pose2d R_POSE = new Pose2d();
-        public static final Pose2d M_POSE = new Pose2d();
-
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
@@ -668,6 +661,11 @@ public final class Constants {
             System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length, SPIKE_TRANSLATIONS_RED.length);
             System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
         }
+
+        public static final Pose2d L_POSE = new Pose2d(5.11,6.23, new Rotation2d());
+        public static final Pose2d R_POSE = GET_SPEAKER_POSITION();
+        public static final Pose2d M_POSE = new Pose2d(4.46,4.81, new Rotation2d());
+        public static final Pose2d W3_POSE = new Pose2d(SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d(), new Rotation2d());
     }
 
     public static final class CameraConstants {
