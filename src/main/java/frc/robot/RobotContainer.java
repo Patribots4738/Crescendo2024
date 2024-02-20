@@ -243,8 +243,10 @@ public class RobotContainer implements Logged {
         controller.a().whileTrue(
             Commands.sequence(
                 swerve.resetHDC(),
-                swerve.setAlignmentSpeed(),
-                swerve.ampAlignmentCommand(() -> driver.getLeftX())));
+                Commands.either(
+                    swerve.trapAlignmentCommand(() -> driver.getLeftX(), () -> driver.getLeftY()), 
+                    swerve.ampAlignmentCommand(() -> driver.getLeftX()), 
+                    climb::hooksUp)));
         
         
         controller.rightTrigger()
@@ -253,18 +255,12 @@ public class RobotContainer implements Logged {
         controller.rightStick()
         // TODO: AIM AT CHAIN IF HOOKS UP
             .toggleOnTrue(
-                Commands.parallel(
-                    Commands.sequence(
-                        swerve.resetHDC(),
-                        swerve.getDriveCommand(
-                            () -> {
-                                return new ChassisSpeeds(
-                                    -controller.getLeftY(),
-                                    -controller.getLeftX(),
-                                    swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
-                            },
-                            () -> true
-                        )
+                Commands.sequence(
+                    swerve.resetHDC(),
+                    Commands.either(
+                        swerve.chainRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY()),
+                        swerve.speakerRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY(), shooterCalc),
+                        climb::hooksUp
                     )
                 )
             );
