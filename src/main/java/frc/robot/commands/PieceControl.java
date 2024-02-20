@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Trapper;
+import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.SpeedAngleTriplet;
 import frc.robot.util.Constants.TrapConstants;
@@ -21,6 +22,8 @@ public class PieceControl {
 
     private Elevator elevator;
     private Trapper trapper;
+    
+    private Pivot pivot;
 
     private ShooterCalc shooterCalc;
 
@@ -31,11 +34,13 @@ public class PieceControl {
             Indexer indexer,
             Elevator elevator,
             Trapper trapper,
+            Pivot pivot,
             ShooterCalc shooterCalc) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.trapper = trapper;
+        this.pivot = pivot;
         this.shooterCalc = shooterCalc;
     }
 
@@ -52,7 +57,7 @@ public class PieceControl {
                 .andThen(noteToShoot())
                     .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier)
                 .andThen(pivot.angleReset()));
-    }
+    } 
 
 
     // TODO: Possibly split this into two commands where one sends to shooter
