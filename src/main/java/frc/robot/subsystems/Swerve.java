@@ -479,7 +479,7 @@ public class Swerve extends SubsystemBase implements Logged {
             () -> true);
     }
 
-    public ChassisSpeeds getTrapAlignmentSpeeds(double driverX, double driverY) {
+    public ChassisSpeeds getTrapAlignmentSpeeds(double driverY) {
         Pose2d closestTrap = PoseCalculations.getClosestChain(getPose());
         Pose2d stage = FieldConstants.GET_STAGE_POSITION();
         double distance = getPose().relativeTo(stage).getTranslation().getNorm();
@@ -500,10 +500,10 @@ public class Swerve extends SubsystemBase implements Logged {
             );
     }
 
-    public Command trapAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
+    public Command trapAlignmentCommand(DoubleSupplier driverY) {
         return 
             getAutoAlignmentCommand(
-                () -> getTrapAlignmentSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), 
+                () -> getTrapAlignmentSpeeds(driverY.getAsDouble()), 
                 () -> 
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         -driverY.getAsDouble() * getPose().getRotation().getCos(),
