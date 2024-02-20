@@ -3,47 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.293238893308695,
-        "y": 0.7722070539325854
+        "x": 4.461157776932109,
+        "y": 4.806186572471635
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.121138900732449,
-        "y": 0.8779258767924034
+        "x": 2.9975302503796497,
+        "y": 4.868811439750539
       },
       "isLocked": false,
-      "linkedName": "C5"
+      "linkedName": "M"
     },
     {
       "anchor": {
-        "x": 5.880091849769366,
-        "y": 1.8431846942081342
+        "x": 2.5685447337679963,
+        "y": 4.3334957369796125
       },
       "prevControl": {
-        "x": 6.32135302344513,
-        "y": 1.5765894017790278
+        "x": 0.7705402644847841,
+        "y": 4.621368107984443
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R"
+      "linkedName": "W3"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake & PrepareShooterR",
-      "waypointRelativePos": 0,
+      "name": "StopIntake",
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
           "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooterR"
-              }
-            },
             {
               "type": "named",
               "data": {
@@ -55,8 +49,8 @@
       }
     },
     {
-      "name": "Shoot",
-      "waypointRelativePos": 1.0,
+      "name": "Intake",
+      "waypointRelativePos": 0.9,
       "command": {
         "type": "parallel",
         "data": {
@@ -64,7 +58,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot"
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PrepareShooterW3",
+      "waypointRelativePos": 0.4,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PrepareShooterW3"
               }
             }
           ]
@@ -80,13 +91,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 147.21190301355887,
-    "rotateFast": true
+    "rotation": 169.00174959554687,
+    "rotateFast": false
   },
   "reversed": false,
-  "folder": "Center Line",
+  "folder": "Stage",
   "previewStartingState": {
-    "rotation": -179.4569283062762,
+    "rotation": 171.92085261432547,
     "velocity": 0
   },
   "useDefaultConstraints": true
