@@ -257,7 +257,6 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.rightStick()
-        // TODO: AIM AT CHAIN IF HOOKS UP
             .toggleOnTrue(
                 Commands.sequence(
                     swerve.resetHDC(),
