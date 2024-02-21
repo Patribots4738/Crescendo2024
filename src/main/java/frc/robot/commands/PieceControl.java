@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -45,7 +44,7 @@ public class PieceControl {
                 indexer.stopCommand(),
                 elevator.stopCommand(),
                 trapper.stopCommand(),
-                shooterCalc.stopAllMotors());
+                shooterCalc.stopAllMotors()).ignoringDisable(true);
     }
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {

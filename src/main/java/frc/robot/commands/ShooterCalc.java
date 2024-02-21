@@ -3,8 +3,6 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.GeometryUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -13,22 +11,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Constants.FieldConstants.GameMode;
 import monologue.Logged;
 import monologue.Annotations.Log;
 import frc.robot.util.SpeedAngleTriplet;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ShooterCalc implements Logged {
 
@@ -65,11 +58,11 @@ public class ShooterCalc implements Logged {
      *                       of the robot. It is of type `Supplier<Pose2d>`.
      * @return The method is returning a Command object.
      */
-    public Command prepareFireCommand(Supplier<Pose2d> shootingPose) {
+    public Command prepareFireCommand(Supplier<Translation2d> shootingPose) {
         return Commands.runEnd(() -> {
-                Pose2d desiredPose = shootingPose.get();
-                if (Robot.isRedAlliance() && FieldConstants.GAME_MODE == GameMode.AUTONOMOUS) {
-                    desiredPose = GeometryUtil.flipFieldPose(shootingPose.get());
+                Translation2d desiredPose = shootingPose.get();
+                if (Robot.isRedAlliance() && Robot.gameMode == GameMode.AUTONOMOUS) {
+                    desiredPose = GeometryUtil.flipFieldPosition(desiredPose);
                 }
                 desiredTriplet = calculateTriplet(desiredPose);
 
@@ -77,7 +70,7 @@ public class ShooterCalc implements Logged {
                 shooter.setSpeed(desiredTriplet.getSpeeds());
             }, 
             () -> {
-                if (FieldConstants.GAME_MODE == GameMode.TELEOP) {
+                if (Robot.gameMode == GameMode.TELEOP) {
                     pivot.setAngle(0);
                     shooter.stop();
                 }
@@ -85,41 +78,9 @@ public class ShooterCalc implements Logged {
             pivot, shooter);
     }
 
-    public Pose2d getPathEndPose(PathPlannerPath path) {
-        List<Pose2d> poses = path.getPathPoses();
-        Pose2d lastPose = poses.get(poses.size()-1);
-        return lastPose;
-    }
-
-    public List<Pose2d> getAutoPoses(String name) {
-        List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(name);
-        List<Pose2d> autoPoses = new ArrayList<Pose2d>();
-        paths.forEach(path -> {
-            autoPoses.addAll(Robot.isRedAlliance() ? path.flipPath().getPathPoses() : path.getPathPoses());
-        });
-
-        return autoPoses;
-    }
-
-    @Log
-    Pose2d activeEndPose = new Pose2d();
-    public Translation2d getActiveEndTraj() {
-        double[] activeTraj = NetworkTableInstance.getDefault().getTable("PathPlanner").getEntry("activePath").getDoubleArray(new double[0]);
-        
-        if (activeTraj.length == 0) return new Translation2d(0, 0);
-
-        int activeTrajLength = activeTraj.length;
-        double endX = activeTraj[activeTrajLength - 3];
-        double endY = activeTraj[activeTrajLength - 2];
-        Translation2d endPose = new Translation2d(endX, endY);
-
-        activeEndPose = new Pose2d(endPose, new Rotation2d());
-        return endPose;
-    }
-
     public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {
         return Commands.run(() -> {
-                desiredTriplet = calculateTriplet(robotPose.get());
+                desiredTriplet = calculateTriplet(robotPose.get().getTranslation());
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
@@ -189,12 +150,10 @@ public class ShooterCalc implements Logged {
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
     // known required speeds and angles for certain poses
-    public SpeedAngleTriplet calculateTriplet(Pose2d robotPose) {
+    public SpeedAngleTriplet calculateTriplet(Translation2d robotPose) {
         // Get our position relative to the desired field element
-        robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-
         // Use the distance as our key for interpolation
-        double distanceFeet = Units.metersToFeet(robotPose.getTranslation().getNorm());
+        double distanceFeet = Units.metersToFeet(robotPose.getDistance(FieldConstants.GET_SPEAKER_TRANSLATION()));
 
         this.distance = distanceFeet;
 
@@ -372,7 +331,7 @@ public class ShooterCalc implements Logged {
      */
     private SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
-        SpeedAngleTriplet currentTriplet = calculateTriplet(pose);
+        SpeedAngleTriplet currentTriplet = calculateTriplet(pose.getTranslation());
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());

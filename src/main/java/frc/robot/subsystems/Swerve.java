@@ -9,7 +9,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.fasterxml.jackson.databind.ser.std.CalendarSerializer;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
@@ -26,19 +25,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
 import frc.robot.commands.ShooterCalc;
-import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
-import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -97,9 +94,6 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Log
     Pose2d robotPose2d = new Pose2d();
-
-    @Log.NT
-    Field2d field2d = new Field2d();
 
     // The gyro sensor
     private final Pigeon2 gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
@@ -181,7 +175,7 @@ public class Swerve extends SubsystemBase implements Logged {
                                     speeds.omegaRadiansPerSecond * .02)));
         }
 
-        field2d.setRobotPose(currentPose);
+        RobotContainer.field2d.setRobotPose(currentPose);
         SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
         if (! (Double.isNaN(currentPose.getX())
@@ -206,14 +200,6 @@ public class Swerve extends SubsystemBase implements Logged {
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
                 new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
 
-    }
-
-    public Field2d getField2d() {
-        return field2d;
-    }
-
-    public void setField2d(Field2d field2d) {
-        this.field2d = field2d;
     }
 
     /**
@@ -254,7 +240,7 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(swerveModuleStates);
     }
 
-    public void stopMotors() {
+    public void stopDriving() {
         drive(0, 0, 0, false);
     }
     
