@@ -2,10 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.PieceControl;
+import frc.robot.Robot;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Neo.TelemetryPreference;
@@ -17,6 +16,7 @@ public class Intake extends SubsystemBase implements Logged {
 
     @Log
     private double desiredSpeed = 0;
+    private double startedIntakingTimestamp = 0;
     @Log
     private boolean notePossession = true; 
 
@@ -25,23 +25,38 @@ public class Intake extends SubsystemBase implements Logged {
         configMotors();
     }
 
+    @Override
+    public void periodic() {
+        if (desiredSpeed == IntakeConstants.INTAKE_PERCENT
+            && Robot.currentTimestamp - startedIntakingTimestamp > 0.1
+            && intakeMotor.getAppliedOutput() < ((Math.abs(IntakeConstants.INTAKE_PERCENT) - 0.2) * Math.signum(IntakeConstants.INTAKE_PERCENT)))
+        {
+            notePossession = true;
+        }
+    }
+
     public void configMotors() {
         intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
         // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
         intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-    }
-
+    } 
+    
     public void setPercent(double desiredPercent) {
         desiredSpeed = 
             MathUtil.clamp(
                 desiredPercent, 
                 IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
                 IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
-        intakeMotor.setTargetPercent(desiredSpeed);
+        intakeMotor.set(desiredSpeed);
     }
 
     public Command setPercentCommand(double desiredPercent) {
-        return runOnce(() -> setPercent(desiredPercent));
+        return runOnce(() -> {
+            setPercent(desiredPercent);
+            if(desiredPercent > 0) {
+                startedIntakingTimestamp = Robot.currentTimestamp;
+            }
+        });
     }
 
     public Command inCommand() {
@@ -53,7 +68,7 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public boolean isStopped() {
-        return desiredSpeed != 0;
+        return desiredSpeed == 0;
     }
 
     public Command stopCommand() {
@@ -71,5 +86,4 @@ public class Intake extends SubsystemBase implements Logged {
     public Trigger possessionTrigger() {
         return new Trigger(this::getPossession);
     }
-
 }

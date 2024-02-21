@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.GeometryUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,6 +22,7 @@ import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.Constants.FieldConstants.GameMode;
 import monologue.Logged;
 import monologue.Annotations.Log;
 import frc.robot.util.SpeedAngleTriplet;
@@ -58,18 +60,29 @@ public class ShooterCalc implements Logged {
      * @param shootAtSpeaker A BooleanSupplier that returns true if the robot should
      *                       shoot at the
      *                       speaker, and false otherwise.
-     * @param robotPose      The `robotPose` parameter represents the supplier of the current pose
+     * @param shootingPose      The `robotPose` parameter represents the supplier of the current pose
      *                       (position and orientation)
      *                       of the robot. It is of type `Supplier<Pose2d>`.
      * @return The method is returning a Command object.
      */
-    public Command prepareFireCommand(Supplier<Pose2d> robotPose) {
-        return Commands.runOnce(() -> {
-                desiredTriplet = calculateTriplet(robotPose.get());
+    public Command prepareFireCommand(Supplier<Pose2d> shootingPose) {
+        return Commands.runEnd(() -> {
+                Pose2d desiredPose = shootingPose.get();
+                if (Robot.isRedAlliance() && FieldConstants.GAME_MODE == GameMode.AUTONOMOUS) {
+                    desiredPose = GeometryUtil.flipFieldPose(shootingPose.get());
+                }
+                desiredTriplet = calculateTriplet(desiredPose);
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
-            }, pivot, shooter);
+            }, 
+            () -> {
+                if (FieldConstants.GAME_MODE == GameMode.TELEOP) {
+                    pivot.setAngle(0);
+                    shooter.stop();
+                }
+            },
+            pivot, shooter);
     }
 
     public Pose2d getPathEndPose(PathPlannerPath path) {
