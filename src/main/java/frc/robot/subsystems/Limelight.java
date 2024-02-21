@@ -7,16 +7,17 @@ import java.util.function.Supplier;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
-import frc.robot.util.Constants;
+import frc.robot.Robot;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.LimelightHelpers.LimelightTarget_Fiducial;
@@ -29,6 +30,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
     String limelightName = "limelight";
     private final Supplier<Pose2d> robotPoseSupplier;
+    private final SwerveDrivePoseEstimator poseEstimator;
 
     @Log
     Pose3d[] visableTags;
@@ -42,10 +44,11 @@ public class Limelight extends SubsystemBase implements Logged{
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
-    public Limelight(Supplier<Pose2d> robotPoseSupplier) {
+    public Limelight(Supplier<Pose2d> robotPoseSupplier, SwerveDrivePoseEstimator poseEstimator) {
         // Uses network tables to check status of limelight
         timingTestEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName,"TIMING_TEST_ENTRY");
         this.robotPoseSupplier = robotPoseSupplier;
+        this.poseEstimator = poseEstimator;
         loadAprilTagFieldLayout();
     }
 
@@ -54,7 +57,54 @@ public class Limelight extends SubsystemBase implements Logged{
         if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
+            updatePoseEstimator();
             getTags();
+        }
+    }
+
+    private void updatePoseEstimator() {
+        Results result = getResults();
+        Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
+
+        // invalid data check
+        if (estimatedRobotPose.getX() == 0.0
+            || Double.isNaN(estimatedRobotPose.getX()) 
+            || Double.isNaN(estimatedRobotPose.getY()) 
+            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())) {
+            return;
+        }
+
+        // distance from current pose to vision estimated pose
+        double poseDifference = poseEstimator.getEstimatedPosition().getTranslation()
+            .getDistance(estimatedRobotPose.getTranslation());
+    
+        if (result.valid) {
+            double xyStds;
+            double degStds;
+            // multiple targets detected
+            if (result.targets_Fiducials.length >= 2) {
+                xyStds = 0.5;
+                degStds = 3;
+            }
+            // 1 target with large area and close to estimated pose
+            else if (poseDifference < 0.5 && getBestTargetArea(result) > 0.8) {
+                xyStds = 1.0;
+                degStds = 6;
+            }
+            // 1 target farther away and estimated pose is close
+            else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.1) {
+                xyStds = 2.0;
+                degStds = 12;
+            }
+            // conditions don't match to add a vision measurement
+            else {
+                return;
+            }
+    
+            poseEstimator.setVisionMeasurementStdDevs(
+                VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
+            poseEstimator.addVisionMeasurement(estimatedRobotPose,
+                Robot.currentTimestamp - getLatencyDiffSeconds(result));
         }
     }
 
@@ -93,6 +143,14 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public double getLatencyDiffSeconds() {
         return (LimelightHelpers.getLatency_Pipeline(limelightName)/1000d) - (LimelightHelpers.getLatency_Capture(limelightName)/1000d); 
+    }
+
+    public double getLatencyDiffSeconds(Results result) {
+        return (result.latency_pipeline/1000.0) - (result.latency_capture/1000.0); 
+    }
+
+    public double getBestTargetArea(Results result) {
+        return 0.0;
     }
 
     // The below code is for simulation only
