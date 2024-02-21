@@ -16,12 +16,11 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
+import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.subsystems.LedStrip;
 import frc.robot.util.PatriBoxController;
-import frc.robot.util.Constants.AutoConstants;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.LEDConstants;
-import frc.robot.util.Constants.FieldConstants.GameMode;
 import monologue.Logged;
 import java.util.function.Consumer;
 import monologue.Annotations.Log;
@@ -67,9 +66,9 @@ public class LPI extends Command implements Logged{
 
         double closestDistance = 9999;
 
-        for (int i = 0; i < AutoConstants.AUTO_STARTING_POSITIONS.size(); i++) {
+        for (int i = 0; i < PathPlannerStorage.AUTO_STARTING_POSITIONS.size(); i++) {
             
-            Pose2d startingPosition = AutoConstants.AUTO_STARTING_POSITIONS.get(i);
+            Pose2d startingPosition = PathPlannerStorage.AUTO_STARTING_POSITIONS.get(i);
             if (Robot.isRedAlliance()) {
                 startingPosition = GeometryUtil.flipFieldPose(startingPosition);
             }
@@ -153,6 +152,6 @@ public class LPI extends Command implements Logged{
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return FieldConstants.GAME_MODE.equals(GameMode.DISABLED);
+        return Robot.gameMode.equals(GameMode.DISABLED);
     }
 }
