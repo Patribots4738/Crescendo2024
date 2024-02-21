@@ -263,10 +263,7 @@ public class RobotContainer implements Logged {
                     Commands.either(
                         swerve.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         swerve.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, shooterCalc, climb),
-                        swerve::onOppositeSide
-                    )
-                )
-            );
+                        swerve::onOppositeSide)));
 
         controller.b()
             .onTrue(pieceControl.stopAllMotors());
