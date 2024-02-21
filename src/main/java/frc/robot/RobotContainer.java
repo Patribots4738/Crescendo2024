@@ -182,6 +182,10 @@ public class RobotContainer implements Logged {
         };
     }
 
+    public void runActiveTraj() {
+        shooterCalc.getActiveEndTraj();
+    }
+
     private void configureButtonBindings() {
         if (FieldConstants.IS_SIMULATION) {
             configureSimulationBindings(driver);

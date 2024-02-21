@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -22,8 +20,6 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.FieldConstants.GameMode;
 import frc.robot.util.Constants.NeoMotorConstants;
 import monologue.Monologue;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 
 /**
@@ -74,6 +70,8 @@ public class Robot extends TimedRobot {
 
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
+
+        robotContainer.runActiveTraj();
     }
 
     @Override

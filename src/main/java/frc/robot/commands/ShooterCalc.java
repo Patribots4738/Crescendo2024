@@ -88,14 +88,19 @@ public class ShooterCalc implements Logged {
         return autoPoses;
     }
 
-    NetworkTableEntry pathEntry = NetworkTableInstance.getDefault().getTable("PathPlanner").getEntry("activePath");
+    @Log
+    Pose2d activeEndPose = new Pose2d();
     public Translation2d getActiveEndTraj() {
-        double[] activeTraj = pathEntry.getDoubleArray(new double[0]);
+        double[] activeTraj = NetworkTableInstance.getDefault().getTable("PathPlanner").getEntry("activePath").getDoubleArray(new double[0]);
+        
+        if (activeTraj.length == 0) return new Translation2d(0, 0);
+
         int activeTrajLength = activeTraj.length;
         double endX = activeTraj[activeTrajLength - 3];
         double endY = activeTraj[activeTrajLength - 2];
         Translation2d endPose = new Translation2d(endX, endY);
 
+        activeEndPose = new Pose2d(endPose, new Rotation2d());
         return endPose;
     }
 
