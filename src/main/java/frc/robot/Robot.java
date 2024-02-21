@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -20,6 +22,9 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.FieldConstants.GameMode;
 import frc.robot.util.Constants.NeoMotorConstants;
 import monologue.Monologue;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -40,6 +45,9 @@ public class Robot extends TimedRobot {
     public static double previousTimestamp = 0;
     private boolean hasStartedURCL = false;
 
+    private static Alliance lastAlliance = 
+        (DriverStation.getAlliance().isPresent()) ? DriverStation.getAlliance().get() : Alliance.Blue;
+    
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
@@ -66,7 +74,6 @@ public class Robot extends TimedRobot {
 
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-
     }
 
     @Override
@@ -81,6 +88,11 @@ public class Robot extends TimedRobot {
         // it needs to be updated.
         DriverStation.refreshData();
         FieldConstants.ALLIANCE = DriverStation.getAlliance();
+        
+        if (FieldConstants.ALLIANCE.get() != lastAlliance) {
+            allianceTrigger(robotContainer);
+        }
+        Robot.lastAlliance = FieldConstants.ALLIANCE.get();
     }
 
     @Override
@@ -161,6 +173,13 @@ public class Robot extends TimedRobot {
 
         for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
             neo.tick();
+        }
+    }
+
+    public static void allianceTrigger(RobotContainer robotContainer) {
+        if (FieldConstants.ALLIANCE.get() != lastAlliance) {
+            System.out.println("Alliance Triggered");
+            robotContainer.updatePathViewer().run();
         }
     }
 

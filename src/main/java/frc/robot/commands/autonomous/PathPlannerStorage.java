@@ -3,10 +3,12 @@ package frc.robot.commands.autonomous;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.util.PatriSendableChooser;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
@@ -26,8 +28,9 @@ public class PathPlannerStorage implements Logged {
 
     private final BooleanSupplier hasPieceSupplier;
     @Log.NT
-    private SendableChooser<Command> autoChooser = new SendableChooser<>();
-
+    private PatriSendableChooser<Command> autoChooser = new PatriSendableChooser<>();
+    private String lastName = "";
+    private Command lastAuto = Commands.none();
     /**
      * Creates a new AutoPathStorage object.
      * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
@@ -52,13 +55,27 @@ public class PathPlannerStorage implements Logged {
 
         // Good news! 
         // This auto caches our paths so we don't need to manually load them
+        
         for (String autoName : AutoConstants.AUTO_NAMES) {
-            autoChooser.addOption(autoName, AutoBuilder.buildAuto(autoName));
+            Command auto = AutoBuilder.buildAuto(autoName);
+            autoChooser.addOption(autoName, auto);
+            lastName = autoName;
+            lastAuto = auto;
+            autoChooser.setDefaultOption(lastName, lastAuto);
         }
+    }
+
+    public void configureAutoChooser(Pair<String, Command> defaultAuto) {
+        configureAutoChooser();
+        autoChooser.setDefaultOption(defaultAuto.getFirst(), defaultAuto.getSecond());
     }
 
     public Command getSelectedAuto() {
         return autoChooser.getSelected();
+    }
+
+    public String getSelectedAutoName() {
+        return autoChooser.getSelectedName();
     }
 
     public void bindListener(Consumer<Command> consumer) {

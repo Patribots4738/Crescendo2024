@@ -35,9 +35,12 @@ import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.FieldConstants.GameMode;
 import monologue.Annotations.Log;
+import java.util.function.Supplier;
+import java.util.function.Consumer;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PIDTunerCommands;
 import monologue.Logged;
+import java.lang.System;
 
 public class RobotContainer implements Logged {
 
@@ -162,9 +165,23 @@ public class RobotContainer implements Logged {
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
-        pathPlannerStorage.bindListener(shooterCalc.setAutoPoses());
+        
+        pathPlannerStorage.bindListener(getUpdatePathViewer());
     }
-    
+
+    public Runnable updatePathViewer() {
+        return () -> {
+            swerve.getField2d().getObject("path")
+                .setPoses(shooterCalc.getAutoPoses(pathPlannerStorage.getSelectedAutoName()));
+        };
+    }
+
+    private Consumer<Command> getUpdatePathViewer() {
+        return (command) -> {
+            updatePathViewer().run();
+        };
+    }
+
     private void configureButtonBindings() {
         if (FieldConstants.IS_SIMULATION) {
             configureSimulationBindings(driver);
@@ -362,11 +379,6 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-
-        // if (!pathPlannerStorage.getSelectedAutoName().equals("")) {
-        //     swerve.getField2d().getObject("traj")
-        //     .setTrajectory(shooterCalc.getActiveTrajectory(pathPlannerStorage.getSelectedAutoName()));
-        // }
         return driver.getYButton() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
     }
 

@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -12,15 +11,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Robot;
 import frc.robot.subsystems.shooter.*;
-import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -83,61 +80,23 @@ public class ShooterCalc implements Logged {
 
     public List<Pose2d> getAutoPoses(String name) {
         List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(name);
-        List<Pose2d> endPoses = new ArrayList<Pose2d>();
+        List<Pose2d> autoPoses = new ArrayList<Pose2d>();
         paths.forEach(path -> {
-            endPoses.add(getPathEndPose(path));
+            autoPoses.addAll(Robot.isRedAlliance() ? path.flipPath().getPathPoses() : path.getPathPoses());
         });
 
-        return endPoses;
+        return autoPoses;
     }
 
-    @Log
-    double[] autoPoses = new double[0];
-    public Consumer<Command> setAutoPoses() {
-        return (selectedAuto) -> Commands.deferredProxy(
-            () -> Commands.runOnce(
-                () -> {
-                    System.out.println("Setting auto poses");
-                    System.out.println("Selected auto: " + selectedAuto.getName());
-
-                    List<Pose2d> endPoses = getAutoPoses(selectedAuto.getName());
-                    // convert to double array in the format of [x,y,rot,x,y,rot...]
-                    double[] endPosesArray = new double[endPoses.size() * 3];
-                    for (int i = 0; i < endPoses.size(); i++) {
-                        Pose2d pose = endPoses.get(i);
-                        endPosesArray[i * 3] = pose.getTranslation().getX();
-                        endPosesArray[i * 3 + 1] = pose.getTranslation().getY();
-                        endPosesArray[i * 3 + 2] = pose.getRotation().getDegrees();
-                    }
-
-                    autoPoses = endPosesArray;
-                }
-            )
-        );
-    }
-
+    NetworkTableEntry pathEntry = NetworkTableInstance.getDefault().getTable("PathPlanner").getEntry("activePath");
     public Translation2d getActiveEndTraj() {
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        double[] activeTraj = inst.getTable("PathPlanner").getEntry("activePath").getDoubleArray(new double[0]);
+        double[] activeTraj = pathEntry.getDoubleArray(new double[0]);
         int activeTrajLength = activeTraj.length;
         double endX = activeTraj[activeTrajLength - 3];
         double endY = activeTraj[activeTrajLength - 2];
         Translation2d endPose = new Translation2d(endX, endY);
 
         return endPose;
-    }
-
-    public Trajectory getActiveTrajectory(String name) {
-        
-        System.out.println("Getting auto double");
-        System.out.println("Name: " + name + "\n\n\n\n\n\n");
-        return TrajectoryGenerator.generateTrajectory(
-            getAutoPoses(name), 
-            new TrajectoryConfig(
-                AutoConstants.MAX_SPEED_METERS_PER_SECOND, 
-                AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
-            )
-        );
     }
 
     public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {
