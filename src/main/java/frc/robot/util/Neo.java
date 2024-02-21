@@ -11,9 +11,13 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
+import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 /*
  * Some of this is adapted from 3005's 2022 Code
@@ -28,6 +32,7 @@ public class Neo extends CANSparkMax {
     private double targetVelocity = 0;
     private double targetPercent = 0;
     private int inversionMultiplier = 1;
+    private final int canID;
     
     /**
      * Creates a new Neo motor
@@ -70,6 +75,7 @@ public class Neo extends CANSparkMax {
      */
     public Neo(int id, boolean inverted, CANSparkBase.IdleMode mode) {
         super(id, CANSparkLowLevel.MotorType.kBrushless);
+        this.canID = id;
         this.encoder = getEncoder();
         this.pidController = getPIDController();
         this.inversionMultiplier = inverted ? -1 : 1;
@@ -85,12 +91,79 @@ public class Neo extends CANSparkMax {
         setCANTimeout(50);
         Timer.delay(0.25);
 
+        setMeasurementPeriod();
+        setAverageDepth();
 
         // Turn off alternate and analog encoders
         // we never use them
         setTelemetryPreference(TelemetryPreference.DEFAULT);
         setIdleMode(mode);
         register();
+    }
+
+    /**
+     * Set encoder velocity measurement period to {@value Spark#MEASUREMENT_PERIOD} milliseconds
+     * @return {@link REVLibError#kOk} if successful
+     */
+    private REVLibError setMeasurementPeriod() {
+        REVLibError status;
+        status = applyParameter(
+        () -> this.getEncoder().setMeasurementPeriod(16),
+        () -> this.getEncoder().getMeasurementPeriod() == 16,
+        "Set encoder measurement period failure!"
+        );
+        return status;
+    }
+
+    /**
+     * Set encoder velocity average depth to {@value Spark#AVERAGE_DEPTH} samples
+     * @return {@link REVLibError#kOk} if successful
+     */
+    private REVLibError setAverageDepth() {
+        REVLibError status;
+        status = applyParameter(
+        () -> this.getEncoder().setAverageDepth(2),
+        () -> this.getEncoder().getAverageDepth() == 2,
+        "Set encoder average depth failure!"
+        );
+        return status;
+    }
+
+    /**
+     * Attempt to apply parameter and check if specified parameter is set correctly
+     * 
+     * @param parameterSetter        Method to set desired parameter
+     * @param parameterCheckSupplier Method to check for parameter in question
+     * @return {@link REVLibError#kOk} if successful
+     */
+    private REVLibError applyParameter(Supplier<REVLibError> parameterSetter, BooleanSupplier parameterCheckSupplier,
+            String errorMessage) {
+        if (RobotBase.isSimulation())
+            return parameterSetter.get();
+        if (parameterCheckSupplier.getAsBoolean())
+            return REVLibError.kOk;
+
+        REVLibError status = REVLibError.kError;
+        for (int i = 0; i < 20; i++) {
+            status = parameterSetter.get();
+            if (parameterCheckSupplier.getAsBoolean() && status == REVLibError.kOk)
+                break;
+            Timer.delay(0.1);
+        }
+
+        checkStatus(status, errorMessage);
+        return status;
+    }
+
+    /**
+     * Check status and print error message if necessary
+     * 
+     * @param status       Status to check
+     * @param errorMessage Error message to print
+     */
+    private void checkStatus(REVLibError status, String errorMessage) {
+        if (status != REVLibError.kOk)
+            System.err.println(canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ") " + errorMessage + " - " + status.toString());
     }
 
     /**
