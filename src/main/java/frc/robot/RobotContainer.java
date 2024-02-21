@@ -262,9 +262,9 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDC(),
                     Commands.either(
-                        swerve.chainRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY()),
-                        swerve.speakerRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY(), shooterCalc),
-                        climb::hooksUp
+                        swerve.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        swerve.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, shooterCalc, climb),
+                        swerve::onOppositeSide
                     )
                 )
             );
