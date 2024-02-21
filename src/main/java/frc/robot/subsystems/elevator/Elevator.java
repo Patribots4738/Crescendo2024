@@ -13,7 +13,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

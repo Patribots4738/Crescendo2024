@@ -1,11 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import java.util.function.BooleanSupplier;
-
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -17,7 +11,7 @@ import frc.robot.util.Neo;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import frc.robot.util.PIDNotConstants;
 import monologue.Annotations.Log;
@@ -25,8 +19,6 @@ import monologue.Annotations.Log;
 public class Pivot extends SubsystemBase implements Logged {
 	private Neo pivot;
     private PIDNotConstants pivotPID;
-	private AbsoluteEncoder pivotEncoder;
-	private SparkPIDController pivotPIDController;
 
 	@Log
 	private double realAngle = 0, desiredAngle = 0;
@@ -35,19 +27,14 @@ public class Pivot extends SubsystemBase implements Logged {
 	private boolean atDesiredAngle = false;
 
 	public Pivot() {
-		this.pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID);
-		this.pivotEncoder = pivot.getAbsoluteEncoder(Type.kDutyCycle);
-		this.pivotPIDController = pivot.getPIDController();
+		pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID, !FieldConstants.IS_SIMULATION, true);
 		configMotor();
         pivotPID = new PIDNotConstants(ShooterConstants.PIVOT_PID, pivot.getPIDController());
 	}
 
 	public void configMotor() {
-        pivotEncoder.setInverted(true);
 		pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
-		pivot.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-		pivotPIDController.setFeedbackDevice(pivotEncoder);
-		pivotEncoder.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
+		pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
 		pivot.setPID(
             ShooterConstants.PIVOT_PID,
@@ -58,13 +45,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	@Override
 	public void periodic() {
 
-        if (FieldConstants.IS_SIMULATION) {
-            if (Math.abs(desiredAngle - realAngle) > 0.25) {
-                realAngle += (-desiredAngle - realAngle) / 10;
-            }
-        } else {
-            realAngle = -getAngle();
-        }
+        realAngle = -getAngle();
 
 		atDesiredAngle = 
             MathUtil.applyDeadband(
@@ -100,6 +81,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				NTConstants.PIVOT_OFFSET_METERS.getZ(),
 				new Rotation3d(0, -Units.degreesToRadians(angle), 0));
 	}
+
     public PIDNotConstants getPIDNotConstants() {
         return this.pivotPID;
     }
@@ -116,7 +98,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return pivotEncoder.getPosition();
+		return pivot.getPosition();
 	}
 
 	public double getTargetAngle() {

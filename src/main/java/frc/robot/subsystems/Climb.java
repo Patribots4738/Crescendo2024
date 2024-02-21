@@ -17,8 +17,7 @@ import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -35,7 +34,7 @@ public class Climb extends SubsystemBase implements Logged {
     private boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
-        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, false);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
         // invert right motor in real life, not in sim
         rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, !FieldConstants.IS_SIMULATION);
 
@@ -55,10 +54,6 @@ public class Climb extends SubsystemBase implements Logged {
 
         leftMotor.setPID(ClimbConstants.CLIMB_PID);
         rightMotor.setPID(ClimbConstants.CLIMB_PID);
-
-        // Change to brake when done testing x2
-        leftMotor.setBrakeMode();
-        rightMotor.setBrakeMode();
     }
 
     @Override

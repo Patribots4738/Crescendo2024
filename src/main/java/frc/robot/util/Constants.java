@@ -121,9 +121,9 @@ public final class Constants {
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
             0,
-            0.20992
+            0.20992,
+            0.0001762
         );
-        public static final double SHOOTER_FF = 0.0001762;
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
             0.05,

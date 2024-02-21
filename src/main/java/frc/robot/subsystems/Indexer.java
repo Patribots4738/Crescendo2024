@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.IntakeConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.SafeSpark.TelemetryPreference;
 import frc.robot.util.Neo;
 
 public class Indexer extends SubsystemBase {

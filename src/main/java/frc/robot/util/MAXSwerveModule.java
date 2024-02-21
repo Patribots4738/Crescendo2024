@@ -15,7 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
-import frc.robot.util.Neo.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -171,8 +170,8 @@ public class MAXSwerveModule implements Logged{
         // Apply position and velocity conversion factors for the driving encoder. The
         // native units for position and velocity are rotations and RPM, respectively,
         // but we want meters and meters per second to use with WPILib's swerve APIs.
-        drivingEncoder.setPositionConversionFactor(ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR);
-        drivingEncoder.setVelocityConversionFactor(ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
+        drivingSpark.setPositionConversionFactor(ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR);
+        drivingSpark.setVelocityConversionFactor(ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
 
         // Apply position and velocity conversion factors for the turning encoder. We
         // want these in radians and radians per second to use with WPILib's swerve
@@ -217,10 +216,5 @@ public class MAXSwerveModule implements Logged{
         turningSpark.setIdleMode(CANSparkBase.IdleMode.kBrake);
         drivingSpark.setSmartCurrentLimit(ModuleConstants.VORTEX_CURRENT_LIMIT);
         turningSpark.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
-
-        // See
-        // https://docs.revrobotics.com/Spark/operating-modes/control-interfaces#periodic-status-5-default-rate-200ms
-        drivingSpark.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
-        turningSpark.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
     }
 }

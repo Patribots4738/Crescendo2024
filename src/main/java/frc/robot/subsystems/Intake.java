@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.IntakeConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
