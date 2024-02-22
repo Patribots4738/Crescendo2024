@@ -387,17 +387,6 @@ public class Swerve extends SubsystemBase implements Logged {
         }
     }
 
-    public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds, Supplier<ChassisSpeeds> controllerSpeeds) {
-        return new Drive(this, () -> {
-            ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
-            ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
-            return new ChassisSpeeds(
-                    (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond),
-                    -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond),
-                    controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
-        }, () -> false, () -> false);
-    }
-
     public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
         return new Drive(this, speeds, fieldRelative, () -> false);
     }
@@ -406,140 +395,12 @@ public class Swerve extends SubsystemBase implements Logged {
         return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
-    public double getAlignmentSpeeds(Rotation2d desiredAngle) {
-        return MathUtil.applyDeadband(AutoConstants.HDC.getThetaController().calculate(
-            getPose().getRotation().getRadians(),
-            desiredAngle.getRadians()),  0.02);
-    }
-
-    public ChassisSpeeds getAmpAlignmentSpeeds() {
-        Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
-        Pose2d desiredPose = new Pose2d(
-            ampPose.getX(),
-            getPose().getY(),
-            ampPose.getRotation()
-        );
-        setDesiredPose(desiredPose);
-        return
-            AutoConstants.HDC.calculate(
-                getPose(),
-                desiredPose,
-                0,
-                desiredPose.getRotation()
-            );
-    }
-
-    public Command ampAlignmentCommand(DoubleSupplier driverX) {
-        return 
-            getAutoAlignmentCommand(
-                () -> getAmpAlignmentSpeeds(), 
-                () -> 
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        0,
-                        driverX.getAsDouble() * (Robot.isRedAlliance() ? 1 : -1),
-                        0,
-                        getPose().getRotation()
-                    )
-            );
-    }
-
-    public ChassisSpeeds getChainRotationalSpeeds(double driverX, double driverY) {
-        Pose2d closestChain = PoseCalculations.getClosestChain(getPose());
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(closestChain.getRotation())
-        );
-    }
-
-    public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
-        return getDriveCommand(() -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
-    }
-
-    public ChassisSpeeds getSourceRotationalSpeeds(double driverX, double driverY) {
-        Pose2d source = FieldConstants.GET_SOURCE_POSITION();
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(source.getRotation())
-        );
-    }
-
-    public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
-        return getDriveCommand(() -> getSourceRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
-    }
-
-    public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCalc shooterCalc) {
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(getPose(), getFieldRelativeVelocity())));
-    }
-
-    public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCalc shooterCalc) {
-        return getDriveCommand(
-            () -> 
-                getSpeakerRotationalSpeeds(
-                    driverX.getAsDouble(), 
-                    driverY.getAsDouble(),
-                    shooterCalc), 
-            () -> true);
-    }
-
-    public ChassisSpeeds getTrapAlignmentSpeeds() {
-        Pose2d closestTrap = PoseCalculations.getClosestChain(getPose());
-        Pose2d stage = FieldConstants.GET_STAGE_POSITION();
-        double distance = getPose().relativeTo(stage).getTranslation().getNorm();
-        double x = stage.getX() + distance * closestTrap.getRotation().getCos();
-        double y = stage.getY() + distance * closestTrap.getRotation().getSin();
-        Pose2d desiredPose = new Pose2d(
-            x,
-            y,
-            closestTrap.getRotation()
-        );
-        setDesiredPose(desiredPose);
-        return
-            AutoConstants.HDC.calculate(
-                getPose(),
-                desiredPose,
-                0,
-                desiredPose.getRotation()
-            );
-    }
-
-    public Command trapAlignmentCommand(DoubleSupplier driverY) {
-        return 
-            getAutoAlignmentCommand(
-                () -> getTrapAlignmentSpeeds(), 
-                () -> 
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        -driverY.getAsDouble() * getPose().getRotation().getCos(),
-                        -driverY.getAsDouble() * getPose().getRotation().getSin(),
-                        0,
-                        getPose().getRotation()
-                    )
-            );
-    }
-
-    public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCalc shooterCalc, Climb climb) {
-        return
-            Commands.either(
-                chainRotationalAlignment(driverX, driverY),
-                speakerRotationalAlignment(driverX, driverY, shooterCalc),
-                climb::hooksUp);
-    }
-
     public Command resetHDC() {
         return Commands.sequence(
-            runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),
-            runOnce(() -> AutoConstants.HDC.getXController().reset()),
-            runOnce(() -> AutoConstants.HDC.getYController().reset())
+            Commands.runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),
+            Commands.runOnce(() -> AutoConstants.HDC.getXController().reset()),
+            Commands.runOnce(() -> AutoConstants.HDC.getYController().reset())
         );
     }
 
-    public boolean onOppositeSide() {
-        return Robot.isRedAlliance() 
-            ? getPose().getX() < FieldConstants.CENTERLINE_X 
-            : getPose().getX() > FieldConstants.CENTERLINE_X;
-    }
 }
