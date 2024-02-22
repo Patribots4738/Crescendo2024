@@ -433,7 +433,7 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j).asProxy());
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
             }
         }
     }
