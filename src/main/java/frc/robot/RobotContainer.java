@@ -257,17 +257,13 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.rightStick()
-        // TODO: AIM AT CHAIN IF HOOKS UP
             .toggleOnTrue(
                 Commands.sequence(
                     swerve.resetHDC(),
                     Commands.either(
-                        swerve.chainRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY()),
-                        swerve.speakerRotationalAlignment(() -> controller.getLeftX(), () -> controller.getLeftY(), shooterCalc),
-                        climb::hooksUp
-                    )
-                )
-            );
+                        swerve.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        swerve.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, shooterCalc, climb),
+                        swerve::onOppositeSide)));
 
         controller.b()
             .onTrue(pieceControl.stopAllMotors());
