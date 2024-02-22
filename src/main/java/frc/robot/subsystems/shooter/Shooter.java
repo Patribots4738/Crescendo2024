@@ -43,15 +43,9 @@ public class Shooter extends SubsystemBase implements Logged{
     public void configMotors() {
         motorLeft.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
         motorRight.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
-        motorLeft.setPID(
-                ShooterConstants.SHOOTER_PID,
-                ShooterConstants.SHOOTER_MIN_OUTPUT,
-                ShooterConstants.SHOOTER_MAX_OUTPUT);
+        motorLeft.setPID(ShooterConstants.SHOOTER_PID);
 
-        motorRight.setPID(
-                ShooterConstants.SHOOTER_PID,
-                ShooterConstants.SHOOTER_MIN_OUTPUT,
-                ShooterConstants.SHOOTER_MAX_OUTPUT);
+        motorRight.setPID(ShooterConstants.SHOOTER_PID);
 
         motorLeft.setCoastMode();
         motorRight.setCoastMode();

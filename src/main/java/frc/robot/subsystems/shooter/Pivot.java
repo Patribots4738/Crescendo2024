@@ -38,10 +38,7 @@ public class Pivot extends SubsystemBase implements Logged {
 		pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
 		pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 
-		pivot.setPID(
-            ShooterConstants.PIVOT_PID,
-            ShooterConstants.PIVOT_MIN_OUTPUT,
-            ShooterConstants.PIVOT_MAX_OUTPUT);
+		pivot.setPID(ShooterConstants.PIVOT_PID);
 	}
 
 	@Override

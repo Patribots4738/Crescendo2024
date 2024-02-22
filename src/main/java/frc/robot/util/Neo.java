@@ -17,7 +17,6 @@ import frc.robot.util.Constants.NeoMotorConstants;
 public class Neo extends SafeSpark {
 
     private ControlLoopType controlType = ControlLoopType.PERCENT;
-    private double simualtedPosition = 0;
     private double targetPosition = 0;
     private double targetVelocity = 0;
     private double targetPercent = 0;
@@ -338,22 +337,22 @@ public class Neo extends SafeSpark {
         setPID(constants, 0);
     }
 
-    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput) {
-        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, 0);
-    }
-
-    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput, int slotID) {
-        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, slotID);
-    }
-
     /**
      * Sets the PID constants for the Neo motor controller.
      * 
      * @param constants the PID constants to set
      * @param slotID    the slot ID of the PID controller
      */
-    public void setPID(PatrIDConstants constants, int slotID) {
-        setPID(constants.getP(), constants.getI(), constants.getD(), -1, 1, slotID);
+    public void setPID(PatrIDConstants constants, int slot) {
+        setPID(
+            constants.getP(), 
+            constants.getI(), 
+            constants.getD(), 
+            constants.getIZone(), 
+            constants.getMinOutput(), 
+            constants.getMaxOutput(), 
+            slot
+        );
     }
 
     /**
@@ -366,7 +365,15 @@ public class Neo extends SafeSpark {
      * @param maxOutput  the maximum output value
      */
     public void setPID(double P, double I, double D, double minOutput, double maxOutput) {
-        setPID(P, I, D, minOutput, maxOutput, 0);
+        setPID(
+            P, 
+            I, 
+            D, 
+            Double.POSITIVE_INFINITY, 
+            minOutput, 
+            maxOutput, 
+            0
+        );
     }
 
     /**
@@ -379,11 +386,11 @@ public class Neo extends SafeSpark {
      * @param maxOutput  the maximum output value
      * @param slotID     the slot ID of the PID controller
      */
-    public void setPID(double P, double I, double D, double minOutput, double maxOutput, int slotID) {
+    public void setPID(double P, double I, double D, double iZone, double minOutput, double maxOutput, int slotID) {
         super.setP(P, slotID);
         super.setI(I, slotID);
         super.setD(D, slotID);
-
+        super.setIZone(iZone, slotID);
         super.setOutputRange(minOutput, maxOutput, slotID);
     }
 

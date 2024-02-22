@@ -399,7 +399,7 @@ public class SafeSpark extends CANSparkMax {
      * @param slot Slot to set
      * @return {@link REVLibError#kOk} if successful
      */
-    public REVLibError setIzone(double value, int slot) {
+    public REVLibError setIZone(double value, int slot) {
         REVLibError status = applyParameter(
             () -> pidController.setIZone(value, slot),
             () -> pidController.getIZone(slot) == value,

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -120,13 +119,19 @@ public final class Constants {
             0.002,
             0,
             0.20992,
-            0.0001762
+            0.0001762,
+            // These are in %
+            -1,
+            1
         );
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
             0.05,
             0,
-            0.0083
+            0.0083,
+            // These are in %
+            -0.25,
+            0.25
         );
 
         public static final int SHOOTER_CURRENT_LIMIT = 80;
@@ -136,13 +141,6 @@ public final class Constants {
 
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 150;
-
-        // These are in %
-        public static final double SHOOTER_MIN_OUTPUT = -1;
-        public static final double SHOOTER_MAX_OUTPUT = 1;
-
-        public static final double PIVOT_MIN_OUTPUT = -0.25;
-        public static final double PIVOT_MAX_OUTPUT = 0.25;
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
@@ -199,14 +197,11 @@ public final class Constants {
 
         public static final int TRAP_CURRENT_LIMIT = 15;
 
-        public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
-        public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;
-
         public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 25.0;
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
 
-        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0);
+        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0, -1, 1);
 
         // TODO: set these values
         public static final double RESET_POS = 0;
