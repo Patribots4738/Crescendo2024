@@ -44,7 +44,7 @@ public class PieceControl {
                 indexer.stopCommand(),
                 elevator.stopCommand(),
                 trapper.stopCommand(),
-                shooterCalc.stopAllMotors());
+                shooterCalc.stopAllMotors()).ignoringDisable(true);
     }
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
