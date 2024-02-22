@@ -22,6 +22,8 @@ import frc.robot.commands.subsytemHelpers.PieceControl;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Trapper;
+import frc.robot.subsystems.misc.leds.LedStrip;
+import frc.robot.subsystems.misc.limelight.Limelight;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;

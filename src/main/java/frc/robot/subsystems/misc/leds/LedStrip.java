@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.misc.leds;
 
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
