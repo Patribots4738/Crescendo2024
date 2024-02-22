@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -569,6 +570,11 @@ public final class Constants {
             new Pose2d(11.655, 4.064, new Rotation2d())
         };
 
+        public static final Pose2d[] SOURCE_POSITIONS = new Pose2d[] {
+            new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120)),
+            new Pose2d(1.079, 0.971, Rotation2d.fromDegrees(60))
+        };
+
         public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
             new Pose3d(CHAIN_POSITIONS[0]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
             new Pose3d(CHAIN_POSITIONS[1]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
@@ -607,6 +613,10 @@ public final class Constants {
 
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+        }
+
+        public static Pose2d GET_SOURCE_POSITION() {
+            return SOURCE_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
         }
 
         public static Translation2d GET_SPEAKER_TRANSLATION() {
