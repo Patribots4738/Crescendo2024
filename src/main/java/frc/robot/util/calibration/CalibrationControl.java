@@ -5,7 +5,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.ShooterCmds;
+import frc.robot.commands.subsytemHelpers.ShooterCmds;
 import frc.robot.util.mod.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;

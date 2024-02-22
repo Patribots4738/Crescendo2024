@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.subsytemHelpers;
 
 import java.util.function.Supplier;
 
@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
+import frc.robot.commands.sim.note.NoteTrajectory;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.mod.SpeedAngleTriplet;
