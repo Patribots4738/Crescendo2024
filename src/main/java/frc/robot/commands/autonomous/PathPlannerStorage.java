@@ -1,8 +1,11 @@
 package frc.robot.commands.autonomous;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.ConstraintsZone;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -128,7 +131,7 @@ public class PathPlannerStorage implements Logged {
      */
     public Command generateCenterLogic(int startingNote, int endingNote) {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
-
+        PathPlannerPath totalPath;
         boolean goingDown = startingNote < endingNote;
 
         int increment = goingDown ? 1 : -1;
@@ -142,27 +145,28 @@ public class PathPlannerStorage implements Logged {
                         : "R";
 
             PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
-
+            
             if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
                 commandGroup.addCommands(
-                    AutoBuilder.followPath(shootNote)
+                    Commands.defer(() ->  AutoBuilder.followPath(shootNote), commandGroup.getRequirements())
                 );
                 break;
             }
 
             PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
             PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
-
+            
             Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote).andThen(AutoBuilder.followPath(getNoteAfterShot));
             // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
             Command skipNoteCommand = AutoBuilder.followPath(skipNote);
 
             commandGroup.addCommands(
-                Commands.either(
-                    shootAndMoveToNextNote,
-                    skipNoteCommand,
-                    hasPieceSupplier
-                )
+                Commands.defer(() -> 
+                    Commands.either(
+                        shootAndMoveToNextNote,
+                        skipNoteCommand,
+                        hasPieceSupplier), 
+                        commandGroup.getRequirements())
             );
         }
 
