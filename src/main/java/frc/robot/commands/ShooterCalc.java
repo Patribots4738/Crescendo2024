@@ -226,7 +226,7 @@ public class ShooterCalc implements Logged {
 
         double velocityNormalToSpeaker = totalSpeed * Math.cos(angleDifference);
         
-        return new Translation2d(velocityTangentToSpeaker, -velocityNormalToSpeaker);
+        return new Translation2d(velocityTangentToSpeaker, velocityNormalToSpeaker);
     }
 
     /**
