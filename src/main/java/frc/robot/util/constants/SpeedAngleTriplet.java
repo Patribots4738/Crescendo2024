@@ -1,4 +1,4 @@
-package frc.robot.util.mod;
+package frc.robot.util.constants;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;

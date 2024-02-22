@@ -26,7 +26,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import frc.robot.Robot;
-import frc.robot.util.mod.SpeedAngleTriplet;
 import frc.robot.util.motors.Neo;
 import monologue.Logged;
 

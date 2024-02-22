@@ -453,4 +453,10 @@ public class Neo extends SafeSparkBase {
         VELOCITY,
         PERCENT;
     }
+
+    public static void incinerateMotors() {
+        for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
+            neo.burnFlash();
+        }
+    }
 }

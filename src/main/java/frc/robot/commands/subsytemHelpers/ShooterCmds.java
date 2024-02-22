@@ -13,7 +13,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.commands.sim.note.NoteTrajectory;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.calc.ShooterCalc;
-import frc.robot.util.mod.SpeedAngleTriplet;
+import frc.robot.util.constants.SpeedAngleTriplet;
 
 public class ShooterCmds {
 

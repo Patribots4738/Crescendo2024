@@ -6,7 +6,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
-import frc.robot.util.mod.SpeedAngleTriplet;
+import frc.robot.util.constants.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

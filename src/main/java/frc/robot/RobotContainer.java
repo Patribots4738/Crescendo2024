@@ -16,7 +16,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
-import frc.robot.commands.leds.LPI;
+import frc.robot.commands.misc.leds.LPI;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
 import frc.robot.commands.subsytemHelpers.PieceControl;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
@@ -107,7 +107,7 @@ public class RobotContainer implements Logged {
             AutoConstants.HDC.getXController(),
             AutoConstants.HDC.getThetaController());
 
-        incinerateMotors();
+        Neo.incinerateMotors();
         
         shooterCmds = new ShooterCmds(shooter, pivot);
         
@@ -164,7 +164,7 @@ public class RobotContainer implements Logged {
                 && Robot.isRedAlliance())));
 
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
-        initializeArrays();
+        initializeComponents();
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
@@ -190,7 +190,7 @@ public class RobotContainer implements Logged {
         // Warning: these buttons are not on the default loop!
         // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
         // for more information 
-        configureHDCTuner(driver);
+        configureHDCBindings(driver);
         configureCalibrationBindings(operator);
     }
     
@@ -353,7 +353,7 @@ public class RobotContainer implements Logged {
             .onTrue(calibrationControl.copyCalcTriplet());
     }
     
-    private void configureHDCTuner(PatriBoxController controller) {
+    private void configureHDCBindings(PatriBoxController controller) {
         controller.pov(0, 270, testButtonBindingLoop)
             .onTrue(HDCTuner.controllerDecrementCommand());
         controller.pov(0, 90, testButtonBindingLoop)
@@ -438,14 +438,8 @@ public class RobotContainer implements Logged {
             }
         }
     }
-    
-    private void incinerateMotors() {
-        for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
-            neo.burnFlash();
-        }
-    }
 
-    private void initializeArrays() {
+    private void initializeComponents() {
         Pose3d initialShooterPose = new Pose3d(
                 NTConstants.PIVOT_OFFSET_METERS.getX(),
                 0,
