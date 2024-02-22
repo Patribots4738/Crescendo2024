@@ -16,7 +16,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.commands.AlignmentCalc;
 import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
-import frc.robot.commands.ShooterCalc;
+import frc.robot.commands.ShooterCmds;
 import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.leds.LPI;
@@ -58,7 +58,7 @@ public class RobotContainer implements Logged {
     private Shooter shooter;
     private Trapper trapper;
     private Elevator elevator;
-    private ShooterCalc shooterCalc;
+    private ShooterCmds shooterCmds;
     private PieceControl pieceControl;
     private ChoreoStorage choreoPathStorage;
     private PathPlannerStorage pathPlannerStorage;
@@ -107,23 +107,23 @@ public class RobotContainer implements Logged {
 
         incinerateMotors();
         
-        shooterCalc = new ShooterCalc(shooter, pivot);
+        shooterCmds = new ShooterCmds(shooter, pivot);
         
         PIDTuner = new PIDTunerCommands(new PIDNotConstants[] {
             swerve.getDrivingPidNotConstants(),
             swerve.getTurningPidNotConstants()
         });
 
-        alignmentCalc = new AlignmentCalc(swerve, climb, shooterCalc);
+        alignmentCalc = new AlignmentCalc(swerve, climb, shooterCmds);
 
         pieceControl = new PieceControl(
             intake,
             triggerWheel,
             elevator,
             trapper,
-            shooterCalc);
+            shooterCmds);
 
-        calibrationControl = new CalibrationControl(shooterCalc);
+        calibrationControl = new CalibrationControl(shooterCmds);
 
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -272,7 +272,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors());
 
         controller.x()
-            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .toggleOnTrue(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.leftBumper()
             .onTrue(pieceControl.toggleIn());
@@ -282,8 +282,8 @@ public class RobotContainer implements Logged {
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
-        controller.rightTrigger().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-        controller.rightTrigger().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.rightTrigger().onTrue(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.rightTrigger().onFalse(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger()
             .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
@@ -417,16 +417,16 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
-        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommandAuto(swerve::getPose));
+        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
-        NamedCommands.registerCommand("PrepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("PrepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("PrepareShooterR", shooterCalc.prepareFireCommand(() -> FieldConstants.R_POSE));
-        NamedCommands.registerCommand("PrepareShooterW3", shooterCalc.prepareFireCommand(() -> FieldConstants.W3_POSE));
-        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
-        NamedCommands.registerCommand("PrepareSWD", shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE));
+        NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE));
+        NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE));
+        NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE));
+        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
+        NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
             for (int j = 1; j <= FieldConstants.CENTER_NOTE_COUNT; j++) {
                 if (i == j) {

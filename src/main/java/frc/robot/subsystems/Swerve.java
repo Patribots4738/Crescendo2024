@@ -33,7 +33,7 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
-import frc.robot.commands.ShooterCalc;
+import frc.robot.commands.ShooterCmds;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calibration.PIDNotConstants;
 import frc.robot.util.constants.Constants.AutoConstants;

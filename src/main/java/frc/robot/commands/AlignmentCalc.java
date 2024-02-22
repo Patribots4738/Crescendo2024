@@ -20,13 +20,13 @@ public class AlignmentCalc {
     
     private Climb climb;
     private Swerve swerve;
-    private ShooterCalc shooterCalc;
+    private ShooterCmds shooterCmds;
 
-    public AlignmentCalc(Swerve swerve, Climb climb, ShooterCalc shooterCalc) {
+    public AlignmentCalc(Swerve swerve, Climb climb, ShooterCmds shooterCmds) {
 
         this.climb = climb;
         this.swerve = swerve;
-        this.shooterCalc = shooterCalc;
+        this.shooterCmds = shooterCmds;
 
     }
 
@@ -104,20 +104,20 @@ public class AlignmentCalc {
         return swerve.getDriveCommand(() -> getSourceRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
     }
 
-    public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCalc shooterCalc) {
+    public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return new ChassisSpeeds(
             driverY * (Robot.isRedAlliance() ? -1 : 1),
             driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+            getAlignmentSpeeds(shooterCmds.shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
     }
 
-    public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCalc shooterCalc) {
+    public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return swerve.getDriveCommand(
             () -> 
                 getSpeakerRotationalSpeeds(
                     driverX.getAsDouble(), 
                     driverY.getAsDouble(),
-                    shooterCalc), 
+                    shooterCmds), 
             () -> true);
     }
 
@@ -160,7 +160,7 @@ public class AlignmentCalc {
         return
             Commands.either(
                 chainRotationalAlignment(driverX, driverY),
-                speakerRotationalAlignment(driverX, driverY, shooterCalc),
+                speakerRotationalAlignment(driverX, driverY, shooterCmds),
                 climb::hooksUp);
     }
 
