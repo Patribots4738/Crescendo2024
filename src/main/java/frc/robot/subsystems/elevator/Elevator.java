@@ -11,7 +11,6 @@ import frc.robot.util.calibration.PIDNotConstants;
 import frc.robot.util.constants.Constants.NTConstants;
 import frc.robot.util.constants.Constants.TrapConstants;
 import frc.robot.util.motors.Neo;
-import frc.robot.util.motors.SafeSparkBase.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

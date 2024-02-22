@@ -5,13 +5,11 @@
 package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -33,8 +31,6 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
-import frc.robot.commands.ShooterCmds;
-import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calibration.PIDNotConstants;
 import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.DriveConstants;
