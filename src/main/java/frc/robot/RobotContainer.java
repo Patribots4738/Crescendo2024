@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
-import frc.robot.commands.AlignmentCalc;
+import frc.robot.commands.AlignmentCmds;
 import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCmds;
@@ -64,7 +64,7 @@ public class RobotContainer implements Logged {
     private PathPlannerStorage pathPlannerStorage;
     private CalibrationControl calibrationControl;
     private PIDTunerCommands PIDTuner;
-    private AlignmentCalc alignmentCalc;
+    private AlignmentCmds alignmentCmds;
 
     public static HDCTuner HDCTuner;
     
@@ -114,7 +114,7 @@ public class RobotContainer implements Logged {
             swerve.getTurningPidNotConstants()
         });
 
-        alignmentCalc = new AlignmentCalc(swerve, climb, shooterCmds);
+        alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
 
         pieceControl = new PieceControl(
             intake,
@@ -251,8 +251,8 @@ public class RobotContainer implements Logged {
             Commands.sequence(
                 swerve.resetHDC(),
                 Commands.either(
-                    alignmentCalc.trapAlignmentCommand(() -> controller.getLeftY()), 
-                    alignmentCalc.ampAlignmentCommand(() -> controller.getLeftX()), 
+                    alignmentCmds.trapAlignmentCommand(() -> controller.getLeftY()), 
+                    alignmentCmds.ampAlignmentCommand(() -> controller.getLeftX()), 
                     climb::hooksUp)));
         
         
@@ -264,9 +264,9 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDC(),
                     Commands.either(
-                        alignmentCalc.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
-                        alignmentCalc.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
-                        alignmentCalc::onOppositeSide)));
+                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        alignmentCmds.alignmentCalc::onOppositeSide)));
 
         controller.b()
             .onTrue(pieceControl.stopAllMotors());
