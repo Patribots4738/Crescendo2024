@@ -8,36 +8,43 @@ import monologue.Annotations.Log;
 public class PatrIDConstants implements Logged {
 
     @Log
-    private final double P, I, D, FF, iZone, minOutput, maxOutput;
+    private final double 
+        P, 
+        I, 
+        D, 
+        FF, 
+        iZone,
+        minOutput,
+        maxOutput;
 
     public PatrIDConstants(double P) {
         this(P, 0);
     }
 
     public PatrIDConstants(double P, double D) {
-        this(P, 0, D, 0, 1.0, -1, 1);
+        this(P, 0, D);
     }
 
     public PatrIDConstants(double P, double I, double D) {
-        this(P, I, D, 0, 1.0, -1, 1);
+        this(P, I, D, 0);
     }
 
     public PatrIDConstants(double P, double I, double D, double FF) {
-        this(P, I, D, FF, 1.0, -1, 1);
+        this(P, I, D, FF, -1, 1);
     }
     
     public PatrIDConstants(double P, double I, double D, double minOutput, double maxOutput) {
-        this(P, I, D, 0, 1.0, minOutput, maxOutput);
+        this(P, I, D, 0, minOutput, maxOutput);
     }
 
     public PatrIDConstants(double P, double I, double D, double FF, double minOutput, double maxOutput) {
-        this(P, I, D, FF, 1.0, minOutput, maxOutput);
+        this(P, I, D, FF, Double.POSITIVE_INFINITY, minOutput, maxOutput);
     }
 
-    public PatrIDConstants(double kP, double kI, double kD, double FF, double iZone, double minOutput, double maxOutput) {
-        this.P = kP;
-        this.I = kI;
-        this.D = kD;
+    public PatrIDConstants(double P, double I, double D, double FF, double iZone, double minOutput, double maxOutput) {
+        this.P = P;
+        this.I = I;
+        this.D = D;
         this.FF = FF;
         this.iZone = iZone;
         this.minOutput = minOutput;
@@ -73,7 +80,7 @@ public class PatrIDConstants implements Logged {
     }
 
     public String toString() {
-        return String.format("P: %.4f | I: %.4f | D: %.4f | FF: %.4f | iZone: %.4f | minOutput: %.4f | maxOutput: %.4f",
+        return String.format("P: %.2f | I: %.4f | D: %.2f | FF: %.4f | iZone: %.2f | minOutput: %.1f | maxOutput: %.1f",
                 this.P, this.I, this.D, this.FF, this.iZone, this.minOutput, this.maxOutput);
     }
 }

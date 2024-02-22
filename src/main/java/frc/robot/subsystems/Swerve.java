@@ -71,17 +71,17 @@ public class Swerve extends SubsystemBase implements Logged {
 
     private PIDNotConstants drivingConstants = new PIDNotConstants(
         ModuleConstants.DRIVING_PID, 
-        frontLeft.drivingPIDController, 
-        frontRight.drivingPIDController, 
-        rearLeft.drivingPIDController,
-        rearRight.drivingPIDController);
+        frontLeft.getDrivingPIDController(), 
+        frontRight.getDrivingPIDController(), 
+        rearLeft.getDrivingPIDController(),
+        rearRight.getDrivingPIDController());
         
     private PIDNotConstants turningConstants = new PIDNotConstants(
         ModuleConstants.TURNING_PID, 
-        frontLeft.turningPIDController, 
-        frontRight.turningPIDController, 
-        rearLeft.turningPIDController,
-        rearRight.turningPIDController);
+        frontLeft.getTurningPIDController(), 
+        frontRight.getTurningPIDController(), 
+        rearLeft.getTurningPIDController(),
+        rearRight.getTurningPIDController());
 
     @Log
     SwerveModuleState[] swerveMeasuredStates;

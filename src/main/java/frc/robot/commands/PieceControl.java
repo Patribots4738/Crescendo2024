@@ -104,18 +104,11 @@ public class PieceControl {
         // rotation and speed before sending note from trapper into indexer and then into 
         // shooter before stopping trapper and indexer
         return Commands.sequence(
-            intake.outCommand(),
-            trapper.outtake(),
+            intake.stopCommand(),
             indexer.toElevator(),
-            Commands.waitSeconds(.75),
-            stopAllMotors());
-
-        // return Commands.sequence(
-        //     intake.stop(),
-        //     indexer.toElevator(),
-        //     dropPieceCommand(),
-        //     stopAllMotors()
-        // );
+            dropPieceCommand(),
+            stopAllMotors()
+        );
 
     }
 
@@ -129,10 +122,9 @@ public class PieceControl {
     }
 
     public Command indexCommand() {
-        return Commands.none();
-        // return elevator.indexCommand()
-        //     .andThen(elevator.toBottomCommand()
-        //         .alongWith(intake.stopCommand()));
+        return elevator.indexCommand()
+            .andThen(elevator.toBottomCommand()
+                .alongWith(intake.stopCommand()));
     }
 
     public Command intakeAuto() {
