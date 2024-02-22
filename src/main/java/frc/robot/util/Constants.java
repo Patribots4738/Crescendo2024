@@ -716,8 +716,8 @@ public final class Constants {
         public static final int PIVOT_INDEX = 0;
         public static final int TRAPPER_INDEX = 1;
         public static final int ELEVATOR_INDEX = 2;
-        public static final int LEFT_CLIMB_INDEX = 4;
         public static final int RIGHT_CLIMB_INDEX = 3;
+        public static final int LEFT_CLIMB_INDEX = 4;
         
         public static final double PIVOT_OFFSET_X = 0.112;
         public static final double PIVOT_OFFSET_Z = 0.21;
