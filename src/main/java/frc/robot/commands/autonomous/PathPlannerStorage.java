@@ -131,7 +131,6 @@ public class PathPlannerStorage implements Logged {
      */
     public Command generateCenterLogic(int startingNote, int endingNote) {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
-        PathPlannerPath totalPath;
         boolean goingDown = startingNote < endingNote;
 
         int increment = goingDown ? 1 : -1;
