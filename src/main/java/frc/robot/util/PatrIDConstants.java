@@ -80,7 +80,7 @@ public class PatrIDConstants implements Logged {
     }
 
     public String toString() {
-        return String.format("P: %.4f | I: %.4f | D: %.4f | FF: %.4f | iZone: %.4f | minOutput: %.4f | maxOutput: %.4f",
+        return String.format("P: %.2f | I: %.4f | D: %.2f | FF: %.4f | iZone: %.2f | minOutput: %.1f | maxOutput: %.1f",
                 this.P, this.I, this.D, this.FF, this.iZone, this.minOutput, this.maxOutput);
     }
 }
