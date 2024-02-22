@@ -144,9 +144,6 @@ public final class Constants {
         public static final double PIVOT_MIN_OUTPUT = -0.25;
         public static final double PIVOT_MAX_OUTPUT = 0.25;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES_WRONG = 343.5;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES_WRONG = 300;
-
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
 
