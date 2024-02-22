@@ -5,14 +5,17 @@ import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.event.EventLoop;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot.GameMode;
+import frc.robot.commands.AlignmentCalc;
 import frc.robot.commands.Drive;
 import frc.robot.commands.PieceControl;
 import frc.robot.commands.ShooterCalc;
@@ -33,7 +36,6 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.OIConstants;
-import frc.robot.util.Constants.FieldConstants.GameMode;
 import monologue.Annotations.Log;
 import frc.robot.util.PIDNotConstants;
 import frc.robot.util.PIDTunerCommands;
@@ -63,6 +65,7 @@ public class RobotContainer implements Logged {
     private PathPlannerStorage pathPlannerStorage;
     private CalibrationControl calibrationControl;
     private PIDTunerCommands PIDTuner;
+    private AlignmentCalc alignmentCalc;
 
     public static HDCTuner HDCTuner;
     
@@ -77,6 +80,9 @@ public class RobotContainer implements Logged {
 
     @Log
     private boolean freshCode = true;
+
+    @Log
+    public static Field2d field2d = new Field2d();
     
     public RobotContainer() {
         
@@ -108,6 +114,8 @@ public class RobotContainer implements Logged {
             swerve.getDrivingPidNotConstants(),
             swerve.getTurningPidNotConstants()
         });
+
+        alignmentCalc = new AlignmentCalc(swerve, climb, shooterCalc);
 
         pieceControl = new PieceControl(
             intake,
@@ -152,28 +160,29 @@ public class RobotContainer implements Logged {
             () -> -driver.getRightX(),
             () -> !driver.getYButton(),
             () -> (!driver.getYButton()
-                && Robot.isRedAlliance()))); 
-        
-        configureButtonBindings();
-        initializeArrays();
-        
+                && Robot.isRedAlliance())));
+
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
+        initializeArrays();
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
+        
+        configureButtonBindings();
     }
-    
+
     private void configureButtonBindings() {
         if (FieldConstants.IS_SIMULATION) {
             configureSimulationBindings(driver);
         }
         configureDriverBindings(driver);
-        operator.a()
-            .onTrue(Commands.runOnce(() -> freshCode = true))
-            .onFalse(Commands.runOnce(() -> freshCode = false));
-        // configureOperatorBindings(operator);
+        configureOperatorBindings(operator);
         configureTestBindings();
+
+        new Trigger(Robot::isRedAlliance)
+            .onTrue(pathPlannerStorage.updatePathViewerCommand())
+            .onFalse(pathPlannerStorage.updatePathViewerCommand());
     }
 
     private void configureTestBindings() {
@@ -185,7 +194,6 @@ public class RobotContainer implements Logged {
     }
     
     private void configureOperatorBindings(PatriBoxController controller) {
-
         controller.povUp()
             .onTrue(elevator.toTopCommand());
         
@@ -213,7 +221,8 @@ public class RobotContainer implements Logged {
         controller.back().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
-                    swerve.getPose().getTranslation(),
+                    1.31,
+                    5.53, 
                     Rotation2d.fromDegrees(
                         Robot.isRedAlliance()
                             ? 0
@@ -223,6 +232,7 @@ public class RobotContainer implements Logged {
         // Upon hitting start button
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
+        // TODO: for testing reset odometry to speaker
         controller.start().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
@@ -241,37 +251,40 @@ public class RobotContainer implements Logged {
         controller.a().whileTrue(
             Commands.sequence(
                 swerve.resetHDC(),
-                swerve.setAlignmentSpeed(),
-                swerve.ampAlignmentCommand(() -> driver.getLeftX())));
+                Commands.either(
+                    alignmentCalc.trapAlignmentCommand(() -> controller.getLeftY()), 
+                    alignmentCalc.ampAlignmentCommand(() -> controller.getLeftX()), 
+                    climb::hooksUp)));
         
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.rightStick()
-        // TODO: AIM AT CHAIN IF HOOKS UP
             .toggleOnTrue(
-                Commands.parallel(
-                    Commands.sequence(
-                        swerve.resetHDC(),
-                        swerve.getDriveCommand(
-                            () -> {
-                                return new ChassisSpeeds(
-                                    -controller.getLeftY(),
-                                    -controller.getLeftX(),
-                                    swerve.getAlignmentSpeeds(shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
-                            },
-                            () -> true
-                        )
-                    ),
-                    shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                )
-            );
+                Commands.sequence(
+                    swerve.resetHDC(),
+                    Commands.either(
+                        alignmentCalc.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        alignmentCalc.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        alignmentCalc::onOppositeSide)));
+
+        controller.b()
+            .onTrue(pieceControl.stopAllMotors());
+
+        controller.x()
+            .toggleOnTrue(shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+
+        controller.leftBumper()
+            .onTrue(pieceControl.toggleIn());
+
+        controller.rightBumper()
+            .onTrue(pieceControl.toggleOut());
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
-        controller.a().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-        controller.a().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.rightTrigger().onTrue(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.rightTrigger().onFalse(shooterCalc.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger()
             .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
@@ -307,7 +320,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
-        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().alongWith(shooterCalc.stopAllMotors()));
+        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors());
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
         controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
 
@@ -383,13 +396,16 @@ public class RobotContainer implements Logged {
     }
 
     public void onDisabled() {
-        swerve.stopMotors();
-        pieceControl.stopAllMotors().ignoringDisable(true).schedule();;
+        swerve.stopDriving();
+        pieceControl.stopAllMotors().schedule();
+        pathPlannerStorage.updatePathViewerCommand().schedule();
     }
     
     public void onEnabled() {
-        if (FieldConstants.GAME_MODE == GameMode.TELEOP)
+        if (Robot.gameMode == GameMode.TELEOP) {
             new LPI(ledStrip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
+            pathPlannerStorage.updatePathViewerCommand().schedule();
+        }
         this.freshCode = false;
     }
 
@@ -401,6 +417,7 @@ public class RobotContainer implements Logged {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
+        NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -408,6 +425,9 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterL", shooterCalc.prepareFireCommand(() -> FieldConstants.L_POSE));
         NamedCommands.registerCommand("PrepareShooterM", shooterCalc.prepareFireCommand(() -> FieldConstants.M_POSE));
         NamedCommands.registerCommand("PrepareShooterR", shooterCalc.prepareFireCommand(() -> FieldConstants.R_POSE));
+        NamedCommands.registerCommand("PrepareShooterW3", shooterCalc.prepareFireCommand(() -> FieldConstants.W3_POSE));
+        NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
+        NamedCommands.registerCommand("PrepareSWD", shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
             for (int j = 1; j <= FieldConstants.CENTER_NOTE_COUNT; j++) {
                 if (i == j) {

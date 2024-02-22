@@ -4,12 +4,9 @@
 
 package frc.robot.subsystems;
 
-import java.lang.reflect.Field;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
-import org.ejml.sparse.csc.factory.FillReductionFactory_DSCC;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -28,17 +25,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
+import frc.robot.commands.ShooterCalc;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
-import frc.robot.util.PatriBoxController;
+import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -96,9 +94,6 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Log
     Pose2d robotPose2d = new Pose2d();
-
-    @Log.NT
-    Field2d field2d = new Field2d();
 
     // The gyro sensor
     private final Pigeon2 gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
@@ -180,10 +175,19 @@ public class Swerve extends SubsystemBase implements Logged {
                                     speeds.omegaRadiansPerSecond * .02)));
         }
 
-        field2d.setRobotPose(currentPose);
+        RobotContainer.field2d.setRobotPose(currentPose);
         SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
-        robotPose2d = currentPose;
+        if (! (Double.isNaN(currentPose.getX())
+            || Double.isNaN(currentPose.getY())
+            || Double.isNaN(currentPose.getRotation().getDegrees())))
+        {
+            robotPose2d = currentPose;
+        } else {
+            // Something in our pose was NaN...
+            resetOdometry(robotPose2d);
+            resetHDC();
+        }
 
         robotPose3d = new Pose3d(
                 new Translation3d(
@@ -236,7 +240,7 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(swerveModuleStates);
     }
 
-    public void stopMotors() {
+    public void stopDriving() {
         drive(0, 0, 0, false);
     }
     
@@ -258,11 +262,12 @@ public class Swerve extends SubsystemBase implements Logged {
      * Sets the wheels into an X formation to prevent movement.
      */
     public void setWheelsX() {
-        SwerveModuleState[] desiredStates = new SwerveModuleState[4];
-        desiredStates[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
-        desiredStates[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-        desiredStates[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-        desiredStates[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+        SwerveModuleState[] desiredStates = new SwerveModuleState[] {
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+        };
 
         setModuleStates(desiredStates);
     }
@@ -382,17 +387,6 @@ public class Swerve extends SubsystemBase implements Logged {
         }
     }
 
-    public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds, Supplier<ChassisSpeeds> controllerSpeeds) {
-        return new Drive(this, () -> {
-            ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
-            ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
-            return new ChassisSpeeds(
-                    (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond),
-                    -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond),
-                    controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
-        }, () -> false, () -> false);
-    }
-
     public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
         return new Drive(this, speeds, fieldRelative, () -> false);
     }
@@ -401,47 +395,12 @@ public class Swerve extends SubsystemBase implements Logged {
         return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
-    public double getAlignmentSpeeds(Rotation2d desiredAngle) {
-        return MathUtil.applyDeadband(AutoConstants.HDC.getThetaController().calculate(
-            getPose().getRotation().getRadians(),
-            desiredAngle.getRadians()),  0.02);
-    }
-
-    public Command ampAlignmentCommand(DoubleSupplier driverX) {
-
-        return 
-            getAutoAlignmentCommand(
-                () -> {
-                    Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
-                    Pose2d desiredPose = new Pose2d(
-                        ampPose.getX(),
-                        getPose().getY(),
-                        ampPose.getRotation()
-                    );
-                    setDesiredPose(desiredPose);
-                    return
-                        AutoConstants.HDC.calculate(
-                            getPose(),
-                            desiredPose,
-                            0,
-                            desiredPose.getRotation()
-                        );
-                }, 
-                () -> 
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        0,
-                        driverX.getAsDouble() * (Robot.isRedAlliance() ? 1 : -1),
-                        0,
-                        getPose().getRotation()
-                    )
-            );
-    }
-
     public Command resetHDC() {
         return Commands.sequence(
-            runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),
-            runOnce(() -> AutoConstants.HDC.getXController().reset()),
-            runOnce(() -> AutoConstants.HDC.getYController().reset())
+            Commands.runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),
+            Commands.runOnce(() -> AutoConstants.HDC.getXController().reset()),
+            Commands.runOnce(() -> AutoConstants.HDC.getYController().reset())
         );
     }
+
 }

@@ -3,7 +3,6 @@ package frc.robot.util;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.Robot;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
@@ -11,25 +10,7 @@ import monologue.Logged;
 public class PoseCalculations implements Logged {
 
     public static Pair<Double, Double> getChainIntercepts(Pose2d position) {
-        Pose2d closestChainPose;
-
-        double minDifference = 10000;
-        int closestChainIndex = 0;
-
-        int startingIndex = Robot.isRedAlliance() ? 3 : 0;
-        int endingIndex = Robot.isRedAlliance() ? 6 : 3;
-
-        for (int i = startingIndex; i < endingIndex; i++) {
-            Pose2d currentChainPose = FieldConstants.CHAIN_POSITIONS[i];
-            double currentChainDistance = position.getTranslation().getDistance(currentChainPose.getTranslation());
-
-            if (currentChainDistance < minDifference) {
-                minDifference = currentChainDistance;
-                closestChainIndex = i;
-            }
-        }
-
-        closestChainPose = FieldConstants.CHAIN_POSITIONS[closestChainIndex];
+        Pose2d closestChainPose = getClosestChain(position);
 
         Pose2d relativePosition = position.relativeTo(closestChainPose);
 
@@ -41,6 +22,19 @@ public class PoseCalculations implements Logged {
         double rightIntercept = getChainIntercept(relativePosition.getY() + ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
 
         return Pair.of(leftIntercept - 0.6, rightIntercept - 0.6);
+    }
+
+    public static Pose2d getClosestChain(Pose2d position) {
+        Pose2d[] chainPoses = FieldConstants.GET_CHAIN_POSITIONS();
+        Pose2d closestChain = chainPoses[0];
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (Pose2d pose : chainPoses) {
+            if (position.relativeTo(pose).getTranslation().getNorm() < minDistance) {
+                minDistance = position.relativeTo(pose).getTranslation().getNorm();
+                closestChain = pose;
+            }
+        }
+        return closestChain;
     }
 
     /**

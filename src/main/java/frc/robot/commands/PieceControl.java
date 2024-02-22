@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,7 +23,7 @@ public class PieceControl {
 
     private ShooterCalc shooterCalc;
 
-    private boolean shooterMode;
+    private boolean shooterMode = true;
 
     public PieceControl(
             Intake intake,
@@ -44,7 +43,8 @@ public class PieceControl {
                 intake.stopCommand(),
                 indexer.stopCommand(),
                 elevator.stopCommand(),
-                trapper.stopCommand());
+                trapper.stopCommand(),
+                shooterCalc.stopAllMotors()).ignoringDisable(true);
     }
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
@@ -64,8 +64,7 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitUntil(intake.possessionTrigger()),
-                indexCommand());
+                Commands.waitSeconds(.75));
 
     }
 
@@ -85,7 +84,7 @@ public class PieceControl {
 
     public Command toggleIn() {
         return Commands.either(
-            noteToShoot(),
+            noteToTrap(),
             stopIntakeAndIndexer(),
             intake::isStopped
         );
@@ -105,7 +104,7 @@ public class PieceControl {
         // rotation and speed before sending note from trapper into indexer and then into 
         // shooter before stopping trapper and indexer
         return Commands.sequence(
-            intake.stopCommand(),
+            intake.outCommand(),
             trapper.outtake(),
             indexer.toElevator(),
             Commands.waitSeconds(.75),
@@ -130,9 +129,10 @@ public class PieceControl {
     }
 
     public Command indexCommand() {
-        return elevator.indexCommand()
-            .andThen(elevator.toBottomCommand())
-            .alongWith(intake.stopCommand());
+        return Commands.none();
+        // return elevator.indexCommand()
+        //     .andThen(elevator.toBottomCommand()
+        //         .alongWith(intake.stopCommand()));
     }
 
     public Command intakeAuto() {

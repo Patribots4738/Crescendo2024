@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -21,10 +19,10 @@ public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
     private final PIDNotConstants elevatorPID;
     @Log
-    public double pos = 0, desiredPos = 0;
+    private double pos = 0, desiredPos = 0;
 
     @Log
-    public boolean atDesiredPos = false;
+    private boolean atDesiredPos = false;
 
     /** Creates a new Elevator. */
     public Elevator() {
