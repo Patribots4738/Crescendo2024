@@ -42,19 +42,19 @@ public class Elevator extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        // pos = elevator.getPosition();
-        // desiredPos = elevator.getTargetPosition();
+        pos = elevator.getPosition();
+        desiredPos = elevator.getTargetPosition();
 
-        // atDesiredPos = atDesiredPosition();
+        atDesiredPos = atDesiredPosition();
 
-        // RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
-        //     0, 0, elevator.getPosition() * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
-        //     new Rotation3d()
-        // );
-        // RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
-        //     0, 0, elevator.getPosition(),
-        //     new Rotation3d()
-        // );
+        RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
+            0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
+            new Rotation3d()
+        );
+        RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+            0, 0, pos,
+            new Rotation3d()
+        );
     }
 
     public double getPosition() {
@@ -72,13 +72,14 @@ public class Elevator extends SubsystemBase implements Logged {
             new Rotation3d()
         );
         RobotContainer.desiredComponents3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
-            0, 0, pos*TrapConstants.TRAPPER_POSITION_MULTIPLIER,
+            0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER,
             new Rotation3d()
         );
     }
 
     public Command setPositionCommand(double pos) {
         return runOnce(() -> this.setPosition(pos))
+                // Keep the subsystem required as it gets there
                 .andThen(Commands.waitUntil(this::atDesiredPosition));
     }
 
