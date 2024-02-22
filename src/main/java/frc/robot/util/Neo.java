@@ -2,7 +2,6 @@
 
 package frc.robot.util;
 
-import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
@@ -80,12 +79,12 @@ public class Neo extends CANSparkMax {
         // this requires the code to configure the sparks after construction
         restoreFactoryDefaults();
         // Add a delay to let the spark reset
-        Timer.delay(0.05);
-
         // If a parameter set fails, this will add more time 
         // to minimize any bus traffic.
         // Default is 20ms
         setCANTimeout(50);
+        Timer.delay(0.25);
+
 
         // Turn off alternate and analog encoders
         // we never use them
@@ -261,8 +260,8 @@ public class Neo extends CANSparkMax {
      */
     public void tick() {
         if (shouldCache) {
-            position = encoder.getPosition();
-            velo = encoder.getVelocity();
+            position = encoder.getPosition() * inversionMultiplier;
+            velo = encoder.getVelocity() * inversionMultiplier;
         }
 
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
@@ -278,7 +277,7 @@ public class Neo extends CANSparkMax {
      * if in simulation.
      */
     public void register() {
-        NeoMotorConstants.motors.add(this);
+        NeoMotorConstants.MOTOR_LIST.add(this);
         if (FieldConstants.IS_SIMULATION)
             REVPhysicsSim.getInstance().addSparkMax(this, DCMotor.getNEO(1));  
     }
@@ -290,6 +289,8 @@ public class Neo extends CANSparkMax {
     public double getPosition() {
         
         double pos = shouldCache ? position : encoder.getPosition();
+
+        pos *= inversionMultiplier;
 
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.VELOCITY) {
             pos /= encoder.getVelocityConversionFactor();
@@ -303,7 +304,7 @@ public class Neo extends CANSparkMax {
      * @return The instantaneous velocity of the Neo in rotations per minute.
      */
     public double getVelocity() {
-        return shouldCache ? velo : encoder.getVelocity(); 
+        return shouldCache ? velo : encoder.getVelocity() * inversionMultiplier; 
     }
 
     /**
@@ -311,7 +312,7 @@ public class Neo extends CANSparkMax {
      * 
      * @param position the desired position to set
      */
-    public void setPosition(double position) {
+    public void resetEncoder(double position) {
         encoder.setPosition(position * inversionMultiplier);
     }
 
@@ -363,8 +364,16 @@ public class Neo extends CANSparkMax {
      * 
      * @param constants the PID constants to set
      */
-    public void setPID(PIDConstants constants) {
+    public void setPID(PatrIDConstants constants) {
         setPID(constants, 0);
+    }
+
+    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, 0);
+    }
+
+    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput, int slotID) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, slotID);
     }
 
     /**
@@ -373,8 +382,8 @@ public class Neo extends CANSparkMax {
      * @param constants the PID constants to set
      * @param slotID    the slot ID of the PID controller
      */
-    public void setPID(PIDConstants constants, int slotID) {
-        setPID(constants.kP, constants.kI, constants.kD, -1, 1, slotID);
+    public void setPID(PatrIDConstants constants, int slotID) {
+        setPID(constants.getP(), constants.getI(), constants.getD(), -1, 1, slotID);
     }
 
     /**
@@ -406,6 +415,10 @@ public class Neo extends CANSparkMax {
         pidController.setD(D, slotID);
 
         pidController.setOutputRange(minOutput, maxOutput, slotID);
+    }
+
+    public void setFF(double ff) {
+        pidController.setFF(ff);
     }
 
     /**
@@ -450,6 +463,10 @@ public class Neo extends CANSparkMax {
      */
     public double getD() {
         return pidController.getD();
+    }
+
+    public PatrIDConstants getPID() {
+        return new PatrIDConstants(pidController.getP(), pidController.getI(), pidController.getD());
     }
 
     /**
@@ -567,7 +584,7 @@ public class Neo extends CANSparkMax {
      * This will make it try to stop when not power.
      */
     public void setBrakeMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kCoast);
+        this.setIdleMode(CANSparkBase.IdleMode.kBrake);
     }
 
     /**
@@ -575,9 +592,10 @@ public class Neo extends CANSparkMax {
      * This will make it spin freely when not powered.
      */
     public void setCoastMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        this.setIdleMode(CANSparkBase.IdleMode.kCoast);
     }
 
+    
     public enum TelemetryPreference {
         DEFAULT,
         ONLY_ABSOLUTE_ENCODER,

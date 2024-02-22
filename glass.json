@@ -1,0 +1,35 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "Robot": {
+        "choreoChooser": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Robot/choreoChooser": "String Chooser",
+      "/Robot/field2d": "Field2d",
+      "/Robot/pathPlannerStorage/autoChooser": "String Chooser"
+    },
+    "windows": {
+      "/Robot/pathPlannerStorage/autoChooser": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "4738"
+  }
+}

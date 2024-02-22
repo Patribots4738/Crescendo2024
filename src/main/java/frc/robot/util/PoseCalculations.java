@@ -10,25 +10,7 @@ import monologue.Logged;
 public class PoseCalculations implements Logged {
 
     public static Pair<Double, Double> getChainIntercepts(Pose2d position) {
-        Pose2d closestChainPose;
-
-        double minDifference = 10000;
-        int closestChainIndex = 0;
-
-        int startingIndex = FieldConstants.IS_RED_ALLIANCE() ? 3 : 0;
-        int endingIndex = FieldConstants.IS_RED_ALLIANCE() ? 6 : 3;
-
-        for (int i = startingIndex; i < endingIndex; i++) {
-            Pose2d currentChainPose = FieldConstants.CHAIN_POSITIONS[i];
-            double currentChainDistance = position.getTranslation().getDistance(currentChainPose.getTranslation());
-
-            if (currentChainDistance < minDifference) {
-                minDifference = currentChainDistance;
-                closestChainIndex = i;
-            }
-        }
-
-        closestChainPose = FieldConstants.CHAIN_POSITIONS[closestChainIndex];
+        Pose2d closestChainPose = getClosestChain(position);
 
         Pose2d relativePosition = position.relativeTo(closestChainPose);
 
@@ -36,10 +18,23 @@ public class PoseCalculations implements Logged {
             return Pair.of(0d, 0d);
         }
 
-        double leftIntercept = getChainIntercept(relativePosition.getY() + ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
-        double rightIntercept = getChainIntercept(relativePosition.getY() - ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
+        double leftIntercept = getChainIntercept(relativePosition.getY() - ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
+        double rightIntercept = getChainIntercept(relativePosition.getY() + ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
 
         return Pair.of(leftIntercept - 0.6, rightIntercept - 0.6);
+    }
+
+    public static Pose2d getClosestChain(Pose2d position) {
+        Pose2d[] chainPoses = FieldConstants.GET_CHAIN_POSITIONS();
+        Pose2d closestChain = chainPoses[0];
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (Pose2d pose : chainPoses) {
+            if (position.relativeTo(pose).getTranslation().getNorm() < minDistance) {
+                minDistance = position.relativeTo(pose).getTranslation().getNorm();
+                closestChain = pose;
+            }
+        }
+        return closestChain;
     }
 
     /**

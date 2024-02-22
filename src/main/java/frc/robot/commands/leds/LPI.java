@@ -6,18 +6,23 @@ package frc.robot.commands.leds;
 
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.DriverUI;
+import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
+import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.subsystems.LedStrip;
-import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.LEDConstants;
-import frc.robot.util.Constants.FieldConstants.GameMode;
 import monologue.Logged;
+import java.util.function.Consumer;
 import monologue.Annotations.Log;
 
 //https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
@@ -26,22 +31,27 @@ public class LPI extends Command implements Logged{
     private final LedStrip ledStrip;
     private final Supplier<Pose2d> positionSupplier;
     private int activeRotationalLED = 0;
+    private PatriBoxController xboxController;
 
     Pose2d closestPose;
     Pose2d currentRobotPosition;
     Translation2d currentRobotTranslation;
+    private final Consumer<Pose2d> poseConsumer;
     
     @Log
     Pose2d cardinalMagnitude;
 
-    public LPI(LedStrip ledStrip, Supplier<Pose2d> positionSupplier) {
+    public LPI(LedStrip ledStrip, Supplier<Pose2d> positionSupplier, PatriBoxController xboxController, Consumer<Pose2d> consumer) {
         this.ledStrip = ledStrip;
+        this.xboxController = xboxController;
         this.positionSupplier = positionSupplier;
+        this.poseConsumer = consumer;
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        xboxController.setRumble(() -> 0);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -54,9 +64,14 @@ public class LPI extends Command implements Logged{
         // closest position is point B
         // current position in point A
 
-        double closestDistance = currentRobotTranslation.getDistance(closestPose.getTranslation());
+        double closestDistance = 9999;
 
-        for (Pose2d startingPosition : LEDConstants.startingPositions) {
+        for (int i = 0; i < PathPlannerStorage.AUTO_STARTING_POSITIONS.size(); i++) {
+            
+            Pose2d startingPosition = PathPlannerStorage.AUTO_STARTING_POSITIONS.get(i);
+            if (Robot.isRedAlliance()) {
+                startingPosition = GeometryUtil.flipFieldPose(startingPosition);
+            }
 
             double currentDistance = currentRobotTranslation.getDistance(startingPosition.getTranslation());
             //sets the closest staring position to the closest position
@@ -65,6 +80,8 @@ public class LPI extends Command implements Logged{
                 closestDistance = currentDistance;
             }
         }
+
+        poseConsumer.accept(closestPose);
 
         Rotation2d requiredRotation = closestPose.getRotation().minus(currentRobotPosition.getRotation());
 
@@ -76,28 +93,32 @@ public class LPI extends Command implements Logged{
 
             cardinalMagnitude = new Pose2d(desiredTranslation, cardinalDirection);
 
-            int arrowIndex = (int) cardinalDirection.getDegrees()/45;
+            int degrresToThreeSixty = (int) (((cardinalDirection.getDegrees() % 360) + 360) % 360);
+
+            int arrowIndex = degrresToThreeSixty/45;
+            
             //sets the LED to corresponding arrow
-            ledStrip.setLED(
-                LEDConstants.ARROW_MAP.get((arrowIndex)).getFirst(), 
-                LEDConstants.ARROW_MAP.get((arrowIndex)).getSecond(), 
-                getColorFromDistance(closestDistance)
-            );
+            // ledStrip.setLED(
+            //     LEDConstants.ARROW_MAP.get((arrowIndex)).getFirst(), 
+            //     LEDConstants.ARROW_MAP.get((arrowIndex)).getSecond(), 
+            //     getColorFromDistance(closestDistance)
+            // );
         } else if (MathUtil.applyDeadband(requiredRotation.getDegrees(), LEDConstants.LPI_ROTATIONAL_DEADBAND) != 0) {
-            ledStrip.setLED(
-                activeRotationalLED,
-                activeRotationalLED + 2, 
-                Color.kGreen);
+            // ledStrip.setLED(
+            //     activeRotationalLED,
+            //     activeRotationalLED + 2, 
+            //     Color.kGreen);
 
             activeRotationalLED = requiredRotation.getDegrees() > 0 ? activeRotationalLED + 1 : activeRotationalLED - 1;
             activeRotationalLED %= LEDConstants.LED_COUNT - 2;
         } else {
             // Flash the LEDs based on the current timestamp
-            ledStrip.setLED(
-                ((int) (DriverUI.currentTimestamp * 10) % 2 == 0) 
-                    ? Color.kGreen 
-                    : Color.kGold
-            );
+            xboxController.getHID().setRumble(RumbleType.kRightRumble, 1);
+            // ledStrip.setLED(
+            //     ((int) (Robot.currentTimestamp * 10) % 2 == 0) 
+            //         ? Color.kGreen 
+            //         : Color.kGold
+            // );
         }
     }
 
@@ -115,6 +136,7 @@ public class LPI extends Command implements Logged{
         } else if (distance > LEDConstants.INNER_ZONE) {
             return Color.kOrange;
         } else {
+            xboxController.getHID().setRumble(RumbleType.kLeftRumble, 1);
             return Color.kGreen; 
         }
     }
@@ -124,11 +146,12 @@ public class LPI extends Command implements Logged{
     public void end(boolean interrupted) {
         cancel();
         ledStrip.greenNGold();
+        xboxController.setRumble(() -> 0);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return !FieldConstants.GAME_MODE.equals(GameMode.DISABLED);
+        return Robot.gameMode.equals(GameMode.DISABLED);
     }
 }

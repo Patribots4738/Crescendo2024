@@ -19,17 +19,50 @@
     "cameras": [
       {
         "name": "FrontCam",
-        "position": [
-          0.0508,
-          -0.1524,
-          0.2604
-        ],
-        "resolution": [
-          1280,
-          960
-        ],
-        "fov": 100
-      }
+      "position": [
+        0.0508,
+        -0.1524,
+        0.589701
+      ],
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -33
+        },
+        {
+          "axis": "z",
+          "degrees": 15
+        }
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 80
+    },
+    {
+      "name": "BackCam",
+      "position": [
+        -0.254,
+        -0.155575,
+        0.589701
+      ],
+      "rotations" : [
+        {
+          "axis": "z",
+          "degrees": 180
+        },
+        {
+          "axis": "y",
+          "degrees": -10
+        }
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 80
+    }
     ],
     "components": [
       {

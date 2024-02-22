@@ -64,15 +64,21 @@ public class Drive extends Command {
         // The driver's right is negative 
         // on the field's axis
         double y = -ySupplier.getAsDouble();
+        double rotation = rotationSupplier.getAsDouble();
         if (shouldMirror.getAsBoolean()) {
             x *= -1;
             y *= -1;
         }
-        swerve.drive(
+        if (x + y + rotation == 0) {
+            swerve.setWheelsX();
+        }
+        else {
+            swerve.drive(
                 x,
                 y,
-                rotationSupplier.getAsDouble(),
+                rotation,
                 fieldRelativeSupplier.getAsBoolean());
+        }
     }
 
     @Override
