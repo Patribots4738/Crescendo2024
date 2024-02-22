@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -35,9 +33,8 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public void configMotors() {
         elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        elevator.getEncoder().setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
+        elevator.setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
         elevator.setPID(TrapConstants.TRAP_PID);
-        elevator.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
 
         // Change to brake when done testing
         elevator.setCoastMode();

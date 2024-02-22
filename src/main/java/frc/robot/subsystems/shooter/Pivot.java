@@ -11,7 +11,6 @@ import frc.robot.util.Neo;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import frc.robot.util.PIDNotConstants;
 import monologue.Annotations.Log;
@@ -27,7 +26,10 @@ public class Pivot extends SubsystemBase implements Logged {
 	private boolean atDesiredAngle = false;
 
 	public Pivot() {
-		pivot = new Neo(ShooterConstants.SHOOTER_PIVOT_CAN_ID, !FieldConstants.IS_SIMULATION, true);
+		pivot = new Neo(
+            ShooterConstants.SHOOTER_PIVOT_CAN_ID, 
+            !FieldConstants.IS_SIMULATION, 
+            true);
 		configMotor();
         pivotPID = new PIDNotConstants(ShooterConstants.PIVOT_PID, pivot.getPIDController());
 	}

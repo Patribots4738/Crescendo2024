@@ -9,7 +9,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.fasterxml.jackson.databind.ser.std.CalendarSerializer;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
@@ -35,10 +34,8 @@ import frc.robot.Robot;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
 import frc.robot.commands.ShooterCalc;
-import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
-import frc.robot.util.PatriBoxController;
 import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -74,17 +71,17 @@ public class Swerve extends SubsystemBase implements Logged {
 
     private PIDNotConstants drivingConstants = new PIDNotConstants(
         ModuleConstants.DRIVING_PID, 
-        frontLeft.drivingPIDController, 
-        frontRight.drivingPIDController, 
-        rearLeft.drivingPIDController,
-        rearRight.drivingPIDController);
+        frontLeft.getDrivingPIDController(), 
+        frontRight.getDrivingPIDController(), 
+        rearLeft.getDrivingPIDController(),
+        rearRight.getDrivingPIDController());
         
     private PIDNotConstants turningConstants = new PIDNotConstants(
         ModuleConstants.TURNING_PID, 
-        frontLeft.turningPIDController, 
-        frontRight.turningPIDController, 
-        rearLeft.turningPIDController,
-        rearRight.turningPIDController);
+        frontLeft.getTurningPIDController(), 
+        frontRight.getTurningPIDController(), 
+        rearLeft.getTurningPIDController(),
+        rearRight.getTurningPIDController());
 
     @Log
     SwerveModuleState[] swerveMeasuredStates;

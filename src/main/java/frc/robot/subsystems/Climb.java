@@ -17,7 +17,6 @@ import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -43,9 +42,6 @@ public class Climb extends SubsystemBase implements Logged {
     }
 
     private void configureMotors() {
-        leftMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
-        rightMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
-
         leftMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
         rightMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
 

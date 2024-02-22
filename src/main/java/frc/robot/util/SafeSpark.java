@@ -6,18 +6,23 @@ import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.REVLibError;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
+import com.revrobotics.jni.CANSparkMaxJNI;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 
 public class SafeSpark extends CANSparkMax {
 
     protected final int canID;
     protected final boolean useAbsoluteEncoder;
+    SparkPIDController pidController = getPIDController();
 
     private final int MAX_ATTEMPTS = 20;
     private final int MEASUREMENT_PERIOD = 16;
@@ -35,12 +40,8 @@ public class SafeSpark extends CANSparkMax {
 
         this.canID = canID;
         this.useAbsoluteEncoder = useAbsoluteEncoder;
-
         if (useAbsoluteEncoder) {
-            setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-            getPIDController().setFeedbackDevice(getAbsoluteEncoder());
-        } else {
-            setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+            setFeedbackDevice(getAbsoluteEncoder());
         }
     }
 
@@ -51,9 +52,12 @@ public class SafeSpark extends CANSparkMax {
      * @param parameterCheckSupplier Method to check for parameter in question
      * @return {@link REVLibError#kOk} if successful
      */
-    public REVLibError applyParameter(Supplier<REVLibError> parameterSetter, BooleanSupplier parameterCheckSupplier,
-            String errorMessage) {
-        if (RobotBase.isSimulation())
+    public REVLibError applyParameter(
+        Supplier<REVLibError> parameterSetter, 
+        BooleanSupplier parameterCheckSupplier, 
+        String errorMessage)
+    {
+        if (FieldConstants.IS_SIMULATION)
             return parameterSetter.get();
         if (parameterCheckSupplier.getAsBoolean())
             return REVLibError.kOk;
@@ -67,47 +71,6 @@ public class SafeSpark extends CANSparkMax {
         }
 
         checkStatus(status, errorMessage);
-        return status;
-    }
-
-    /**
-     * Check status and print error message if necessary
-     * 
-     * @param status       Status to check
-     * @param errorMessage Error message to print
-     */
-    public void checkStatus(REVLibError status, String errorMessage) {
-        if (status != REVLibError.kOk)
-            System.err.println(canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ") " + errorMessage + " - "
-                    + status.toString());
-    }
-
-    /**
-     * Set encoder velocity measurement period to {@value Spark#MEASUREMENT_PERIOD}
-     * milliseconds
-     * 
-     * @return {@link REVLibError#kOk} if successful
-     */
-    public REVLibError fixMeasurementPeriod() {
-        REVLibError status;
-        status = applyParameter(
-                () -> this.getEncoder().setMeasurementPeriod(MEASUREMENT_PERIOD),
-                () -> this.getEncoder().getMeasurementPeriod() == MEASUREMENT_PERIOD,
-                "Set encoder measurement period failure!");
-        return status;
-    }
-
-    /**
-     * Set encoder velocity average depth to {@value Spark#AVERAGE_DEPTH} samples
-     * 
-     * @return {@link REVLibError#kOk} if successful
-     */
-    public REVLibError fixAverageDepth() {
-        REVLibError status;
-        status = applyParameter(
-                () -> this.getEncoder().setAverageDepth(AVERAGE_DEPTH),
-                () -> this.getEncoder().getAverageDepth() == AVERAGE_DEPTH,
-                "Set encoder average depth failure!");
         return status;
     }
 
@@ -136,15 +99,78 @@ public class SafeSpark extends CANSparkMax {
      */
     @Override
     public REVLibError restoreFactoryDefaults() {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.restoreFactoryDefaults(),
-                () -> true,
-                "Restore factory defaults failure!");
+        REVLibError status = applyParameter(
+            () -> super.restoreFactoryDefaults(),
+            () -> true,
+            "Restore factory defaults failure!");
 
         return status;
     }
 
+    /**
+     * Check status and print error message if necessary
+     * 
+     * @param status       Status to check
+     * @param errorMessage Error message to print
+     */
+    public void checkStatus(REVLibError status, String errorMessage) {
+        if (status != REVLibError.kOk)
+            System.err.println(canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ") " + errorMessage + " - "
+                    + status.toString());
+    }
+
+    /**
+     * Set encoder velocity measurement period to {@value Spark#MEASUREMENT_PERIOD}
+     * milliseconds
+     * 
+     * @return {@link REVLibError#kOk} if successful
+     */
+    public REVLibError fixMeasurementPeriod() {
+        REVLibError status = applyParameter(
+                () -> this.getEncoder().setMeasurementPeriod(MEASUREMENT_PERIOD),
+                () -> this.getEncoder().getMeasurementPeriod() == MEASUREMENT_PERIOD,
+                "Set encoder measurement period failure!");
+        return status;
+    }
+
+    /**
+     * Set encoder velocity average depth to {@value Spark#AVERAGE_DEPTH} samples
+     * 
+     * @return {@link REVLibError#kOk} if successful
+     */
+    public REVLibError fixAverageDepth() {
+        REVLibError status = applyParameter(
+                () -> this.getEncoder().setAverageDepth(AVERAGE_DEPTH),
+                () -> this.getEncoder().getAverageDepth() == AVERAGE_DEPTH,
+                "Set encoder average depth failure!");
+        return status;
+    }
+
+    /**
+     * Invert the motor.
+     * 
+     * @param inverted to invert or not to invert, that is the question
+     * @return {@link REVLibError#kOk} if successful
+     */
+    public REVLibError invertMotor(boolean inverted) {
+        return applyParameter(
+                () -> {
+                    throwIfClosed();
+                    return REVLibError.fromInt(CANSparkMaxJNI.c_SparkMax_SetInverted(sparkMaxHandle, inverted));
+                },
+                () -> super.getInverted() == inverted,
+                "Set inverted failure!");
+    }
+
+    /**
+     * Invert the motor
+     * 
+     */
+    @Override
+    public void setInverted(boolean inverted) {
+        invertMotor(inverted);
+    }
+    
     /**
      * Set a Spark to follow another Spark
      * 
@@ -153,8 +179,7 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError follow(SafeSpark leader, boolean invert) {
-        REVLibError status;
-        status = applyParameter(
+        REVLibError status = applyParameter(
                 () -> super.follow(ExternalFollower.kFollowerSpark, leader.canID, invert),
                 () -> super.isFollower(),
                 "Set motor master failure!");
@@ -176,14 +201,19 @@ public class SafeSpark extends CANSparkMax {
         BooleanSupplier parameterCheckSupplier;
 
         if (useAbsoluteEncoder) {
-            parameterSetter = () -> getAbsoluteEncoder().setVelocityConversionFactor(factor);
-            parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
+            parameterSetter = () -> getAbsoluteEncoder().setPositionConversionFactor(factor);
+            parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         } else {
-            parameterSetter = () -> super.getEncoder().setVelocityConversionFactor(factor);
-            parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
+            parameterSetter = () -> super.getEncoder().setPositionConversionFactor(factor);
+            parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         }
 
         status = applyParameter(parameterSetter, parameterCheckSupplier, "Set position conversion factor failure!");
+
+        if (status == REVLibError.kOk) {
+            System.out.println("Set position conversion factor to " + factor + " for " + canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")");
+        }
+
         return status;
     }
 
@@ -217,8 +247,49 @@ public class SafeSpark extends CANSparkMax {
             parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
         }
 
-        status = applyParameter(parameterSetter, parameterCheckSupplier, "Set velocity conversion factor failure!");
+        status = applyParameter(
+            parameterSetter, 
+            parameterCheckSupplier, 
+            "Set velocity conversion factor failure!");
+        
         return status;
+    }
+
+    public REVLibError setSoftLimit(double min, double max) {
+        REVLibError status;
+        Supplier<REVLibError> parameterSetter = () -> {
+            REVLibError forwardLimitStatus = super.setSoftLimit(SoftLimitDirection.kForward, (float)min);
+            REVLibError reverseLimitStatus = super.setSoftLimit(SoftLimitDirection.kReverse, (float)max);
+            REVLibError softLimitStatus = setSoftLimit(true);
+        
+            if (forwardLimitStatus != REVLibError.kOk 
+                || reverseLimitStatus != REVLibError.kOk 
+                || softLimitStatus != REVLibError.kOk) 
+            {
+                return REVLibError.kInvalid;
+            }
+        
+            return REVLibError.kOk;
+        };
+        BooleanSupplier parameterCheckSupplier = () -> super.getSoftLimit(SoftLimitDirection.kForward) == min &&
+                super.getSoftLimit(SoftLimitDirection.kReverse) == max;
+
+        status = applyParameter(parameterSetter, parameterCheckSupplier, "Set soft limits failure!");
+        return status;
+    }
+
+    public REVLibError setSoftLimit(boolean enable) {
+        REVLibError statusForward = applyParameter(
+                () -> super.enableSoftLimit(SoftLimitDirection.kForward, enable),
+                () -> super.isSoftLimitEnabled(SoftLimitDirection.kForward) == enable,
+                enable ? "Enable" : "Disable" + " soft limit forward failure!");
+
+        REVLibError statusReverse = applyParameter(
+                () -> super.enableSoftLimit(SoftLimitDirection.kReverse, enable),
+                () -> super.isSoftLimitEnabled(SoftLimitDirection.kReverse) == enable,
+                enable ? "Enable" : "Disable" + " soft limit reverse failure!");
+
+        return statusForward == REVLibError.kOk && statusReverse == REVLibError.kOk ? REVLibError.kOk : REVLibError.kError;
     }
 
     public double getVelocityConversionFactor() {
@@ -229,18 +300,31 @@ public class SafeSpark extends CANSparkMax {
         }
     }
 
+    /**
+     * Get the position of the encoder
+     * This will go through the positionConversionFactor if there is one
+     * @return The position of the encoder
+     */
     public double getPosition() {
-        if (useAbsoluteEncoder) {
+        if (useAbsoluteEncoder && !FieldConstants.IS_SIMULATION) {
             return getAbsoluteEncoder().getPosition();
         } else {
             return super.getEncoder().getPosition();
         }
     }
 
+    /**
+     * RESET THE RELATIVE ENCODER TO BE THE SET POSITION
+     */
     public void setPosition(double position) {
         super.getEncoder().setPosition(position);
     }
 
+    /**
+     * Get the velocity of the encoder, in RPM
+     * This will go through the velocityConversionFactor if there is one
+     * @return The velocity of the encoder, in RPM
+     */
     public double getVelocity() {
         if (useAbsoluteEncoder) {
             return getAbsoluteEncoder().getVelocity();
@@ -257,11 +341,10 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError setP(double value, int slot) {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.getPIDController().setP(value, slot),
-                () -> super.getPIDController().getP(slot) == value,
-                "Set kP failure!");
+        REVLibError status = applyParameter(
+            () -> pidController.setP(value, slot),
+            () -> pidController.getP(slot) == value,
+            "Set kP failure!");
         return status;
     }
 
@@ -273,11 +356,10 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError setI(double value, int slot) {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.getPIDController().setI(value, slot),
-                () -> super.getPIDController().getI(slot) == value,
-                "Set kI failure!");
+        REVLibError status = applyParameter(
+            () -> pidController.setI(value, slot),
+            () -> pidController.getI(slot) == value,
+            "Set kI failure!");
         return status;
     }
 
@@ -289,11 +371,10 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError setD(double value, int slot) {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.getPIDController().setD(value, slot),
-                () -> super.getPIDController().getD(slot) == value,
-                "Set kD failure!");
+        REVLibError status = applyParameter(
+            () -> pidController.setD(value, slot),
+            () -> pidController.getD(slot) == value,
+            "Set kD failure!");
         return status;
     }
 
@@ -305,11 +386,10 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError setFF(double value, int slot) {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.getPIDController().setFF(value, slot),
-                () -> super.getPIDController().getFF(slot) == value,
-                "Set kF failure!");
+        REVLibError status = applyParameter(
+            () -> pidController.setFF(value, slot),
+            () -> pidController.getFF(slot) == value,
+            "Set kF failure!");
         return status;
     }
 
@@ -324,11 +404,10 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError setIzone(double value, int slot) {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.getPIDController().setIZone(value, slot),
-                () -> super.getPIDController().getIZone(slot) == value,
-                "Set Izone failure!");
+        REVLibError status = applyParameter(
+            () -> pidController.setIZone(value, slot),
+            () -> pidController.getIZone(slot) == value,
+            "Set Izone failure!");
         return status;
     }
     
@@ -341,12 +420,92 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError setOutputRange(double min, double max, int slot) {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.getPIDController().setOutputRange(min, max, slot),
-                () -> super.getPIDController().getOutputMin(slot) == min && super.getPIDController().getOutputMax(slot) == max,
-                "Set output range failure!");
+        REVLibError status = applyParameter(
+            () -> pidController.setOutputRange(min, max, slot),
+            () -> pidController.getOutputMin(slot) == min && pidController.getOutputMax(slot) == max,
+            "Set output range failure!");
         return status;
+    }
+
+    /**
+     * Enable PID wrapping for closed loop position control
+     * 
+     * @param minInput Value of min input for position
+     * @param maxInput Value of max input for position
+     * @return {@link REVLibError#kOk} if successful
+     */
+    public REVLibError enablePIDWrapping(double minInput, double maxInput) {
+        Supplier<REVLibError> parameterSetter = () -> {
+            REVLibError wrappingEnabledStatus = pidController.setPositionPIDWrappingEnabled(true);
+            REVLibError minInputStatus = pidController.setPositionPIDWrappingMinInput(minInput);
+            REVLibError maxInputStatus = pidController.setPositionPIDWrappingMaxInput(maxInput);
+
+            if (wrappingEnabledStatus != REVLibError.kOk 
+                || minInputStatus != REVLibError.kOk 
+                || maxInputStatus != REVLibError.kOk) 
+            {
+                return REVLibError.kInvalid;
+            }
+
+            return REVLibError.kOk;
+        };
+        BooleanSupplier parameterCheckSupplier = () -> pidController
+                .getPositionPIDWrappingEnabled() == true &&
+                pidController.getPositionPIDWrappingMinInput() == minInput &&
+                pidController.getPositionPIDWrappingMaxInput() == maxInput;
+
+        return applyParameter(
+            parameterSetter, 
+            parameterCheckSupplier, 
+            "Enable position PID wrapping failure!");
+    }
+
+    /**
+     * Disable PID wrapping for close loop position control
+     * 
+     * @return {@link REVLibError#kOk} if successful
+     */
+    public REVLibError disablePIDWrapping() {
+        return applyParameter(
+            () -> pidController.setPositionPIDWrappingEnabled(false),
+            () -> pidController.getPositionPIDWrappingEnabled() == false,
+            "Disable position PID wrapping failure!");
+    }
+
+    /**
+     * Set the motor fedeback device to the PIDController
+     * 
+     * @return {@link REVLibError#kOk} if successful
+     */
+    public REVLibError setFeedbackDevice(MotorFeedbackSensor device) {
+        return applyParameter(
+            () -> pidController.setFeedbackDevice(device), 
+            () -> true,
+            "Feedback device failure!");
+    }
+
+    /**
+     * Set the PID wrapping to be enabled or disabled
+     * 
+     * @param enabled Whether to enable or disable the PID wrapping
+     * @return {@link REVLibError#kOk} if successful
+     */
+    public REVLibError setPositionPIDWrappingEnabled(boolean enabled) {
+        return applyParameter(
+            () -> pidController.setPositionPIDWrappingEnabled(enabled),
+            () -> pidController.getPositionPIDWrappingEnabled() == enabled,
+            "Set PID wrapping enabled failure!");
+    }
+
+    public REVLibError setPositionPIDWrappingBounds(double min, double max) {
+        return applyParameter(
+            () -> {
+                REVLibError minStatus = pidController.setPositionPIDWrappingMinInput(min);
+                REVLibError maxStatus = pidController.setPositionPIDWrappingMaxInput(max);
+                return minStatus == REVLibError.kOk && maxStatus == REVLibError.kOk ? REVLibError.kOk : REVLibError.kInvalid;
+            },
+            () -> pidController.getPositionPIDWrappingMinInput() == min && pidController.getPositionPIDWrappingMaxInput() == max,
+            "Set PID wrapping bounds failure!");
     }
 
     /**
@@ -359,7 +518,7 @@ public class SafeSpark extends CANSparkMax {
      * @param arbFFUnits   Units for the arbitrary feed forward value
      */
     public void setPIDReference(double value, ControlType controlType, int slot, double arbitraryFeedForward, ArbFFUnits arbFFUnits) {
-        super.getPIDController().setReference(value, controlType, slot, arbitraryFeedForward, arbFFUnits);
+        pidController.setReference(value, controlType, slot, arbitraryFeedForward, arbFFUnits);
     }
 
     /**
@@ -369,20 +528,57 @@ public class SafeSpark extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError setIdleMode(IdleMode mode) {
-        REVLibError status;
-        status = applyParameter(
-                () -> super.setIdleMode(mode),
-                () -> super.getIdleMode() == mode,
-                "Set idle mode failure!");
+        REVLibError status = applyParameter(
+            () -> super.setIdleMode(mode),
+            () -> super.getIdleMode() == mode,
+            "Set idle mode failure!");
         return status;
     }
 
+    /**
+     * Sets the brake mode for the Spark MAX motor controller.
+     * 
+     * @return The REVLibError indicating the success or failure of the operation.
+     */
     public REVLibError setBrakeMode() {
-        return setIdleMode(IdleMode.kBrake);
+        return this.setIdleMode(IdleMode.kBrake);
     }
 
+    /**
+     * Sets the motor controller to coast mode.
+     * 
+     * @return The REVLibError indicating the success or failure of the operation.
+     */
     public REVLibError setCoastMode() {
-        return setIdleMode(IdleMode.kCoast);
+        return this.setIdleMode(IdleMode.kCoast);
+    }
+
+    /**
+     * Sets the current limit in Amps.
+     *
+     * <p>
+     * The motor controller will reduce the controller voltage output to avoid
+     * surpassing this
+     * limit. This limit is enabled by default and used for brushless only. This
+     * limit is highly
+     * recommended when using the NEO brushless motor.
+     *
+     * <p>
+     * The NEO Brushless Motor has a low internal resistance, which can mean large
+     * current spikes
+     * that could be enough to cause damage to the motor and controller. This
+     * current limit provides a
+     * smarter strategy to deal with high current draws and keep the motor and
+     * controller operating in
+     * a safe region.
+     *
+     * @param limit The current limit in Amps.
+     */
+    public REVLibError setSmartCurrentLimit(int limit) {
+        return applyParameter(
+            () -> super.setSmartCurrentLimit(limit),
+            () -> true,
+            "Set current limit failure!");
     }
 
     /**

@@ -21,7 +21,6 @@ public class Neo extends SafeSpark {
     private double targetPosition = 0;
     private double targetVelocity = 0;
     private double targetPercent = 0;
-    private int inversionMultiplier = 1;
 
     
     /**
@@ -45,11 +44,6 @@ public class Neo extends SafeSpark {
         this(id, inverted, false);
     }
 
-    public Neo(int id, boolean inverted, boolean useAbsoluteEncoder, boolean shouldCache) {
-        this(id, inverted, useAbsoluteEncoder);
-        this.shouldCache = shouldCache;
-    }
-
     /**
      * Creates a new Neo motor
      * 
@@ -61,12 +55,11 @@ public class Neo extends SafeSpark {
      */
     public Neo(int id, boolean inverted, boolean useAbsoluteEncoder) {
         super(id, useAbsoluteEncoder, CANSparkLowLevel.MotorType.kBrushless);
-        this.inversionMultiplier = inverted ? -1 : 1;
-
         // Set the motor to factory default settings
         // we do this so we can hot-swap sparks without needing to reconfigure them
         // this requires the code to configure the sparks after construction
         restoreFactoryDefaults();
+        setInverted(inverted);
         // Add a delay to let the spark reset
         // If a parameter set fails, this will add more time 
         // to minimize any bus traffic.
@@ -77,6 +70,12 @@ public class Neo extends SafeSpark {
         // Turn off alternate and analog encoders
         // we never use them
         setTelemetryPreference(TelemetryPreference.DEFAULT);
+        if (useAbsoluteEncoder) {
+            setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+            pidController.setFeedbackDevice(getAbsoluteEncoder());
+        } else {
+            setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+        }
         setBrakeMode();
         register();
     }
@@ -120,7 +119,6 @@ public class Neo extends SafeSpark {
      * @param slot                 The PID slot to use for control.
      */
     public void setTargetPosition(double position, double arbitraryFeedForward, int slot) {
-        position *= inversionMultiplier;
         if (!FieldConstants.IS_SIMULATION) {
             setPIDReference(position, ControlType.kPosition, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
         }
@@ -165,7 +163,6 @@ public class Neo extends SafeSpark {
      * @param slot                 The PID slot to use.
      */
     public void setTargetPercent(double percent, double arbitraryFeedForward, int slot) {
-        percent *= inversionMultiplier;
         if (percent == 0) {
             setVoltage(0);
         } else {
@@ -213,7 +210,6 @@ public class Neo extends SafeSpark {
      *                             output.
      */
     public void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
-        velocity *= inversionMultiplier;
         if (velocity == 0) {
             setVoltage(0);
         } else {
@@ -231,15 +227,10 @@ public class Neo extends SafeSpark {
      * @param percent The percentage value to set the motor output to.
      */
     public void set(double percent) {
-        percent *= inversionMultiplier;
         super.set(percent);
         controlType = ControlLoopType.PERCENT;
     }
 
-    private boolean shouldCache = false;
-    private double position = 0;
-    private double velo = 0;
-    
     /**
      * Updates the position and velocity of the Neo motor.
      * If caching is enabled, it caches the position and velocity values.
@@ -247,11 +238,6 @@ public class Neo extends SafeSpark {
      * it simulates movement on the motor
      */
     public void tick() {
-        if (shouldCache) {
-            position = super.getPosition() * inversionMultiplier;
-            velo = super.getVelocity() * inversionMultiplier;
-        }
-
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
             setVoltage(getP() * (targetPosition - getPosition()));
         }
@@ -274,24 +260,10 @@ public class Neo extends SafeSpark {
      * @return The position of the Neo in rotations relative to the last 0 position.
      */
     public double getPosition() {
-        
-        double pos = shouldCache 
-            ? position
-            : FieldConstants.IS_SIMULATION && useAbsoluteEncoder
-                ? simualtedPosition
-                : super.getPosition();
-
-        pos *= inversionMultiplier;
-
-        if (FieldConstants.IS_SIMULATION) {
-            if (controlType == ControlLoopType.VELOCITY) {
-                pos /= super.getVelocityConversionFactor();
-            } else if (useAbsoluteEncoder) {
-                if (Math.abs(targetPosition - simualtedPosition) > 0.25) {
-                    simualtedPosition += (targetPosition - simualtedPosition) / 10;
-                }
-                pos = simualtedPosition;
-            }
+        double pos = super.getPosition();
+                
+        if (FieldConstants.IS_SIMULATION && controlType == ControlLoopType.VELOCITY) {
+            pos /= super.getVelocityConversionFactor();
         }
 
         return pos;
@@ -302,7 +274,7 @@ public class Neo extends SafeSpark {
      * @return The instantaneous velocity of the Neo in rotations per minute.
      */
     public double getVelocity() {
-        return shouldCache ? velo : super.getVelocity() * inversionMultiplier; 
+        return super.getVelocity(); 
     }
 
     /**
@@ -311,7 +283,7 @@ public class Neo extends SafeSpark {
      * @param position the desired position to set
      */
     public void resetEncoder(double position) {
-        super.setPosition(position * inversionMultiplier);
+        super.setPosition(position);
     }
 
     /**

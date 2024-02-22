@@ -47,9 +47,6 @@ public class Shooter extends SubsystemBase implements Logged{
                 ShooterConstants.SHOOTER_PID,
                 ShooterConstants.SHOOTER_MIN_OUTPUT,
                 ShooterConstants.SHOOTER_MAX_OUTPUT);
-        
-        motorLeft.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-        motorRight.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
 
         motorRight.setPID(
                 ShooterConstants.SHOOTER_PID,
