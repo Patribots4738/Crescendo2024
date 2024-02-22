@@ -17,6 +17,7 @@ import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
+import frc.robot.commands.misc.limelight.LimelightValid;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
 import frc.robot.commands.subsytemHelpers.PieceControl;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
@@ -27,11 +28,9 @@ import frc.robot.subsystems.misc.limelight.Limelight;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.util.calc.LimelightHelpers;
 import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.constants.Constants.NTConstants;
-import frc.robot.util.constants.Constants.NeoMotorConstants;
 import frc.robot.util.constants.Constants.OIConstants;
 import frc.robot.util.mod.PatriBoxController;
 import frc.robot.util.motors.Neo;
@@ -127,32 +126,13 @@ public class RobotContainer implements Logged {
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
-        limelight.setDefaultCommand(Commands.run(() -> {
-            // Create an "Optional" object that contains the estimated pose of the robot
-            // This can be present (sees tag) or not present (does not see tag)
-            LimelightHelpers.Results result = limelight.getResults();
-            // The skew of the tag represents how confident the camera is
-            // If the result of the estimatedRobotPose exists,
-            // and the skew of the tag is less than 3 degrees,
-            // then we can confirm that the estimated position is realistic
-            if ( // check validity
-                ((driver.getHID().getLeftTriggerAxis() > 0 && !(result.botpose[0] == 0 && result.botpose[1] == 0) )
-                // check if good tag
-                && (LimelightHelpers.getTA("limelight") >= 0.3 
-                    || result.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
-                && limelight.getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25
-            ) {
-                Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
-                if (Double.isNaN(estimatedRobotPose.getX()) 
-                    || Double.isNaN(estimatedRobotPose.getY()) 
-                    || Double.isNaN(estimatedRobotPose.getRotation().getRadians())) {
-                    return;
-                }
-                swerve.getPoseEstimator().addVisionMeasurement( 
-                    estimatedRobotPose,
-                    Robot.currentTimestamp - limelight.getLatencyDiffSeconds());
-            }
-        }, limelight));
+        limelight.setDefaultCommand(
+            new LimelightValid(
+                limelight, 
+                swerve, 
+                driver.getHID()::getLeftTriggerAxis
+            )
+        );
 
         swerve.setDefaultCommand(new Drive(
             swerve,
