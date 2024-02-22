@@ -393,7 +393,10 @@ public final class Constants {
             DRIVING_P,
             DRIVING_I,
             DRIVING_D,
-            DRIVING_FF
+            DRIVING_FF,
+            0,
+            DRIVING_MIN_OUTPUT,
+            DRIVING_MAX_OUTPUT
         );
 
         public static final double TURNING_P = Robot.isSimulation() ? 0.5 : 1.5;
@@ -406,7 +409,10 @@ public final class Constants {
             TURNING_P,
             TURNING_I,
             TURNING_D,
-            TURNING_FF
+            TURNING_FF,
+            0,
+            TURNING_MIN_OUTPUT,
+            TURNING_MAX_OUTPUT
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
