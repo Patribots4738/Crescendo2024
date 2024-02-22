@@ -209,11 +209,7 @@ public class SafeSpark extends CANSparkMax {
         }
 
         status = applyParameter(parameterSetter, parameterCheckSupplier, "Set position conversion factor failure!");
-
-        if (status == REVLibError.kOk) {
-            System.out.println("Set position conversion factor to " + factor + " for " + canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")");
-        }
-
+        
         return status;
     }
 
