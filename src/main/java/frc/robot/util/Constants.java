@@ -319,9 +319,9 @@ public final class Constants {
                 0,
                 AutoConstants.XY_CORRECTION_D*2),
             new PIDConstants(
-                    AutoConstants.ROTATION_CORRECTION_P,
+                    AutoConstants.ROTATION_CORRECTION_P*3,
                     0,
-                    AutoConstants.ROTATION_CORRECTION_D),
+                    AutoConstants.ROTATION_CORRECTION_D*2),
             MAX_SPEED_METERS_PER_SECOND,
             Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0,
             new ReplanningConfig());
