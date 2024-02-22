@@ -389,7 +389,6 @@ public final class Constants {
             DRIVING_I,
             DRIVING_D,
             DRIVING_FF,
-            0,
             DRIVING_MIN_OUTPUT,
             DRIVING_MAX_OUTPUT
         );
@@ -405,7 +404,6 @@ public final class Constants {
             TURNING_I,
             TURNING_D,
             TURNING_FF,
-            0,
             TURNING_MIN_OUTPUT,
             TURNING_MAX_OUTPUT
         );
