@@ -1,20 +1,21 @@
 // Developed in tandem with Reza from Team Spyder (1622)
 
-package frc.robot.util;
+package frc.robot.util.motors;
 
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.constants.PatrIDConstants;
+import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.NeoMotorConstants;
 
 /*
  * Some of this is adapted from 3005's 2022 Code
  * Original source published at https://github.com/FRC3005/Rapid-React-2022-Public/tree/d499655448ed592c85f9cfbbd78336d8841f46e2
  */
-public class Neo extends SafeSpark {
+public class Neo extends SafeSparkBase {
 
     private ControlLoopType controlType = ControlLoopType.PERCENT;
     private double targetPosition = 0;

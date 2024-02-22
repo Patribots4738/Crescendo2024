@@ -1,10 +1,11 @@
-package frc.robot.util;
+package frc.robot.util.calc;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.util.Constants.ClimbConstants;
-import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.constants.Constants;
+import frc.robot.util.constants.Constants.ClimbConstants;
+import frc.robot.util.constants.Constants.FieldConstants;
 import monologue.Logged;
 
 public class PoseCalculations implements Logged {

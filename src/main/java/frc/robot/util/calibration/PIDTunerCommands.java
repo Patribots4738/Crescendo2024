@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.calibration;
 import java.text.DecimalFormat;
 
 import edu.wpi.first.wpilibj2.command.Command;

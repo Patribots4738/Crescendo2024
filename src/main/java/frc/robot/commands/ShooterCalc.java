@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.shooter.*;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
-import frc.robot.util.SpeedAngleTriplet;
+import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.NTConstants;
+import frc.robot.util.constants.Constants.ShooterConstants;
+import frc.robot.util.mod.SpeedAngleTriplet;
 
 public class ShooterCalc implements Logged {
 

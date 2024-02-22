@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.constants;
 
 import monologue.Logged;
 import monologue.Annotations.Log;

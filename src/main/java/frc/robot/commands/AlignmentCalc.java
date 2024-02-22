@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.Constants.AutoConstants;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.PoseCalculations;
+import frc.robot.util.calc.PoseCalculations;
+import frc.robot.util.constants.Constants.AutoConstants;
+import frc.robot.util.constants.Constants.FieldConstants;
 
 public class AlignmentCalc {
     
