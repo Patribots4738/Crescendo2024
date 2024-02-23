@@ -408,8 +408,7 @@ public class RobotContainer implements Logged {
         fixPathPlannerCommands();
 
         // TODO: Extract this into a command file
-        Commands.runOnce(this::updateNTGains)
-            .repeatedly()
+        Commands.run(this::updateNTGains)
             .until(() -> Robot.gameMode != GameMode.DISABLED)
             .ignoringDisable(true)
             .schedule();
@@ -428,30 +427,27 @@ public class RobotContainer implements Logged {
     }
 
     public void updateNTGains() {
-        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/P")
+        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P")
                 .getDouble(-1);
-        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/I")
+        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I")
                 .getDouble(-1);
-        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/D")
-                .getDouble(-1);
-
-        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/P")
-                .getDouble(-1);
-        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/I")
-                .getDouble(-1);
-        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/D")
+        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D")
                 .getDouble(-1);
 
-        double MAX = NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
+        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P")
+                .getDouble(-1);
+        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I")
+                .getDouble(-1);
+        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D")
                 .getDouble(-1);
 
-        if (P == -1 || I == -1 || D == -1 || P2 == -1 || I2 == -1 || D2 == -1 || MAX == -1) {
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/P").setDouble(AutoConstants.XY_CORRECTION_P);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/I").setDouble(AutoConstants.XY_CORRECTION_I);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/D").setDouble(AutoConstants.XY_CORRECTION_D);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
+        if (P == -1 || I == -1 || D == -1 || P2 == -1 || I2 == -1 || D2 == -1) {
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P").setDouble(AutoConstants.XY_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I").setDouble(AutoConstants.XY_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D").setDouble(AutoConstants.XY_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
             return;
         }
         
@@ -470,7 +466,7 @@ public class RobotContainer implements Logged {
                             P2,
                             I2,
                             D2),
-                    MAX,
+                    DriveConstants.MAX_SPEED_METERS_PER_SECOND,
                     Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
                     new ReplanningConfig());
             
