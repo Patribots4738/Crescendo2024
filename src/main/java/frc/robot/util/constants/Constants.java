@@ -257,7 +257,7 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 7.20;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
@@ -273,7 +273,7 @@ public final class Constants {
          *   I: 1 (izone on 20 degrees)
          *   D: 0.0375
          */
-        public static final double XY_CORRECTION_P = 2;
+        public static final double XY_CORRECTION_P = 4;
         public static final double XY_CORRECTION_I = 0.0125;
         public static final double XY_CORRECTION_D = 0.0125;
 
@@ -282,7 +282,7 @@ public final class Constants {
                 AutoConstants.XY_CORRECTION_I,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = .725;
+        public static final double ROTATION_CORRECTION_P = .8514;
         public static final double ROTATION_CORRECTION_I = 1;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -307,15 +307,16 @@ public final class Constants {
                 THETA_PID
             );
 
-        public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
+        public static HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
             new PIDConstants(
-                AutoConstants.XY_CORRECTION_P*3,
-                0,
-                AutoConstants.XY_CORRECTION_D*2),
+                AutoConstants.XY_CORRECTION_P,
+                AutoConstants.XY_CORRECTION_I,
+                AutoConstants.XY_CORRECTION_D),
             new PIDConstants(
-                    AutoConstants.ROTATION_CORRECTION_P*3,
-                    0,
-                    AutoConstants.ROTATION_CORRECTION_D*2),
+                    AutoConstants.ROTATION_CORRECTION_P,
+                    1,
+                    AutoConstants.ROTATION_CORRECTION_D,
+                    Units.degreesToRadians(45)),
             MAX_SPEED_METERS_PER_SECOND,
             Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0,
             new ReplanningConfig());
@@ -726,9 +727,8 @@ public final class Constants {
         public static final int RIGHT_CLIMB_INDEX = 3;
         public static final int LEFT_CLIMB_INDEX = 4;
         
-        public static final double PIVOT_OFFSET_X = 0.112;
-        public static final double PIVOT_OFFSET_Z = 0.21;
-
+        public static final double PIVOT_OFFSET_X = 0.165;
+        public static final double PIVOT_OFFSET_Z = 0.2095;
     
         public static final Translation3d PIVOT_OFFSET_METERS = new Translation3d(
             PIVOT_OFFSET_X,
