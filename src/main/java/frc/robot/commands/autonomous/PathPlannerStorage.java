@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.util.constants.Constants.AutoConstants;
@@ -161,7 +162,7 @@ public class PathPlannerStorage implements Logged {
                         shootAndMoveToNextNote,
                         skipNoteCommand,
                         hasPieceSupplier), 
-                        commandGroup.getRequirements())
+                    commandGroup.getRequirements())
             );
         }
 
