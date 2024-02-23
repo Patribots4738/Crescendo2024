@@ -5,10 +5,9 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-//import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
-//import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.DriveConstants;
 
 public class Drive extends Command {
 
@@ -74,9 +73,9 @@ public class Drive extends Command {
         }
         else {
             swerve.drive(
-                x,
-                y,
-                rotation,
+                x * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
+                y * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
+                rotation * DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * swerve.getSpeedMultiplier(),
                 fieldRelativeSupplier.getAsBoolean());
         }
     }
