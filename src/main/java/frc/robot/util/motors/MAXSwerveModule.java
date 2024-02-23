@@ -93,8 +93,10 @@ public class MAXSwerveModule implements Logged{
         correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(chassisAngularOffset));
 
         // Optimize the reference state to avoid spinning further than 90 degrees.
-        correctedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
-                new Rotation2d(turningSpark.getPosition()));
+        if (!FieldConstants.IS_SIMULATION) {
+            correctedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
+                    new Rotation2d(turningSpark.getPosition()));
+        }
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
         drivingSpark.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);

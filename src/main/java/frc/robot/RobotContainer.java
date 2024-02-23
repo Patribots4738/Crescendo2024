@@ -387,8 +387,7 @@ public class RobotContainer implements Logged {
         fixPathPlannerCommands();
 
         // TODO: Extract this into a command file
-        Commands.runOnce(this::updateNTGains)
-            .repeatedly()
+        Commands.run(this::updateNTGains)
             .until(() -> Robot.gameMode != GameMode.DISABLED)
             .ignoringDisable(true)
             .schedule();
