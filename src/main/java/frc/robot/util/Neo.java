@@ -241,8 +241,7 @@ public class Neo extends SafeSpark {
     public void tick() {
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
             double error = (targetPosition - getPosition());
-            // Fix swerve modules trying to go the long way around
-            if (canID < 9) {
+            if (pidController.getPositionPIDWrappingEnabled()) {
                 error = MathUtil.angleModulus(error);
             }
             setVoltage(getP() * error);
