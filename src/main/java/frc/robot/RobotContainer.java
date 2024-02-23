@@ -249,7 +249,7 @@ public class RobotContainer implements Logged {
         
         controller.a().whileTrue(
             Commands.sequence(
-                swerve.resetHDC(),
+                swerve.resetHDCCommand(),
                 Commands.either(
                     alignmentCalc.trapAlignmentCommand(() -> controller.getLeftY()), 
                     alignmentCalc.ampAlignmentCommand(() -> controller.getLeftX()), 
@@ -262,7 +262,7 @@ public class RobotContainer implements Logged {
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
-                    swerve.resetHDC(),
+                    swerve.resetHDCCommand(),
                     Commands.either(
                         alignmentCalc.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCalc.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
@@ -279,6 +279,10 @@ public class RobotContainer implements Logged {
 
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut());
+
+        controller.povLeft().onTrue(swerve.getChaseCommand());
+
+        controller.povRight().onTrue(swerve.updateChasePose(() -> new Pose2d(Math.random() * 20, Math.random() * 20, new Rotation2d())));
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {

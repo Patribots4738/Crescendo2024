@@ -25,12 +25,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.event.NetworkBooleanEvent;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.commands.ChasePose;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
 import frc.robot.commands.ShooterCalc;
@@ -186,6 +188,7 @@ public class Swerve extends SubsystemBase implements Logged {
         } else {
             // Something in our pose was NaN...
             resetOdometry(robotPose2d);
+            resetEncoders();
             resetHDC();
         }
 
@@ -395,12 +398,22 @@ public class Swerve extends SubsystemBase implements Logged {
         return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
-    public Command resetHDC() {
-        return Commands.sequence(
-            Commands.runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),
-            Commands.runOnce(() -> AutoConstants.HDC.getXController().reset()),
-            Commands.runOnce(() -> AutoConstants.HDC.getYController().reset())
-        );
+    public Command updateChasePose(Supplier<Pose2d> poseSupplier) {
+        return Commands.runOnce(() -> ChasePose.updateDesiredPose(poseSupplier.get()));
+    }
+
+    public Command getChaseCommand() {
+        return new ChasePose(this);
+    }
+
+    public void resetHDC() {
+        AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians());
+        AutoConstants.HDC.getXController().reset();
+        AutoConstants.HDC.getYController().reset();
+    }
+
+    public Command resetHDCCommand() {
+        return runOnce(() -> resetHDC());
     }
 
 }

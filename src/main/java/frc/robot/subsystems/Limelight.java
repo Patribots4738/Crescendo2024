@@ -81,12 +81,12 @@ public class Limelight extends SubsystemBase implements Logged{
         visableTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
-    public Pose2d getNotePose() {
+    public Pose2d getNotePose2d() {
         LimelightHelpers.setPipelineIndex(limelightName, 1);
         Pose2d notePose = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d();
-        Pose2d robotPose = robotPoseSupplier.get();
-        double x = notePose.getX() + robotPose.getX();
-        double y = notePose.getY() + robotPose.getY();
+        // Pose2d robotPose = robotPoseSupplier.get();
+        double x = notePose.getX();
+        double y = notePose.getY();
         return new Pose2d(x, y, new Rotation2d());
     }
 
