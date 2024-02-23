@@ -255,7 +255,7 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 7.20;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
@@ -305,7 +305,7 @@ public final class Constants {
                 THETA_PID
             );
 
-        public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
+        public static HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
             new PIDConstants(
                 AutoConstants.XY_CORRECTION_P*3,
                 0,

@@ -1,10 +1,16 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -31,6 +37,7 @@ import frc.robot.util.LimelightHelpers;
 import frc.robot.util.Neo;
 import frc.robot.util.PatriBoxController;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
@@ -169,6 +176,11 @@ public class RobotContainer implements Logged {
         pathPlannerStorage.configureAutoChooser();
         
         configureButtonBindings();
+
+        NetworkTableInstance.getDefault().getTable("Robot").getEntry("P").setDouble(AutoConstants.XY_CORRECTION_P);
+        NetworkTableInstance.getDefault().getTable("Robot").getEntry("I").setDouble(AutoConstants.XY_CORRECTION_I);
+        NetworkTableInstance.getDefault().getTable("Robot").getEntry("D").setDouble(AutoConstants.XY_CORRECTION_D);
+        NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX").setDouble(4.377);
     }
 
     private void configureButtonBindings() {
@@ -373,6 +385,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
+        CommandScheduler.getInstance().cancelAll();
         return driver.getYButton() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
     }
 
@@ -393,11 +406,49 @@ public class RobotContainer implements Logged {
         //         AutoBuilder.followPath(starting)
         //         .andThen(choreoPathStorage.generateCenterLineComplete(1, 5, false))));
     }
-
+    
     public void onDisabled() {
         swerve.stopDriving();
         pieceControl.stopAllMotors().schedule();
         pathPlannerStorage.updatePathViewerCommand().schedule();
+        fixPathPlannerCommands();
+        // Pull the latest value of @Log's P, I, and D from networktables
+        // reconfigure the HPFC with the new values
+    }
+
+    public void updateNTGains() {
+        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("P")
+                .getDouble(AutoConstants.XY_CORRECTION_P);
+        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("I")
+                .getDouble(AutoConstants.XY_CORRECTION_I);
+        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("D")
+                .getDouble(AutoConstants.XY_CORRECTION_D);
+
+        double MAX = NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
+                .getDouble(4);
+        
+        if (!(MathUtil.isNear(AutoConstants.HPFC.translationConstants.kP, P, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kI, I, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kD, D, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.maxModuleSpeed, MAX, 0.01))) {
+
+            AutoConstants.HPFC = new HolonomicPathFollowerConfig(
+                    new PIDConstants(
+                            P,
+                            I,
+                            D),
+                    new PIDConstants(
+                            AutoConstants.ROTATION_CORRECTION_P * 3,
+                            0,
+                            AutoConstants.ROTATION_CORRECTION_D * 2),
+                    MAX,
+                    Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
+                    new ReplanningConfig());
+            
+            swerve.reconfigureAutoBuilder();
+            fixPathPlannerCommands();
+            System.out.println("Reconfigured HPFC");
+        }
     }
     
     public void onEnabled() {
@@ -412,7 +463,7 @@ public class RobotContainer implements Logged {
         CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
     }
     
-    public void prepareNamedCommands() {
+    private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
@@ -427,6 +478,10 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterW3", shooterCalc.prepareFireCommand(() -> FieldConstants.W3_POSE));
         NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
         NamedCommands.registerCommand("PrepareSWD", shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        registerPathToPathCommands();
+    }
+
+    private void registerPathToPathCommands() {
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
             for (int j = 1; j <= FieldConstants.CENTER_NOTE_COUNT; j++) {
                 if (i == j) {
@@ -435,6 +490,14 @@ public class RobotContainer implements Logged {
                 NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
             }
         }
+    }
+
+    /**
+     * This is explained in detail in discussion #180 of the 2024 repository of 4738
+     */
+    private void fixPathPlannerCommands() {
+        registerPathToPathCommands();
+        pathPlannerStorage.configureAutoChooser();
     }
     
     private void incinerateMotors() {
