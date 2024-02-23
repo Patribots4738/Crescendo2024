@@ -2,14 +2,11 @@
 
 package frc.robot.util;
 
-import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVLibError;
 import com.revrobotics.REVPhysicsSim;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
@@ -19,44 +16,33 @@ import frc.robot.util.Constants.NeoMotorConstants;
  * Some of this is adapted from 3005's 2022 Code
  * Original source published at https://github.com/FRC3005/Rapid-React-2022-Public/tree/d499655448ed592c85f9cfbbd78336d8841f46e2
  */
-public class Neo extends CANSparkMax {
-    public final RelativeEncoder encoder;
-    public final SparkPIDController pidController;
+public class Neo extends SafeSpark {
 
     private ControlLoopType controlType = ControlLoopType.PERCENT;
     private double targetPosition = 0;
     private double targetVelocity = 0;
     private double targetPercent = 0;
-    private int inversionMultiplier = 1;
+
     
     /**
-     * Creates a new Neo motor
+     * Creates a new Neo motor with the default settings.
+     * @see Neo.NeoBuilder for more configuration options
      * 
-     * @param id CANID of the SparkMax the Neo is connected to.
+     * @param id the CANID of the SparkMax/Flex the Neo is connected to
      */
     public Neo(int id) {
-        this(id, false);
+        this(id, false, false);
     }
 
     /**
-     * Creates a new Neo motor
+     * Creates a new Neo motor with the default settings.
+     * @see Neo.NeoBuilder for more configuration options
      * 
-     * @param id       CANID of the SparkMax the Neo is connected to.
-     * @param inverted Whether the motor is reversed or not.
+     * @param id       the CANID of the SparkMax/Flex the Neo is connected to
+     * @param inverted whether the motor is reversed or not
      */
     public Neo(int id, boolean inverted) {
-        this(id, inverted, CANSparkBase.IdleMode.kBrake);
-    }
-
-    /**
-     * Creates a new Neo motor
-     * 
-     * @param id   CANID of the SparkMax the Neo is connected to.
-     * @param mode The idle mode of the motor. If true, the motor will brake when
-     *             not powered. If false, the motor will coast when not powered.
-     */
-    public Neo(int id, CANSparkBase.IdleMode mode) {
-        this(id, false, mode);
+        this(id, inverted, false);
     }
 
     /**
@@ -68,28 +54,30 @@ public class Neo extends CANSparkMax {
      *                 when not powered. If false, the motor will coast when not
      *                 powered.
      */
-    public Neo(int id, boolean inverted, CANSparkBase.IdleMode mode) {
-        super(id, CANSparkLowLevel.MotorType.kBrushless);
-        this.encoder = getEncoder();
-        this.pidController = getPIDController();
-        this.inversionMultiplier = inverted ? -1 : 1;
-
+    public Neo(int id, boolean inverted, boolean useAbsoluteEncoder) {
+        super(id, useAbsoluteEncoder, CANSparkLowLevel.MotorType.kBrushless);
         // Set the motor to factory default settings
         // we do this so we can hot-swap sparks without needing to reconfigure them
         // this requires the code to configure the sparks after construction
         restoreFactoryDefaults();
+        setInverted(inverted);
         // Add a delay to let the spark reset
         // If a parameter set fails, this will add more time 
         // to minimize any bus traffic.
         // Default is 20ms
         setCANTimeout(50);
         Timer.delay(0.25);
-
-
+        
         // Turn off alternate and analog encoders
         // we never use them
         setTelemetryPreference(TelemetryPreference.DEFAULT);
-        setIdleMode(mode);
+        if (useAbsoluteEncoder) {
+            setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+            pidController.setFeedbackDevice(getAbsoluteEncoder());
+        } else {
+            setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
+        }
+        setBrakeMode();
         register();
     }
 
@@ -132,9 +120,8 @@ public class Neo extends CANSparkMax {
      * @param slot                 The PID slot to use for control.
      */
     public void setTargetPosition(double position, double arbitraryFeedForward, int slot) {
-        position *= inversionMultiplier;
         if (!FieldConstants.IS_SIMULATION) {
-            pidController.setReference(position, ControlType.kPosition, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
+            setPIDReference(position, ControlType.kPosition, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
         }
         targetPosition = position;
         controlType = ControlLoopType.POSITION;
@@ -177,11 +164,10 @@ public class Neo extends CANSparkMax {
      * @param slot                 The PID slot to use.
      */
     public void setTargetPercent(double percent, double arbitraryFeedForward, int slot) {
-        percent *= inversionMultiplier;
         if (percent == 0) {
             setVoltage(0);
         } else {
-            pidController.setReference(percent, ControlType.kDutyCycle, slot, arbitraryFeedForward, ArbFFUnits.kPercentOut);
+            setPIDReference(percent, ControlType.kDutyCycle, slot, arbitraryFeedForward, ArbFFUnits.kPercentOut);
         }
         targetPercent = percent;
         controlType = ControlLoopType.PERCENT;
@@ -225,11 +211,10 @@ public class Neo extends CANSparkMax {
      *                             output.
      */
     public void setTargetVelocity(double velocity, double arbitraryFeedForward, int slot) {
-        velocity *= inversionMultiplier;
         if (velocity == 0) {
             setVoltage(0);
         } else {
-            pidController.setReference(velocity, ControlType.kVelocity, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
+            setPIDReference(velocity, ControlType.kVelocity, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
         }
         targetVelocity = velocity;
         controlType = ControlLoopType.VELOCITY;
@@ -243,15 +228,10 @@ public class Neo extends CANSparkMax {
      * @param percent The percentage value to set the motor output to.
      */
     public void set(double percent) {
-        percent *= inversionMultiplier;
         super.set(percent);
         controlType = ControlLoopType.PERCENT;
     }
 
-    private boolean shouldCache = false;
-    private double position = 0;
-    private double velo = 0;
-    
     /**
      * Updates the position and velocity of the Neo motor.
      * If caching is enabled, it caches the position and velocity values.
@@ -259,16 +239,14 @@ public class Neo extends CANSparkMax {
      * it simulates movement on the motor
      */
     public void tick() {
-        if (shouldCache) {
-            position = encoder.getPosition() * inversionMultiplier;
-            velo = encoder.getVelocity() * inversionMultiplier;
-        }
-
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
-            setVoltage(pidController.getP() * (targetPosition - getPosition()));
+            double error = (targetPosition - getPosition());
+            if (pidController.getPositionPIDWrappingEnabled()) {
+                error = MathUtil.angleModulus(error);
+            }
+            setVoltage(getP() * error);
         }
     }
-
 
     /**
      * Registers the Neo motor instance.
@@ -287,13 +265,10 @@ public class Neo extends CANSparkMax {
      * @return The position of the Neo in rotations relative to the last 0 position.
      */
     public double getPosition() {
-        
-        double pos = shouldCache ? position : encoder.getPosition();
-
-        pos *= inversionMultiplier;
-
-        if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.VELOCITY) {
-            pos /= encoder.getVelocityConversionFactor();
+        double pos = super.getPosition();
+                
+        if (FieldConstants.IS_SIMULATION && controlType == ControlLoopType.VELOCITY) {
+            pos /= super.getVelocityConversionFactor();
         }
 
         return pos;
@@ -304,7 +279,7 @@ public class Neo extends CANSparkMax {
      * @return The instantaneous velocity of the Neo in rotations per minute.
      */
     public double getVelocity() {
-        return shouldCache ? velo : encoder.getVelocity() * inversionMultiplier; 
+        return super.getVelocity(); 
     }
 
     /**
@@ -313,7 +288,7 @@ public class Neo extends CANSparkMax {
      * @param position the desired position to set
      */
     public void resetEncoder(double position) {
-        encoder.setPosition(position * inversionMultiplier);
+        super.setPosition(position);
     }
 
     /**
@@ -360,33 +335,6 @@ public class Neo extends CANSparkMax {
     }
 
     /**
-     * Sets the PID constants for the Neo motor controller.
-     * 
-     * @param constants the PID constants to set
-     */
-    public void setPID(PatrIDConstants constants) {
-        setPID(constants, 0);
-    }
-
-    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput) {
-        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, 0);
-    }
-
-    public void setPID(PatrIDConstants constants, double minOutput, double maxOutput, int slotID) {
-        setPID(constants.getP(), constants.getI(), constants.getD(), minOutput, maxOutput, slotID);
-    }
-
-    /**
-     * Sets the PID constants for the Neo motor controller.
-     * 
-     * @param constants the PID constants to set
-     * @param slotID    the slot ID of the PID controller
-     */
-    public void setPID(PatrIDConstants constants, int slotID) {
-        setPID(constants.getP(), constants.getI(), constants.getD(), -1, 1, slotID);
-    }
-
-    /**
      * Sets the PID values and output limits for the Neo motor controller.
      * 
      * @param P          the proportional gain
@@ -396,7 +344,35 @@ public class Neo extends CANSparkMax {
      * @param maxOutput  the maximum output value
      */
     public void setPID(double P, double I, double D, double minOutput, double maxOutput) {
-        setPID(P, I, D, minOutput, maxOutput, 0);
+        setPID(new PatrIDConstants(P, I, D, minOutput, maxOutput));
+    }
+
+    /**
+     * Sets the PID constants for the Neo motor controller.
+     * 
+     * @param constants the PID constants to set
+     */
+    public void setPID(PatrIDConstants constants) {
+        setPID(constants, 0);
+    }
+
+    /**
+     * Sets the PID constants for the Neo motor controller.
+     * 
+     * @param constants the PID constants to set
+     * @param slotID    the slot ID of the PID controller
+     */
+    public void setPID(PatrIDConstants constants, int slot) {
+        setPID(
+            constants.getP(), 
+            constants.getI(), 
+            constants.getD(), 
+            constants.getFF(),
+            constants.getIZone(), 
+            constants.getMinOutput(), 
+            constants.getMaxOutput(), 
+            slot
+        );
     }
 
     /**
@@ -409,36 +385,13 @@ public class Neo extends CANSparkMax {
      * @param maxOutput  the maximum output value
      * @param slotID     the slot ID of the PID controller
      */
-    public void setPID(double P, double I, double D, double minOutput, double maxOutput, int slotID) {
-        pidController.setP(P, slotID);
-        pidController.setI(I, slotID);
-        pidController.setD(D, slotID);
-
-        pidController.setOutputRange(minOutput, maxOutput, slotID);
-    }
-
-    public void setFF(double ff) {
-        pidController.setFF(ff);
-    }
-
-    /**
-     * Sets the position conversion factor for the encoder.
-     * This is generally a gear ratio
-     * 
-     * @param factor the conversion factor to set
-     */
-    public void setPositionConversionFactor(double factor) {
-        encoder.setPositionConversionFactor(factor);
-    }
-
-    /**
-     * Sets the velocity conversion factor for the encoder.
-     * This is generally a gear ratio
-     * 
-     * @param factor the conversion factor to set
-     */
-    public void setVelocityConversionFactor(double factor) {
-        encoder.setVelocityConversionFactor(factor);
+    public void setPID(double P, double I, double D, double FF, double iZone, double minOutput, double maxOutput, int slotID) {
+        super.setP(P, slotID);
+        super.setI(I, slotID);
+        super.setD(D, slotID);
+        super.setFF(FF, slotID);
+        super.setIZone(iZone, slotID);
+        super.setOutputRange(minOutput, maxOutput, slotID);
     }
 
     /**
@@ -446,7 +399,7 @@ public class Neo extends CANSparkMax {
      * @return The proportional gain constant for PID controller.
      */
     public double getP() {
-        return pidController.getP();
+        return getPIDController().getP();
     }
 
     /**
@@ -454,7 +407,7 @@ public class Neo extends CANSparkMax {
      * @return The integral gain constant for PID controller.
      */
     public double getI() {
-        return pidController.getI();
+        return getPIDController().getI();
     }
 
     /**
@@ -462,11 +415,11 @@ public class Neo extends CANSparkMax {
      * @return The derivative gain constant for PID controller.
      */
     public double getD() {
-        return pidController.getD();
+        return getPIDController().getD();
     }
 
     public PatrIDConstants getPID() {
-        return new PatrIDConstants(pidController.getP(), pidController.getI(), pidController.getD());
+        return new PatrIDConstants(getPIDController().getP(), getPIDController().getI(), getPIDController().getD());
     }
 
     /**
@@ -485,7 +438,7 @@ public class Neo extends CANSparkMax {
      * @return The I-Zone constant for PID control.
      */
     public double getIZ() {
-        return pidController.getIZone();
+        return getPIDController().getIZone();
     }
 
     /**
@@ -493,80 +446,7 @@ public class Neo extends CANSparkMax {
      * @return The feedforward gain constant for PID controller.
      */
     public double getFF() {
-        return pidController.getFF();
-    }
-
-    /**
-     * Represents an error that can occur while using the REVLib library.
-     * Rev docs:
-     * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-     * 
-     * @param frame  The status frame to reset
-     * @param period The update period for the status frame.
-     * @return error
-     */
-    public REVLibError changeStatusFrame(StatusFrame frame, int period) {
-        REVLibError error = setPeriodicFramePeriod(frame.getFrame(), period);
-        // Add a delay to alleviate bus traffic
-        Timer.delay(0.05);
-        return error;
-    }
-
-    /**
-     * Resets the status frame of the NEO motor controller to its default period.
-     * Rev docs: https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-     * 
-     * @param frame the status frame to reset
-     * @return the REVLibError indicating the result of the operation
-     */
-    public REVLibError resetStatusFrame(StatusFrame frame) {
-        return changeStatusFrame(frame, frame.getDefaultPeriodms());
-    }
-
-    /**
-     * Represents the status frames for the Neo class.
-     * Rev docs: https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-     */
-    public enum StatusFrame {
-        APPLIED_FAULTS_FOLLOWER(PeriodicFrame.kStatus0, 10),
-        VELO_TEMP_VOLTAGE_CURRENT(PeriodicFrame.kStatus1, 20),
-        ENCODER_POSITION(PeriodicFrame.kStatus2, 20),
-        ALL_ANALOG_ENCODER(PeriodicFrame.kStatus3, 50),
-        ALL_ALTERNATE_ENCODER(PeriodicFrame.kStatus4, 20),
-        ABSOLUTE_ENCODER_POS(PeriodicFrame.kStatus5, 200),
-        ABSOLUTE_ENCODER_VELO(PeriodicFrame.kStatus6, 200);
-
-        private final PeriodicFrame frame;
-        private final int defaultPeriodms;
-
-        /**
-         * Constructs a StatusFrame with the specified frame and default period.
-         * 
-         * @param frame         The periodic frame.
-         * @param defaultPeriod The default period in milliseconds.
-         */
-        StatusFrame(PeriodicFrame frame, int defaultPeriod) {
-            this.frame = frame;
-            this.defaultPeriodms = defaultPeriod;
-        }
-
-        /**
-         * Gets the periodic frame associated with this StatusFrame.
-         * 
-         * @return The periodic frame.
-         */
-        public PeriodicFrame getFrame() {
-            return frame;
-        }
-
-        /**
-         * Gets the default period in milliseconds for this StatusFrame.
-         * 
-         * @return The default period in milliseconds.
-         */
-        public int getDefaultPeriodms() {
-            return defaultPeriodms;
-        }
+        return getPIDController().getFF();
     }
 
     /**
@@ -577,78 +457,5 @@ public class Neo extends CANSparkMax {
         POSITION,
         VELOCITY,
         PERCENT;
-    }
-
-    /**
-     * Sets the motor to brake mode.
-     * This will make it try to stop when not power.
-     */
-    public void setBrakeMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kBrake);
-    }
-
-    /**
-     * Sets the motor to coast mode.
-     * This will make it spin freely when not powered.
-     */
-    public void setCoastMode() {
-        this.setIdleMode(CANSparkBase.IdleMode.kCoast);
-    }
-
-    
-    public enum TelemetryPreference {
-        DEFAULT,
-        ONLY_ABSOLUTE_ENCODER,
-        ONLY_RELATIVE_ENCODER,
-        NO_TELEMETRY,
-        NO_ENCODER
-    }
-    
-    /**
-     * Set the telemetry preference of the Neo
-     * This will disable the telemtry status frames 
-     * which is found at https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-     * @param type the enum to represent the telemetry preference
-     *             this will tell the motor to only send 
-     *             that type of telemtry
-     */
-    public void setTelemetryPreference(TelemetryPreference type) {
-        int minDelay = NeoMotorConstants.FAST_PERIODIC_STATUS_TIME_MS;
-        int maxDelay = NeoMotorConstants.MAX_PERIODIC_STATUS_TIME_MS;
-
-        // No matter what preference, we don't use analog or external encoders.
-        changeStatusFrame(StatusFrame.ALL_ALTERNATE_ENCODER, maxDelay);
-        changeStatusFrame(StatusFrame.ALL_ANALOG_ENCODER, maxDelay);
-
-        switch(type) {
-            // Disable all telemetry that is unrelated to the encoder
-            case NO_ENCODER: 
-                changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
-                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
-                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, maxDelay);
-                break;
-            // Disable all telemetry that is unrelated to absolute encoders
-            case ONLY_ABSOLUTE_ENCODER:
-                changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
-                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, minDelay);
-                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, minDelay);
-                break;
-            // Disable all telemetry that is unrelated to the relative encoder
-            case ONLY_RELATIVE_ENCODER: 
-                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
-                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, maxDelay);
-                break;
-            // Disable everything
-            case NO_TELEMETRY:
-                changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, maxDelay);
-                changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
-                changeStatusFrame(StatusFrame.ALL_ANALOG_ENCODER, maxDelay);
-                changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
-                break;
-
-            case DEFAULT:
-            default:
-                break;
-        }
     }
 }

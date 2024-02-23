@@ -5,11 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-import java.util.Optional;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -27,7 +25,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 import monologue.Logged;
 
@@ -121,14 +118,20 @@ public final class Constants {
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
             0,
-            0.20992
+            0.20992,
+            0.0001762,
+            // These are in %
+            -1,
+            1
         );
-        public static final double SHOOTER_FF = 0.0001762;
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
             0.05,
             0,
-            0.0083
+            0.0083,
+            // These are in %
+            -0.25,
+            0.25
         );
 
         public static final int SHOOTER_CURRENT_LIMIT = 80;
@@ -138,16 +141,6 @@ public final class Constants {
 
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 150;
-
-        // These are in %
-        public static final double SHOOTER_MIN_OUTPUT = -1;
-        public static final double SHOOTER_MAX_OUTPUT = 1;
-
-        public static final double PIVOT_MIN_OUTPUT = -0.25;
-        public static final double PIVOT_MAX_OUTPUT = 0.25;
-
-        public static final double PIVOT_LOWER_LIMIT_DEGREES_WRONG = 343.5;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES_WRONG = 300;
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
@@ -204,14 +197,11 @@ public final class Constants {
 
         public static final int TRAP_CURRENT_LIMIT = 15;
 
-        public static final double TRAP_ELEVATOR_MAX_OUTPUT = 1;
-        public static final double TRAP_ELEVATOR_MIN_OUTPUT = -TRAP_ELEVATOR_MAX_OUTPUT;
-
         public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 25.0;
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
 
-        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0);
+        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0, -1, 1);
 
         // TODO: set these values
         public static final double RESET_POS = 0;
@@ -265,7 +255,7 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 7.20;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
@@ -281,7 +271,7 @@ public final class Constants {
          *   I: 1 (izone on 20 degrees)
          *   D: 0.0375
          */
-        public static final double XY_CORRECTION_P = 2;
+        public static final double XY_CORRECTION_P = 4;
         public static final double XY_CORRECTION_I = 0.0125;
         public static final double XY_CORRECTION_D = 0.0125;
 
@@ -290,7 +280,7 @@ public final class Constants {
                 AutoConstants.XY_CORRECTION_I,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = .725;
+        public static final double ROTATION_CORRECTION_P = .8514;
         public static final double ROTATION_CORRECTION_I = 1;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -315,15 +305,16 @@ public final class Constants {
                 THETA_PID
             );
 
-        public static final HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
+        public static HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
             new PIDConstants(
-                AutoConstants.XY_CORRECTION_P*3,
-                0,
-                AutoConstants.XY_CORRECTION_D*2),
+                AutoConstants.XY_CORRECTION_P,
+                AutoConstants.XY_CORRECTION_I,
+                AutoConstants.XY_CORRECTION_D),
             new PIDConstants(
                     AutoConstants.ROTATION_CORRECTION_P,
-                    0,
-                    AutoConstants.ROTATION_CORRECTION_D),
+                    1,
+                    AutoConstants.ROTATION_CORRECTION_D,
+                    Units.degreesToRadians(45)),
             MAX_SPEED_METERS_PER_SECOND,
             Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0,
             new ReplanningConfig());
@@ -349,15 +340,6 @@ public final class Constants {
             "S W1A C1-5",
             "S W3-1 S",
             "S W3-1 S C1-3 S"
-        };
-
-        public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>() {
-            {
-                for (int i = 0; i < AUTO_NAMES.length; i++) {
-                    Pose2d startingPosition = PathPlannerAuto.getStaringPoseFromAutoFile(AUTO_NAMES[i]);
-                    add(startingPosition);
-                }
-            }
         };
     }
 
@@ -407,7 +389,9 @@ public final class Constants {
             DRIVING_P,
             DRIVING_I,
             DRIVING_D,
-            DRIVING_FF
+            DRIVING_FF,
+            DRIVING_MIN_OUTPUT,
+            DRIVING_MAX_OUTPUT
         );
 
         public static final double TURNING_P = Robot.isSimulation() ? 0.5 : 1.5;
@@ -420,7 +404,9 @@ public final class Constants {
             TURNING_P,
             TURNING_I,
             TURNING_D,
-            TURNING_FF
+            TURNING_FF,
+            TURNING_MIN_OUTPUT,
+            TURNING_MAX_OUTPUT
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
@@ -555,17 +541,6 @@ public final class Constants {
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
 
-        public static Optional<Alliance> ALLIANCE = Optional.empty();
-
-        public static enum GameMode {
-            DISABLED,
-            AUTONOMOUS,
-            TELEOP,
-            TEST
-        };
-
-        public static GameMode GAME_MODE;
-
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
         // Chain Positions: Blue alliance left
@@ -590,6 +565,11 @@ public final class Constants {
         public static final Pose2d[] STAGE_POSITIONS = new Pose2d[] {
             new Pose2d(4.897, 4.064, new Rotation2d()),
             new Pose2d(11.655, 4.064, new Rotation2d())
+        };
+
+        public static final Pose2d[] SOURCE_POSITIONS = new Pose2d[] {
+            new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120)),
+            new Pose2d(1.079, 0.971, Rotation2d.fromDegrees(60))
         };
 
         public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
@@ -630,7 +610,15 @@ public final class Constants {
 
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
-        } 
+        }
+
+        public static Pose2d GET_SOURCE_POSITION() {
+            return SOURCE_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+        }
+
+        public static Translation2d GET_SPEAKER_TRANSLATION() {
+            return SPEAKER_POSITIONS[Robot.isRedAlliance() ? 1 : 0].getTranslation();
+        }
 
         public static Pose2d GET_AMP_POSITION() {
             return AMP_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
@@ -677,10 +665,10 @@ public final class Constants {
             System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
         }
 
-        public static final Pose2d L_POSE = new Pose2d(5.11,6.23, new Rotation2d());
-        public static final Pose2d R_POSE = GET_SPEAKER_POSITION();
-        public static final Pose2d M_POSE = new Pose2d(4.46,4.81, new Rotation2d());
-        public static final Pose2d W3_POSE = new Pose2d(SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d(), new Rotation2d());
+        public static final Translation2d L_POSE = new Translation2d(5.11,6.23);
+        public static final Translation2d R_POSE = GET_SPEAKER_TRANSLATION();
+        public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
+        public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
     }
 
     public static final class CameraConstants {
@@ -725,12 +713,11 @@ public final class Constants {
         public static final int PIVOT_INDEX = 0;
         public static final int TRAPPER_INDEX = 1;
         public static final int ELEVATOR_INDEX = 2;
-        public static final int LEFT_CLIMB_INDEX = 4;
         public static final int RIGHT_CLIMB_INDEX = 3;
+        public static final int LEFT_CLIMB_INDEX = 4;
         
-        public static final double PIVOT_OFFSET_X = 0.112;
-        public static final double PIVOT_OFFSET_Z = 0.21;
-
+        public static final double PIVOT_OFFSET_X = 0.165;
+        public static final double PIVOT_OFFSET_Z = 0.2095;
     
         public static final Translation3d PIVOT_OFFSET_METERS = new Translation3d(
             PIVOT_OFFSET_X,

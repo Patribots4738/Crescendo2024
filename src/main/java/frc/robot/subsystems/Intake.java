@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.IntakeConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -22,7 +22,8 @@ public class Intake extends SubsystemBase implements Logged {
 
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID);
-        configMotors();
+        intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
+        intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
     @Override
@@ -35,12 +36,6 @@ public class Intake extends SubsystemBase implements Logged {
         }
     }
 
-    public void configMotors() {
-        intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
-        // See https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
-        intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-    } 
-    
     public void setPercent(double desiredPercent) {
         desiredSpeed = 
             MathUtil.clamp(
