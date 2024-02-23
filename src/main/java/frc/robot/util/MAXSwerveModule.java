@@ -4,7 +4,6 @@
 
 package frc.robot.util;
 
-import com.revrobotics.CANSparkBase;
 import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,12 +18,13 @@ public class MAXSwerveModule implements Logged{
     private final Neo drivingSpark;
     private final Neo turningSpark;
 
-    private double chassisAngularOffset = 0;
-    @Log
-    private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
-
     private PIDNotConstants turningPID;
     private PIDNotConstants drivingPID;
+
+    private double chassisAngularOffset = 0;
+
+    @Log
+    private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
     /**
      * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -35,11 +35,10 @@ public class MAXSwerveModule implements Logged{
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
         drivingSpark = new Neo(drivingCANId);
         turningSpark = new Neo(turningCANId, ModuleConstants.TURNING_ENCODER_INVERTED, true);
-
-        drivingSpark.setPosition(0);
-
-        configMotors();
         this.chassisAngularOffset = chassisAngularOffset;
+
+        resetEncoders();
+        configMotors();
         desiredState.angle = new Rotation2d(turningSpark.getPosition());
     }
 
@@ -49,21 +48,10 @@ public class MAXSwerveModule implements Logged{
      * @return The current state of the module.
      */
     public SwerveModuleState getState() {
-        if (FieldConstants.IS_SIMULATION) {
-            return getSimState();
-        }
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
         return new SwerveModuleState(drivingSpark.getVelocity(),
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
-    }
-
-    public SwerveModuleState getSimState() {
-        // Apply chassis angular offset to the encoder position to get the position
-        // relative to the chassis.
-        return new SwerveModuleState(drivingSpark.getVelocity(),
-                new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
-
     }
 
     public PIDNotConstants getTurningPIDNotConstants() {
@@ -124,19 +112,19 @@ public class MAXSwerveModule implements Logged{
     }
 
     /**
-     * Set the motor to coast mode
+     * Set the full module to coast mode
      */
     public void setCoastMode() {
-        drivingSpark.setIdleMode(CANSparkBase.IdleMode.kCoast);
-        turningSpark.setIdleMode(CANSparkBase.IdleMode.kCoast);
+        drivingSpark.setCoastMode();
+        turningSpark.setCoastMode();
     }
 
     /**
-     * Set the motor to brake mode
+     * Set the full module to brake mode
      */
     public void setBrakeMode() {
-        drivingSpark.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        turningSpark.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        drivingSpark.setBrakeMode();
+        turningSpark.setBrakeMode();
     }
 
     public void configMotors() {
@@ -166,15 +154,11 @@ public class MAXSwerveModule implements Logged{
             ModuleConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT,
             ModuleConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
 
-        // Set the PID gains for the driving motor. Note these are example gains, and
-        // you
-        // may need to tune them for your own robot!
         drivingSpark.setPID(ModuleConstants.DRIVING_PID);
         turningSpark.setPID(ModuleConstants.TURNING_PID);
 
-        drivingSpark.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        turningSpark.setIdleMode(CANSparkBase.IdleMode.kBrake);
         drivingSpark.setSmartCurrentLimit(ModuleConstants.VORTEX_CURRENT_LIMIT);
         turningSpark.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
+        setBrakeMode();
     }
 }
