@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 import frc.robot.util.motors.Neo;
 import monologue.Logged;
@@ -96,7 +98,6 @@ public final class Constants {
         public static final int PIGEON_CAN_ID = 29;
         public static final boolean GYRO_REVERSED = true;
     }
-
 
     public static final class TuningConstants implements Logged {
         public final int DRIVE_INDEX = 0;
@@ -521,7 +522,6 @@ public final class Constants {
 
         public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
-        // TODO: Add these to the robot
         public static final int TRIGGER_WHEEL_CURRENT_LIMIT_AMPS = 30;
         public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = -1;
         public static final double TRAP_TRIGGER_WHEEL_PERCENT = 1;
@@ -557,19 +557,19 @@ public final class Constants {
                 new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0)),
                 new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120)),
                 // Red Stage
-                new Pose2d(12.07, 3.237, Rotation2d.fromDegrees(-60)),
-                new Pose2d(10.638, 4.204, Rotation2d.fromDegrees(180)),
-                new Pose2d(12.2, 5, Rotation2d.fromDegrees(60))
+                GeometryUtil.flipFieldPose(new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(-120))),
+                GeometryUtil.flipFieldPose(new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0))),
+                GeometryUtil.flipFieldPose(new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120))),
         };
 
         public static final Pose2d[] STAGE_POSITIONS = new Pose2d[] {
             new Pose2d(4.897, 4.064, new Rotation2d()),
-            new Pose2d(11.655, 4.064, new Rotation2d())
+            GeometryUtil.flipFieldPose(new Pose2d(4.897, 4.064, new Rotation2d()))
         };
 
         public static final Pose2d[] SOURCE_POSITIONS = new Pose2d[] {
             new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120)),
-            new Pose2d(1.079, 0.971, Rotation2d.fromDegrees(60))
+            GeometryUtil.flipFieldPose(new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120)))
         };
 
         public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
@@ -594,7 +594,7 @@ public final class Constants {
                 // Blue Speaker
                 new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)),
                 // Red Speaker
-                new Pose2d(FIELD_WIDTH_METERS, 5.547, Rotation2d.fromDegrees(0)),
+                GeometryUtil.flipFieldPose(new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)))
         };
 
         public static final double SPEAKER_HEIGHT = 2.08;
@@ -605,27 +605,37 @@ public final class Constants {
                 // Blue Amp
                 new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
                 // Red Amp
-                new Pose2d(14.706, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
+                GeometryUtil.flipFieldPose(new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)))
         };
 
+        private static int getAllienceIndex() {
+            return getAllienceIndex(Alliance.Blue);
+        }
+
+        private static int getAllienceIndex(Alliance defaultAlliance) {
+            return defaultAlliance == Alliance.Blue 
+                ? (Robot.isRedAlliance() ? 1 : 0) 
+                : (Robot.isBlueAlliance() ? 1 : 0);
+        }
+
         public static Pose2d GET_SPEAKER_POSITION() {
-            return SPEAKER_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+            return SPEAKER_POSITIONS[getAllienceIndex()];
         }
 
         public static Pose2d GET_SOURCE_POSITION() {
-            return SOURCE_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+            return SOURCE_POSITIONS[getAllienceIndex()];
         }
 
         public static Translation2d GET_SPEAKER_TRANSLATION() {
-            return SPEAKER_POSITIONS[Robot.isRedAlliance() ? 1 : 0].getTranslation();
+            return SPEAKER_POSITIONS[getAllienceIndex()].getTranslation();
         }
 
         public static Pose2d GET_AMP_POSITION() {
-            return AMP_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+            return AMP_POSITIONS[getAllienceIndex()];
         }
 
         public static Pose2d GET_STAGE_POSITION() {
-            return STAGE_POSITIONS[Robot.isRedAlliance() ? 1 : 0];
+            return STAGE_POSITIONS[getAllienceIndex()];
         }
 
         public static Pose2d[] GET_CHAIN_POSITIONS() {
