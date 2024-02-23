@@ -224,11 +224,6 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
-
-        xSpeed   *= speedMultiplier;
-        ySpeed   *= speedMultiplier;
-        rotSpeed *= speedMultiplier;
-
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed,

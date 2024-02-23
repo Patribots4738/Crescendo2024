@@ -380,7 +380,6 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        CommandScheduler.getInstance().cancelAll();
         return driver.getYButton() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
     }
 

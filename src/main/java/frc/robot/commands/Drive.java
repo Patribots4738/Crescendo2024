@@ -75,9 +75,9 @@ public class Drive extends Command {
         }
         else {
             swerve.drive(
-                x * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
-                y * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
-                rotation * DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND,
+                x * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
+                y * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
+                rotation * DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * swerve.getSpeedMultiplier(),
                 fieldRelativeSupplier.getAsBoolean());
         }
     }
