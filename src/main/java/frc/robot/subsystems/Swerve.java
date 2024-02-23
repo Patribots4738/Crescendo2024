@@ -5,13 +5,11 @@
 package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,20 +23,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.event.NetworkBooleanEvent;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.commands.ChasePose;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
-import frc.robot.commands.ShooterCalc;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
-import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -398,14 +391,6 @@ public class Swerve extends SubsystemBase implements Logged {
     
     public DriveHDC getDriveHDCCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
         return new DriveHDC(this, speeds, fieldRelative, () -> false);
-    }
-
-    public Command updateChasePose(Supplier<Pose2d> poseSupplier) {
-        return Commands.runOnce(() -> ChasePose.updateDesiredPose(poseSupplier.get()));
-    }
-
-    public Command getChaseCommand() {
-        return new ChasePose(this);
     }
 
     public void resetHDCXY() {
