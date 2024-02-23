@@ -338,8 +338,7 @@ public final class Constants {
             "S C1-5 S",
             "S W1A C1-5",
             "S W3-1 S",
-            "S W3-1 S C1-3 S",
-            "TEST"
+            "S W3-1 S C1-3 S"
         };
     }
 
