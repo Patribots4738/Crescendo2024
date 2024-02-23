@@ -5,13 +5,11 @@
 package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +22,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,10 +32,8 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveHDC;
-import frc.robot.commands.ShooterCalc;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.PIDNotConstants;
-import frc.robot.util.PoseCalculations;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -227,17 +224,17 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
+        double timeDifference = Timer.getFPGATimestamp() - Robot.previousTimestamp;
+        ChassisSpeeds robotRelativeSpeeds;
 
-        xSpeed   *= speedMultiplier;
-        ySpeed   *= speedMultiplier;
-        rotSpeed *= speedMultiplier;
+        if (fieldRelative) {
+            robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getPose().getRotation());
+        } else {
+            robotRelativeSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rotSpeed);
+        }
 
-        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-                fieldRelative
-                        ? ChassisSpeeds.discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed,
-                                getPose().getRotation()), (Timer.getFPGATimestamp() - Robot.previousTimestamp))
-                        : ChassisSpeeds.discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed),
-                                (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
+        ChassisSpeeds discretizedSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, timeDifference);
+        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(discretizedSpeeds);
 
         setModuleStates(swerveModuleStates);
     }
@@ -286,7 +283,8 @@ public class Swerve extends SubsystemBase implements Logged {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
             desiredStates, 
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
+                .getDouble(DriveConstants.MAX_SPEED_METERS_PER_SECOND)
         );
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
@@ -403,6 +401,17 @@ public class Swerve extends SubsystemBase implements Logged {
             Commands.runOnce(() -> AutoConstants.HDC.getXController().reset()),
             Commands.runOnce(() -> AutoConstants.HDC.getYController().reset())
         );
+    }
+
+    public void reconfigureAutoBuilder() {
+        AutoBuilder.configureHolonomic(
+                this::getPose,
+                this::resetOdometry,
+                this::getRobotRelativeVelocity,
+                this::drive,
+                AutoConstants.HPFC,
+                Robot::isRedAlliance,
+                this);
     }
 
 }
