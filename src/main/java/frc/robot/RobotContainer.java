@@ -233,8 +233,8 @@ public class RobotContainer implements Logged {
             Commands.sequence(
                 swerve.resetHDC(),
                 Commands.either(
-                    alignmentCmds.trapAlignmentCommand(() -> controller.getLeftY()), 
-                    alignmentCmds.ampAlignmentCommand(() -> controller.getLeftX()), 
+                    alignmentCmds.trapAlignmentCommand(controller::getLeftY), 
+                    alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
                     climb::hooksUp)));
         
         

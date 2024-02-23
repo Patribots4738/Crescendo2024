@@ -79,6 +79,14 @@ public class ShooterCmds {
         shooter.setSpeed(triplet.getSpeeds());
     }
 
+    public Command setTripletCommand(SpeedAngleTriplet triplet) {
+        return Commands.run(() -> {
+            desiredTriplet = triplet;
+            pivot.setAngle(triplet.getAngle());
+            shooter.setSpeed(triplet.getSpeeds());
+        }, pivot, shooter);
+    }
+    
     public SpeedAngleTriplet getTriplet() {
         return desiredTriplet;
     }

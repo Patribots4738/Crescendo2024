@@ -154,7 +154,7 @@ public class PieceControl {
 
     public Command sourceShooterIntake() {
         return Commands.sequence(
-            Commands.runOnce(() -> shooterCmds.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, 45.0))),
+            shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 45.0)),
             indexer.toElevator(),
             trapper.outtake(),
             Commands.waitSeconds(3),

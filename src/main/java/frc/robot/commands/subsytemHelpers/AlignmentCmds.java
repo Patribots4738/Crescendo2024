@@ -27,20 +27,21 @@ public class AlignmentCmds {
     }
 
     public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds, Supplier<ChassisSpeeds> controllerSpeeds) {
-        return swerve.getDriveCommand(() -> {
-            ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
-            ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
-            return new ChassisSpeeds(
-                    (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond),
-                    -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond),
-                    controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
-        }, () -> false);
+        return 
+            swerve.getDriveCommand(() -> {
+                ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
+                ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
+                return new ChassisSpeeds(
+                        (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond),
+                        -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond),
+                        controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
+            }, () -> false);
     }
 
     public Command ampAlignmentCommand(DoubleSupplier driverX) {
         return 
             getAutoAlignmentCommand(
-                () -> alignmentCalc.getAmpAlignmentSpeeds(), 
+                alignmentCalc.getAmpAlignmentSpeedsSupplier(), 
                 () -> 
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         0,
@@ -51,32 +52,36 @@ public class AlignmentCmds {
             );
     }
 
-    
-
     public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
-        return swerve.getDriveCommand(() -> alignmentCalc.getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
-    }
-
-    
+        return 
+            swerve.getDriveCommand(
+                alignmentCalc.getChainRotationalSpeedsSupplier(driverX.getAsDouble(), driverY.getAsDouble()), 
+                () -> true
+        );
+    }    
 
     public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
-        return swerve.getDriveCommand(() -> alignmentCalc.getSourceRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble()), () -> true);
+        return 
+            swerve.getDriveCommand(
+                alignmentCalc.getSourceRotationalSpeedsSupplier(driverX.getAsDouble(), driverY.getAsDouble()), 
+                () -> true
+        );
     }
 
     public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
-        return swerve.getDriveCommand(
-            () -> 
-                alignmentCalc.getSpeakerRotationalSpeeds(
-                    driverX.getAsDouble(), 
+        return 
+            swerve.getDriveCommand(
+                alignmentCalc.getSpeakerRotationalSpeedsSupplier(
+                    driverX.getAsDouble(),
                     driverY.getAsDouble(),
-                    shooterCmds), 
-            () -> true);
+                    shooterCmds),
+                () -> true);
     }
 
     public Command trapAlignmentCommand(DoubleSupplier driverY) {
         return 
             getAutoAlignmentCommand(
-                () -> alignmentCalc.getTrapAlignmentSpeeds(), 
+                alignmentCalc.getTrapAlignmentSpeedsSupplier(), 
                 () -> 
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         -driverY.getAsDouble() * swerve.getPose().getRotation().getCos(),
