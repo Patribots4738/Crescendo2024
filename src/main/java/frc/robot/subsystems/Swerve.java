@@ -224,12 +224,17 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
-        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-                fieldRelative
-                        ? ChassisSpeeds.discretize(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed,
-                                getPose().getRotation()), (Timer.getFPGATimestamp() - Robot.previousTimestamp))
-                        : ChassisSpeeds.discretize(new ChassisSpeeds(xSpeed, ySpeed, rotSpeed),
-                                (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
+        double timeDifference = Timer.getFPGATimestamp() - Robot.previousTimestamp;
+        ChassisSpeeds robotRelativeSpeeds;
+
+        if (fieldRelative) {
+            robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getPose().getRotation());
+        } else {
+            robotRelativeSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rotSpeed);
+        }
+
+        ChassisSpeeds discretizedSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, timeDifference);
+        SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(discretizedSpeeds);
 
         setModuleStates(swerveModuleStates);
     }
