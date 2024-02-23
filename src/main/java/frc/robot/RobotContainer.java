@@ -428,18 +428,18 @@ public class RobotContainer implements Logged {
     }
 
     public void updateNTGains() {
-        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("0Translation/P")
+        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/P")
                 .getDouble(-1);
-        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("0Translation/I")
+        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/I")
                 .getDouble(-1);
-        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("0Translation/D")
+        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/D")
                 .getDouble(-1);
 
-        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("1Rotation/P")
+        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/P")
                 .getDouble(-1);
-        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("1Rotation/I")
+        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/I")
                 .getDouble(-1);
-        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("1Rotation/D")
+        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/D")
                 .getDouble(-1);
 
         double MAX = NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
