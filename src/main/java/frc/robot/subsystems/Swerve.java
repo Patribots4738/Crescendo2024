@@ -220,15 +220,17 @@ public class Swerve extends SubsystemBase implements Logged {
         return poseEstimator;
     }
 
-    public void drive(ChassisSpeeds speeds) {
-        drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, false);
+    public void drive(ChassisSpeeds robotRelativeSpeeds) {
+        setModuleStates(DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+            ChassisSpeeds.discretize(robotRelativeSpeeds, (Timer.getFPGATimestamp() - Robot.previousTimestamp)))
+        );
     }
 
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
 
-        xSpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        ySpeed   *= (DriveConstants.MAX_SPEED_METERS_PER_SECOND * speedMultiplier);
-        rotSpeed *= (DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * speedMultiplier);
+        xSpeed   *= speedMultiplier;
+        ySpeed   *= speedMultiplier;
+        rotSpeed *= speedMultiplier;
 
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative
