@@ -5,6 +5,8 @@ package frc.robot.util;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
@@ -238,7 +240,12 @@ public class Neo extends SafeSpark {
      */
     public void tick() {
         if ((FieldConstants.IS_SIMULATION) && controlType == ControlLoopType.POSITION) {
-            setVoltage(getP() * (targetPosition - getPosition()));
+            double error = (targetPosition - getPosition());
+            // Fix swerve modules trying to go the long way around
+            if (canID < 9) {
+                error = MathUtil.angleModulus(error);
+            }
+            setVoltage(getP() * error);
         }
     }
 
