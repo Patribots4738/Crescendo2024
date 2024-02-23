@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,7 +24,6 @@ import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
-import frc.robot.commands.misc.limelight.LimelightValid;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
 import frc.robot.commands.subsytemHelpers.PieceControl;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
@@ -106,7 +104,7 @@ public class RobotContainer implements Logged {
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        limelight = new Limelight(swerve::getPose);
+        limelight = new Limelight(swerve.getPoseEstimator(), swerve::getPose);
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
 
@@ -139,14 +137,6 @@ public class RobotContainer implements Logged {
             shooterCmds);
 
         calibrationControl = new CalibrationControl(shooterCmds);
-
-        limelight.setDefaultCommand(
-            new LimelightValid(
-                limelight, 
-                swerve, 
-                driver.getHID()::getLeftTriggerAxis
-            )
-        );
 
         swerve.setDefaultCommand(new Drive(
             swerve,

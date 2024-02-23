@@ -3,6 +3,7 @@ package frc.robot.util.constants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.pathplanner.lib.util.GeometryUtil;
@@ -550,37 +551,61 @@ public final class Constants {
         //      1      4
         //  0              3
         // @formatter:on
-        public static final Pose2d[] CHAIN_POSITIONS = new Pose2d[] {
-                // All points are in meters and radians
-                // All relative to the blue origin
-                // Blue Stage
-                new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(-120)),
-                new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0)),
-                new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120)),
-                // Red Stage
-                GeometryUtil.flipFieldPose(new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(-120))),
-                GeometryUtil.flipFieldPose(new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0))),
-                GeometryUtil.flipFieldPose(new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120))),
-        };
+        public static final List<Pose2d> CHAIN_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Stage
+            Pose2d bluePose1 = new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(-120));
+            Pose2d bluePose2 = new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0));
+            Pose2d bluePose3 = new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120));
+            add(bluePose1);
+            add(bluePose2);
+            add(bluePose3);
 
-        public static final Pose2d[] STAGE_POSITIONS = new Pose2d[] {
-            new Pose2d(4.897, 4.064, new Rotation2d()),
-            GeometryUtil.flipFieldPose(new Pose2d(4.897, 4.064, new Rotation2d()))
-        };
+            // Red Stage
+            add(GeometryUtil.flipFieldPose(bluePose1));
+            add(GeometryUtil.flipFieldPose(bluePose2));
+            add(GeometryUtil.flipFieldPose(bluePose3));
+        }};
 
-        public static final Pose2d[] SOURCE_POSITIONS = new Pose2d[] {
-            new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120)),
-            GeometryUtil.flipFieldPose(new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120)))
-        };
+        public static final List<Pose2d> STAGE_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Stage
+            Pose2d blueStage = new Pose2d(4.897, 4.064, new Rotation2d());
+            add(blueStage);
 
-        public static final Pose3d[] CHAIN_POSE3DS = new Pose3d[] {
-            new Pose3d(CHAIN_POSITIONS[0]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
-            new Pose3d(CHAIN_POSITIONS[1]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
-            new Pose3d(CHAIN_POSITIONS[2]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
-            new Pose3d(CHAIN_POSITIONS[3]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
-            new Pose3d(CHAIN_POSITIONS[4]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
-            new Pose3d(CHAIN_POSITIONS[5]).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())),
-        };
+            // Red Stage
+            add(GeometryUtil.flipFieldPose(blueStage));
+        }};
+
+        public static final List<Pose2d> SOURCE_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Source
+            Pose2d blueSource = new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120));
+            add(blueSource);
+
+            // Red Source
+            add(GeometryUtil.flipFieldPose(blueSource));
+        }};
+
+        public static final List<Pose3d> CHAIN_POSE3DS = new ArrayList<Pose3d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Chain
+            Pose3d blueChain1 = new Pose3d(CHAIN_POSITIONS.get(0)).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
+            Pose3d blueChain2 = new Pose3d(CHAIN_POSITIONS.get(1)).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
+            Pose3d blueChain3 = new Pose3d(CHAIN_POSITIONS.get(2)).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
+            add(blueChain1);
+            add(blueChain2);
+            add(blueChain3);
+
+            // Red Chain
+            add(new Pose3d(GeometryUtil.flipFieldPose(blueChain1.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
+            add(new Pose3d(GeometryUtil.flipFieldPose(blueChain2.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
+            add(new Pose3d(GeometryUtil.flipFieldPose(blueChain3.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
+        }};
 
         // Speaker Positions: Blue alliance left
         // @formatter:off
@@ -589,59 +614,58 @@ public final class Constants {
         //
         //
         // @formatter:on
-        private static final Pose2d[] SPEAKER_POSITIONS = new Pose2d[] {
-                // All points are in meters and radians
-                // All relative to the blue origin
-                // Blue Speaker
-                new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)),
-                // Red Speaker
-                GeometryUtil.flipFieldPose(new Pose2d(0, 5.547, Rotation2d.fromDegrees(0)))
-        };
+        public static final List<Pose2d> SPEAKER_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Speaker
+            Pose2d blueSpeaker = new Pose2d(0, 5.547, Rotation2d.fromDegrees(0));
+            add(blueSpeaker);
+
+            // Red Speaker
+            add(GeometryUtil.flipFieldPose(blueSpeaker));
+        }};
 
         public static final double SPEAKER_HEIGHT = 2.08;
 
-        public static final Pose2d[] AMP_POSITIONS = new Pose2d[] {
-                // All points are in meters and radians
-                // All relative to the blue origin
-                // Blue Amp
-                new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)),
-                // Red Amp
-                GeometryUtil.flipFieldPose(new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90)))
-        };
+    
+        public static final List<Pose2d> AMP_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            Pose2d bluePose = new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90));
+            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose);
+            add(bluePose);
+            add(redPose);
+        }};
 
-        private static int getAllienceIndex() {
-            return getAllienceIndex(Alliance.Blue);
-        }
-
-        private static int getAllienceIndex(Alliance defaultAlliance) {
-            return defaultAlliance == Alliance.Blue 
+        private static int getAllianceIndex(Alliance defaultAlliance) {
+            return defaultAlliance == Alliance.Blue
                 ? (Robot.isRedAlliance() ? 1 : 0) 
                 : (Robot.isBlueAlliance() ? 1 : 0);
         }
 
         public static Pose2d GET_SPEAKER_POSITION() {
-            return SPEAKER_POSITIONS[getAllienceIndex()];
+            return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_SOURCE_POSITION() {
-            return SOURCE_POSITIONS[getAllienceIndex()];
+            return SOURCE_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Translation2d GET_SPEAKER_TRANSLATION() {
-            return SPEAKER_POSITIONS[getAllienceIndex()].getTranslation();
+            return GET_SPEAKER_POSITION().getTranslation();
         }
 
         public static Pose2d GET_AMP_POSITION() {
-            return AMP_POSITIONS[getAllienceIndex()];
+            return AMP_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_STAGE_POSITION() {
-            return STAGE_POSITIONS[getAllienceIndex()];
+            return STAGE_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
-        public static Pose2d[] GET_CHAIN_POSITIONS() {
+        public static List<Pose2d> GET_CHAIN_POSITIONS() {
             int startIndex = Robot.isRedAlliance() ? 3 : 0;
-            return Arrays.copyOfRange(CHAIN_POSITIONS, startIndex, startIndex + 3);
+            return CHAIN_POSITIONS.subList(startIndex, startIndex + 3);
         }
 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);

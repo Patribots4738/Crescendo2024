@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.constants.Constants.NeoMotorConstants;
 
-public class SafeSparkBase extends CANSparkMax {
+public class SafeSparkMax extends CANSparkMax {
 
     protected final int canID;
     protected final boolean useAbsoluteEncoder;
@@ -30,7 +30,7 @@ public class SafeSparkBase extends CANSparkMax {
     private final double BURN_FLASH_WAIT_TIME = 0.5;
     private final double APPLY_PARAMETER_WAIT_TIME = 0.1;
 
-    public SafeSparkBase(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
+    public SafeSparkMax(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
         super(canID, motorType);
 
         if (motorType == CANSparkBase.MotorType.kBrushless) {
@@ -178,7 +178,7 @@ public class SafeSparkBase extends CANSparkMax {
      * @param invert Set slave to output opposite of the master
      * @return {@link REVLibError#kOk} if successful
      */
-    public REVLibError follow(SafeSparkBase leader, boolean invert) {
+    public REVLibError follow(SafeSparkMax leader, boolean invert) {
         REVLibError status = applyParameter(
                 () -> super.follow(ExternalFollower.kFollowerSpark, leader.canID, invert),
                 () -> super.isFollower(),

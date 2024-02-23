@@ -1,5 +1,7 @@
 package frc.robot.util.calc;
 
+import java.util.List;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,8 +39,8 @@ public class PoseCalculations implements Logged {
      * @return The closest chain position to the given pose.
      */
     public static Pose2d getClosestChain(Pose2d position) {
-        Pose2d[] chainPoses = FieldConstants.GET_CHAIN_POSITIONS();
-        Pose2d closestChain = chainPoses[0];
+        List<Pose2d> chainPoses = FieldConstants.GET_CHAIN_POSITIONS();
+        Pose2d closestChain = chainPoses.get(0);
         double minDistance = Double.POSITIVE_INFINITY;
         for (Pose2d pose : chainPoses) {
             if (position.relativeTo(pose).getTranslation().getNorm() < minDistance) {
