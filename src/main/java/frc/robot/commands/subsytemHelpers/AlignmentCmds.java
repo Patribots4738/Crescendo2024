@@ -60,6 +60,13 @@ public class AlignmentCmds {
         );
     }    
 
+    /**
+     * Command to align the robot rotationally to the source of the field.
+     * 
+     * @param driverX the driver's x input
+     * @param driverY the driver's y input
+     * @return        the command to align the robot to the source
+     */
     public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return 
             swerve.getDriveCommand(
@@ -78,6 +85,13 @@ public class AlignmentCmds {
                 () -> true);
     }
 
+    /**
+     * Command to align the robot to the trap of the field.
+     * multiplies the driverY by the cosine and sine to get the x and y components of the field relative speed
+     * '
+     * @param driverY the driver's y input
+     * @return        the command to align the robot to the trap
+     */
     public Command trapAlignmentCommand(DoubleSupplier driverY) {
         return 
             getAutoAlignmentCommand(
@@ -92,6 +106,14 @@ public class AlignmentCmds {
             );
     }
 
+    /**
+     * Command to align the robot to the wing of the field.
+     * multiplies the driverY by the cosine and sine to get the x and y components of the field relative speed
+     * 
+     * @param driverX the driver's x input
+     * @param driverY the driver's y input
+     * @return        the command to align the robot to the wing
+     */
     public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return
             Commands.either(

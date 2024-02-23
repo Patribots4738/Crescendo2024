@@ -21,12 +21,23 @@ public class AlignmentCalc {
         this.swerve = swerve;
     }
 
+    /**
+     * Calculates the rotational HDC speeds to align the robot to the desired angle.
+     * 
+     * @param desiredAngle the desired angle
+     * @return             the rotational HDC speeds to align the robot to the desired angle
+     */
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {
         return MathUtil.applyDeadband(AutoConstants.HDC.getThetaController().calculate(
             swerve.getPose().getRotation().getRadians(),
             desiredAngle.getRadians()),  0.02);
     }
 
+    /**
+     * Calculates the rotational speeds to align the robot to the amp.
+     * 
+     * @return the rotational speeds to align the robot to the amp
+     */
     public ChassisSpeeds getAmpAlignmentSpeeds() {
         Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
         Pose2d desiredPose = new Pose2d(
@@ -44,10 +55,22 @@ public class AlignmentCalc {
             );
     }
 
+    /**
+     * Supplier for the Command to align the robot to the amp.
+     * 
+     * @return the command to align the robot to the amp
+     */
     public Supplier<ChassisSpeeds> getAmpAlignmentSpeedsSupplier() {
         return () -> getAmpAlignmentSpeeds();
     }
 
+    /**
+     * Calculates the rotational speeds to align the robot to the chain.
+     * 
+     * @param driverX the driver's x input
+     * @param driverY the driver's y input
+     * @return        the rotational speeds to align the robot to the chain
+     */
     public ChassisSpeeds getChainRotationalSpeeds(double driverX, double driverY) {
         Pose2d closestChain = PoseCalculations.getClosestChain(swerve.getPose());
         return new ChassisSpeeds(
@@ -57,10 +80,24 @@ public class AlignmentCalc {
         );
     }
 
+    /**
+     * Supplier for the Command to align the robot rotationally to the chain.
+     * 
+     * @param driverX the driver's x input
+     * @param driverY the driver's y input
+     * @return        the command to align the robot to the chain
+     */
     public Supplier<ChassisSpeeds> getChainRotationalSpeedsSupplier(double driverX, double driverY) {
         return () -> getChainRotationalSpeeds(driverX, driverY);
     }
 
+    /**
+     * Calculates the rotational speeds to align the robot to the source of the field.
+     * 
+     * @param driverX the driver's x input
+     * @param driverY the driver's y input
+     * @return     the rotational speeds to align the robot to the source
+     */
     public ChassisSpeeds getSourceRotationalSpeeds(double driverX, double driverY) {
         Pose2d source = FieldConstants.GET_SOURCE_POSITION();
         return new ChassisSpeeds(
@@ -70,10 +107,25 @@ public class AlignmentCalc {
         );
     }
 
+    /**
+     * Supplier for the Command to align the robot rotationally to the source of the field.
+     * 
+     * @param driverX the driver's x input
+     * @param driverY the driver's y input
+     * @return        the command to align the robot to the source
+     */
     public Supplier<ChassisSpeeds> getSourceRotationalSpeedsSupplier(double driverX, double driverY) {
         return () -> getSourceRotationalSpeeds(driverX, driverY);
     }
 
+    /**
+     * Calculates the rotational speeds to align the robot to the speaker.
+     * 
+     * @param driverX   the driver's x input
+     * @param driverY   the driver's y input
+     * @param shooterCmds the shooter commands
+     * @return        the rotational speeds to align the robot to the speaker
+     */
     public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return new ChassisSpeeds(
             driverY * (Robot.isRedAlliance() ? -1 : 1),
@@ -81,10 +133,23 @@ public class AlignmentCalc {
             getAlignmentSpeeds(shooterCmds.shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
     }
 
+    /**
+     * Supplier for the Command to align the robot rotationally to the speaker.
+     * 
+     * @param driverX   the driver's x input
+     * @param driverY   the driver's y input
+     * @param shooterCmds the shooter commands
+     * @return          the command to align the robot to the speaker
+     */
     public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(double driverX, double driverY, ShooterCmds shooterCmds) {
         return () -> getSpeakerRotationalSpeeds(driverX, driverY, shooterCmds);
     }
 
+    /**
+     * Calculates the rotational speeds to align the robot to the trap.
+     * 
+     * @return the rotational speeds to align the robot to the trap
+     */
     public ChassisSpeeds getTrapAlignmentSpeeds() {
         Pose2d closestTrap = PoseCalculations.getClosestChain(swerve.getPose());
         Pose2d stage = FieldConstants.GET_STAGE_POSITION();
@@ -106,10 +171,21 @@ public class AlignmentCalc {
             );
     }
 
+    /**
+     * Supplier for the Command to align the robot to the trap.
+     * 
+     * @return the command to align the robot to the trap
+     */
     public Supplier<ChassisSpeeds> getTrapAlignmentSpeedsSupplier() {
         return () -> getTrapAlignmentSpeeds();
     }
 
+    /**
+     * Detects if the robot is on the opposite side of the field.
+     * Uses the robot's x position to determine if it has crossed the centerline.
+     * 
+     * @return true if the robot is on the opposite side of the field
+     */
     public boolean onOppositeSide() {
         return Robot.isRedAlliance() 
             ? swerve.getPose().getX() < FieldConstants.CENTERLINE_X 
