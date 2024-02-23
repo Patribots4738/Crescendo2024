@@ -16,26 +16,25 @@ import frc.robot.util.Constants.AutoConstants;
 public class ChasePose extends Command {
 
 	private Swerve swerve;
-	private static Pose2d desiredPose;
+	private static Pose2d desiredPose = new Pose2d();
 
 	/** Creates a new ChasePose. */
 	public ChasePose(Swerve swerve) {
 		this.swerve = swerve;
-		desiredPose = new Pose2d();
 		addRequirements(swerve);
 	}
 
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		
+
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
 
-		swerve.resetHDC();
+		swerve.resetHDCXY();
 
 		ChassisSpeeds desiredSpeeds = 
 			AutoConstants.HDC.calculate(
@@ -47,7 +46,7 @@ public class ChasePose extends Command {
 		swerve.setDesiredPose(desiredPose);
 
 		swerve.drive(desiredSpeeds);
-		
+
 	}
 
 	// Called once the command ends or is interrupted.

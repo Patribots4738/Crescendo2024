@@ -282,7 +282,13 @@ public class RobotContainer implements Logged {
 
         controller.povLeft().onTrue(swerve.getChaseCommand());
 
-        controller.povRight().onTrue(swerve.updateChasePose(() -> new Pose2d(Math.random() * 20, Math.random() * 20, new Rotation2d())));
+        controller.povRight().onTrue(
+            swerve.updateChasePose(
+                () -> new Pose2d(
+                    Math.random() * 20, 
+                    Math.random() * 20, 
+                    new Rotation2d(
+                        Math.random() * Math.PI))));
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
@@ -431,6 +437,8 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterW3", shooterCalc.prepareFireCommand(() -> FieldConstants.W3_POSE));
         NamedCommands.registerCommand("PrepareShooter", shooterCalc.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
         NamedCommands.registerCommand("PrepareSWD", shooterCalc.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("ChasePose", swerve.getChaseCommand());
+        NamedCommands.registerCommand("UpdateChasePose", swerve.updateChasePose(() -> new Pose2d(10.2, 4.0, new Rotation2d(Math.PI))));
         for (int i = 1; i <= FieldConstants.CENTER_NOTE_COUNT; i++) {
             for (int j = 1; j <= FieldConstants.CENTER_NOTE_COUNT; j++) {
                 if (i == j) {

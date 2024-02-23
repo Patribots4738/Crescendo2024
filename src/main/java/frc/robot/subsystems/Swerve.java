@@ -406,10 +406,14 @@ public class Swerve extends SubsystemBase implements Logged {
         return new ChasePose(this);
     }
 
-    public void resetHDC() {
-        AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians());
+    public void resetHDCXY() {
         AutoConstants.HDC.getXController().reset();
         AutoConstants.HDC.getYController().reset();
+    }
+
+    public void resetHDC() {
+        AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians());
+        resetHDCXY();
     }
 
     public Command resetHDCCommand() {
