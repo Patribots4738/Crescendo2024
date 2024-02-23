@@ -1,5 +1,5 @@
 // Primarily referenced from https://github.com/lasarobotics/PurpleLib/blob/master/src/main/java/org/lasarobotics/hardware/revrobotics/Spark.java
-package frc.robot.util;
+package frc.robot.util.motors;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -15,10 +15,10 @@ import com.revrobotics.jni.CANSparkMaxJNI;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.NeoMotorConstants;
 
-public class SafeSpark extends CANSparkMax {
+public class SafeSparkMax extends CANSparkMax {
 
     protected final int canID;
     protected final boolean useAbsoluteEncoder;
@@ -30,7 +30,7 @@ public class SafeSpark extends CANSparkMax {
     private final double BURN_FLASH_WAIT_TIME = 0.5;
     private final double APPLY_PARAMETER_WAIT_TIME = 0.1;
 
-    public SafeSpark(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
+    public SafeSparkMax(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
         super(canID, motorType);
 
         if (motorType == CANSparkBase.MotorType.kBrushless) {
@@ -178,7 +178,7 @@ public class SafeSpark extends CANSparkMax {
      * @param invert Set slave to output opposite of the master
      * @return {@link REVLibError#kOk} if successful
      */
-    public REVLibError follow(SafeSpark leader, boolean invert) {
+    public REVLibError follow(SafeSparkMax leader, boolean invert) {
         REVLibError status = applyParameter(
                 () -> super.follow(ExternalFollower.kFollowerSpark, leader.canID, invert),
                 () -> super.isFollower(),
