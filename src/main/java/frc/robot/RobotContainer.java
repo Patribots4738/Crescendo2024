@@ -401,27 +401,27 @@ public class RobotContainer implements Logged {
     }
 
     public void updateNTGains() {
-        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P")
+        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/P")
                 .getDouble(-1);
-        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I")
+        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/I")
                 .getDouble(-1);
-        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D")
+        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/D")
                 .getDouble(-1);
 
-        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P")
+        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/P")
                 .getDouble(-1);
-        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I")
+        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/I")
                 .getDouble(-1);
-        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D")
+        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/D")
                 .getDouble(-1);
 
         if (P == -1 || I == -1 || D == -1 || P2 == -1 || I2 == -1 || D2 == -1) {
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P").setDouble(AutoConstants.XY_CORRECTION_P);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I").setDouble(AutoConstants.XY_CORRECTION_I);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D").setDouble(AutoConstants.XY_CORRECTION_D);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/P").setDouble(AutoConstants.XY_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/I").setDouble(AutoConstants.XY_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/D").setDouble(AutoConstants.XY_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
             return;
         }
         
