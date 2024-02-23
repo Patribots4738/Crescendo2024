@@ -176,11 +176,6 @@ public class RobotContainer implements Logged {
         pathPlannerStorage.configureAutoChooser();
         
         configureButtonBindings();
-
-        NetworkTableInstance.getDefault().getTable("Robot").getEntry("P").setDouble(AutoConstants.XY_CORRECTION_P);
-        NetworkTableInstance.getDefault().getTable("Robot").getEntry("I").setDouble(AutoConstants.XY_CORRECTION_I);
-        NetworkTableInstance.getDefault().getTable("Robot").getEntry("D").setDouble(AutoConstants.XY_CORRECTION_D);
-        NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX").setDouble(4.377);
     }
 
     private void configureButtonBindings() {
@@ -412,45 +407,15 @@ public class RobotContainer implements Logged {
         pieceControl.stopAllMotors().schedule();
         pathPlannerStorage.updatePathViewerCommand().schedule();
         fixPathPlannerCommands();
-        // Pull the latest value of @Log's P, I, and D from networktables
-        // reconfigure the HPFC with the new values
+
+        // TODO: Extract this into a command file
+        Commands.runOnce(this::updateNTGains)
+            .repeatedly()
+            .until(() -> Robot.gameMode != GameMode.DISABLED)
+            .ignoringDisable(true)
+            .schedule();
     }
 
-    public void updateNTGains() {
-        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("P")
-                .getDouble(AutoConstants.XY_CORRECTION_P);
-        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("I")
-                .getDouble(AutoConstants.XY_CORRECTION_I);
-        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("D")
-                .getDouble(AutoConstants.XY_CORRECTION_D);
-
-        double MAX = NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
-                .getDouble(4);
-        
-        if (!(MathUtil.isNear(AutoConstants.HPFC.translationConstants.kP, P, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kI, I, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kD, D, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.maxModuleSpeed, MAX, 0.01))) {
-
-            AutoConstants.HPFC = new HolonomicPathFollowerConfig(
-                    new PIDConstants(
-                            P,
-                            I,
-                            D),
-                    new PIDConstants(
-                            AutoConstants.ROTATION_CORRECTION_P * 3,
-                            0,
-                            AutoConstants.ROTATION_CORRECTION_D * 2),
-                    MAX,
-                    Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
-                    new ReplanningConfig());
-            
-            swerve.reconfigureAutoBuilder();
-            fixPathPlannerCommands();
-            System.out.println("Reconfigured HPFC");
-        }
-    }
-    
     public void onEnabled() {
         if (Robot.gameMode == GameMode.TELEOP) {
             new LPI(ledStrip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
@@ -462,7 +427,61 @@ public class RobotContainer implements Logged {
     public void onTest() {
         CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
     }
+
+    public void updateNTGains() {
+        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("0Translation/P")
+                .getDouble(-1);
+        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("0Translation/I")
+                .getDouble(-1);
+        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("0Translation/D")
+                .getDouble(-1);
+
+        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("1Rotation/P")
+                .getDouble(-1);
+        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("1Rotation/I")
+                .getDouble(-1);
+        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("1Rotation/D")
+                .getDouble(-1);
+
+        double MAX = NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
+                .getDouble(-1);
+
+        if (P == -1 || I == -1 || D == -1 || P2 == -1 || I2 == -1 || D2 == -1 || MAX == -1) {
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/P").setDouble(AutoConstants.XY_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/I").setDouble(AutoConstants.XY_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/D").setDouble(AutoConstants.XY_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
+            return;
+        }
+        
+        if (!(MathUtil.isNear(AutoConstants.HPFC.translationConstants.kP, P, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kI, I, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kD, D, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kP, P2, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kI, I2, 0.01)
+                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kD, D2, 0.01))) {
+            AutoConstants.HPFC = new HolonomicPathFollowerConfig(
+                    new PIDConstants(
+                            P,
+                            I,
+                            D),
+                    new PIDConstants(
+                            P2,
+                            I2,
+                            D2),
+                    MAX,
+                    Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
+                    new ReplanningConfig());
+            
+            swerve.reconfigureAutoBuilder();
+            fixPathPlannerCommands();
+            System.out.println("Reconfigured HPFC");
+        }
+    }
     
+
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());

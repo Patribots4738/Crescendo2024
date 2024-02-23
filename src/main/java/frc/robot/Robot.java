@@ -88,8 +88,6 @@ public class Robot extends TimedRobot {
         // it needs to be updated.
         DriverStation.refreshData();
         Robot.alliance = DriverStation.getAlliance();
-
-        robotContainer.updateNTGains();
     }
 
     @Override
