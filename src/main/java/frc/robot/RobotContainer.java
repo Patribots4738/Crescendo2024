@@ -1,7 +1,5 @@
 package frc.robot;
 
-import java.util.HashMap;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -12,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -40,9 +39,7 @@ import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.constants.Constants.NTConstants;
 import frc.robot.util.constants.Constants.NeoMotorConstants;
 import frc.robot.util.constants.Constants.OIConstants;
-import frc.robot.util.mod.NetworkTableManager;
 import frc.robot.util.mod.PatriBoxController;
-import frc.robot.util.mod.NetworkTableManager.PatriNetworkTableLayout;
 import frc.robot.util.motors.Neo;
 import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
@@ -76,8 +73,6 @@ public class RobotContainer implements Logged {
     private CalibrationControl calibrationControl;
     private PIDTunerCommands PIDTuner;
     private AlignmentCmds alignmentCmds;
-
-    private NetworkTableManager networkTableManager = new NetworkTableManager();
 
     public static HDCTuner HDCTuner;
     
@@ -406,15 +401,29 @@ public class RobotContainer implements Logged {
     }
 
     public void updateNTGains() {
-        HashMap<String, Double> gains = networkTableManager.getPatriNetworkTableLayout();
+        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P")
+                .getDouble(-1);
+        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I")
+                .getDouble(-1);
+        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D")
+                .getDouble(-1);
 
-        double P = gains.get(PatriNetworkTableLayout.XY_P_ENTRY_NAME);
-        double I = gains.get(PatriNetworkTableLayout.XY_I_ENTRY_NAME);
-        double D = gains.get(PatriNetworkTableLayout.XY_D_ENTRY_NAME);
-        double P2 = gains.get(PatriNetworkTableLayout.ROTATION_P_ENTRY_NAME);
-        double I2 = gains.get(PatriNetworkTableLayout.ROTATION_I_ENTRY_NAME);
-        double D2 = gains.get(PatriNetworkTableLayout.ROTATION_D_ENTRY_NAME);
-        double MAX = gains.get(PatriNetworkTableLayout.MAX_ENTRY_NAME);
+        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P")
+                .getDouble(-1);
+        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I")
+                .getDouble(-1);
+        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D")
+                .getDouble(-1);
+
+        if (P == -1 || I == -1 || D == -1 || P2 == -1 || I2 == -1 || D2 == -1) {
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P").setDouble(AutoConstants.XY_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I").setDouble(AutoConstants.XY_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D").setDouble(AutoConstants.XY_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
+            return;
+        }
         
         if (!(MathUtil.isNear(AutoConstants.HPFC.translationConstants.kP, P, 0.01)
                 && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kI, I, 0.01)
@@ -422,11 +431,16 @@ public class RobotContainer implements Logged {
                 && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kP, P2, 0.01)
                 && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kI, I2, 0.01)
                 && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kD, D2, 0.01))) {
-            
-                    AutoConstants.HPFC = new HolonomicPathFollowerConfig(
-                    new PIDConstants( P, I, D),
-                    new PIDConstants( P2, I2, D2),
-                    MAX,
+            AutoConstants.HPFC = new HolonomicPathFollowerConfig(
+                    new PIDConstants(
+                            P,
+                            I,
+                            D),
+                    new PIDConstants(
+                            P2,
+                            I2,
+                            D2),
+                    DriveConstants.MAX_SPEED_METERS_PER_SECOND,
                     Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
                     new ReplanningConfig());
             
@@ -435,6 +449,7 @@ public class RobotContainer implements Logged {
             System.out.println("Reconfigured HPFC");
         }
     }
+    
 
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
