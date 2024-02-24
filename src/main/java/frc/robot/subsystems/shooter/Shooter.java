@@ -5,10 +5,9 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.Neo;
-import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Neo.TelemetryPreference;
-import frc.robot.util.PIDNotConstants;
+import frc.robot.util.constants.Constants.ShooterConstants;
+import frc.robot.util.motors.Neo;
+import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -37,27 +36,15 @@ public class Shooter extends SubsystemBase implements Logged{
         motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true);
 
         configMotors();
-        shooterPID = new PIDNotConstants(ShooterConstants.SHOOTER_PID, ShooterConstants.SHOOTER_FF, motorLeft.getPIDController());
+        shooterPID = new PIDNotConstants(ShooterConstants.SHOOTER_PID, motorLeft.getPIDController());
     }
 
     public void configMotors() {
         motorLeft.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
         motorRight.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
-        motorLeft.setPID(
-                ShooterConstants.SHOOTER_PID,
-                ShooterConstants.SHOOTER_MIN_OUTPUT,
-                ShooterConstants.SHOOTER_MAX_OUTPUT);
-                motorLeft.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-                motorRight.setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
+        motorLeft.setPID(ShooterConstants.SHOOTER_PID);
 
-        motorLeft.setFF(ShooterConstants.SHOOTER_FF);
-
-        motorRight.setPID(
-                ShooterConstants.SHOOTER_PID,
-                ShooterConstants.SHOOTER_MIN_OUTPUT,
-                ShooterConstants.SHOOTER_MAX_OUTPUT);
-
-        motorRight.setFF(ShooterConstants.SHOOTER_FF);
+        motorRight.setPID(ShooterConstants.SHOOTER_PID);
 
         motorLeft.setCoastMode();
         motorRight.setCoastMode();

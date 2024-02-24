@@ -1,0 +1,104 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.461157776932109,
+        "y": 4.806186572471635
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.9975302503796497,
+        "y": 4.868811439750539
+      },
+      "isLocked": false,
+      "linkedName": "M"
+    },
+    {
+      "anchor": {
+        "x": 2.5685447337679963,
+        "y": 4.3334957369796125
+      },
+      "prevControl": {
+        "x": 0.7705402644847841,
+        "y": 4.621368107984443
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "W3"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "StopIntake",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "StopIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0.9,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PrepareShooterW3",
+      "waypointRelativePos": 0.4,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PrepareShooterW3"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 6.08,
+    "maxAcceleration": 7.378,
+    "maxAngularVelocity": 45.0,
+    "maxAngularAcceleration": 60.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 169.00174959554687,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Stage",
+  "previewStartingState": {
+    "rotation": 171.92085261432547,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

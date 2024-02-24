@@ -11,13 +11,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.util.Neo;
-import frc.robot.util.PIDNotConstants;
-import frc.robot.util.PoseCalculations;
-import frc.robot.util.Constants.ClimbConstants;
-import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.calc.PoseCalculations;
+import frc.robot.util.constants.Constants.ClimbConstants;
+import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.NTConstants;
+import frc.robot.util.motors.Neo;
+import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -28,23 +27,21 @@ public class Climb extends SubsystemBase implements Logged {
     private final PIDNotConstants climbPID;
 
     @Log
-    public double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
+    private double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
 
     @Log
-    public boolean atDesiredPos = false;
+    private boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
-        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, false);
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
+        // invert right motor in real life, not in sim
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, !FieldConstants.IS_SIMULATION);
 
         configureMotors();
         climbPID = new PIDNotConstants(leftMotor.getPID(), leftMotor.getPIDController());
     }
 
     private void configureMotors() {
-        leftMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
-        rightMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
-
         leftMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
         rightMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
 
@@ -53,10 +50,6 @@ public class Climb extends SubsystemBase implements Logged {
 
         leftMotor.setPID(ClimbConstants.CLIMB_PID);
         rightMotor.setPID(ClimbConstants.CLIMB_PID);
-
-        // Change to brake when done testing x2
-        leftMotor.setBrakeMode();
-        rightMotor.setBrakeMode();
     }
 
     @Override
@@ -67,6 +60,7 @@ public class Climb extends SubsystemBase implements Logged {
         posRight = rightMotor.getPosition();
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
+        hooksUp = hooksUp();
 
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, leftMotor.getPosition(),
@@ -148,4 +142,8 @@ public class Climb extends SubsystemBase implements Logged {
 						rightMotor.getPosition() - rightMotor.getTargetPosition()),
 				ClimbConstants.CLIMB_DEADBAND) == 0);
 	}
+
+    public boolean hooksUp() {
+        return (leftMotor.getTargetPosition() > 0 || rightMotor.getTargetPosition() > 0);
+    }
 }
