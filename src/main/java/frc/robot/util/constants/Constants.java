@@ -287,6 +287,8 @@ public final class Constants {
         public static final double ROTATION_CORRECTION_I = 1;
         public static final double ROTATION_CORRECTION_D = 0;
 
+        public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;
+
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
             AutoConstants.ROTATION_CORRECTION_I,

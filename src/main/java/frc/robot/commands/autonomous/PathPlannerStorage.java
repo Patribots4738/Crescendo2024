@@ -189,7 +189,12 @@ public class PathPlannerStorage implements Logged {
                             goingDown.getAsBoolean() 
                             ? currentIndex.getAsInt() + 1 
                             : currentIndex.getAsInt() - 1]
-                        .toTranslation2d(), 
+                        .getX() - AutoConstants.PIECE_SEARCH_OFFSET_METERS, 
+                        FieldConstants.CENTERLINE_TRANSLATIONS[
+                            goingDown.getAsBoolean() 
+                            ? currentIndex.getAsInt() + 1 
+                            : currentIndex.getAsInt() - 1]
+                        .getY(), 
                         new Rotation2d(Math.PI)), 
                     PATH_CONSTRAINTS);
     }
