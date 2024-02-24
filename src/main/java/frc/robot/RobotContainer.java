@@ -147,7 +147,7 @@ public class RobotContainer implements Logged {
             () -> (!driver.getYButton()
                 && Robot.isRedAlliance())));
 
-        pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), swerve, limelight);
+        pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
@@ -418,32 +418,32 @@ public class RobotContainer implements Logged {
     public void updateNTGains() {
         HashMap<String, Double> gains = networkTableManager.getPatriNetworkTableLayout();
 
-        double P = gains.get(PatriNetworkTableLayout.XY_P_ENTRY_NAME);
-        double I = gains.get(PatriNetworkTableLayout.XY_I_ENTRY_NAME);
-        double D = gains.get(PatriNetworkTableLayout.XY_D_ENTRY_NAME);
-        double P2 = gains.get(PatriNetworkTableLayout.ROTATION_P_ENTRY_NAME);
-        double I2 = gains.get(PatriNetworkTableLayout.ROTATION_I_ENTRY_NAME);
-        double D2 = gains.get(PatriNetworkTableLayout.ROTATION_D_ENTRY_NAME);
-        double MAX = gains.get(PatriNetworkTableLayout.MAX_ENTRY_NAME);
+        // double P = gains.get(PatriNetworkTableLayout.XY_P_ENTRY_NAME);
+        // double I = gains.get(PatriNetworkTableLayout.XY_I_ENTRY_NAME);
+        // double D = gains.get(PatriNetworkTableLayout.XY_D_ENTRY_NAME);
+        // double P2 = gains.get(PatriNetworkTableLayout.ROTATION_P_ENTRY_NAME);
+        // double I2 = gains.get(PatriNetworkTableLayout.ROTATION_I_ENTRY_NAME);
+        // double D2 = gains.get(PatriNetworkTableLayout.ROTATION_D_ENTRY_NAME);
+        // double MAX = gains.get(PatriNetworkTableLayout.MAX_ENTRY_NAME);
         
-        if (!(MathUtil.isNear(AutoConstants.HPFC.translationConstants.kP, P, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kI, I, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kD, D, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kP, P2, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kI, I2, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kD, D2, 0.01))) {
+        // if (!(MathUtil.isNear(AutoConstants.HPFC.translationConstants.kP, P, 0.01)
+        //         && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kI, I, 0.01)
+        //         && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kD, D, 0.01)
+        //         && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kP, P2, 0.01)
+        //         && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kI, I2, 0.01)
+        //         && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kD, D2, 0.01))) {
             
-                    AutoConstants.HPFC = new HolonomicPathFollowerConfig(
-                    new PIDConstants( P, I, D),
-                    new PIDConstants( P2, I2, D2),
-                    MAX,
-                    Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
-                    new ReplanningConfig());
+        //             AutoConstants.HPFC = new HolonomicPathFollowerConfig(
+        //             new PIDConstants( P, I, D),
+        //             new PIDConstants( P2, I2, D2),
+        //             MAX,
+        //             Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
+        //             new ReplanningConfig());
             
-            swerve.reconfigureAutoBuilder();
-            fixPathPlannerCommands();
-            System.out.println("Reconfigured HPFC");
-        }
+        //     swerve.reconfigureAutoBuilder();
+        //     fixPathPlannerCommands();
+        //     System.out.println("Reconfigured HPFC");
+        // }
     }
 
     private void prepareNamedCommands() {
@@ -470,7 +470,7 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j, swerve, limelight));
             }
         }
     }

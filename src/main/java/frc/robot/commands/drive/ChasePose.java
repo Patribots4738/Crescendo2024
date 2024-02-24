@@ -58,12 +58,7 @@ public class ChasePose extends Command {
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
-		Transform2d subtractedTransform = swerve.getPose().minus(desiredPose);
-		Rotation2d subtractedRotation = swerve.getPose().getRotation().minus(desiredPose.getRotation());
-		return 
-			MathUtil.applyDeadband(subtractedTransform.getX(), 0.02) == 0 &&
-			MathUtil.applyDeadband(subtractedTransform.getY(), 0.02) == 0 &&
-			MathUtil.applyDeadband(subtractedRotation.getRadians(), 0.02) == 0;
+		return swerve.atDesiredPose();
 	}
 
 	public static void updateDesiredPose(Pose2d newPose) {

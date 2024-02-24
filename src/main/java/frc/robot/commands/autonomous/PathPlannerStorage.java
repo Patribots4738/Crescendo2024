@@ -2,25 +2,22 @@ package frc.robot.commands.autonomous;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.commands.PathfindHolonomic;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.constants.Constants.AutoConstants;
-import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.mod.PatriSendableChooser;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
-import frc.robot.commands.drive.ChasePose;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.misc.limelight.Limelight;
 import monologue.Logged;
@@ -31,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 /**
  * This file represents all of the auto paths that we will have
@@ -45,11 +43,14 @@ public class PathPlannerStorage implements Logged {
     @Log.NT
     private PatriSendableChooser<Command> autoChooser = new PatriSendableChooser<>();
 
-    private Swerve swerve;
-
-    private Limelight limelight;
-
     public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>();
+
+    public static final PathConstraints PATH_CONSTRAINTS = 
+        new PathConstraints(
+            AutoConstants.MAX_SPEED_METERS_PER_SECOND, 
+            AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, 
+            AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 
+            AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
     public static final HashMap<String, List<PathPlannerPath>> AUTO_PATHS = new HashMap<String, List<PathPlannerPath>>();
     /**
@@ -57,10 +58,8 @@ public class PathPlannerStorage implements Logged {
      * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
      *                         This could be a sensor, motor current, or other system.
      */
-    public PathPlannerStorage(BooleanSupplier hasPieceSupplier, Swerve swerve, Limelight limelight) {
+    public PathPlannerStorage(BooleanSupplier hasPieceSupplier) {
         this.hasPieceSupplier = hasPieceSupplier;
-        this.swerve = swerve;
-        this.limelight = limelight;
     }
 
     public void configureAutoChooser() {
@@ -139,36 +138,70 @@ public class PathPlannerStorage implements Logged {
      * @param goingDown  If true, increment from startingNote to endingNote. If false, decrement from startingNote to endingNote.
      * @return             The command that will execute the logic for the given notes
      */
-    public Command generateCenterLogic(int startingNote, int endingNote) {
+    public Command generateCenterLogic(int startingNote, int endingNote, Swerve swerve, Limelight limelight) {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         boolean goingDown = startingNote < endingNote;
 
         int increment = goingDown ? 1 : -1;
 
         for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
-            Command goToNote = Commands.parallel(
-                        swerve.updateChasePose(limelight::getNotePose2d).repeatedly().until(swerve::atDesiredPose),
-                        swerve.getChaseCommand());
 
-            PathConstraints pathConstraints = 
-                new PathConstraints(
-                    DriveConstants.MAX_SPEED_METERS_PER_SECOND, 
-                    7.378, 
-                    DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND, 
-                    60.0);
+            int currentIndex = i;
 
-            Command goToShoot = 
-                AutoBuilder.pathfindToPose(
-                    PoseCalculations.getClosestShootingPose(swerve.getPose()), pathConstraints);
-
-            commandGroup.addCommands(
-                Commands.defer(
-                    () -> goToNote.andThen(goToShoot), 
-                    commandGroup.getRequirements()));
+            if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
+                commandGroup.addCommands(
+                    Commands.defer(
+                        () -> 
+                            Commands.either(
+                                goToNote(swerve, limelight)
+                                    .andThen(pathfindToShoot(swerve)
+                                    .andThen(pathfindToNextNote(() -> currentIndex, () -> goingDown))), 
+                                pathfindToNextNote(() -> currentIndex, () -> goingDown), 
+                                limelightHasNote(limelight)),
+                        commandGroup.getRequirements()));
+            } else {
+                commandGroup.addCommands(
+                    Commands.defer(
+                        () -> 
+                            Commands.sequence(
+                                goToNote(swerve, limelight),
+                                pathfindToShoot(swerve)
+                            ).onlyIf(limelightHasNote(limelight)), 
+                        commandGroup.getRequirements())
+                );
+            }
             
         }
 
         return commandGroup;
+    }
+
+    public Command pathfindToShoot(Swerve swerve) {
+        return AutoBuilder.pathfindToPose(
+                    PoseCalculations.getClosestShootingPose(swerve.getPose()), 
+                    PATH_CONSTRAINTS);
+    }
+
+    public Command pathfindToNextNote(IntSupplier currentIndex, BooleanSupplier goingDown) {
+        return AutoBuilder.pathfindToPose(
+                    new Pose2d(
+                        FieldConstants.CENTERLINE_TRANSLATIONS[
+                            goingDown.getAsBoolean() 
+                            ? currentIndex.getAsInt() + 1 
+                            : currentIndex.getAsInt() - 1]
+                        .toTranslation2d(), 
+                        new Rotation2d(Math.PI)), 
+                    PATH_CONSTRAINTS);
+    }
+
+    public Command goToNote(Swerve swerve, Limelight limelight) {
+        return Commands.parallel(
+                        swerve.updateChasePose(limelight::getNotePose2d).repeatedly().until(swerve::atDesiredPose),
+                        swerve.getChaseCommand());  
+    }
+
+    public BooleanSupplier limelightHasNote(Limelight limelight) {
+        return limelight::noteInVision;
     }
 
     public Pose2d getPathEndPose(PathPlannerPath path) {
