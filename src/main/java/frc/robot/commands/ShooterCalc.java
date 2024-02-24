@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -19,7 +18,6 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
-import frc.robot.util.Constants;
 import frc.robot.util.SpeedAngleTriplet;
 
 public class ShooterCalc implements Logged {
@@ -42,7 +40,17 @@ public class ShooterCalc implements Logged {
         this.pivot = pivot;
         this.shooter = shooter;
     }
-    
+
+    /**
+	 * The function is a command that resets the angle of the robot
+	 * to be at the min angle.
+	 * 
+	 * @return The method is returning a Command object.
+	 */
+
+	public Command angleReset() {
+		return Commands.runOnce(() -> pivot.setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES));
+	}
     /**
      * The function prepares a fire command by calculating the speed and angle for
      * the robot's shooter

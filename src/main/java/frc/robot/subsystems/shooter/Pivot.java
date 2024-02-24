@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import java.util.function.BooleanSupplier;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
@@ -13,7 +12,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.util.Constants;
 import frc.robot.util.Neo;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -122,17 +120,6 @@ public class Pivot extends SubsystemBase implements Logged {
 
 	public double getTargetAngle() {
 		return pivot.getTargetPosition();
-	}
-
-	/**
-	 * The function is a command that resets the angle of the robot
-	 * to be at the min angle.
-	 * 
-	 * @return The method is returning a Command object.
-	 */
-
-	public Command angleReset() {
-		return runOnce(() -> setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES));
 	}
 
 	/**

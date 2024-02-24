@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,13 +33,11 @@ public class PieceControl {
             Indexer indexer,
             Elevator elevator,
             Trapper trapper,
-            Pivot pivot,
             ShooterCalc shooterCalc) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.trapper = trapper;
-        this.pivot = pivot;
         this.shooterCalc = shooterCalc;
     }
 
@@ -56,7 +53,7 @@ public class PieceControl {
         return Commands.waitUntil(shooterCalc.readyToShootSupplier())
                 .andThen(noteToShoot())
                     .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier)
-                .andThen(pivot.angleReset()));
+                .andThen(shooterCalc.angleReset()));
     } 
 
 

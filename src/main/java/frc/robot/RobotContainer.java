@@ -114,7 +114,6 @@ public class RobotContainer implements Logged {
             triggerWheel,
             elevator,
             trapper,
-            pivot,
             shooterCalc);
 
         calibrationControl = new CalibrationControl(shooterCalc);
