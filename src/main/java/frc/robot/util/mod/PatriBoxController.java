@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.mod;
 
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.util.Constants.OIConstants;
+import frc.robot.util.constants.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
 
