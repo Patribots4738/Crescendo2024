@@ -1,12 +1,11 @@
-package frc.robot.util.testing;
+package frc.robot.util;
 
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.subsytemHelpers.ShooterCmds;
-import frc.robot.util.constants.SpeedAngleTriplet;
+import frc.robot.commands.ShooterCalc;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -23,15 +22,15 @@ public class CalibrationControl implements Logged {
     @Log
     private double distance = 0;
 
-    private ShooterCmds shooterCmds;
+    private ShooterCalc shooterCalc;
 
-    public CalibrationControl(ShooterCmds shooterCmds) {
-        this.shooterCmds = shooterCmds;
+    public CalibrationControl(ShooterCalc shooterCalc) {
+        this.shooterCalc = shooterCalc;
     }
 
     public Command copyCalcTriplet() {
         return Commands.runOnce(() -> {
-            SpeedAngleTriplet triplet = shooterCmds.getTriplet();
+            SpeedAngleTriplet triplet = shooterCalc.getTriplet();
             desiredTriplet = triplet;
             leftSpeed = triplet.getLeftSpeed();
             rightSpeed = triplet.getRightSpeed();
@@ -111,7 +110,7 @@ public class CalibrationControl implements Logged {
         rightSpeed = MathUtil.clamp(rightSpeed, 0, 5500);
         angle = MathUtil.clamp(angle, 0, 60);
         desiredTriplet = new SpeedAngleTriplet(leftSpeed, rightSpeed, (double) Math.round(angle*10)/10.0);
-        shooterCmds.setTriplet(desiredTriplet);
+        shooterCalc.setTriplet(desiredTriplet);
     }
     
     public Command updateMotorsCommand() {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.sim.note;
+package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -15,9 +15,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.NTConstants;
-import frc.robot.util.constants.Constants.ShooterConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 
 public class NoteTrajectory extends Command implements Logged {

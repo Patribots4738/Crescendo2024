@@ -1,4 +1,4 @@
-package frc.robot.util.testing;
+package frc.robot.util;
 import java.text.DecimalFormat;
 
 import edu.wpi.first.wpilibj2.command.Command;
