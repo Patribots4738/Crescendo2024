@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.constants;
 
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -80,7 +80,8 @@ public class PatrIDConstants implements Logged {
     }
 
     public String toString() {
-        return String.format("P: %.2f | I: %.4f | D: %.2f | FF: %.4f | iZone: %.2f | minOutput: %.1f | maxOutput: %.1f",
-                this.P, this.I, this.D, this.FF, this.iZone, this.minOutput, this.maxOutput);
+        return String.format(
+            "P: %.2f | I: %.4f | D: %.2f | FF: %.4f | iZone: %.2f | minOutput: %.1f | maxOutput: %.1f",
+            this.P, this.I, this.D, this.FF, this.iZone, this.minOutput, this.maxOutput);
     }
 }

@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.misc.leds;
 
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.util.Constants.LEDConstants;
+import frc.robot.util.constants.Constants.LEDConstants;
 
 public class LedStrip extends SubsystemBase {
 

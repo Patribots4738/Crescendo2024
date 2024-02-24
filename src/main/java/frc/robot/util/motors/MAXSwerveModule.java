@@ -2,15 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.util;
+package frc.robot.util.motors;
 
 import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.ModuleConstants;
+import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.ModuleConstants;
+import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -92,8 +93,10 @@ public class MAXSwerveModule implements Logged{
         correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(chassisAngularOffset));
 
         // Optimize the reference state to avoid spinning further than 90 degrees.
-        correctedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
-                new Rotation2d(turningSpark.getPosition()));
+        if (!FieldConstants.IS_SIMULATION) {
+            correctedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
+                    new Rotation2d(turningSpark.getPosition()));
+        }
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
         drivingSpark.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
