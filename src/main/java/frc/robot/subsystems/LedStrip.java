@@ -47,12 +47,12 @@ public class LedStrip extends SubsystemBase {
 
         configureLED();
 
-        patternMap.put(0, turnOff());
-        patternMap.put(1, greenNGold());
-        patternMap.put(2, circus());
-        patternMap.put(3, loading());
-        patternMap.put(5, alliance(() -> FieldConstants.IS_RED_ALLIANCE()));
-        patternMap.put(6, flash());
+    //    patternMap.put(0, turnOff());
+    //    patternMap.put(1, greenNGold());
+    //    patternMap.put(2, circus());
+    //    patternMap.put(3, loading());
+    //    patternMap.put(5, alliance(() -> FieldConstants.IS_RED_ALLIANCE()));
+    //    patternMap.put(6, flash());
     }
 
     public AddressableLEDBuffer getBuffer() {

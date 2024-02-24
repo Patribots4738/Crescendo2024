@@ -1,12 +1,10 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Neo;
-import frc.robot.subsystems.LedStrip;
 import frc.robot.util.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
@@ -61,20 +59,6 @@ public class Shooter extends SubsystemBase {
         motorLeft.setTargetVelocity(speeds.getFirst());
         motorRight.setTargetVelocity(speeds.getSecond());
     }
-
-
-    //remove this soon
-    LedStrip ledStrip = new LedStrip();
-    
-    public boolean getAtDesiredSpeed = false;
-
-    public boolean getAtDesiredSpeed() { 
-        if (currentSpeed() == 0) {
-            return getAtDesiredSpeed = true;
-        } else {
-            return getAtDesiredSpeed = false;
-        }
-    }
     /**
      * The function is a command that sets the motor speed for both motors
      * to the speed provided
@@ -84,13 +68,7 @@ public class Shooter extends SubsystemBase {
      * @return The method is returning a Command object.
      */
     public Command setSpeedCommand(double speed) {
-        return Commands.runOnce(() -> setSpeed(speed))
-            .alongWith(Commands.runOnce(() -> ledStrip.setLED(Color.kYellow))
-                .andThen(Commands.waitSeconds(0.2))
-                .andThen(Commands.runOnce(() -> ledStrip.setLED(Color.kBlack)))
-                .repeatedly()
-            ).until(this::getAtDesiredSpeed);
-
+        return Commands.runOnce(() -> setSpeed(speed));
     }
 
     public Command setSpeedCommand(Pair<Double, Double> speeds) {
@@ -101,10 +79,7 @@ public class Shooter extends SubsystemBase {
         return new Pair<Double, Double>(motorLeft.getVelocity(), motorRight.getVelocity());
     }
 
-    public double currentSpeed() {
-        double theSpeed = motorLeft.getVelocity();
-        return theSpeed = motorLeft.getVelocity();
-    }
+   
     /**
      * The function is a command that stops both motors
      * 
