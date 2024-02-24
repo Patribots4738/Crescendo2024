@@ -457,7 +457,7 @@ public class RobotContainer implements Logged {
         //     swerve.reconfigureAutoBuilder();
         //     fixPathPlannerCommands();
         //     System.out.println("Reconfigured HPFC");
-        // }
+        }
     }
     
 
