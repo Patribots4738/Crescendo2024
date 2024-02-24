@@ -2,6 +2,8 @@ package frc.robot.commands.autonomous;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.commands.PathfindHolonomic;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,12 +12,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.constants.Constants.AutoConstants;
+import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.mod.PatriSendableChooser;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
+import frc.robot.commands.drive.ChasePose;
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.misc.limelight.Limelight;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -38,6 +45,10 @@ public class PathPlannerStorage implements Logged {
     @Log.NT
     private PatriSendableChooser<Command> autoChooser = new PatriSendableChooser<>();
 
+    private Swerve swerve;
+
+    private Limelight limelight;
+
     public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>();
 
     public static final HashMap<String, List<PathPlannerPath>> AUTO_PATHS = new HashMap<String, List<PathPlannerPath>>();
@@ -46,8 +57,10 @@ public class PathPlannerStorage implements Logged {
      * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
      *                         This could be a sensor, motor current, or other system.
      */
-    public PathPlannerStorage(BooleanSupplier hasPieceSupplier) {
+    public PathPlannerStorage(BooleanSupplier hasPieceSupplier, Swerve swerve, Limelight limelight) {
         this.hasPieceSupplier = hasPieceSupplier;
+        this.swerve = swerve;
+        this.limelight = limelight;
     }
 
     public void configureAutoChooser() {
@@ -133,37 +146,26 @@ public class PathPlannerStorage implements Logged {
         int increment = goingDown ? 1 : -1;
 
         for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
-            String shootingLocation = 
-                (i < 3) 
-                    ? "L" 
-                    : (i == 3) 
-                        ? "M" 
-                        : "R";
+            Command goToNote = Commands.parallel(
+                        swerve.updateChasePose(limelight::getNotePose2d).repeatedly().until(swerve::atDesiredPose),
+                        swerve.getChaseCommand());
 
-            PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
-            
-            if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
-                commandGroup.addCommands(
-                    Commands.defer(() ->  AutoBuilder.followPath(shootNote), commandGroup.getRequirements())
-                );
-                break;
-            }
+            PathConstraints pathConstraints = 
+                new PathConstraints(
+                    DriveConstants.MAX_SPEED_METERS_PER_SECOND, 
+                    7.378, 
+                    DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND, 
+                    60.0);
 
-            PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
-            PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
-            
-            Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote).andThen(AutoBuilder.followPath(getNoteAfterShot));
-            // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
-            Command skipNoteCommand = AutoBuilder.followPath(skipNote);
+            Command goToShoot = 
+                AutoBuilder.pathfindToPose(
+                    PoseCalculations.getClosestShootingPose(swerve.getPose()), pathConstraints);
 
             commandGroup.addCommands(
-                Commands.defer(() -> 
-                    Commands.either(
-                        shootAndMoveToNextNote,
-                        skipNoteCommand,
-                        hasPieceSupplier), 
-                    commandGroup.getRequirements())
-            );
+                Commands.defer(
+                    () -> goToNote.andThen(goToShoot), 
+                    commandGroup.getRequirements()));
+            
         }
 
         return commandGroup;

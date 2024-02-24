@@ -39,16 +39,11 @@ public class PoseCalculations implements Logged {
      * @return The closest chain position to the given pose.
      */
     public static Pose2d getClosestChain(Pose2d position) {
-        List<Pose2d> chainPoses = FieldConstants.GET_CHAIN_POSITIONS();
-        Pose2d closestChain = chainPoses.get(0);
-        double minDistance = Double.POSITIVE_INFINITY;
-        for (Pose2d pose : chainPoses) {
-            if (position.relativeTo(pose).getTranslation().getNorm() < minDistance) {
-                minDistance = position.relativeTo(pose).getTranslation().getNorm();
-                closestChain = pose;
-            }
-        }
-        return closestChain;
+        return position.nearest(FieldConstants.GET_CHAIN_POSITIONS());
+    }
+
+    public static Pose2d getClosestShootingPose(Pose2d position) {
+        return position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
     }
 
     /**

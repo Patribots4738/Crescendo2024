@@ -10,12 +10,14 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -429,6 +431,15 @@ public class Swerve extends SubsystemBase implements Logged {
                 AutoConstants.HPFC,
                 Robot::isRedAlliance,
                 this);
+    }
+
+    public boolean atDesiredPose() {
+        Transform2d subtractedTransform = getPose().minus(desiredHDCPose);
+		Rotation2d subtractedRotation = getPose().getRotation().minus(desiredHDCPose.getRotation());
+		return 
+			MathUtil.applyDeadband(subtractedTransform.getX(), 0.1) == 0 &&
+			MathUtil.applyDeadband(subtractedTransform.getY(), 0.1) == 0 &&
+			MathUtil.applyDeadband(subtractedRotation.getRadians(), 0.1) == 0;
     }
 
 }

@@ -147,7 +147,7 @@ public class RobotContainer implements Logged {
             () -> (!driver.getYButton()
                 && Robot.isRedAlliance())));
 
-        pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
+        pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), swerve, limelight);
         initializeComponents();
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());

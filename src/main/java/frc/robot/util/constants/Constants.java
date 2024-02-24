@@ -704,6 +704,15 @@ public final class Constants {
         public static final Translation2d R_POSE = GET_SPEAKER_TRANSLATION();
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
+
+        public static List<Pose2d> GET_SHOOTING_POSITIONS() {
+            return new ArrayList<Pose2d>() {{
+                add(new Pose2d(L_POSE, new Rotation2d()));
+                add(new Pose2d(R_POSE, new Rotation2d()));
+                add(new Pose2d(M_POSE, new Rotation2d()));
+                add(new Pose2d(W3_POSE, new Rotation2d()));
+            }};
+        }
     }
 
     public static final class CameraConstants {
