@@ -30,8 +30,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 
-import org.ejml.sparse.csc.factory.FillReductionFactory_DSCC;
-
 /**
  * This file represents all of the auto paths that we will have
  * They will be primarily comiled through
