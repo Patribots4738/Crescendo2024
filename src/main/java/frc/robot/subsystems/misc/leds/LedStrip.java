@@ -225,6 +225,7 @@ public class LedStrip extends SubsystemBase {
     Color Orange = new Color(250, 160, 30);
     Color GreerYeller = new Color(50, 250, 0);
     Color TurnOff = new Color(0, 0, 0);
+    Color Red = new Color(250, 0, 0);
 
     public Command upwardsElevatorGradientLED() {
         return Commands.run(() -> {
@@ -241,6 +242,12 @@ public class LedStrip extends SubsystemBase {
     public Command elevatorTOPLED() {
         return Commands.runOnce(() -> {
             oohShiny(GreerYeller, TurnOff, 10, 1, 10);
+        });
+    }
+
+    public Command cautionCoolDownLED() {
+        return Commands.runOnce(() -> {
+            oohShiny(Red, TurnOff, 999, 10, 1);
         });
     }
 

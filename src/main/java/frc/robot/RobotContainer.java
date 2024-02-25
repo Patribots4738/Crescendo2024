@@ -175,22 +175,30 @@ public class RobotContainer implements Logged {
     
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(elevator.toTopCommand());
+            .onTrue(elevator.toTopCommand())
+            .whileTrue(ledStrip.upwardsElevatorGradientLED()
+                .andThen(ledStrip.elevatorTOPLED()));
         
         controller.povDown()
-            .onTrue(elevator.toBottomCommand());
+            .onTrue(elevator.toBottomCommand())
+            .whileTrue(ledStrip.backwardsElevatorGradientLED()
+                .andThen(ledStrip.elevatorTOPLED()));
 
         controller.leftBumper()
-            .onTrue(pieceControl.toggleIn());
+            .onTrue(pieceControl.toggleIn())
+            .onTrue(ledStrip.blueLED());
 
         controller.rightBumper()
-            .onTrue(pieceControl.toggleOut());
+            .onTrue(pieceControl.toggleOut())
+            .onTrue(ledStrip.almmondLED());
 
         controller.x()
-            .onTrue(pieceControl.setShooterModeCommand(true));
+            .onTrue(pieceControl.setShooterModeCommand(true))
+            .whileTrue(ledStrip.cautionLED());
 
         controller.b()
-            .onTrue(pieceControl.setShooterModeCommand(false));
+            .onTrue(pieceControl.setShooterModeCommand(false))
+            .onTrue(ledStrip.cautionCoolDownLED());
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
