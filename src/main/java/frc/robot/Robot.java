@@ -13,13 +13,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.util.Neo;
-import frc.robot.util.Constants.AutoConstants;
-import frc.robot.util.Constants.DriveConstants;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.FieldConstants.GameMode;
-import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.constants.Constants.AutoConstants;
+import frc.robot.util.constants.Constants.DriveConstants;
+import frc.robot.util.constants.Constants.NeoMotorConstants;
+import frc.robot.util.motors.Neo;
 import monologue.Monologue;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -32,13 +31,21 @@ import monologue.Monologue;
  */
 public class Robot extends TimedRobot {
 
-    private Command autonomousCommand;
-
-    private RobotContainer robotContainer;
+    private static Optional<Alliance> alliance = Optional.empty();
+    public static GameMode gameMode = GameMode.DISABLED;
+    public static enum GameMode {
+        DISABLED,
+        AUTONOMOUS,
+        TELEOP,
+        TEST
+    };
 
     public static double currentTimestamp = 0;
     public static double previousTimestamp = 0;
-    private boolean hasStartedURCL = false;
+
+    private Command autonomousCommand;
+
+    private RobotContainer robotContainer;
 
     @Override
     public void robotInit() {
@@ -49,7 +56,8 @@ public class Robot extends TimedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
-}
+        URCL.start(NeoMotorConstants.CAN_ID_MAP);
+    }
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
      * diagnostics
@@ -66,13 +74,12 @@ public class Robot extends TimedRobot {
 
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-
     }
 
     @Override
     public void disabledInit() {
+        Robot.gameMode = GameMode.DISABLED;
         robotContainer.onDisabled();
-        FieldConstants.GAME_MODE = GameMode.DISABLED;
     }
 
     @Override
@@ -80,23 +87,26 @@ public class Robot extends TimedRobot {
         // Now while this may not necessarily be a constant...
         // it needs to be updated.
         DriverStation.refreshData();
-        FieldConstants.ALLIANCE = DriverStation.getAlliance();
+        Robot.alliance = DriverStation.getAlliance();
     }
 
     @Override
     public void disabledExit() {
         robotContainer.onEnabled();
-        if (!hasStartedURCL) {
-            URCL.start(NeoMotorConstants.CAN_ID_MAP);
-        }
     }
 
-    @Override
+    @Override   
     public void autonomousInit() {
+        // Update "constants"
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
+        Robot.gameMode = GameMode.AUTONOMOUS;
+        // We only need to update alliance becuase
+        // sim GUI starts the bot in a "disconnected"
+        // state which won't update the alliance before
+        // we enable...
         DriverStation.refreshData();
-        FieldConstants.ALLIANCE = DriverStation.getAlliance();
-        FieldConstants.GAME_MODE = GameMode.AUTONOMOUS;
+        Robot.alliance = DriverStation.getAlliance();
+
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null) {
@@ -118,10 +128,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        FieldConstants.GAME_MODE = GameMode.TELEOP;
+        Robot.gameMode = GameMode.TELEOP;
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = DriveConstants.MAX_TELEOP_SPEED_METERS_PER_SECOND;
         robotContainer.onEnabled();
-
     }
 
     @Override
@@ -135,7 +144,7 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         // Cancels all running commands at the start of test mode.
-        FieldConstants.GAME_MODE = GameMode.TEST;
+        Robot.gameMode = GameMode.TEST;
         CommandScheduler.getInstance().cancelAll();
         robotContainer.onTest();
     }
@@ -157,7 +166,7 @@ public class Robot extends TimedRobot {
     @Override
     public void simulationPeriodic() {
         REVPhysicsSim.getInstance().run();
-        FieldConstants.ALLIANCE = DriverStation.getAlliance();
+        Robot.alliance = DriverStation.getAlliance();
 
         for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
             neo.tick();
@@ -165,10 +174,10 @@ public class Robot extends TimedRobot {
     }
 
     public static boolean isRedAlliance() {
-        return FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Red));
+        return alliance.equals(Optional.of(Alliance.Red));
     }
 
     public static boolean isBlueAlliance() {
-        return FieldConstants.ALLIANCE.equals(Optional.of(Alliance.Blue));
+        return alliance.equals(Optional.of(Alliance.Blue));
     }
 }
