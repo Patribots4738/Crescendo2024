@@ -253,16 +253,6 @@ public class RobotContainer implements Logged {
 
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut());
-
-        controller.povLeft().onTrue(swerve.getChaseCommand());
-
-        controller.povRight().onTrue(
-            swerve.updateChasePose(
-                () -> new Pose2d(
-                    Math.random() * 20, 
-                    Math.random() * 20, 
-                    new Rotation2d(
-                        Math.random() * Math.PI))));
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
@@ -399,9 +389,9 @@ public class RobotContainer implements Logged {
                     Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
                     new ReplanningConfig());
             
-        //     swerve.reconfigureAutoBuilder();
-        //     fixPathPlannerCommands();
-        //     System.out.println("Reconfigured HPFC");
+            swerve.reconfigureAutoBuilder();
+            fixPathPlannerCommands();
+            System.out.println("Reconfigured HPFC");
         }
     }
     
