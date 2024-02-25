@@ -131,6 +131,63 @@ public class PathPlannerStorage implements Logged {
         };
     }
 
+
+    // CURRENTLY UNUSED
+    /**
+     * Given a starting note and an ending note, this method will generate a command
+     * that uses the booleanSupplier hasPieceSupplier to determine whether or not the
+     * robot has a piece. 
+     * If we have a piece: come to wing, shoot it, and go to the next note.
+     * If we don't have a piece: skip the shooting and go to the next note.
+     * 
+     * @param startingNote The note to start at (1-5)
+     * @param endingNote   The note to end at (1-5)
+     * @param goingDown  If true, increment from startingNote to endingNote. If false, decrement from startingNote to endingNote.
+     * @return             The command that will execute the logic for the given notes
+     */
+    public Command generateCenterLogicHasPiece(int startingNote, int endingNote) {
+        SequentialCommandGroup commandGroup = new SequentialCommandGroup();
+        boolean goingDown = startingNote < endingNote;
+
+        int increment = goingDown ? 1 : -1;
+
+        for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
+            String shootingLocation = 
+                (i < 3) 
+                    ? "L" 
+                    : (i == 3) 
+                        ? "M" 
+                        : "R";
+
+            PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
+            
+            if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
+                commandGroup.addCommands(
+                    Commands.defer(() ->  AutoBuilder.followPath(shootNote), commandGroup.getRequirements())
+                );
+                break;
+            }
+
+            PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
+            PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
+            
+            Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote).andThen(AutoBuilder.followPath(getNoteAfterShot));
+            // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
+            Command skipNoteCommand = AutoBuilder.followPath(skipNote);
+
+            commandGroup.addCommands(
+                Commands.defer(() -> 
+                    Commands.either(
+                        shootAndMoveToNextNote,
+                        skipNoteCommand,
+                        hasPieceSupplier), 
+                    commandGroup.getRequirements())
+            );
+        }
+
+        return commandGroup;
+    }
+
     /**
      * Given a starting note and an ending note, this method will generate a command
      * that uses the object detection on our limelight to 
@@ -151,9 +208,14 @@ public class PathPlannerStorage implements Logged {
 
         for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
 
+            // Actual index to access from note pose list
             int currentIndex = i - 1;
 
+            // If we are not on last note try to get it, shoot it, and then go towards the next one
+            // If we are on the last note, just try to go and shoot it
             if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
+                // Grab note, go to shoot it, and then go towards the next if we see the piece
+                // Otherwise skip to the next one in the range and repeat
                 commandGroup.addCommands(
                     Commands.defer(
                         () -> 
