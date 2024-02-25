@@ -10,13 +10,11 @@ import frc.robot.RobotContainer;
 import frc.robot.util.constants.Constants.NTConstants;
 import frc.robot.util.constants.Constants.TrapConstants;
 import frc.robot.util.motors.Neo;
-import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
-    private final PIDNotConstants elevatorPID;
     @Log
     private double pos = 0, desiredPos = 0;
 
@@ -27,7 +25,6 @@ public class Elevator extends SubsystemBase implements Logged {
     public Elevator() {
         elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID);
         configMotors();
-        elevatorPID = new PIDNotConstants(elevator.getPID(), elevator.getPIDController());
     }
 
     public void configMotors() {
@@ -101,8 +98,4 @@ public class Elevator extends SubsystemBase implements Logged {
     public boolean atDesiredPosition() {
 		return MathUtil.applyDeadband(pos - desiredPos, TrapConstants.ELEVATOR_DEADBAND) == 0;
 	}
-
-    public PIDNotConstants getPIDNotConstants() {
-        return this.elevatorPID;
-    }
 }
