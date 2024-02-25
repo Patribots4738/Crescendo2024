@@ -1,11 +1,9 @@
 package frc.robot.util.constants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -482,27 +480,60 @@ public final class Constants {
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
       
         // This gets filled out as motors are created on the robot
-        public static ArrayList<Neo> MOTOR_LIST = new ArrayList<>();
+        public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
 
         public static final HashMap<Integer, String> CAN_ID_MAP = new HashMap<Integer, String>() {{
-                /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "FrontRightDrive");
-                /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "FrontRightTurn");
-                /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "FrontLeftDrive");
-                /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "FrontLeftTurn");
-                /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "RearLeftDrive");
-                /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "RearLeftTurn");
-                /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "RearRightDrive");
-                /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "RearRightTurn");
-                /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
-                /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "TriggerWheel");
-                /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
-                /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
-                /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
-                /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
-                /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
-                /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
-                /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
-            }};
+            /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "FrontRightDrive");
+            /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "FrontRightTurn");
+            /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "FrontLeftDrive");
+            /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "FrontLeftTurn");
+            /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "RearLeftDrive");
+            /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "RearLeftTurn");
+            /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "RearRightDrive");
+            /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "RearRightTurn");
+            /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
+            /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "TriggerWheel");
+            /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
+            /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
+            /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
+            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
+            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
+            /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
+            /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
+        }};
+
+        public static final HashMap<String, List<Neo>> MOTOR_GROUPS = new HashMap<String, List<Neo>>();
+
+        public static Map<String, List<Neo>> initializeMotorGroupMap() {
+            MOTOR_GROUPS.put("Drive", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_LEFT_DRIVING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Turn", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(DriveConstants.FRONT_LEFT_TURNING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_LEFT_TURNING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_RIGHT_TURNING_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Shooter", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(ShooterConstants.LEFT_SHOOTER_CAN_ID));
+                add(MOTOR_MAP.get(ShooterConstants.RIGHT_SHOOTER_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Pivot", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(ShooterConstants.SHOOTER_PIVOT_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Elevator", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(TrapConstants.ELEVATOR_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Climb", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(ClimbConstants.LEFT_CLIMB_CAN_ID));
+                add(MOTOR_MAP.get(ClimbConstants.RIGHT_CLIMB_CAN_ID));
+            }});
+
+            return MOTOR_GROUPS;
+        }
     }
 
     public static final class IntakeConstants {

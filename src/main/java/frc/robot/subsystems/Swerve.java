@@ -35,9 +35,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.ModuleConstants;
 import frc.robot.util.motors.MAXSwerveModule;
-import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -65,20 +63,6 @@ public class Swerve extends SubsystemBase implements Logged {
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
-
-    private PIDNotConstants drivingConstants = new PIDNotConstants(
-        ModuleConstants.DRIVING_PID, 
-        frontLeft.getDrivingPIDController(), 
-        frontRight.getDrivingPIDController(), 
-        rearLeft.getDrivingPIDController(),
-        rearRight.getDrivingPIDController());
-        
-    private PIDNotConstants turningConstants = new PIDNotConstants(
-        ModuleConstants.TURNING_PID, 
-        frontLeft.getTurningPIDController(), 
-        frontRight.getTurningPIDController(), 
-        rearLeft.getTurningPIDController(),
-        rearRight.getTurningPIDController());
 
     @Log
     SwerveModuleState[] swerveMeasuredStates;
@@ -207,12 +191,7 @@ public class Swerve extends SubsystemBase implements Logged {
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
-    public PIDNotConstants getTurningPidNotConstants() {
-        return turningConstants;
-    }
-    public PIDNotConstants getDrivingPidNotConstants() {
-        return drivingConstants;
-    }
+
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
@@ -337,9 +316,7 @@ public class Swerve extends SubsystemBase implements Logged {
         return positions;
 
     }
-    public PIDNotConstants getTurningModulePID() {
-        return this.frontLeft.getTurningPIDNotConstants();
-    }
+    
     public void resetEncoders() {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
             mSwerveMod.resetEncoders();
