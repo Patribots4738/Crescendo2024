@@ -700,6 +700,8 @@ public final class Constants {
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
+        public static double BLUE_WING_X = 5.84;
+        public static double RED_WING_X = 10.7;
 
         // need to update
         private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);

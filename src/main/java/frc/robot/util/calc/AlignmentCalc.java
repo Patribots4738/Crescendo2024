@@ -180,7 +180,7 @@ public class AlignmentCalc {
      */
     public boolean onOppositeSide() {
         return Robot.isRedAlliance() 
-            ? swerve.getPose().getX() < FieldConstants.CENTERLINE_X 
-            : swerve.getPose().getX() > FieldConstants.CENTERLINE_X;
+            ? swerve.getPose().getX() < FieldConstants.BLUE_WING_X 
+            : swerve.getPose().getX() > FieldConstants.RED_WING_X;
     }
 }
