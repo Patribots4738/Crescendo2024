@@ -129,8 +129,7 @@ public class RobotContainer implements Logged {
             triggerWheel,
             elevator,
             trapper,
-            shooterCmds,
-            pivot);
+            shooterCmds);
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
@@ -267,7 +266,9 @@ public class RobotContainer implements Logged {
         controller.rightTrigger().onTrue(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger().onFalse(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger()
-            .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .onTrue(
+                pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity)
+                .andThen(pieceControl.resetPivotAngle()));
     }
     
     private void configurePIDTunerBindings(PatriBoxController controller) {

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.constants.SpeedAngleTriplet;
@@ -27,6 +28,7 @@ public class ShooterCalc implements Logged {
         this.shooter = shooter;
         this.pivot = pivot;
     }
+    
     
     @Log
     double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
@@ -269,5 +271,4 @@ public class ShooterCalc implements Logged {
         double desiredRPM = velocityToRPM(Math.sqrt(2 * ShooterConstants.GRAVITY * FieldConstants.SPEAKER_HEIGHT) / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
-
 }
