@@ -47,10 +47,12 @@ public class PieceControl {
                 shooterCmds.stopAllMotors()).ignoringDisable(true);
     }
 
+    // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
-                .andThen(noteToShoot())
-                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier));
+                .andThen(noteToShoot()
+                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier)))
+                .andThen(shooterCmds.angleReset());
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter

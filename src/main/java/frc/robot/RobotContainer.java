@@ -33,6 +33,7 @@ import frc.robot.subsystems.misc.limelight.Limelight;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
@@ -64,6 +65,7 @@ public class RobotContainer implements Logged {
     private Trapper trapper;
     private Elevator elevator;
     private ShooterCmds shooterCmds;
+    private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
     private PathPlannerStorage pathPlannerStorage;
     private CalibrationControl calibrationControl;
@@ -111,7 +113,8 @@ public class RobotContainer implements Logged {
         Neo.incinerateMotors();
         new NTPIDTuner().schedule();
         
-        shooterCmds = new ShooterCmds(shooter, pivot);
+        shooterCalc = new ShooterCalc(shooter, pivot);
+        shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
 
         alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
 
@@ -215,7 +218,11 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
+            .onTrue(shooterCmds.angleReset());
+
+        controller.povUp()
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+
         
         controller.povDown().onTrue(climb.toBottomCommand());
         
@@ -223,9 +230,9 @@ public class RobotContainer implements Logged {
             Commands.sequence(
                 swerve.resetHDCCommand(),
                 Commands.either(
-                    alignmentCmds.trapAlignmentCommand(controller::getLeftY), 
+                    alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
-                    climb::hooksUp)));
+                    climb::getHooksUp)));
         
         
         controller.rightTrigger()
@@ -239,7 +246,7 @@ public class RobotContainer implements Logged {
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
-
+                    
         controller.b()
             .onTrue(pieceControl.stopAllMotors());
 
@@ -257,7 +264,8 @@ public class RobotContainer implements Logged {
         controller.rightTrigger().onTrue(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger().onFalse(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger()
-            .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .onTrue(
+                pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
@@ -392,7 +400,6 @@ public class RobotContainer implements Logged {
             System.out.println("Reconfigured HPFC");
         }
     }
-    
 
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)

@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -143,8 +144,8 @@ public final class Constants {
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 150;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 20;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 45;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -662,14 +663,10 @@ public final class Constants {
             // All relative to the blue origin
             // Blue Speaker
             Pose2d blueSpeaker = new Pose2d(0, 5.547, Rotation2d.fromDegrees(0));
+            Pose2d redSpeaker = GeometryUtil.flipFieldPose(blueSpeaker).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
             add(blueSpeaker);
-
-            // Red Speaker
-            add(GeometryUtil.flipFieldPose(blueSpeaker));
+            add(redSpeaker);
         }};
-
-        public static final double SPEAKER_HEIGHT = 2.08;
-
     
         public static final List<Pose2d> AMP_POSITIONS = new ArrayList<Pose2d>() {{
             // All points are in meters and radians
@@ -714,6 +711,8 @@ public final class Constants {
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
+        public static double BLUE_WING_X = 5.84;
+        public static double RED_WING_X = 10.7;
 
         // need to update
         private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);
