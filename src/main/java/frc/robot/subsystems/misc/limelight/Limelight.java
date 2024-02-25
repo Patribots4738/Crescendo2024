@@ -116,12 +116,9 @@ public class Limelight extends SubsystemBase implements Logged{
     }
 
     public Pose2d getNotePose2d() {
-        LimelightHelpers.setPipelineIndex(limelightName, 1);
-        Pose2d notePose = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d();
-        // Pose2d robotPose = robotPoseSupplier.get();
-        double x = notePose.getX();
-        double y = notePose.getY();
-        return new Pose2d(x, y, new Rotation2d(Math.PI));
+        return noteInVision() 
+            ? LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d()
+            : robotPoseSupplier.get();
     }
 
     public boolean noteInVision() {

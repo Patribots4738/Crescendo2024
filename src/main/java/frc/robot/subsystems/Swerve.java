@@ -413,8 +413,12 @@ public class Swerve extends SubsystemBase implements Logged {
         AutoConstants.HDC.getYController().reset();
     }
 
-    public void resetHDC() {
+    public void resetHDCTheta() {
         AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians());
+    }
+
+    public void resetHDC() {
+        resetHDCTheta();
         resetHDCXY();
     }
 
@@ -433,13 +437,14 @@ public class Swerve extends SubsystemBase implements Logged {
                 this);
     }
 
-    public boolean atDesiredPose() {
+    public boolean atDesiredPoseAuto() {
         Transform2d subtractedTransform = getPose().minus(desiredHDCPose);
 		Rotation2d subtractedRotation = getPose().getRotation().minus(desiredHDCPose.getRotation());
+        // More lenient on x axis, less lenient on y axis and rotation
 		return 
-			MathUtil.applyDeadband(subtractedTransform.getX(), 0.1) == 0 &&
+			MathUtil.applyDeadband(subtractedTransform.getX(), 0.3) == 0 &&
 			MathUtil.applyDeadband(subtractedTransform.getY(), 0.1) == 0 &&
-			MathUtil.applyDeadband(subtractedRotation.getRadians(), 0.1) == 0;
+			MathUtil.applyDeadband(subtractedRotation.getRadians(), 0.2) == 0;
     }
 
 }

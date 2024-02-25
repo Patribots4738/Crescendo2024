@@ -27,14 +27,12 @@ public class ChasePose extends Command {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-
+		swerve.resetHDCTheta();
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-
-		swerve.resetHDCXY();
 
 		ChassisSpeeds desiredSpeeds = 
 			AutoConstants.HDC.calculate(
@@ -58,7 +56,7 @@ public class ChasePose extends Command {
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
-		return swerve.atDesiredPose();
+		return swerve.atDesiredPoseAuto();
 	}
 
 	public static void updateDesiredPose(Pose2d newPose) {

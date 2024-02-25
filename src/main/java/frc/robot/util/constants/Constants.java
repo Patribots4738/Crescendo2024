@@ -258,10 +258,10 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 7.20;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 6.08;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
 
         /*
          * XY:
@@ -341,7 +341,7 @@ public final class Constants {
         public static final String[] AUTO_NAMES = new String[] {
             "A W1A C1-5 S",
             "S C1-3 S",
-            "S C1-5 S",
+            "S C5-1 S",
             "S W1A C1-5",
             "S W3-1 S",
             "S W3-1 S C1-3 S"
@@ -703,18 +703,44 @@ public final class Constants {
         }
 
         public static final Translation2d L_POSE = new Translation2d(5.11,6.23);
-        public static final Translation2d R_POSE = GET_SPEAKER_TRANSLATION();
+        public static final Translation2d R_POSE = new Translation2d(5.88, 1.84);
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
+        public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
+            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromDegrees(151.68));
+            Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
+            //Blue
+            add(L_POSE2D);
+            add(R_POSE2D);
+            add(M_POSE2D);
+            add(W3_POSE2D);
+            //Red
+            add(GeometryUtil.flipFieldPose(L_POSE2D));
+            add(GeometryUtil.flipFieldPose(R_POSE2D));
+            add(GeometryUtil.flipFieldPose(M_POSE2D));
+            add(GeometryUtil.flipFieldPose(W3_POSE2D));
+        }};
+
         public static List<Pose2d> GET_SHOOTING_POSITIONS() {
-            return new ArrayList<Pose2d>() {{
-                add(new Pose2d(L_POSE, new Rotation2d()));
-                add(new Pose2d(R_POSE, new Rotation2d()));
-                add(new Pose2d(M_POSE, new Rotation2d()));
-                add(new Pose2d(W3_POSE, new Rotation2d()));
-            }};
+            int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;
+            return SHOOTING_POSITIONS.subList(startingIndex, startingIndex + 4);
         }
+
+        public static List<Pose2d> GET_CENTERLINE_NOTES() {
+            List<Pose2d> notePoses = new ArrayList<Pose2d>();
+            for (int i = CENTERLINE_TRANSLATIONS.length - 1; i >= 0; i--) {
+                notePoses.add(
+                    new Pose2d(
+                        CENTERLINE_TRANSLATIONS[i].toTranslation2d(), 
+                        new Rotation2d()));
+            }
+            return notePoses;
+        }
+
+        
     }
 
     public static final class CameraConstants {

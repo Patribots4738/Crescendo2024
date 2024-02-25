@@ -14,13 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S C2"
+            "pathName": "S C1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "C2toC1"
+            "name": "C1toC5"
           }
         }
       ]
