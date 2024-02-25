@@ -41,6 +41,12 @@
             {
               "type": "named",
               "data": {
+                "name": "LowerElevator"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
                 "name": "Intake"
               }
             }

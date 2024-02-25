@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.293238893308695,
-        "y": 2.4407258668940637
+        "x": 8.288642422749572,
+        "y": 2.436296745792339
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.69484552554272,
-        "y": 1.6600025954327322
+        "x": 7.690249054983597,
+        "y": 1.6555734743310073
       },
       "isLocked": false,
       "linkedName": "C4"
@@ -20,8 +20,8 @@
         "y": 1.8431846942081342
       },
       "prevControl": {
-        "x": 5.723516679253472,
-        "y": 1.7684797339006313
+        "x": 6.628397256794513,
+        "y": 1.759134946841323
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake & PrepareShooterR",
+      "name": "StopIntake & PrepareShooter",
       "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
@@ -41,13 +41,13 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "StopIntake"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooterR"
+                "name": "PrepareShooter"
               }
             }
           ]
@@ -56,7 +56,7 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
