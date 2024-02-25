@@ -4,8 +4,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.Neo;
-import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.constants.Constants.TrapConstants;
+import frc.robot.util.motors.Neo;
 
 public class Trapper extends SubsystemBase {
     private final Neo trapper;

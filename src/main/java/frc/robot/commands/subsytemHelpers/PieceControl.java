@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.subsytemHelpers;
 
 import java.util.function.Supplier;
 
@@ -10,8 +10,8 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Trapper;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.util.SpeedAngleTriplet;
-import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.constants.SpeedAngleTriplet;
+import frc.robot.util.constants.Constants.TrapConstants;
 
 public class PieceControl {
 
@@ -21,7 +21,7 @@ public class PieceControl {
     private Elevator elevator;
     private Trapper trapper;
 
-    private ShooterCalc shooterCalc;
+    private ShooterCmds shooterCmds;
 
     private boolean shooterMode = true;
 
@@ -30,12 +30,12 @@ public class PieceControl {
             Indexer indexer,
             Elevator elevator,
             Trapper trapper,
-            ShooterCalc shooterCalc) {
+            ShooterCmds shooterCmds) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.trapper = trapper;
-        this.shooterCalc = shooterCalc;
+        this.shooterCmds = shooterCmds;
     }
 
     public Command stopAllMotors() {
@@ -44,13 +44,13 @@ public class PieceControl {
                 indexer.stopCommand(),
                 elevator.stopCommand(),
                 trapper.stopCommand(),
-                shooterCalc.stopAllMotors()).ignoringDisable(true);
+                shooterCmds.stopAllMotors()).ignoringDisable(true);
     }
 
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        return Commands.waitUntil(shooterCalc.readyToShootSupplier())
+        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
                 .andThen(noteToShoot())
-                    .alongWith(shooterCalc.getNoteTrajectoryCommand(poseSupplier, speedSupplier));
+                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier));
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
@@ -154,7 +154,7 @@ public class PieceControl {
 
     public Command sourceShooterIntake() {
         return Commands.sequence(
-            Commands.runOnce(() -> shooterCalc.setTriplet(new SpeedAngleTriplet(-300.0, -300.0, 45.0))),
+            shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 45.0)),
             indexer.toElevator(),
             trapper.outtake(),
             Commands.waitSeconds(3),
