@@ -11,16 +11,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.constants.Constants.ModuleConstants;
-import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class MAXSwerveModule implements Logged{
     private final Neo drivingSpark;
     private final Neo turningSpark;
-
-    private PIDNotConstants turningPID;
-    private PIDNotConstants drivingPID;
 
     private double chassisAngularOffset = 0;
 
@@ -55,15 +51,10 @@ public class MAXSwerveModule implements Logged{
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
     }
 
-    public PIDNotConstants getTurningPIDNotConstants() {
-        return turningPID;
-    }
-    public PIDNotConstants getDrivingPIDNotConstnats() {
-        return drivingPID;
-    }
     public SparkPIDController getDrivingPIDController() {
         return drivingSpark.getPIDController();
     }
+    
     public SparkPIDController getTurningPIDController() {
         return turningSpark.getPIDController();
     }

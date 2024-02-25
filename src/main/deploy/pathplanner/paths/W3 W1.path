@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.461157776932109,
-        "y": 4.806186572471635
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 2.9975302503796497,
-        "y": 4.868811439750539
-      },
-      "isLocked": false,
-      "linkedName": "M"
-    },
-    {
-      "anchor": {
         "x": 2.5685447337679963,
         "y": 4.3334957369796125
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7938295227094376,
+        "y": 4.559698794649549
+      },
+      "isLocked": false,
+      "linkedName": "W3"
+    },
+    {
+      "anchor": {
+        "x": 2.892385986339722,
+        "y": 6.9912317204253664
+      },
       "prevControl": {
-        "x": 0.7705402644847841,
-        "y": 4.621368107984443
+        "x": 1.4904624658073509,
+        "y": 6.7660046630283635
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "W3"
+      "linkedName": "W1"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "StopIntake",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -49,8 +49,25 @@
       }
     },
     {
+      "name": "PrepareShooter",
+      "waypointRelativePos": 0.45,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PrepareShooter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "Shoot",
-      "waypointRelativePos": 0.9,
+      "waypointRelativePos": 0.75,
       "command": {
         "type": "parallel",
         "data": {
@@ -64,40 +81,23 @@
           ]
         }
       }
-    },
-    {
-      "name": "PrepareShooterW3",
-      "waypointRelativePos": 0.15,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooterW3"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
     "maxVelocity": 6.08,
     "maxAcceleration": 7.378,
-    "maxAngularVelocity": 45.0,
-    "maxAngularAcceleration": 60.0
+    "maxAngularVelocity": 1137.207,
+    "maxAngularAcceleration": 1492.899
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 169.00174959554687,
+    "rotation": -153.6913860214855,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Stage",
+  "folder": "Wings",
   "previewStartingState": {
-    "rotation": 171.92085261432547,
+    "rotation": 155.97197955215407,
     "velocity": 0
   },
   "useDefaultConstraints": true

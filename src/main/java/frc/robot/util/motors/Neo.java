@@ -220,7 +220,6 @@ public class Neo extends SafeSparkMax {
         targetVelocity = velocity;
         controlType = ControlLoopType.VELOCITY;
     }
-
     
     /**
      * Sets the output of the Neo motor controller based on a percentage value.
@@ -256,7 +255,8 @@ public class Neo extends SafeSparkMax {
      * if in simulation.
      */
     public void register() {
-        NeoMotorConstants.MOTOR_LIST.add(this);
+        NeoMotorConstants.MOTOR_MAP.put(canID, this);
+        
         if (FieldConstants.IS_SIMULATION)
             REVPhysicsSim.getInstance().addSparkMax(this, DCMotor.getNEO(1));  
     }
@@ -438,7 +438,7 @@ public class Neo extends SafeSparkMax {
      * 
      * @return The I-Zone constant for PID control.
      */
-    public double getIZ() {
+    public double getIZone() {
         return getPIDController().getIZone();
     }
 
@@ -461,7 +461,7 @@ public class Neo extends SafeSparkMax {
     }
 
     public static void incinerateMotors() {
-        for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
+        for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {
             neo.burnFlash();
         }
     }
