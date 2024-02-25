@@ -251,7 +251,7 @@ public class PathPlannerStorage implements Logged {
                                 new Pose2d(
                                     limelight.getNotePose2d().getTranslation(), 
                                     new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI))
-                        ).repeatedly().until(swerve::atDesiredPoseAuto).onlyIf(limelightHasNote(limelight)),
+                        ).repeatedly().until(() -> swerve.atDesiredPoseAuto() || !limelightHasNote(limelight).getAsBoolean()),
                         swerve.getChaseCommand());  
     }
 
