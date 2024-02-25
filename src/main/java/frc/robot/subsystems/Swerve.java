@@ -39,9 +39,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.ModuleConstants;
 import frc.robot.util.motors.MAXSwerveModule;
-import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -69,20 +67,6 @@ public class Swerve extends SubsystemBase implements Logged {
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
-
-    private PIDNotConstants drivingConstants = new PIDNotConstants(
-        ModuleConstants.DRIVING_PID, 
-        frontLeft.getDrivingPIDController(), 
-        frontRight.getDrivingPIDController(), 
-        rearLeft.getDrivingPIDController(),
-        rearRight.getDrivingPIDController());
-        
-    private PIDNotConstants turningConstants = new PIDNotConstants(
-        ModuleConstants.TURNING_PID, 
-        frontLeft.getTurningPIDController(), 
-        frontRight.getTurningPIDController(), 
-        rearLeft.getTurningPIDController(),
-        rearRight.getTurningPIDController());
 
     @Log
     SwerveModuleState[] swerveMeasuredStates;
@@ -156,8 +140,8 @@ public class Swerve extends SubsystemBase implements Logged {
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
-
     }
+
     public void logPositions() {
 
         Pose2d currentPose = getPose();
@@ -179,16 +163,16 @@ public class Swerve extends SubsystemBase implements Logged {
         RobotContainer.field2d.setRobotPose(currentPose);
         SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
-        if (! (Double.isNaN(currentPose.getX())
+        if ((Double.isNaN(currentPose.getX())
             || Double.isNaN(currentPose.getY())
             || Double.isNaN(currentPose.getRotation().getDegrees())))
         {
-            robotPose2d = currentPose;
-        } else {
             // Something in our pose was NaN...
             resetOdometry(robotPose2d);
             resetEncoders();
             resetHDC();
+        } else {
+            robotPose2d = currentPose;
         }
 
         robotPose3d = new Pose3d(
@@ -212,12 +196,7 @@ public class Swerve extends SubsystemBase implements Logged {
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
-    public PIDNotConstants getTurningPidNotConstants() {
-        return turningConstants;
-    }
-    public PIDNotConstants getDrivingPidNotConstants() {
-        return drivingConstants;
-    }
+
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
@@ -342,9 +321,7 @@ public class Swerve extends SubsystemBase implements Logged {
         return positions;
 
     }
-    public PIDNotConstants getTurningModulePID() {
-        return this.frontLeft.getTurningPIDNotConstants();
-    }
+    
     public void resetEncoders() {
         for (MAXSwerveModule mSwerveMod : swerveModules) {
             mSwerveMod.resetEncoders();
