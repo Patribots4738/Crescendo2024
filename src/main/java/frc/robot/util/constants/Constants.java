@@ -436,7 +436,15 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int PWM_PORT = 9;
-        public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
+        public static int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
+
+        public static final int ELEVATOR_LEFT_START_INDEX = 10;
+        public static final int ELEVATOR_LEFT_END_INDEX = 19;
+        
+        public static final int ELEVATOR_RIGHT_START_INDEX = 20;
+        public static final int ELEVATOR_RIGHT_END_INDEX = 29;
+
+        public static final int ELEVATOR_LED_COUNT = LEDConstants.ELEVATOR_LEFT_END_INDEX-LEDConstants.ELEVATOR_LEFT_START_INDEX;
 
         public static final Integer patternMap = null;
 
