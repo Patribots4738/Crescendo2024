@@ -7,16 +7,16 @@ import java.util.function.Supplier;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.estimator.PoseEstimator;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.Swerve;
 import frc.robot.util.calc.LimelightHelpers;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
@@ -30,15 +30,14 @@ public class Limelight extends SubsystemBase implements Logged{
 
     String limelightName = "limelight";
     private final Supplier<Pose2d> robotPoseSupplier;
+    private final SwerveDrivePoseEstimator poseEstimator;
 
     @Log
     Pose3d[] visableTags;
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
-
-    private SwerveDrivePoseEstimator poseEstimator;
-
+    
     @Log
     public boolean isConnected = false;
 
@@ -58,6 +57,7 @@ public class Limelight extends SubsystemBase implements Logged{
         if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
+            updatePoseEstimator();
             getTags();
             runLimelightCode();
         }
@@ -87,6 +87,52 @@ public class Limelight extends SubsystemBase implements Logged{
             poseEstimator.addVisionMeasurement( 
                 estimatedRobotPose,
                 Robot.currentTimestamp - getLatencyDiffSeconds());
+        }
+    }
+
+    private void updatePoseEstimator() {
+        Results result = getResults();
+        Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
+
+        // invalid data check
+        if (estimatedRobotPose.getX() == 0.0
+            || Double.isNaN(estimatedRobotPose.getX()) 
+            || Double.isNaN(estimatedRobotPose.getY()) 
+            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())) {
+            return;
+        }
+
+        // distance from current pose to vision estimated pose
+        double poseDifference = poseEstimator.getEstimatedPosition().getTranslation()
+            .getDistance(estimatedRobotPose.getTranslation());
+    
+        if (result.valid) {
+            double xyStds;
+            double degStds;
+            // multiple targets detected
+            if (result.targets_Fiducials.length >= 2) {
+                xyStds = 0.5;
+                degStds = 3;
+            }
+            // 1 target with large area and close to estimated pose
+            else if (poseDifference < 0.5 && getBestTargetArea(result) > 0.8) {
+                xyStds = 1.0;
+                degStds = 6;
+            }
+            // 1 target farther away and estimated pose is close
+            else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.1) {
+                xyStds = 2.0;
+                degStds = 12;
+            }
+            // conditions don't match to add a vision measurement
+            else {
+                return;
+            }
+    
+            poseEstimator.setVisionMeasurementStdDevs(
+                VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
+            poseEstimator.addVisionMeasurement(estimatedRobotPose,
+                Robot.currentTimestamp - getLatencyDiffSeconds(result));
         }
     }
 
@@ -125,6 +171,20 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public double getLatencyDiffSeconds() {
         return (LimelightHelpers.getLatency_Pipeline(limelightName)/1000d) - (LimelightHelpers.getLatency_Capture(limelightName)/1000d); 
+    }
+
+    public double getLatencyDiffSeconds(Results result) {
+        return (result.latency_pipeline/1000.0) - (result.latency_capture/1000.0); 
+    }
+
+    public double getBestTargetArea(Results result) {
+        double bestArea = 0;
+        for (LimelightTarget_Fiducial target : result.targets_Fiducials) {
+            if (target.ta > bestArea) {
+                bestArea = target.ta;
+            }
+        }
+        return bestArea;
     }
 
     // The below code is for simulation only

@@ -136,8 +136,8 @@ public class Swerve extends SubsystemBase implements Logged {
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
-
     }
+
     public void logPositions() {
 
         Pose2d currentPose = getPose();
@@ -159,15 +159,15 @@ public class Swerve extends SubsystemBase implements Logged {
         RobotContainer.field2d.setRobotPose(currentPose);
         SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
-        if (! (Double.isNaN(currentPose.getX())
+        if ((Double.isNaN(currentPose.getX())
             || Double.isNaN(currentPose.getY())
             || Double.isNaN(currentPose.getRotation().getDegrees())))
         {
-            robotPose2d = currentPose;
-        } else {
             // Something in our pose was NaN...
             resetOdometry(robotPose2d);
             resetHDC();
+        } else {
+            robotPose2d = currentPose;
         }
 
         robotPose3d = new Pose3d(
