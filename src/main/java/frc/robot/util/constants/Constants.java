@@ -283,7 +283,7 @@ public final class Constants {
 
         private static final PIDController XY_PID = new PIDController(
                 AutoConstants.XY_CORRECTION_P,
-                AutoConstants.XY_CORRECTION_I,
+                0,
                 AutoConstants.XY_CORRECTION_D);
 
         public static final double ROTATION_CORRECTION_P = .8514;

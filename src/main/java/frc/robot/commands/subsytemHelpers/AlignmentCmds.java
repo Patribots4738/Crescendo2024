@@ -38,8 +38,8 @@ public class AlignmentCmds {
                 ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
                 ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
                 return new ChassisSpeeds(
-                        MathUtil.applyDeadband((controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond), 0.1),
-                        MathUtil.applyDeadband(-(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 0.1),
+                        MathUtil.applyDeadband((controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond), 0.2),
+                        MathUtil.applyDeadband(-(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 0.2),
                         controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
             }, () -> false);
     }
