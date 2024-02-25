@@ -10,8 +10,10 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Trapper;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.constants.SpeedAngleTriplet;
 import frc.robot.util.constants.Constants.TrapConstants;
+import frc.robot.subsystems.shooter.Pivot;
 
 public class PieceControl {
 
@@ -23,6 +25,8 @@ public class PieceControl {
 
     private ShooterCmds shooterCmds;
 
+    private Pivot pivot;
+
     private boolean shooterMode = true;
 
     public PieceControl(
@@ -30,12 +34,14 @@ public class PieceControl {
             Indexer indexer,
             Elevator elevator,
             Trapper trapper,
-            ShooterCmds shooterCmds) {
+            ShooterCmds shooterCmds,
+            Pivot pivot) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.trapper = trapper;
         this.shooterCmds = shooterCmds;
+        this.pivot = pivot;
     }
 
     public Command stopAllMotors() {
@@ -50,7 +56,8 @@ public class PieceControl {
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
                 .andThen(noteToShoot())
-                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier));
+                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier)
+                .andThen(pivot.angleReset()));
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
