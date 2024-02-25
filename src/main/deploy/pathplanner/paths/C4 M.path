@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.0535215356145,
-        "y": 3.2104212779854135
+        "x": 7.185456656627599,
+        "y": 3.049167241191626
       },
       "isLocked": false,
       "linkedName": "C4"
@@ -20,8 +20,8 @@
         "y": 4.806186572471635
       },
       "prevControl": {
-        "x": 5.001197430966291,
-        "y": 4.515113030226061
+        "x": 5.250408215102145,
+        "y": 4.177945498748141
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake & PrepareShooterM",
-      "waypointRelativePos": 0,
+      "name": "StopIntake & PrepareShooter",
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -47,7 +47,7 @@
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooterM"
+                "name": "PrepareShooter"
               }
             }
           ]
@@ -56,7 +56,7 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 2.0,
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -80,13 +80,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 169.6990871639762,
-    "rotateFast": true
+    "rotation": 169.37079287466392,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Center Line",
   "previewStartingState": {
-    "rotation": -179.85511438110993,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true
