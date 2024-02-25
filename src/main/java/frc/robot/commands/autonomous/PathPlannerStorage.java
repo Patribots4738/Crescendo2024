@@ -188,10 +188,11 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that will pathfind to the shooting pose
      */
     public Command pathfindToShoot(Swerve swerve) {
-        return AutoBuilder.pathfindToPose(
-                    PoseCalculations.getClosestShootingPose(swerve.getPose()), 
-                    PATH_CONSTRAINTS,
-                    0);
+        return 
+            AutoBuilder.pathfindToPose(
+                PoseCalculations.getClosestShootingPose(swerve.getPose()), 
+                PATH_CONSTRAINTS,
+                0);
     }
 
     /**
@@ -203,16 +204,17 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that will pathfind towards the next note
      */
     public Command pathfindToNextNote(IntSupplier index) {
-        return AutoBuilder.pathfindToPose(
-                    new Pose2d(
-                        NOTE_POSES.get(index.getAsInt()).getX() + 
-                            (Robot.isRedAlliance() 
-                            ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
-                            : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
-                        NOTE_POSES.get(index.getAsInt()).getY(), 
-                        new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI)), 
-                    PATH_CONSTRAINTS,
-                    0);
+        return 
+            AutoBuilder.pathfindToPose(
+                new Pose2d(
+                    NOTE_POSES.get(index.getAsInt()).getX() + 
+                        (Robot.isRedAlliance() 
+                        ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
+                        : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
+                    NOTE_POSES.get(index.getAsInt()).getY(), 
+                    new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI)), 
+                PATH_CONSTRAINTS,
+                0);
     }
 
     /**
@@ -245,14 +247,15 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that holonomically drives to a note position gathered from vision
      */
     public Command goToNote(Swerve swerve, Limelight limelight) {
-        return Commands.parallel(
-                        swerve.updateChasePose(
-                            () -> 
-                                new Pose2d(
-                                    limelight.getNotePose2d().getTranslation(), 
-                                    new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI))
-                        ).repeatedly().until(() -> swerve.atDesiredPoseAuto() || !limelightHasNote(limelight).getAsBoolean()),
-                        swerve.getChaseCommand());  
+        return 
+            Commands.parallel(
+                swerve.updateChasePose(
+                    () -> 
+                        new Pose2d(
+                            limelight.getNotePose2d().getTranslation(), 
+                            new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI))
+                ).repeatedly().until(() -> swerve.atDesiredPoseAuto() || !limelightHasNote(limelight).getAsBoolean()),
+                swerve.getChaseCommand());  
     }
 
     // Returns true if the limelight subsystem can see a note

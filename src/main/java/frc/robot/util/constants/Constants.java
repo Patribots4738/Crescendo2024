@@ -261,6 +261,10 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
 
+        public static final double AUTO_POSITION_DEADBAND_METERS_X = 0.3;
+        public static final double AUTO_POSITION_DEADBAND_METERS_Y = 0.1;
+        public static final double AUTO_POSITION_DEADBAND_RADS = 0.2;
+
         /*
          * XY:
          *  P: 5.2
@@ -567,6 +571,8 @@ public final class Constants {
 
         public static boolean IS_SIMULATION = Robot.isSimulation();
         public static final int CENTER_NOTE_COUNT = 5;
+
+        public static final Pose2d BLUE_ORIGIN = new Pose2d(0, 0, new Rotation2d());
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;

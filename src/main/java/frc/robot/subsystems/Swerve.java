@@ -419,9 +419,15 @@ public class Swerve extends SubsystemBase implements Logged {
 		Rotation2d subtractedRotation = getPose().getRotation().minus(desiredHDCPose.getRotation());
         // More lenient on x axis, less lenient on y axis and rotation
 		return 
-			MathUtil.applyDeadband(subtractedTransform.getX(), 0.3) == 0 &&
-			MathUtil.applyDeadband(subtractedTransform.getY(), 0.1) == 0 &&
-			MathUtil.applyDeadband(subtractedRotation.getRadians(), 0.2) == 0;
+			MathUtil.applyDeadband(
+                subtractedTransform.getX(), 
+                AutoConstants.AUTO_POSITION_DEADBAND_METERS_X) == 0 &&
+			MathUtil.applyDeadband(
+                subtractedTransform.getY(), 
+                AutoConstants.AUTO_POSITION_DEADBAND_METERS_Y) == 0 &&
+			MathUtil.applyDeadband(
+                subtractedRotation.getRadians(), 
+                AutoConstants.AUTO_POSITION_DEADBAND_RADS) == 0;
     }
 
 }
