@@ -1,7 +1,9 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -9,29 +11,37 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.util.Neo;
-import frc.robot.util.PoseCalculations;
-import frc.robot.util.Constants.ClimbConstants;
-import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Neo.TelemetryPreference;
+import frc.robot.util.calc.PoseCalculations;
+import frc.robot.util.constants.Constants.ClimbConstants;
+import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.NTConstants;
+import frc.robot.util.motors.Neo;
+import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
+import monologue.Annotations.Log;
 
 public class Climb extends SubsystemBase implements Logged {
 
     private final Neo leftMotor;
     private final Neo rightMotor;
+    private final PIDNotConstants climbPID;
+
+    @Log
+    private double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
+
+    @Log
+    private boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID);
+        // invert right motor in real life, not in sim
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, !FieldConstants.IS_SIMULATION);
 
         configureMotors();
+        climbPID = new PIDNotConstants(leftMotor.getPID(), leftMotor.getPIDController());
     }
 
     private void configureMotors() {
-        leftMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
-        rightMotor.setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
-
         leftMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
         rightMotor.setPositionConversionFactor(ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR);
 
@@ -44,6 +54,14 @@ public class Climb extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
+        targetPosLeft = leftMotor.getTargetPosition();
+        targetPosRight = rightMotor.getTargetPosition();
+        posLeft = leftMotor.getPosition();
+        posRight = rightMotor.getPosition();
+
+        atDesiredPos = atDesiredPosition().getAsBoolean();
+        hooksUp = hooksUp();
+
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, leftMotor.getPosition(),
             new Rotation3d()
@@ -54,11 +72,27 @@ public class Climb extends SubsystemBase implements Logged {
         );
     }
 
+
+    public PIDNotConstants getPidNotConstants() {
+        return this.climbPID;
+    }
+
     public void setPosition(Pair<Double, Double> positionPair) {
         setPosition(positionPair.getFirst(), positionPair.getSecond());
     }
 
     public void setPosition(double pos1, double pos2) {
+        pos1 = 
+            MathUtil.clamp(
+                pos1,
+                ClimbConstants.BOTTOM_LIMIT,
+                ClimbConstants.TOP_LIMIT);
+        pos2 = 
+            MathUtil.clamp(
+                pos2,
+                ClimbConstants.BOTTOM_LIMIT,
+                ClimbConstants.TOP_LIMIT);
+
         leftMotor.setTargetPosition(pos1);
         rightMotor.setTargetPosition(pos2);
 
@@ -95,5 +129,21 @@ public class Climb extends SubsystemBase implements Logged {
             }, 
             this::toTop
         );
+    }
+
+    public BooleanSupplier atDesiredPosition() {
+		return () -> (
+            MathUtil.applyDeadband(
+				Math.abs(
+						leftMotor.getPosition() - leftMotor.getTargetPosition()),
+				ClimbConstants.CLIMB_DEADBAND) == 0 &&
+            MathUtil.applyDeadband(
+				Math.abs(
+						rightMotor.getPosition() - rightMotor.getTargetPosition()),
+				ClimbConstants.CLIMB_DEADBAND) == 0);
+	}
+
+    public boolean hooksUp() {
+        return (leftMotor.getTargetPosition() > 0 || rightMotor.getTargetPosition() > 0);
     }
 }
