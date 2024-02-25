@@ -217,10 +217,13 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
+            .onTrue(shooterCmds.angleReset());
+
+        controller.povUp()
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+
         
-        controller.povDown().onTrue(climb.toBottomCommand()
-            .andThen(shooterCmds.angleReset()));
+        controller.povDown().onTrue(climb.toBottomCommand());
         
         controller.a().whileTrue(
             Commands.sequence(

@@ -143,8 +143,8 @@ public final class Constants {
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 150;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 20;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 45;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
