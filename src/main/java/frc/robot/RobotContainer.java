@@ -232,7 +232,7 @@ public class RobotContainer implements Logged {
                 Commands.either(
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
-                    climb::hooksUp)));
+                    climb::getHooksUp)));
         
         
         controller.rightTrigger()
@@ -246,7 +246,7 @@ public class RobotContainer implements Logged {
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
-
+                    
         controller.b()
             .onTrue(pieceControl.stopAllMotors());
 

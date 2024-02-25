@@ -149,6 +149,6 @@ public class AlignmentCmds {
             Commands.either(
                 chainRotationalAlignment(driverX, driverY),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds),
-                climb::hooksUp);
+                climb::getHooksUp);
     }
 }

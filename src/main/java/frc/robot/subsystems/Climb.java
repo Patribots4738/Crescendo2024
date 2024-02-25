@@ -57,7 +57,7 @@ public class Climb extends SubsystemBase implements Logged {
         posRight = rightMotor.getPosition();
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
-        hooksUp = hooksUp();
+        hooksUp = getHooksUp();
 
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, leftMotor.getPosition(),
@@ -135,7 +135,7 @@ public class Climb extends SubsystemBase implements Logged {
 				ClimbConstants.CLIMB_DEADBAND) == 0);
 	}
 
-    public boolean hooksUp() {
+    public boolean getHooksUp() {
         return (leftMotor.getTargetPosition() > 0 || rightMotor.getTargetPosition() > 0);
     }
 }
