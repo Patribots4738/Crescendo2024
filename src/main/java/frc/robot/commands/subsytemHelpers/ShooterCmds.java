@@ -144,10 +144,7 @@ public class ShooterCmds {
 	 * 
 	 * @return The method is returning a Command object.
 	 */
-	 public Command angleReset() {
-		return Commands.runOnce(() -> pivot.setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES));
+	public Command angleReset() {
+	    return Commands.runOnce(() -> pivot.setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES));
 	}
 }
-
-
-
