@@ -142,18 +142,15 @@ public class ShooterCmds {
     public Command stopAllMotors() {
         return shooter.stop().andThen(pivot.stop());
     }
-
     /**
 	 * The function is a command that resets the angle of the robot
 	 * to be at the min angle.
 	 * 
 	 * @return The method is returning a Command object.
 	 */
-
 	 public Command angleReset() {
 		return Commands.runOnce(() -> pivot.setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES));
 	}
-
 }
 
 

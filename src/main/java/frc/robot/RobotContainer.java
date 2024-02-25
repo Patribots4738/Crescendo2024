@@ -226,7 +226,8 @@ public class RobotContainer implements Logged {
         controller.povUp()
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        controller.povDown().onTrue(climb.toBottomCommand());
+        controller.povDown().onTrue(climb.toBottomCommand()
+            .andThen(shooterCmds.angleReset()));
         
         controller.a().whileTrue(
             Commands.sequence(
@@ -267,10 +268,11 @@ public class RobotContainer implements Logged {
         controller.rightTrigger().onFalse(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger()
             .onTrue(
-                pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity)
-                .andThen(pieceControl.resetPivotAngle()));
-    }
+                pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+            }
     
+
+
     private void configurePIDTunerBindings(PatriBoxController controller) {
         controller.pov(0, 270, testButtonBindingLoop)
             .onTrue(PIDTuner.incrementSubsystemCommand());
@@ -451,7 +453,6 @@ public class RobotContainer implements Logged {
             System.out.println("Reconfigured HPFC");
         }
     }
-    
 
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)

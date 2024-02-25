@@ -50,11 +50,8 @@ public class PieceControl {
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
                 .andThen(noteToShoot())
-                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier));
-    }
-
-    public Command resetPivotAngle() {
-        return shooterCmds.angleReset();
+                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier))
+                .andThen(shooterCmds.angleReset());
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
