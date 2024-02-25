@@ -150,7 +150,13 @@ public class Limelight extends SubsystemBase implements Logged{
     }
 
     public double getBestTargetArea(Results result) {
-        return 0.0;
+        double bestArea = 0;
+        for (LimelightTarget_Fiducial target : result.targets_Fiducials) {
+            if (target.ta > bestArea) {
+                bestArea = target.ta;
+            }
+        }
+        return bestArea;
     }
 
     // The below code is for simulation only
