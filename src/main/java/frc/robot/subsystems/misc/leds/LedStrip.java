@@ -1,8 +1,6 @@
 package frc.robot.subsystems.misc.leds;
 
-import frc.robot.subsystems.elevator.Elevator;
 //import frc.robot.DriverUI;
-import frc.robot.RobotContainer;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -26,12 +24,12 @@ public class LedStrip extends SubsystemBase {
     private AddressableLEDBuffer ledBuffer;
 
     private int currentPatternIndex;
-    private final Supplier<Pose2d> poseSupplier;
+    //private final Supplier<Pose2d> poseSupplier;
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
     public LedStrip(Supplier<Pose2d> poseSupplier) {
-        this.poseSupplier = poseSupplier;
+        //this.poseSupplier = poseSupplier;
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
         ledBuffer = new AddressableLEDBuffer(LEDConstants.PWM_PORT);
         LEDConstants.LED_COUNT = ledBuffer.getLength();
@@ -42,13 +40,6 @@ public class LedStrip extends SubsystemBase {
         led.start();
 
         configureLED();
-
-    //    patternMap.put(0, turnOff());
-    //    patternMap.put(1, greenNGold());
-    //    patternMap.put(2, circus());
-    //    patternMap.put(3, loading());
-    //    patternMap.put(5, alliance(() -> FieldConstants.IS_RED_ALLIANCE()));
-    //    patternMap.put(6, flash());
     }
 
     public AddressableLEDBuffer getBuffer() {
@@ -62,7 +53,11 @@ public class LedStrip extends SubsystemBase {
 
     public Command changeLEDsPattern() {
         return Commands.runOnce(() -> {
-            selectedLED += 1;
+            if (selectedLED > 7) {
+                selectedLED = 0;
+            } else {
+                selectedLED += 1;
+            }
         });
     }
 
@@ -77,8 +72,7 @@ public class LedStrip extends SubsystemBase {
             case (5) -> alliance(() -> Robot.isRedAlliance());
             case (6) -> flash();
             case (7) -> rainbow();
-            default -> runOnce(() -> {
-            });
+            default -> turnOff();
         };
         return selectedPattern;
     }
@@ -231,6 +225,7 @@ public class LedStrip extends SubsystemBase {
     
     Color Orange = new Color(250, 160, 30);
     Color GreerYeller = new Color(50, 250, 0);
+    Color Greer = new Color(0, 250, 0);
     Color TurnOff = new Color(0, 0, 0);
     Color Red = new Color(250, 0, 0);
 
@@ -255,6 +250,18 @@ public class LedStrip extends SubsystemBase {
     public Command cautionCoolDownLED() {
         return Commands.runOnce(() -> {
             oohShiny(Red, TurnOff, 999, 10, 1);
+        });
+    }
+
+    public Command roboRiseLED() {
+        return Commands.run(() -> {
+            setLEDGradient(Greer, GreerYeller, 1, 100);
+        });
+    }
+
+    public Command roboLowerLED() {
+        return Commands.run(() -> {
+            setLEDGradient(GreerYeller, Greer, 100, 1);
         });
     }
 
@@ -316,11 +323,6 @@ public class LedStrip extends SubsystemBase {
                     currentElevatorPosition
                 ));
 
-            // (topmostActiveLED == LEDConstants.ELEVATOR_LED_COUNT) {
-            //    desiredColor = ((int) (DriverUI.currentTimestamp * 5)) % 2 == 0
-            //        ? Color.kBlack 
-            //        : Color.kGreenYellow;
-            //}    
         }).until(() -> {
             return elevatorPositionSupplier.getAsDouble() == 0;
         });

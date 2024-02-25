@@ -232,9 +232,11 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
-            .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+            .toggleOnTrue(climb.povUpCommand(swerve::getPose))
+            .whileTrue(ledStrip.roboRiseLED());
         
-        controller.povDown().onTrue(climb.toBottomCommand());
+        controller.povDown().onTrue(climb.toBottomCommand())
+        .whileTrue(ledStrip.roboLowerLED());
         
         controller.a().whileTrue(
             Commands.sequence(
@@ -265,10 +267,12 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.leftBumper()
-            .onTrue(pieceControl.toggleIn());
+            .onTrue(pieceControl.toggleIn())
+            .onTrue(ledStrip.blueLED());
 
         controller.rightBumper()
-            .onTrue(pieceControl.toggleOut());
+            .onTrue(pieceControl.toggleOut())
+            .onTrue(ledStrip.almmondLED());
 
         controller.povLeft()
             .onTrue(ledStrip.changeLEDsPattern());
