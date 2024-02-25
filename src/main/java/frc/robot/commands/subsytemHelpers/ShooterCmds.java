@@ -26,10 +26,10 @@ public class ShooterCmds {
     
     public ShooterCalc shooterCalc;
 
-    public ShooterCmds(Shooter shooter, Pivot pivot) {
+    public ShooterCmds(Shooter shooter, Pivot pivot, ShooterCalc shooterCalc) {
         this.pivot = pivot;
         this.shooter = shooter;
-        this.shooterCalc = new ShooterCalc(this.shooter, this.pivot);
+        this.shooterCalc = shooterCalc;
     }
     
     /**

@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -651,14 +652,10 @@ public final class Constants {
             // All relative to the blue origin
             // Blue Speaker
             Pose2d blueSpeaker = new Pose2d(0, 5.547, Rotation2d.fromDegrees(0));
+            Pose2d redSpeaker = GeometryUtil.flipFieldPose(blueSpeaker).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
             add(blueSpeaker);
-
-            // Red Speaker
-            add(GeometryUtil.flipFieldPose(blueSpeaker));
+            add(redSpeaker);
         }};
-
-        public static final double SPEAKER_HEIGHT = 2.08;
-
     
         public static final List<Pose2d> AMP_POSITIONS = new ArrayList<Pose2d>() {{
             // All points are in meters and radians

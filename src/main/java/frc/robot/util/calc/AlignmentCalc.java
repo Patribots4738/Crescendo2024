@@ -1,5 +1,6 @@
 package frc.robot.util.calc;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -13,7 +14,6 @@ import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
 
 public class AlignmentCalc {
-    
 
     private Swerve swerve;
 
@@ -87,8 +87,8 @@ public class AlignmentCalc {
      * @param driverY the driver's y input
      * @return        the command to align the robot to the chain
      */
-    public Supplier<ChassisSpeeds> getChainRotationalSpeedsSupplier(double driverX, double driverY) {
-        return () -> getChainRotationalSpeeds(driverX, driverY);
+    public Supplier<ChassisSpeeds> getChainRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
     /**
@@ -114,8 +114,8 @@ public class AlignmentCalc {
      * @param driverY the driver's y input
      * @return        the command to align the robot to the source
      */
-    public Supplier<ChassisSpeeds> getSourceRotationalSpeedsSupplier(double driverX, double driverY) {
-        return () -> getSourceRotationalSpeeds(driverX, driverY);
+    public Supplier<ChassisSpeeds> getSourceRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getSourceRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
     /**
@@ -141,8 +141,8 @@ public class AlignmentCalc {
      * @param shooterCmds the shooter commands
      * @return          the command to align the robot to the speaker
      */
-    public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(double driverX, double driverY, ShooterCmds shooterCmds) {
-        return () -> getSpeakerRotationalSpeeds(driverX, driverY, shooterCmds);
+    public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
+        return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
     }
 
     /**
@@ -151,9 +151,10 @@ public class AlignmentCalc {
      * @return the rotational speeds to align the robot to the trap
      */
     public ChassisSpeeds getTrapAlignmentSpeeds() {
-        Pose2d closestTrap = PoseCalculations.getClosestChain(swerve.getPose());
+        Pose2d currentRobotPose = swerve.getPose();
+        Pose2d closestTrap = PoseCalculations.getClosestChain(currentRobotPose);
         Pose2d stage = FieldConstants.GET_STAGE_POSITION();
-        double distance = swerve.getPose().relativeTo(stage).getTranslation().getNorm();
+        double distance = currentRobotPose.relativeTo(stage).getTranslation().getNorm();
         double x = stage.getX() + distance * closestTrap.getRotation().getCos();
         double y = stage.getY() + distance * closestTrap.getRotation().getSin();
         Pose2d desiredPose = new Pose2d(
@@ -169,15 +170,6 @@ public class AlignmentCalc {
                 0,
                 desiredPose.getRotation()
             );
-    }
-
-    /**
-     * Supplier for the Command to align the robot to the trap.
-     * 
-     * @return the command to align the robot to the trap
-     */
-    public Supplier<ChassisSpeeds> getTrapAlignmentSpeedsSupplier() {
-        return () -> getTrapAlignmentSpeeds();
     }
 
     /**

@@ -3,6 +3,10 @@ package frc.robot.commands.subsytemHelpers;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -10,6 +14,8 @@ import frc.robot.Robot;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.calc.AlignmentCalc;
+import frc.robot.util.calc.PoseCalculations;
+import frc.robot.util.constants.Constants.FieldConstants;
 
 public class AlignmentCmds {
     
@@ -32,8 +38,8 @@ public class AlignmentCmds {
                 ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
                 ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
                 return new ChassisSpeeds(
-                        (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond),
-                        -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond),
+                        MathUtil.applyDeadband((controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond), 0.1),
+                        MathUtil.applyDeadband(-(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 0.1),
                         controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
             }, () -> false);
     }
@@ -55,7 +61,7 @@ public class AlignmentCmds {
     public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return 
             swerve.getDriveCommand(
-                alignmentCalc.getChainRotationalSpeedsSupplier(driverX.getAsDouble(), driverY.getAsDouble()), 
+                alignmentCalc.getChainRotationalSpeedsSupplier(driverX, driverY), 
                 () -> true
         );
     }    
@@ -70,7 +76,7 @@ public class AlignmentCmds {
     public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return 
             swerve.getDriveCommand(
-                alignmentCalc.getSourceRotationalSpeedsSupplier(driverX.getAsDouble(), driverY.getAsDouble()), 
+                alignmentCalc.getSourceRotationalSpeedsSupplier(driverX, driverY), 
                 () -> true
         );
     }
@@ -79,8 +85,8 @@ public class AlignmentCmds {
         return 
             swerve.getDriveCommand(
                 alignmentCalc.getSpeakerRotationalSpeedsSupplier(
-                    driverX.getAsDouble(),
-                    driverY.getAsDouble(),
+                    driverX,
+                    driverY,
                     shooterCmds),
                 () -> true);
     }
@@ -92,18 +98,42 @@ public class AlignmentCmds {
      * @param driverY the driver's y input
      * @return        the command to align the robot to the trap
      */
-    public Command trapAlignmentCommand(DoubleSupplier driverY) {
+    public Command trapAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
         return 
             getAutoAlignmentCommand(
-                alignmentCalc.getTrapAlignmentSpeedsSupplier(), 
-                () -> 
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        -driverY.getAsDouble() * swerve.getPose().getRotation().getCos(),
-                        -driverY.getAsDouble() * swerve.getPose().getRotation().getSin(),
-                        0,
-                        swerve.getPose().getRotation()
-                    )
+                alignmentCalc::getTrapAlignmentSpeeds, 
+                () -> getTrapAlignmentSpeeds(driverX, driverY)
             );
+    }
+
+    public ChassisSpeeds getTrapAlignmentSpeeds(DoubleSupplier driverX, DoubleSupplier driverY) {
+
+        // Get the current chain that we are aligning to and the current robot pose
+        Pose2d closestChain = PoseCalculations.getClosestChain(swerve.getPose());
+
+        // Make the pose always relative to the blue alliance
+        // Closest chain is the actual chain position
+        // when we use our comparitors below, we use things from
+        // the origin of the field's persepctive
+        if (Robot.isRedAlliance()) {
+            closestChain = GeometryUtil.flipFieldPose(closestChain);
+        }
+
+        // If we are on the left chain, then use the positive driver X axis
+        // If we are on the right chain, then use the negative driver X axis
+        // If we are on the back chain, then use the positive driver Y axis
+        double x = (closestChain.getTranslation().getX() == FieldConstants.CHAIN_POSITIONS.get(1).getX()) 
+            ? -driverY.getAsDouble() 
+            : closestChain.getTranslation().getY() > FieldConstants.FIELD_HEIGHT_METERS/2.0
+                ? driverX.getAsDouble() * (Robot.isRedAlliance() ? -1 : 1) 
+                : -driverX.getAsDouble() * (Robot.isRedAlliance() ? -1 : 1);
+
+        return ChassisSpeeds.fromFieldRelativeSpeeds(
+            -x * swerve.getPose().getRotation().getCos(),
+            -x * swerve.getPose().getRotation().getSin(),
+            0,
+            swerve.getPose().getRotation()
+        );
     }
 
     /**

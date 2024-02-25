@@ -48,7 +48,7 @@ public class ShooterCalc implements Logged {
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);
+        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
         double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
 
         double newv0 = Math.hypot(v0x, v0z);
@@ -73,7 +73,7 @@ public class ShooterCalc implements Logged {
         double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
         // D/V
         double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
-        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
+        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);  
         // final height of the note should be where it starts + the average vy * time
         double vzFinal = v0z - (time * ShooterConstants.GRAVITY);
         double vzAverage = (v0z + vzFinal) / 2;
@@ -116,7 +116,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT+.3);
+        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS+.3);
     }
 
     /**
@@ -208,7 +208,7 @@ public class ShooterCalc implements Logged {
 
         double velocityNormalToSpeaker = totalSpeed * Math.cos(angleDifference);
         
-        return new Translation2d(velocityTangentToSpeaker, velocityNormalToSpeaker);
+        return new Translation2d(velocityTangentToSpeaker, -velocityNormalToSpeaker);
     }
 
     /**
@@ -266,7 +266,7 @@ public class ShooterCalc implements Logged {
      * @return              a pair of shooter speeds (left and right) required to reach the speaker position
      */
     private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, Rotation2d pivotAngle) {
-        double desiredRPM = velocityToRPM(Math.sqrt(2 * ShooterConstants.GRAVITY * FieldConstants.SPEAKER_HEIGHT) / (pivotAngle.getSin()));
+        double desiredRPM = velocityToRPM(Math.sqrt(2 * ShooterConstants.GRAVITY * FieldConstants.SPEAKER_HEIGHT_METERS) / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
 
