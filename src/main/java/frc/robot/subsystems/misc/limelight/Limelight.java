@@ -18,6 +18,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.calc.LimelightHelpers;
+import frc.robot.util.calc.LimelightHelpers.LimelightResults;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
 import frc.robot.util.constants.Constants.CameraConstants;
@@ -170,7 +171,12 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public boolean noteInVision() {
         LimelightHelpers.setPipelineIndex(limelightName, 1);
-        return getResults().valid;
+        Results results = getResults();
+        return (
+            results.valid && (!(results.botpose[0] == 0 && results.botpose[1] == 0))
+            && (LimelightHelpers.getTA("limelight") >= 0.3 
+                || results.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
+            && getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25;
     }
 
     public Pose2d getPose2d() {
