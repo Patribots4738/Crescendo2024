@@ -112,7 +112,6 @@ public class RobotContainer implements Logged {
 
         Neo.incinerateMotors();
         new NTPIDTuner().schedule();
-        Monologue.logObj(swerve, "Robot/Subsystems/Swerve");
         
         shooterCmds = new ShooterCmds(shooter, pivot);
 
