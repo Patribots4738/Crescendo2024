@@ -498,8 +498,8 @@ public final class Constants {
             /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
             /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
             /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
-            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
-            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
+            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator"); // Need to ID
+            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");         // Need to ID
             /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
             /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
         }};
