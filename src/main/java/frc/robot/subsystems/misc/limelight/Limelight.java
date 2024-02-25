@@ -163,7 +163,8 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public Pose2d getNotePose2d() {
         return noteInVision() 
-            ? LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d().relativeTo(FieldConstants.BLUE_ORIGIN)
+            ? LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d()
+                .relativeTo(FieldConstants.BLUE_ORIGIN)
             : robotPoseSupplier.get();
     }
 
