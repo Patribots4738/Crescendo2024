@@ -63,9 +63,14 @@ public class LedStrip extends SubsystemBase {
     public void periodic() {
         runPattern(currentPatternIndex).schedule();
     }
+    
+    int selectedLED = 0;
+    public Command changeLEDPattern() {
+        return runOnce(() -> selectedLED ++);
+    }
 
     private Command runPattern(int index) {
-        Command selectedPattern = switch (currentPatternIndex) {
+        Command selectedPattern = switch (selectedLED) {
             case (0) -> turnOff();
             case (1) -> greenNGold();
             case (2) -> circus();

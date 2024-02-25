@@ -258,7 +258,8 @@ public class RobotContainer implements Logged {
                         alignmentCmds.alignmentCalc::onOppositeSide)));
 
         controller.b()
-            .onTrue(pieceControl.stopAllMotors());
+            .onTrue(pieceControl.stopAllMotors())
+            .whileTrue(ledStrip.redLED());
 
         controller.x()
             .toggleOnTrue(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -268,6 +269,8 @@ public class RobotContainer implements Logged {
 
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut());
+
+        controller.povLeft().onTrue(ledStrip.changeLEDPattern());
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
