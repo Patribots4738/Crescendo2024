@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
-import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
@@ -45,7 +44,6 @@ import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
 import monologue.Annotations.Log;
 import monologue.Logged;
-import monologue.Monologue;
 
 public class RobotContainer implements Logged {
 
