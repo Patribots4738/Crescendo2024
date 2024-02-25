@@ -168,8 +168,7 @@ public class Limelight extends SubsystemBase implements Logged{
         if (noteInVision()) {
             Translation2d noteTranslation = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d().getTranslation();
             noteTranslation = noteTranslation.plus(robotPoseSupplier.get().getTranslation());
-            Pose2d notePose = new Pose2d(noteTranslation, new Rotation2d());
-            return notePose.rotateBy(robotPoseSupplier.get().getRotation());
+            return new Pose2d(noteTranslation, robotPoseSupplier.get().getRotation());
         }
         return robotPoseSupplier.get();
     }
