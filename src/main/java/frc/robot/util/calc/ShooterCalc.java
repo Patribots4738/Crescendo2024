@@ -28,6 +28,7 @@ public class ShooterCalc implements Logged {
         this.pivot = pivot;
     }
     
+    
     @Log
     double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
 
@@ -269,5 +270,4 @@ public class ShooterCalc implements Logged {
         double desiredRPM = velocityToRPM(Math.sqrt(2 * ShooterConstants.GRAVITY * FieldConstants.SPEAKER_HEIGHT_METERS) / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
-
 }
