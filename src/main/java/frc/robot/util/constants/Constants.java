@@ -193,8 +193,8 @@ public final class Constants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = .05;
-        public static final double OUTTAKE_SECONDS = 1;
-        public static final double TRAPPER_POSITION_MULTIPLIER = 1.83;
+        public static final double OUTTAKE_SECONDS = 0.4;
+        public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
 
@@ -202,7 +202,7 @@ public final class Constants {
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
 
-        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0, -1, 1);
+        public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(.5, 0, 0, -1, 1);
 
         // TODO: set these values
         public static final double RESET_POS = 0;
@@ -341,12 +341,15 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
+            "A W1 A C1-4 S",
+            "S C2-5 S",
+            "S W1 A C1-5 S",
             "S W2 S C1-3 S W3-1 S",
-            "S W3-1 S",
             "S W2 S C1-4 S",
             "S C1-5 S",
             "S W1 A C1-5 S",
             "A W1A C1-4 S",
+            "S W3-1 S",
             "S W3-1 S C1-3 S"
         };
     }

@@ -45,6 +45,7 @@ import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import monologue.Monologue;
 
 public class RobotContainer implements Logged {
 
@@ -66,7 +67,6 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCmds shooterCmds;
     private PieceControl pieceControl;
-    private ChoreoStorage choreoPathStorage;
     private PathPlannerStorage pathPlannerStorage;
     private CalibrationControl calibrationControl;
     private AlignmentCmds alignmentCmds;
@@ -404,12 +404,14 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
+        NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
         NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
-        NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE));
-        NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE));
-        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
+        NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         registerPathToPathCommands();
     }
