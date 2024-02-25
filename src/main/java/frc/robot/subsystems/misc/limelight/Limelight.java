@@ -162,10 +162,10 @@ public class Limelight extends SubsystemBase implements Logged{
         visableTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
+    // TODO: test this logic in real life before running dynamic auto
     public Pose2d getNotePose2d() {
         return noteInVision() 
             ? LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d()
-                .relativeTo(FieldConstants.BLUE_ORIGIN)
             : robotPoseSupplier.get();
     }
 
