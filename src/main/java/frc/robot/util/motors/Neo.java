@@ -67,7 +67,8 @@ public class Neo extends SafeSparkMax {
         // to minimize any bus traffic.
         // Default is 20ms
         setCANTimeout(50);
-        Timer.delay(0.25);
+        if (!FieldConstants.IS_SIMULATION)
+            Timer.delay(0.25);
         
         // Turn off alternate and analog encoders
         // we never use them
