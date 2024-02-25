@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake",
+      "name": "StopIntake & PrepareShooter",
       "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
@@ -43,13 +43,19 @@
               "data": {
                 "name": "StopIntake"
               }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "PrepareShooter"
+              }
             }
           ]
         }
       }
     },
     {
-      "name": "Intake",
+      "name": "Shoot",
       "waypointRelativePos": 0.9,
       "command": {
         "type": "parallel",
@@ -58,24 +64,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "PrepareShooterW3",
-      "waypointRelativePos": 0.4,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooterW3"
+                "name": "Shoot"
               }
             }
           ]

@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.constants.Constants.ShooterConstants;
 import frc.robot.util.motors.Neo;
-import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -16,7 +15,6 @@ public class Shooter extends SubsystemBase implements Logged{
     private final Neo motorLeft;
     private final Neo motorRight;
 
-    public PIDNotConstants shooterPID;
     @Log
     private double targetLeftSpeed = 0;
     @Log
@@ -36,7 +34,6 @@ public class Shooter extends SubsystemBase implements Logged{
         motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true);
 
         configMotors();
-        shooterPID = new PIDNotConstants(ShooterConstants.SHOOTER_PID, motorLeft.getPIDController());
     }
 
     public void configMotors() {
@@ -115,11 +112,7 @@ public class Shooter extends SubsystemBase implements Logged{
         return runOnce(() -> motorLeft.set(0))
             .andThen(runOnce(() -> motorRight.set(0)));
     }
-
-    public PIDNotConstants getPIDNotConstants() {
-        return this.shooterPID;
-    }
-
+    
     public boolean getAtDesiredRPM() {
         return atDesiredRPM;
     }

@@ -6,6 +6,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.MathUtil;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,6 +24,7 @@ import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
+import frc.robot.commands.subsytemHelpers.NTPIDTuner;
 import frc.robot.commands.subsytemHelpers.PieceControl;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
 import frc.robot.subsystems.*;
@@ -37,16 +38,14 @@ import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.constants.Constants.NTConstants;
-import frc.robot.util.constants.Constants.NeoMotorConstants;
 import frc.robot.util.constants.Constants.OIConstants;
 import frc.robot.util.mod.PatriBoxController;
 import frc.robot.util.motors.Neo;
 import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
-import frc.robot.util.testing.PIDNotConstants;
-import frc.robot.util.testing.PIDTunerCommands;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import monologue.Monologue;
 
 public class RobotContainer implements Logged {
 
@@ -68,10 +67,8 @@ public class RobotContainer implements Logged {
     private Elevator elevator;
     private ShooterCmds shooterCmds;
     private PieceControl pieceControl;
-    private ChoreoStorage choreoPathStorage;
     private PathPlannerStorage pathPlannerStorage;
     private CalibrationControl calibrationControl;
-    private PIDTunerCommands PIDTuner;
     private AlignmentCmds alignmentCmds;
 
     public static HDCTuner HDCTuner;
@@ -114,13 +111,9 @@ public class RobotContainer implements Logged {
             AutoConstants.HDC.getThetaController());
 
         Neo.incinerateMotors();
+        new NTPIDTuner().schedule();
         
         shooterCmds = new ShooterCmds(shooter, pivot);
-        
-        PIDTuner = new PIDTunerCommands(new PIDNotConstants[] {
-            swerve.getDrivingPidNotConstants(),
-            swerve.getTurningPidNotConstants()
-        });
 
         alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
 
@@ -269,38 +262,6 @@ public class RobotContainer implements Logged {
         controller.rightTrigger()
             .onTrue(
                 pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
-            }
-    
-
-
-    private void configurePIDTunerBindings(PatriBoxController controller) {
-        controller.pov(0, 270, testButtonBindingLoop)
-            .onTrue(PIDTuner.incrementSubsystemCommand());
-
-        controller.pov(0, 90, testButtonBindingLoop)
-            .onTrue(PIDTuner.decreaseSubsystemCommand());
-            
-        controller.pov(0, 0, testButtonBindingLoop)
-            .onTrue(PIDTuner.increaseCurrentPIDCommand(.1));
-            
-        controller.pov(0, 180, testButtonBindingLoop)
-            .onTrue(PIDTuner.increaseCurrentPIDCommand(-.1));
-            
-        controller.rightBumper(testButtonBindingLoop)
-            .onTrue(PIDTuner.PIDIncrementCommand());
-            
-        controller.leftBumper(testButtonBindingLoop)
-            .onTrue(PIDTuner.PIDDecreaseCommand());
-            
-        controller.a(testButtonBindingLoop)
-            .onTrue(PIDTuner.logCommand());
-            
-        controller.x(testButtonBindingLoop)
-            .onTrue(PIDTuner.multiplyPIDCommand(2));
-            
-        controller.b(testButtonBindingLoop)
-            .onTrue(PIDTuner.multiplyPIDCommand(.5));
-            
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
@@ -358,27 +319,9 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        return driver.getYButton() ? choreoChooser.getSelected() : pathPlannerStorage.getSelectedAuto();
+        return pathPlannerStorage.getSelectedAuto();
     }
 
-    @Log.NT
-    public static SendableChooser<Command> choreoChooser = new SendableChooser<>();
-    // PathPlannerPath starting = PathPlannerPath.fromChoreoTrajectory("S W3-1S C1");
-    private void setupChoreoChooser() {
-        // // TODO: Autos currently start at C1-5, we need to integrate the other paths
-        // // with the center line schenanigans to make full autos
-        // choreoChooser.setDefaultOption("Do Nothing", Commands.none());
-        // choreoChooser.addOption("W3-1 C1-5", 
-        //     swerve.resetOdometryCommand(
-        //         () -> starting.getPreviewStartingHolonomicPose()
-        //             .plus(new Transform2d(
-        //                     new Translation2d(), 
-        //                     Rotation2d.fromDegrees(180))))
-        //     .andThen(
-        //         AutoBuilder.followPath(starting)
-        //         .andThen(choreoPathStorage.generateCenterLineComplete(1, 5, false))));
-    }
-    
     public void onDisabled() {
         swerve.stopDriving();
         pieceControl.stopAllMotors().schedule();
@@ -462,12 +405,14 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
+        NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
         NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
-        NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE));
-        NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE));
-        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
+        NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         registerPathToPathCommands();
     }
@@ -490,14 +435,9 @@ public class RobotContainer implements Logged {
         registerPathToPathCommands();
         pathPlannerStorage.configureAutoChooser();
     }
-    
-    private void incinerateMotors() {
-        for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
-            neo.burnFlash();
-        }
-    }
 
     private void initializeComponents() {
+
         Pose3d initialShooterPose = new Pose3d(
                 NTConstants.PIVOT_OFFSET_METERS.getX(),
                 0,

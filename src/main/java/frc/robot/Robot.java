@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
         REVPhysicsSim.getInstance().run();
         Robot.alliance = DriverStation.getAlliance();
 
-        for (Neo neo : NeoMotorConstants.MOTOR_LIST) {
+        for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {
             neo.tick();
         }
     }

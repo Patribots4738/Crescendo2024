@@ -45,6 +45,10 @@ public class SafeSparkMax extends CANSparkMax {
         }
     }
 
+    public int getCANID() {
+        return canID;
+    }
+
     /**
      * Attempt to apply parameter and check if specified parameter is set correctly
      * 
@@ -344,6 +348,10 @@ public class SafeSparkMax extends CANSparkMax {
         return status;
     }
 
+    public REVLibError setP(double value) {
+        return setP(value, 0);
+    }
+
     /**
      * Set integral gain for PIDF controller on Spark
      * 
@@ -357,6 +365,10 @@ public class SafeSparkMax extends CANSparkMax {
             () -> pidController.getI(slot) == value,
             "Set kI failure!");
         return status;
+    }
+
+    public REVLibError setI(double value) {
+        return setI(value, 0);
     }
 
     /**
@@ -374,6 +386,10 @@ public class SafeSparkMax extends CANSparkMax {
         return status;
     }
 
+    public REVLibError setD(double value) {
+        return setD(value, 0);
+    }
+
     /**
      * Set feed-forward gain for PIDF controller on Spark
      * 
@@ -387,6 +403,10 @@ public class SafeSparkMax extends CANSparkMax {
             () -> pidController.getFF(slot) == value,
             "Set kF failure!");
         return status;
+    }
+
+    public REVLibError setFF(double value) {
+        return setFF(value, 0);
     }
 
     /**
@@ -405,6 +425,10 @@ public class SafeSparkMax extends CANSparkMax {
             () -> pidController.getIZone(slot) == value,
             "Set Izone failure!");
         return status;
+    }
+
+    public REVLibError setIZone(double value) {
+        return setIZone(value, 0);
     }
     
     /**
@@ -589,7 +613,8 @@ public class SafeSparkMax extends CANSparkMax {
     public REVLibError changeStatusFrame(StatusFrame frame, int period) {
         REVLibError error = setPeriodicFramePeriod(frame.getFrame(), period);
         // Add a delay to alleviate bus traffic
-        Timer.delay(0.05);
+        if (!FieldConstants.IS_SIMULATION)
+            Timer.delay(0.05);
         return error;
     }
 
