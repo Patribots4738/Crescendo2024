@@ -270,7 +270,8 @@ public class RobotContainer implements Logged {
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut());
 
-        controller.povLeft().onTrue(ledStrip.changeLEDPattern());
+        controller.povLeft()
+            .onTrue(ledStrip.changeLEDsPattern());
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {

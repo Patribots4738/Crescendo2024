@@ -30,10 +30,6 @@ public class LedStrip extends SubsystemBase {
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
-    //public LedStrip() {
-    //    poseSupplier = () -> new Pose2d();
-    //}
-
     public LedStrip(Supplier<Pose2d> poseSupplier) {
         this.poseSupplier = poseSupplier;
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
@@ -63,11 +59,14 @@ public class LedStrip extends SubsystemBase {
     public void periodic() {
         runPattern(currentPatternIndex).schedule();
     }
-    
-    int selectedLED = 0;
-    public Command changeLEDPattern() {
-        return runOnce(() -> selectedLED ++);
+
+    public Command changeLEDsPattern() {
+        return Commands.runOnce(() -> {
+            selectedLED += 1;
+        });
     }
+
+    public int selectedLED = 0;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -157,6 +156,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     private int rainbowOffset = 0;
+
     public Command rainbow() {
         return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
@@ -169,6 +169,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     private int greenNGoldOffset = 0;
+
     public Command greenNGold() {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
@@ -208,6 +209,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     private int allianceOffset = 0;
+
     public Command alliance(BooleanSupplier isRedAlliance) {
         return runOnce(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
@@ -285,7 +287,8 @@ public class LedStrip extends SubsystemBase {
 
     public Command almmondLED() {
         return Commands.run(() -> {
-            setLED(Color.kBlanchedAlmond);});
+            setLED(Color.kBlanchedAlmond);
+        });
     }
 
     public Command blueLED() {
