@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
-        Monologue.setupMonologue(robotContainer, "Robot", false, false);
+        Monologue.setupMonologue(robotContainer, "Robot", false, true);
 
         DataLogManager.start();
         DataLogManager.logNetworkTables(true);
@@ -58,6 +58,7 @@ public class Robot extends TimedRobot {
         DriverStation.silenceJoystickConnectionWarning(true);
         URCL.start(NeoMotorConstants.CAN_ID_MAP);
     }
+
     /**
      * This function is called every 20 ms, no matter the mode. Used for items like
      * diagnostics
@@ -93,6 +94,9 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledExit() {
         robotContainer.onEnabled();
+        // Shut off NetworkTables broadcasting for most logging calls
+        // if we are at competition
+        Monologue.setFileOnly(DriverStation.isFMSAttached());
     }
 
     @Override   
