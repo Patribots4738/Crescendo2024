@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -101,7 +102,7 @@ public final class Constants {
         public static final int SHOOTER_PIVOT_CAN_ID = 13;
 
         public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1;
-        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1 ;
+        public static final double PIVOT_POSITION_CONVERSION_FACTOR = 1;
 
         public static final double SHOOTER_P = 0.01;
         public static final double SHOOTER_I = 0;
@@ -127,8 +128,13 @@ public final class Constants {
         public static final double PIVOT_MIN_OUTPUT = -1;
         public static final double PIVOT_MAX_OUTPUT = 1;
 
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 0;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+
         public static final double PIVOT_MAX_ANGLE_DEGREES = 360.0;
         public static final double PIVOT_REST_ANGLE_DEGREES = 0;
+
+        public static final double SHOOTER_PASS_SECONDS = 2;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
         /**
@@ -163,7 +169,7 @@ public final class Constants {
         public static final int RIGHT_ELEVATOR_CAN_ID = 15;
         public static final int CLAW_CAN_ID = 16;
         public static final double ELEVATOR_DEADBAND = .3;
-        public static final double OUTTAKE_TIME = .2;
+        public static final double OUTTAKE_SECONDS = 1;
         public static final double CLAW_POSITION_MULTIPLIER = 1.83;
 
 
@@ -414,14 +420,13 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int TOP_INTAKE_CAN_ID = 19;
-        public static final int BOTTOM_INTAKE_CAN_ID = 20;
-        public static final int TRIGGER_WHEEL_CAN_ID = 21;
+        public static final int INTAKE_CAN_ID = 19;
+        public static final int TRIGGER_WHEEL_CAN_ID = 20;
 
         // % speeds of the motor
-        public static final double INTAKE_SPEED = 0.5;
-        public static final double OUTTAKE_SPEED = -0.5;
-        public static final double STOP_SPEED = 0;
+        public static final double INTAKE_PERCENT = 30;
+        public static final double OUTTAKE_PERCENT = -30;
+        public static final double STOP_PERCENT = 0;
 
         public static final int INTAKE_FREE_CURRENT_LIMIT_AMPS = 15;
         public static final int INTAKE_STALL_CURRENT_LIMIT_AMPS = 7;
@@ -429,10 +434,10 @@ public final class Constants {
         public static final int HAS_PIECE_CURRENT_THRESHOLD = 20;
 
         // TODO: Add these to the robot
-        public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 0;
-        public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 0;
-        public static final double SHOOTER_TRIGGER_WHEEL_SPEED = 0;
-        public static final double TRAP_TRIGGER_WHEEL_SPEED = 0;
+        public static final int TRIGGER_WHEEL_STALL_CURRENT_LIMIT_AMPS = 7;
+        public static final int TRIGGER_WHEEL_FREE_CURRENT_LIMIT_AMPS = 15;
+        public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = 30;
+        public static final double TRAP_TRIGGER_WHEEL_PERCENT = -30;
         public static final int INTAKE_CURRENT_LIMIT_AMPS = 0;
     }
 
@@ -446,7 +451,8 @@ public final class Constants {
         public static final double ALLOWABLE_ERROR_METERS = Units.inchesToMeters(2);
         public static final double FIELD_WIDTH_METERS = 16.5410515;
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
-        public static final double CHAIN_HEIGHT_METERS = 8.2112312;
+        public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
+        public static final double SPEAKER_HEIGHT_METERS = 2.082813;
 
         public static Optional<Alliance> ALLIANCE = Optional.empty();
 
@@ -536,7 +542,15 @@ public final class Constants {
         public static final int ELEVATOR_INDEX = 2;
         public static final int LEFT_CLIMB_INDEX = 3;
         public static final int RIGHT_CLIMB_INDEX = 4;
+        
+        public static final double PIVOT_OFFSET_X = 0.112;
+        public static final double PIVOT_OFFSET_Z = 0.21;
 
-        public static final Translation2d PIVOT_OFFSET_METERS = new Translation2d(0.112, 0.21);
+    
+        public static final Translation3d PIVOT_OFFSET_METERS = new Translation3d(
+            PIVOT_OFFSET_X,
+            0, 
+            PIVOT_OFFSET_Z);
+        
     }
 }

@@ -5,11 +5,14 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -21,13 +24,14 @@ public class ShooterCalc implements Logged{
     private Shooter shooter;
 
 
-    @Log.NT
+    @Log
     double desiredRSpeed = 0, desiredLSpeed = 0, distance = 0, desiredAngle = 0;
 
-    @Log.NT
+  
+    @Log
     double realAngle = 0, realRSpeed = 0, realLSpeed = 0;
 
-    @Log.NT 
+    @Log 
     boolean atDesiredAngle = false , atDesiredRPM = false;
     
 
@@ -52,9 +56,9 @@ public class ShooterCalc implements Logged{
      */
     public Command prepareFireCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
         return Commands.runOnce(() -> {
-                SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
-
-                log(triplet);
+                SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean());
+                
+                log(triplet);   
         
                 pivot.setAngle(triplet.getAngle());
                 shooter.setSpeed(triplet.getSpeeds());
@@ -77,7 +81,7 @@ public class ShooterCalc implements Logged{
      */
     public Command prepareFireMovingCommand(BooleanSupplier shootAtSpeaker, Supplier<Pose2d> robotPose) {
         return Commands.run(() -> {
-                SpeedAngleTriplet triplet = calculateSpeed(robotPose.get(), shootAtSpeaker.getAsBoolean());
+                SpeedAngleTriplet triplet = calculateSpeedTesting(robotPose.get(), shootAtSpeaker.getAsBoolean());
 
                 log(triplet);
 
@@ -95,8 +99,8 @@ public class ShooterCalc implements Logged{
     }
 
     public void logAngles(SpeedAngleTriplet triplet) {
-        desiredAngle = -triplet.getAngle();
-        realAngle = pivot.getAngle();
+        desiredAngle = triplet.getAngle();
+        realAngle = -pivot.getAngle();
     }
 
     public void logAtDesired() {
@@ -119,7 +123,7 @@ public class ShooterCalc implements Logged{
 	public BooleanSupplier atDesiredAngle() {
 		return () -> (MathUtil.applyDeadband(
 				Math.abs(
-						pivot.getAngle() - desiredAngle),
+						realAngle - desiredAngle),
 				ShooterConstants.PIVOT_DEADBAND) == 0);
 	}
 
@@ -193,6 +197,60 @@ public class ShooterCalc implements Logged{
 
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
+
+    // Gets a SpeedAngleTriplet by interpolating values from a map of already
+    // known required speeds and angles for certain poses
+    public SpeedAngleTriplet calculateSpeedTesting(Pose2d robotPose, boolean shootingAtSpeaker) {
+        // Constants have blue alliance positions at index 0
+        // and red alliance positions at index 1
+        Rotation2d pivotAngle = calculatePivotAngle(robotPose);
+        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
+
+        // Get our position relative to the desired field element
+        if (shootingAtSpeaker) {
+            robotPose = robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
+        } else {
+            robotPose = robotPose.relativeTo(FieldConstants.AMP_POSITIONS[positionIndex]);
+        }
+
+        // Use the distance as our key for interpolation
+        double distanceFeet = Units.metersToFeet(robotPose.getTranslation().getNorm());
+
+        this.distance = robotPose.getX();
+
+        SpeedAngleTriplet tempTriplet = ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
+        SpeedAngleTriplet realTriplet = new SpeedAngleTriplet(
+            tempTriplet.getFirst(), 
+            MathUtil.clamp(pivotAngle.getDegrees(),
+                ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES,
+                ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES));
+        return realTriplet;
+    }
+
+    /**
+     * Calculates the pivot angle based on the robot's pose.
+     * 
+     * @param robotPose The pose of the robot.
+     * @return The calculated pivot angle.
+     */
+    public Rotation2d calculatePivotAngle(Pose2d robotPose) {
+        // Determine the position index based on the alliance color
+        int positionIndex = FieldConstants.IS_BLUE_ALLIANCE() ? 0 : 1;
+
+        // Add the pivot offset to the robot's pose
+        robotPose = robotPose.plus(new Transform2d(NTConstants.PIVOT_OFFSET_X, 0, new Rotation2d()));
+
+        // Calculate the robot's pose relative to the speaker's position
+        robotPose = robotPose.relativeTo(FieldConstants.SPEAKER_POSITIONS[positionIndex]);
+
+        // Calculate the distance in feet from the robot to the speaker
+        double distanceMeters = robotPose.getTranslation().getNorm();
+
+        // Return a new rotation object that represents the pivot angle
+        // The pivot angle is calculated based on the speaker's height and the distance to the speaker
+        return new Rotation2d(distanceMeters, FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z);
+    }
+
 
     public boolean pivotAtDesiredAngle() {
         return atDesiredAngle().getAsBoolean();

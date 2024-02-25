@@ -50,10 +50,10 @@ public class RobotContainer implements Logged {
     private ShooterCalc shooterCalc;
     private PieceControl pieceControl;
     
-    @Log.NT
+    @Log
     public static Pose3d[] components3d = new Pose3d[5];
 
-    @Log.NT
+    @Log
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
     
     public RobotContainer() {
@@ -82,8 +82,8 @@ public class RobotContainer implements Logged {
             triggerWheel,
             elevator,
             claw,
-            shooterCalc,
-            swerve);
+            shooterCalc
+        );
         
         limelight.setDefaultCommand(Commands.run(() -> {
             // Create an "Optional" object that contains the estimated pose of the robot
@@ -131,8 +131,9 @@ public class RobotContainer implements Logged {
         controller.povLeft().onTrue(elevator.toBottomCommand())
         .onTrue(ledStrip.backwardsElevatorGradientLED());
 
-        controller.povRight().onTrue(pieceControl.placeTrapCommand())
-        .onTrue(ledStrip.upwardsElevatorGradientLED());
+        controller.povLeft().onTrue(elevator.toBottomCommand());
+
+        controller.povRight().onTrue(elevator.toTopCommand());
 
         controller.leftBumper()
             .and(controller.rightBumper())
@@ -146,8 +147,10 @@ public class RobotContainer implements Logged {
 
         controller.leftTrigger(OIConstants.OPERATOR_DEADBAND)
             .and(intake.hasGamePieceTrigger().negate())
-            .onTrue(intake.inCommand())
-            .whileTrue(ledStrip.blueLED());
+            .onTrue(pieceControl.intakeToClaw());
+
+        controller.leftTrigger()
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightTrigger(OIConstants.OPERATOR_DEADBAND)
             .onTrue(intake.outCommand())

@@ -11,13 +11,13 @@ public class DriverUI implements Logged {
     
     public DriverUI() {}
     
-    @Log.NT
+    @Log
     public static SendableChooser<PathPlannerTrajectory> autoChooser = new SendableChooser<>();
     
-    @Log.NT
+    @Log
     public static boolean freshCode = true;
 
-    @Log.NT
+    @Log
     public static Field2d field = new Field2d();
 
     public static double currentTimestamp = 0;
