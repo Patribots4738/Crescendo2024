@@ -59,10 +59,10 @@ public class NoteTrajectory extends Command implements Logged {
         z = NTConstants.PIVOT_OFFSET_METERS.getY();
         x0 = NTConstants.PIVOT_OFFSET_METERS.getX();
         y0 = 0;
-        z0 = NTConstants.PIVOT_OFFSET_METERS.getY();
+        z0 = NTConstants.PIVOT_OFFSET_METERS.getZ();
       
         vx0 = Rotation2d.fromDegrees(pivotAngle).getCos() * initialVelocity + initalSpeeds.vxMetersPerSecond;
-        vy0 = initalSpeeds.vyMetersPerSecond;
+        vy0 = initalSpeeds.vyMetersPerSecond - 1;
         vz0 = Rotation2d.fromDegrees(pivotAngle).getSin() * initialVelocity;
       
         ax = 0;
