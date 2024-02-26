@@ -291,6 +291,8 @@ public final class Constants {
 
         public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;
 
+        public static final boolean USE_OBJECT_DETECTION = true;
+
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
             AutoConstants.ROTATION_CORRECTION_I,
