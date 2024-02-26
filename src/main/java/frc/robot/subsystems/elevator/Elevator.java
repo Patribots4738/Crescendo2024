@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase implements Logged {
     public void configMotors() {
         elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
         elevator.setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
-        elevator.setPID(TrapConstants.TRAP_PID);
+        elevator.setPID(TrapConstants.ELEVATOR_PID);
 
         // Change to brake when done testing
         elevator.setCoastMode();
@@ -96,6 +96,6 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public boolean atDesiredPosition() {
-		return MathUtil.applyDeadband(pos - desiredPos, TrapConstants.ELEVATOR_DEADBAND) == 0;
+		return MathUtil.isNear(desiredPos, pos, TrapConstants.ELEVATOR_DEADBAND);
 	}
 }

@@ -1,8 +1,10 @@
 package frc.robot.commands.subsytemHelpers;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.util.GeometryUtil;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,6 +15,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.commands.sim.note.NoteTrajectory;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.calc.ShooterCalc;
+import frc.robot.util.constants.Constants.ShooterConstants;
 import frc.robot.util.constants.SpeedAngleTriplet;
 
 public class ShooterCmds {
@@ -24,32 +27,26 @@ public class ShooterCmds {
     
     public ShooterCalc shooterCalc;
 
-    public ShooterCmds(Shooter shooter, Pivot pivot) {
+    public ShooterCmds(Shooter shooter, Pivot pivot, ShooterCalc shooterCalc) {
         this.pivot = pivot;
         this.shooter = shooter;
-        this.shooterCalc = new ShooterCalc(this.shooter, this.pivot);
+        this.shooterCalc = shooterCalc;
     }
     
     /**
-     * The function prepares a fire command by calculating the speed and angle for
-     * the robot's shooter
-     * based on the robot's pose and whether it should shoot at the speaker.
-     * This should be called with a onTrue
+     * Prepares a command for firing the shooter based on the given shooting pose.
      * 
-     * @param shootAtSpeaker A BooleanSupplier that returns true if the robot should
-     *                       shoot at the
-     *                       speaker, and false otherwise.
-     * @param shootingPose      The `robotPose` parameter represents the supplier of the current pose
-     *                       (position and orientation)
-     *                       of the robot. It is of type `Supplier<Pose2d>`.
-     * @return The method is returning a Command object.
+     * @param shootingPose the supplier of the desired shooting pose
+     * @return the prepared fire command
      */
-    public Command prepareFireCommand(Supplier<Translation2d> shootingPose) {
+    public Command prepareFireCommand(Supplier<Translation2d> shootingPose, BooleanSupplier shouldMirror) {
         return Commands.runEnd(() -> {
                 Translation2d desiredPose = shootingPose.get();
-                if (Robot.isRedAlliance() && Robot.gameMode == GameMode.AUTONOMOUS) {
+
+                if (shouldMirror.getAsBoolean()) {
                     desiredPose = GeometryUtil.flipFieldPosition(desiredPose);
                 }
+
                 desiredTriplet = shooterCalc.calculateTriplet(desiredPose);
 
                 pivot.setAngle(desiredTriplet.getAngle());
@@ -141,8 +138,13 @@ public class ShooterCmds {
     public Command stopAllMotors() {
         return shooter.stop().andThen(pivot.stop());
     }
-
+    /**
+	 * The function is a command that resets the angle of the robot
+	 * to be at the min angle.
+	 * 
+	 * @return The method is returning a Command object.
+	 */
+	public Command angleReset() {
+	    return Commands.runOnce(() -> pivot.setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES));
+	}
 }
-
-
-

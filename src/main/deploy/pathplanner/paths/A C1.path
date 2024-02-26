@@ -85,6 +85,29 @@
           ]
         }
       }
+    },
+    {
+      "name": "ElevatorDown&StopIntake",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "LowerElevator"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "StopIntake"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {

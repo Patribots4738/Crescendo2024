@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -143,8 +144,8 @@ public final class Constants {
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 150;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 20;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 45;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -193,8 +194,8 @@ public final class Constants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = .05;
-        public static final double OUTTAKE_SECONDS = 1;
-        public static final double TRAPPER_POSITION_MULTIPLIER = 1.83;
+        public static final double OUTTAKE_SECONDS = 0.4;
+        public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
 
@@ -202,7 +203,7 @@ public final class Constants {
 
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
 
-        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0, -1, 1);
+        public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(.5, 0, 0, -1, 1);
 
         // TODO: set these values
         public static final double RESET_POS = 0;
@@ -335,12 +336,12 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
-            "S W2 S C1-3 S W3-1 S",
-            "S W3-1 S",
-            "S W2 S C1-4 S",
+            "A W1 A C1-4 S",
             "S C2-5 S",
-            "S W1 A C1-5",
-            "A W1A C1-4 S",
+            "S W1 A C1-5 S",
+            "S W2 S C1-3 S W3-1 S",
+            "S W2 S C1-4 S",
+            "S W3-1 S",
             "S W3-1 S C1-3 S"
         };
     }
@@ -497,8 +498,8 @@ public final class Constants {
             /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
             /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
             /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
-            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
-            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
+            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator"); // Need to ID
+            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");         // Need to ID
             /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
             /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
         }};
@@ -651,14 +652,10 @@ public final class Constants {
             // All relative to the blue origin
             // Blue Speaker
             Pose2d blueSpeaker = new Pose2d(0, 5.547, Rotation2d.fromDegrees(0));
+            Pose2d redSpeaker = GeometryUtil.flipFieldPose(blueSpeaker).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
             add(blueSpeaker);
-
-            // Red Speaker
-            add(GeometryUtil.flipFieldPose(blueSpeaker));
+            add(redSpeaker);
         }};
-
-        public static final double SPEAKER_HEIGHT = 2.08;
-
     
         public static final List<Pose2d> AMP_POSITIONS = new ArrayList<Pose2d>() {{
             // All points are in meters and radians
@@ -703,6 +700,8 @@ public final class Constants {
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
+        public static double BLUE_WING_X = 5.84;
+        public static double RED_WING_X = 10.7;
 
         // need to update
         private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);

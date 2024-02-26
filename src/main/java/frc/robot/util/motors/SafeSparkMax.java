@@ -613,7 +613,8 @@ public class SafeSparkMax extends CANSparkMax {
     public REVLibError changeStatusFrame(StatusFrame frame, int period) {
         REVLibError error = setPeriodicFramePeriod(frame.getFrame(), period);
         // Add a delay to alleviate bus traffic
-        Timer.delay(0.05);
+        if (!FieldConstants.IS_SIMULATION)
+            Timer.delay(0.05);
         return error;
     }
 

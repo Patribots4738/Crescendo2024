@@ -373,11 +373,7 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public Command resetHDC() {
-        return Commands.sequence(
-            Commands.runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians())),
-            Commands.runOnce(() -> AutoConstants.HDC.getXController().reset()),
-            Commands.runOnce(() -> AutoConstants.HDC.getYController().reset())
-        );
+        return Commands.runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians()));
     }
 
     public void reconfigureAutoBuilder() {

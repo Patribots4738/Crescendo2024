@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
-import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
@@ -34,6 +33,7 @@ import frc.robot.subsystems.misc.limelight.Limelight;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
@@ -43,8 +43,10 @@ import frc.robot.util.mod.PatriBoxController;
 import frc.robot.util.motors.Neo;
 import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import monologue.Monologue;
 
 public class RobotContainer implements Logged {
 
@@ -53,25 +55,37 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
+    @IgnoreLogged
     private Swerve swerve;
+    @IgnoreLogged
     private final Intake intake;
-
+    @IgnoreLogged
     private Limelight limelight;
-    private final LedStrip ledStrip;
+    @IgnoreLogged
     private final Climb climb;
-    private Indexer triggerWheel;
+    @IgnoreLogged
     private Pivot pivot;
+    @IgnoreLogged
     private Shooter shooter;
-    private Trapper trapper;
+    @IgnoreLogged
     private Elevator elevator;
-    private ShooterCmds shooterCmds;
-    private PieceControl pieceControl;
-    private ChoreoStorage choreoPathStorage;
-    private PathPlannerStorage pathPlannerStorage;
+    
+    @IgnoreLogged
     private CalibrationControl calibrationControl;
-    private AlignmentCmds alignmentCmds;
-
+    @IgnoreLogged
+    private PathPlannerStorage pathPlannerStorage;
+    @IgnoreLogged
+    private ShooterCalc shooterCalc;
+    @IgnoreLogged
     public static HDCTuner HDCTuner;
+
+    private final LedStrip ledStrip;
+    private Indexer triggerWheel;
+    private Trapper trapper;
+    private ShooterCmds shooterCmds;
+
+    private PieceControl pieceControl;
+    private AlignmentCmds alignmentCmds;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -113,7 +127,8 @@ public class RobotContainer implements Logged {
         Neo.incinerateMotors();
         new NTPIDTuner().schedule();
         
-        shooterCmds = new ShooterCmds(shooter, pivot);
+        shooterCalc = new ShooterCalc(shooter, pivot);
+        shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
 
         alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
 
@@ -143,6 +158,7 @@ public class RobotContainer implements Logged {
         pathPlannerStorage.configureAutoChooser();
         
         configureButtonBindings();
+        configureLoggingPaths();
     }
 
     private void configureButtonBindings() {
@@ -217,7 +233,11 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
+            .onTrue(shooterCmds.angleReset());
+
+        controller.povUp()
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+
         
         controller.povDown().onTrue(climb.toBottomCommand());
         
@@ -225,9 +245,9 @@ public class RobotContainer implements Logged {
             Commands.sequence(
                 swerve.resetHDC(),
                 Commands.either(
-                    alignmentCmds.trapAlignmentCommand(controller::getLeftY), 
+                    alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
-                    climb::hooksUp)));
+                    climb::getHooksUp)));
         
         
         controller.rightTrigger()
@@ -241,7 +261,7 @@ public class RobotContainer implements Logged {
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
-
+                    
         controller.b()
             .onTrue(pieceControl.stopAllMotors());
 
@@ -259,7 +279,8 @@ public class RobotContainer implements Logged {
         controller.rightTrigger().onTrue(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger().onFalse(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         controller.rightTrigger()
-            .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .onTrue(
+                pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
@@ -394,7 +415,6 @@ public class RobotContainer implements Logged {
             System.out.println("Reconfigured HPFC");
         }
     }
-    
 
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
@@ -404,12 +424,14 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
+        NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
         NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
-        NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE));
-        NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE));
-        NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE));
-        NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE));
-        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation));
+        NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
+        NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
         registerPathToPathCommands();
     }
@@ -423,6 +445,23 @@ public class RobotContainer implements Logged {
                 NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
             }
         }
+    }
+
+    private void configureLoggingPaths() {
+        Monologue.logObj(shooterCalc, "/Robot/maths/shooterCalc");
+        Monologue.logObj(calibrationControl, "/Robot/maths/calibrationControl");
+        Monologue.logObj(HDCTuner, "/Robot/maths/HDCTuner");
+
+        Monologue.logObj(swerve, "/Robot/swerve");
+
+        Monologue.logObj(intake, "/Robot/subsystems/intake");
+        Monologue.logObj(climb, "/Robot/subsystems/climb");
+        Monologue.logObj(limelight, "/Robot/subsystems/limelight");
+        Monologue.logObj(shooter, "/Robot/subsystems/shooter");
+        Monologue.logObj(elevator, "/Robot/subsystems/elevator");
+        Monologue.logObj(pivot, "/Robot/subsystems/pivot");
+        
+        Monologue.logObj(pathPlannerStorage, "/Robot/autuwu/auto/pathPlannerStorage");
     }
 
     /**
