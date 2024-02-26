@@ -69,18 +69,6 @@ public class Swerve extends SubsystemBase implements Logged {
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-    @Log
-    SwerveModuleState[] swerveMeasuredStates;
-
-    @Log
-    SwerveModuleState[] swerveDesiredStates;
-
-    @Log
-    Pose3d robotPose3d = new Pose3d();
-
-    @Log
-    Pose2d robotPose2d = new Pose2d();
-
     // The gyro sensor
     private final Pigeon2 gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
 
@@ -131,8 +119,6 @@ public class Swerve extends SubsystemBase implements Logged {
         resetEncoders();
         gyro.setYaw(0);
         setBrakeMode();
-
-        SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
     }
 
     @Override
@@ -147,11 +133,11 @@ public class Swerve extends SubsystemBase implements Logged {
 
         Pose2d currentPose = getPose();
 
-        swerveMeasuredStates = new SwerveModuleState[] {
+        RobotContainer.swerveMeasuredStates = new SwerveModuleState[] {
                 frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
         };
 
-        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(swerveMeasuredStates);
+        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(RobotContainer.swerveMeasuredStates);
 
         if (FieldConstants.IS_SIMULATION) {
             resetOdometry(
@@ -162,21 +148,20 @@ public class Swerve extends SubsystemBase implements Logged {
         }
 
         RobotContainer.field2d.setRobotPose(currentPose);
-        SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
         if ((Double.isNaN(currentPose.getX())
             || Double.isNaN(currentPose.getY())
             || Double.isNaN(currentPose.getRotation().getDegrees())))
         {
             // Something in our pose was NaN...
-            resetOdometry(robotPose2d);
+            resetOdometry(RobotContainer.robotPose2d);
             resetEncoders();
             resetHDC();
         } else {
-            robotPose2d = currentPose;
+            RobotContainer.robotPose2d = currentPose;
         }
 
-        robotPose3d = new Pose3d(
+        RobotContainer.robotPose3d = new Pose3d(
                 new Translation3d(
                         currentPose.getX(),
                         currentPose.getY(),
@@ -276,7 +261,7 @@ public class Swerve extends SubsystemBase implements Logged {
         rearLeft.setDesiredState(desiredStates[2]);
         rearRight.setDesiredState(desiredStates[3]);
 
-        this.swerveDesiredStates = desiredStates;
+        RobotContainer.swerveDesiredStates = desiredStates;
     }
 
     public void resetOdometry(Pose2d pose) {

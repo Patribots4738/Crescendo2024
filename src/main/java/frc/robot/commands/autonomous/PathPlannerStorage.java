@@ -94,7 +94,7 @@ public class PathPlannerStorage implements Logged {
             List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
             PathPlannerStorage.AUTO_PATHS.put(autoName, paths);
         }
-        
+        System.out.println("Configured auto chooser");
         bindListener(getUpdatePathViewerCommand());
     }
 
@@ -113,13 +113,13 @@ public class PathPlannerStorage implements Logged {
     public Command updatePathViewerCommand() {
         return Commands.either(
             Commands.runOnce(() -> {
-                RobotContainer.field2d.getObject("path").setPoses(new ArrayList<>());
-            }),
-            Commands.runOnce(() -> {
                 RobotContainer.field2d.getObject("path")
                     .setPoses(getAutoPoses(getSelectedAutoName()));
             }),
-            () -> Robot.gameMode == GameMode.TELEOP
+            Commands.runOnce(() -> {
+                RobotContainer.field2d.getObject("path").setPoses(new ArrayList<>());
+            }),
+            () -> Robot.gameMode == GameMode.DISABLED
         ).ignoringDisable(true);
     }
 
@@ -332,8 +332,6 @@ public class PathPlannerStorage implements Logged {
         }
     }
 
-    @Log
-    Translation2d activePathEndPose = new Translation2d();
     public Translation2d getNextShotTranslation() {
         double[] activeTraj = NetworkTableInstance.getDefault().getTable("PathPlanner").getEntry("activePath").getDoubleArray(new double[0]);
         
@@ -342,9 +340,8 @@ public class PathPlannerStorage implements Logged {
         int activeTrajLength = activeTraj.length;
         double endX = activeTraj[activeTrajLength - 3];
         double endY = activeTraj[activeTrajLength - 2];
-        Translation2d endPose = new Translation2d(endX, endY);
+        Translation2d endTranslation = new Translation2d(endX, endY);
 
-        this.activePathEndPose = endPose;
-        return endPose;
+        return endTranslation;
     }
 }
