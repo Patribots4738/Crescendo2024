@@ -166,6 +166,9 @@ public class Limelight extends SubsystemBase implements Logged{
 
     // TODO: test this logic in real life before running dynamic auto
     public Pose2d getNotePose2d() {
+        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
+            LimelightHelpers.setPipelineIndex(limelightName, 1);
+        }
         if (noteInVision()) {
             Translation2d noteTranslation = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d().getTranslation();
             Pose2d notePose = new Pose2d(noteTranslation, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
@@ -175,7 +178,6 @@ public class Limelight extends SubsystemBase implements Logged{
     }
 
     public boolean noteInVision() {
-        LimelightHelpers.setPipelineIndex(limelightName, 1);
         Results results = getResults();
         return (
             results.valid && (!(results.botpose[0] == 0 && results.botpose[1] == 0))
