@@ -16,6 +16,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.calc.AlignmentCalc;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.testing.PatritionalCommand;
 
 public class AlignmentCmds {
     
@@ -146,7 +147,7 @@ public class AlignmentCmds {
      */
     public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return
-            Commands.either(
+            new PatritionalCommand(
                 chainRotationalAlignment(driverX, driverY),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds),
                 climb::getHooksUp);

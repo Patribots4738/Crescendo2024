@@ -46,7 +46,9 @@ import frc.robot.util.testing.HDCTuner;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import frc.robot.util.testing.PatritionalCommand;
 import monologue.Monologue;
+
 
 public class RobotContainer implements Logged {
 
@@ -244,7 +246,7 @@ public class RobotContainer implements Logged {
         controller.a().whileTrue(
             Commands.sequence(
                 swerve.resetHDC(),
-                Commands.either(
+                new PatritionalCommand(
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
                     climb::getHooksUp)));
@@ -257,7 +259,7 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(
                 Commands.sequence(
                     swerve.resetHDC(),
-                    Commands.either(
+                    new PatritionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
