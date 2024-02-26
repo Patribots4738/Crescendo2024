@@ -92,11 +92,12 @@ public class AlignmentCalc {
     }
 
     /**
-     * Calculates the rotational speeds to align the robot to the source of the field.
+     * Calculates the rotational speeds to align the robot to the source of the
+     * field.
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
-     * @return     the rotational speeds to align the robot to the source
+     * @return the rotational speeds to align the robot to the source
      */
     public ChassisSpeeds getSourceRotationalSpeeds(double driverX, double driverY) {
         Pose2d source = FieldConstants.GET_SOURCE_POSITION();
@@ -121,16 +122,31 @@ public class AlignmentCalc {
     /**
      * Calculates the rotational speeds to align the robot to the speaker.
      * 
-     * @param driverX   the driver's x input
-     * @param driverY   the driver's y input
+     * @param driverX     the driver's x input
+     * @param driverY     the driver's y input
      * @param shooterCmds the shooter commands
-     * @return        the rotational speeds to align the robot to the speaker
+     * @return the rotational speeds to align the robot to the speaker
      */
     public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return new ChassisSpeeds(
             driverY * (Robot.isRedAlliance() ? -1 : 1),
             driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(shooterCmds.shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getFieldRelativeVelocity())));
+            getAlignmentSpeeds(shooterCmds.shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity())));
+    }
+
+    /**
+     * Calculates the rotational speeds to align the robot to the speaker.
+     * 
+     * @param driverX      the driver's x input
+     * @param driverY      the driver's y input
+     * @param desiredAngle the desired angle
+     * @return the rotational speeds to align the robot to the speaker
+     */
+    public ChassisSpeeds getRotationalSpeeds(double driverX, double driverY, Rotation2d desiredAngle) {
+        return new ChassisSpeeds(
+            driverY * (Robot.isRedAlliance() ? -1 : 1),
+            driverX * (Robot.isRedAlliance() ? -1 : 1),
+            getAlignmentSpeeds(desiredAngle));
     }
 
     /**
