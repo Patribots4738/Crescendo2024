@@ -2,20 +2,24 @@ package frc.robot.commands.autonomous;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.constants.Constants.AutoConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.mod.PatriSendableChooser;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.misc.limelight.Limelight;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -24,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 /**
  * This file represents all of the auto paths that we will have
@@ -39,6 +44,16 @@ public class PathPlannerStorage implements Logged {
     private PatriSendableChooser<Command> autoChooser = new PatriSendableChooser<>();
 
     public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>();
+
+    public static List<Pose2d> NOTE_POSES = FieldConstants.GET_CENTERLINE_NOTES();
+
+
+    public static final PathConstraints PATH_CONSTRAINTS = 
+        new PathConstraints(
+            AutoConstants.MAX_SPEED_METERS_PER_SECOND, 
+            AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, 
+            AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 
+            AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
 
     public static final HashMap<String, List<PathPlannerPath>> AUTO_PATHS = new HashMap<String, List<PathPlannerPath>>();
     /**
@@ -115,6 +130,13 @@ public class PathPlannerStorage implements Logged {
     }
 
     /**
+     * IF USING OBJ DETECTION:
+     * Given a starting note and an ending note, this method will generate a command
+     * that uses the object detection on our limelight to 
+     * If we see a piece, grab it and go to the nearest shooting position.
+     * If we don't see a piece we try to look for the next one.
+     * 
+     * ELSE:
      * Given a starting note and an ending note, this method will generate a command
      * that uses the booleanSupplier hasPieceSupplier to determine whether or not the
      * robot has a piece. 
@@ -123,50 +145,165 @@ public class PathPlannerStorage implements Logged {
      * 
      * @param startingNote The note to start at (1-5)
      * @param endingNote   The note to end at (1-5)
-     * @param goingDown  If true, increment from startingNote to endingNote. If false, decrement from startingNote to endingNote.
-     * @return             The command that will execute the logic for the given notes
+     * @param swerve  The swerve subsystem to use.
+     * @param limelight The limelight subsystem to use
+     * @return  The command that will execute the logic for the given notes
      */
-    public Command generateCenterLogic(int startingNote, int endingNote) {
+    public Command generateCenterLogic(int startingNote, int endingNote, Swerve swerve, Limelight limelight) {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         boolean goingDown = startingNote < endingNote;
 
         int increment = goingDown ? 1 : -1;
 
         for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
-            String shootingLocation = 
+
+            if (AutoConstants.USE_OBJECT_DETECTION) {
+
+                // Actual index to access from note pose list
+                int currentIndex = i - 1;
+
+                // If we are not on last note try to get it, shoot it, and then go towards the next one
+                // If we are on the last note, just try to go and shoot it
+                if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
+                    // Grab note, go to shoot it, and then go towards the next if we see the piece
+                    // Otherwise skip to the next one in the range and repeat
+                    commandGroup.addCommands(
+                        Commands.defer(
+                            () -> 
+                                Commands.either(
+                                    goToNote(swerve, limelight)
+                                        .andThen(pathfindToShoot(swerve)
+                                        .andThen(pathfindToNextNote(() -> currentIndex + (goingDown ? 1 : -1)))), 
+                                    pathfindToNextNote(() -> currentIndex + (goingDown ? 1 : -1)), 
+                                    limelight::noteInVision),
+                            commandGroup.getRequirements()));
+                } else {
+                    commandGroup.addCommands(
+                        Commands.defer(
+                            () -> 
+                                Commands.sequence(
+                                    goToNote(swerve, limelight),
+                                    pathfindToShoot(swerve)
+                                ).onlyIf(limelight::noteInVision), 
+                            commandGroup.getRequirements()));
+                }
+                
+            } else {
+
+                String shootingLocation = 
                 (i < 3) 
                     ? "L" 
                     : (i == 3) 
                         ? "M" 
                         : "R";
 
-            PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
+                PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
+                
+                if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
+                    commandGroup.addCommands(
+                        Commands.defer(() ->  AutoBuilder.followPath(shootNote), commandGroup.getRequirements())
+                    );
+                    break;
+                }
+
+                PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
+                PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
             
-            if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
+                Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote).andThen(AutoBuilder.followPath(getNoteAfterShot));
+                // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
+                Command skipNoteCommand = AutoBuilder.followPath(skipNote);
+
                 commandGroup.addCommands(
-                    Commands.defer(() ->  AutoBuilder.followPath(shootNote), commandGroup.getRequirements())
+                    Commands.defer(() -> 
+                        Commands.either(
+                            shootAndMoveToNextNote,
+                            skipNoteCommand,
+                            hasPieceSupplier), 
+                        commandGroup.getRequirements())
                 );
-                break;
             }
-
-            PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
-            PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
             
-            Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote).andThen(AutoBuilder.followPath(getNoteAfterShot));
-            // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
-            Command skipNoteCommand = AutoBuilder.followPath(skipNote);
-
-            commandGroup.addCommands(
-                Commands.defer(() -> 
-                    Commands.either(
-                        shootAndMoveToNextNote,
-                        skipNoteCommand,
-                        hasPieceSupplier), 
-                    commandGroup.getRequirements())
-            );
         }
 
         return commandGroup;
+    }
+
+    /**
+     * Uses Pathplanner's pathfinding algorithm to go to the closest shooting position 
+     * from the swerve subsystem's curent position
+     * 
+     * @param swerve  The swerve subsystem to use.
+     * @return  The command that will pathfind to the shooting pose
+     */
+    public Command pathfindToShoot(Swerve swerve) {
+        return 
+            AutoBuilder.pathfindToPose(
+                PoseCalculations.getClosestShootingPose(swerve.getPose()), 
+                PATH_CONSTRAINTS,
+                0);
+    }
+
+    /**
+     * Uses Pathplanner's pathfinding algorithm to go to the next note in our centerline logic 
+     * so that we can see if it is there
+     * 
+     * @param index The supplier for the next note index so that we know which
+     *              note to pathfind to next
+     * @return  The command that will pathfind towards the next note
+     */
+    public Command pathfindToNextNote(IntSupplier index) {
+        return 
+            AutoBuilder.pathfindToPose(
+                new Pose2d(
+                    NOTE_POSES.get(index.getAsInt()).getX() + 
+                        (Robot.isRedAlliance() 
+                        ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
+                        : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
+                    NOTE_POSES.get(index.getAsInt()).getY(), 
+                    Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)), 
+                PATH_CONSTRAINTS,
+                0);
+    }
+
+    /**
+     * Uses a custom chase command to drive towards a predetermined note position
+     * Primarily for testing use without real notes
+     * 
+     * @param swerve  The swerve subsystem to use.
+     * @param currentIndex The current index of the note so that we can get a predetermined note
+     *                      pose without our vision
+     * @return  The command that drives to a preset note position
+     */
+    public Command goToNote(Swerve swerve, IntSupplier currentIndex) {
+        return 
+            Commands.parallel(
+                swerve.updateChasePose(
+                    () -> 
+                        new Pose2d(
+                            NOTE_POSES.get(currentIndex.getAsInt()).getTranslation(),
+                            Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)))
+                    .repeatedly().until(swerve::atHDCPose),
+                swerve.getChaseCommand());  
+    }
+
+    /**
+     * Uses a custom chase command to drive towards a dynamically changing note pose
+     * Updates the note pose with our limelight repeatedly until we reach it
+     * 
+     * @param swerve  The swerve subsystem to use.
+     * @param limelight The limelight subsystem to use
+     * @return  The command that holonomically drives to a note position gathered from vision
+     */
+    public Command goToNote(Swerve swerve, Limelight limelight) {
+        return 
+            Commands.parallel(
+                swerve.updateChasePose(
+                    () -> 
+                        new Pose2d(
+                            limelight.getNotePose2d().getTranslation(), 
+                            Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))
+                ).repeatedly().until(() -> swerve.atHDCPose() || !limelight.noteInVision()),
+                swerve.getChaseCommand());  
     }
 
     public Pose2d getPathEndPose(PathPlannerPath path) {
