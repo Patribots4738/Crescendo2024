@@ -184,26 +184,6 @@ public class RobotContainer implements Logged {
         configureCalibrationBindings(operator);
     }
     
-    private void configureOperatorBindings(PatriBoxController controller) {
-        controller.povUp()
-            .onTrue(elevator.toTopCommand());
-        
-        controller.povDown()
-            .onTrue(elevator.toBottomCommand());
-
-        controller.leftBumper()
-            .onTrue(pieceControl.toggleIn());
-
-        controller.rightBumper()
-            .onTrue(pieceControl.toggleOut());
-
-        controller.x()
-            .onTrue(pieceControl.setShooterModeCommand(true));
-
-        controller.b()
-            .onTrue(pieceControl.setShooterModeCommand(false));
-    }
-    
     private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
@@ -275,6 +255,26 @@ public class RobotContainer implements Logged {
 
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut());
+    }
+
+    private void configureOperatorBindings(PatriBoxController controller) {
+        controller.povUp()
+            .onTrue(elevator.toTopCommand());
+        
+        controller.povDown()
+            .onTrue(elevator.toBottomCommand());
+
+        controller.leftBumper()
+            .onTrue(pieceControl.toggleIn());
+
+        controller.rightBumper()
+            .onTrue(pieceControl.toggleOut());
+
+        controller.x()
+            .onTrue(pieceControl.setShooterModeCommand(true));
+
+        controller.b()
+            .onTrue(pieceControl.setShooterModeCommand(false));
     }
     
     private void configureSimulationBindings(PatriBoxController controller) {
