@@ -405,17 +405,18 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public boolean atDesiredPoseAuto() {
         // More lenient on x axis, less lenient on y axis and rotation
+        Pose2d currentPose = getPose();
 		return 
 			MathUtil.isNear(
-                getPose().getX(), 
+                currentPose.getX(), 
                 desiredHDCPose.getX(), 
-                AutoConstants.AUTO_POSITION_DEADBAND_METERS_X) &&
-			MathUtil.isNear(
-                getPose().getY(), 
+                AutoConstants.AUTO_POSITION_DEADBAND_METERS_X)
+			&& MathUtil.isNear(
+                currentPose.getY(), 
                 desiredHDCPose.getY(), 
-                AutoConstants.AUTO_POSITION_DEADBAND_METERS_Y) &&
-            MathUtil.isNear(
-                getPose().getRotation().getRadians(), 
+                AutoConstants.AUTO_POSITION_DEADBAND_METERS_Y)
+            && MathUtil.isNear(
+                currentPose.getRotation().getRadians(), 
                 desiredHDCPose.getRotation().getRadians(), 
                 AutoConstants.AUTO_POSITION_DEADBAND_RADS);
     }
