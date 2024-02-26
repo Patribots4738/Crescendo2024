@@ -17,6 +17,7 @@ Attached to this repository is a poject called [Crescendo 2024](<https://github.
   - **In Progress** -> Issues that are currently being worked on by a programmer.
   - **In Review** -> Issues where the assigned programmer has requested for revision by collegues.
   - **Done** -> Resolved issues with corresponding branches which have merged into our master branch called [`main`](https://github.com/Patribots4738/Crescendo2024/tree/main/src/main).
+
 We also love [drawing boards](<https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=5486,-1359,3403,1540&page=page:9NTiPVa29oqzjElya5D6n>)! :D
     
 We are a team of students, for students, and we are proud to be a part of the _FIRST&reg;_ community.
@@ -37,12 +38,14 @@ ___
   - LED lights that tell drive team whether or not the robot is in the right place to start autonomous and makes the robot look pretty!
 
 ### Autonomous
+  #### LED Position Indicator (LPI)
+  We have a command callled LPI that runs when the robot is turned on & disabled. This command was created to aid the technicion in positioning the robot in the starting zone by displaying various LED patterns to convey the distance from the desired starting position & the percentage of error of the robots rotation. This allows us to oriente the robot with ease to eliminate the need of aligning to a field object such as the subwoofer, therefore giving us the liberty to start the game anywhere in the starting zone. Please view the section regarding major class functions below if you like to learn more.
+  [LPI Concept Drawing Board](<>)
+  
   #### Path Generation
   We use PathPlanner to construct a modular autonomous. In PathPlanner, we use waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths togethor to make one predetermined autonomous. Using note detection & logic, this also allows us to make a modular autonomous path that can prevent us from going to a note position that has no note detected.
-  [Drawing Board](<>)
+  [Path Generation Drawing Board](<>)
 
-  #### LED Position Indicator (LPI)
-  We have a command callled LPI which 
 
 ### Teleoperated
 
