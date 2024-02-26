@@ -222,7 +222,7 @@ public class PathPlannerStorage implements Logged {
                                     .andThen(pathfindToShoot(swerve)
                                     .andThen(pathfindToNextNote(() -> currentIndex + (goingDown ? 1 : -1)))), 
                                 pathfindToNextNote(() -> currentIndex + (goingDown ? 1 : -1)), 
-                                limelightHasNote(limelight)),
+                                limelight::noteInVision),
                         commandGroup.getRequirements()));
             } else {
                 commandGroup.addCommands(
@@ -231,7 +231,7 @@ public class PathPlannerStorage implements Logged {
                             Commands.sequence(
                                 goToNote(swerve, limelight),
                                 pathfindToShoot(swerve)
-                            ).onlyIf(limelightHasNote(limelight)), 
+                            ).onlyIf(limelight::noteInVision), 
                         commandGroup.getRequirements()));
             }
             
@@ -272,7 +272,7 @@ public class PathPlannerStorage implements Logged {
                         ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
                         : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
                     NOTE_POSES.get(index.getAsInt()).getY(), 
-                    new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI)), 
+                    Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)), 
                 PATH_CONSTRAINTS,
                 0);
     }
@@ -293,8 +293,8 @@ public class PathPlannerStorage implements Logged {
                     () -> 
                         new Pose2d(
                             NOTE_POSES.get(currentIndex.getAsInt()).getTranslation(),
-                            new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI)))
-                    .repeatedly().until(swerve::atDesiredPoseAuto),
+                            Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)))
+                    .repeatedly().until(swerve::atHDCPose),
                 swerve.getChaseCommand());  
     }
 
@@ -313,14 +313,9 @@ public class PathPlannerStorage implements Logged {
                     () -> 
                         new Pose2d(
                             limelight.getNotePose2d().getTranslation(), 
-                            new Rotation2d(Robot.isRedAlliance() ? 0 : Math.PI))
-                ).repeatedly().until(() -> swerve.atDesiredPoseAuto() || !limelightHasNote(limelight).getAsBoolean()),
+                            Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))
+                ).repeatedly().until(() -> swerve.atHDCPose() || !limelight.noteInVision()),
                 swerve.getChaseCommand());  
-    }
-
-    // Returns true if the limelight subsystem can see a note
-    public BooleanSupplier limelightHasNote(Limelight limelight) {
-        return limelight::noteInVision;
     }
 
     public Pose2d getPathEndPose(PathPlannerPath path) {

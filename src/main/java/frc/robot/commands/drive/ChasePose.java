@@ -52,7 +52,7 @@ public class ChasePose extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return swerve.atDesiredPoseAuto();
+        return swerve.atHDCPose();
     }
 
     public static void updateDesiredPose(Pose2d newPose) {

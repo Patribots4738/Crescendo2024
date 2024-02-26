@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.ejml.simple.AutomaticSimpleMatrixConvert;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -403,22 +405,21 @@ public class Swerve extends SubsystemBase implements Logged {
                 this);
     }
 
-    public boolean atDesiredPoseAuto() {
+    // Used for note pickup in auto
+    // Because of the fact that we do not have to be perfectly 
+    // on top of a note to intake it, the tolerance is fairly lenient
+    public boolean atPose(Pose2d position) {
         // More lenient on x axis, less lenient on y axis and rotation
         Pose2d currentPose = getPose();
-		return 
-			MathUtil.isNear(
-                currentPose.getX(), 
-                desiredHDCPose.getX(), 
-                AutoConstants.AUTO_POSITION_DEADBAND_METERS_X)
-			&& MathUtil.isNear(
-                currentPose.getY(), 
-                desiredHDCPose.getY(), 
-                AutoConstants.AUTO_POSITION_DEADBAND_METERS_Y)
-            && MathUtil.isNear(
-                currentPose.getRotation().getRadians(), 
-                desiredHDCPose.getRotation().getRadians(), 
-                AutoConstants.AUTO_POSITION_DEADBAND_RADS);
+        double angleDiff = currentPose.getRotation().minus(position.getRotation()).getRadians();
+		double distance = currentPose.relativeTo(position).getTranslation().getNorm();
+        return 
+            MathUtil.isNear(0, distance, AutoConstants.AUTO_POSITION_TOLERANCE_METERS)
+            && MathUtil.isNear(0, angleDiff, AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
+    }
+
+    public boolean atHDCPose() {
+        return atPose(desiredHDCPose);
     }
 
 }

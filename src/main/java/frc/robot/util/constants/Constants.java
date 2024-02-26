@@ -262,9 +262,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
 
-        public static final double AUTO_POSITION_DEADBAND_METERS_X = 0.3;
-        public static final double AUTO_POSITION_DEADBAND_METERS_Y = 0.1;
-        public static final double AUTO_POSITION_DEADBAND_RADS = 0.2;
+        public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
+        public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
 
         /*
          * XY:
@@ -433,6 +432,8 @@ public final class Constants {
         public static final double DRIVER_DEADBAND = 0.15;
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
+
+        public static final double ALIGNMENT_DEADBAND = 0.2;
 
         // See https://www.desmos.com/calculator/e07raajzh5
         // And
@@ -721,9 +722,9 @@ public final class Constants {
         private static double SPIKE_SEPARATION_Y = Units.inchesToMeters(57);
         private static double NOTE_Z = Units.inchesToMeters(2);
 
-        public static Translation3d[] CENTERLINE_TRANSLATIONS = new Translation3d[5];
-        public static Translation3d[] SPIKE_TRANSLATIONS_BLUE = new Translation3d[3];
-        public static Translation3d[] SPIKE_TRANSLATIONS_RED = new Translation3d[3];
+        private static Translation3d[] CENTERLINE_TRANSLATIONS = new Translation3d[5];
+        private static Translation3d[] SPIKE_TRANSLATIONS_BLUE = new Translation3d[3];
+        private static Translation3d[] SPIKE_TRANSLATIONS_RED = new Translation3d[3];
         public static Translation3d[] NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
 
         static {
