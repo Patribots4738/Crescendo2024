@@ -5,10 +5,8 @@ import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -28,18 +26,17 @@ public class LedStrip extends SubsystemBase {
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
-    public LedStrip(Supplier<Pose2d> poseSupplier) {
-        //this.poseSupplier = poseSupplier;
+    public LedStrip() {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
-        ledBuffer = new AddressableLEDBuffer(LEDConstants.PWM_PORT);
+        ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
         LEDConstants.LED_COUNT = ledBuffer.getLength();
 
         led.setLength(ledBuffer.getLength());
 
         led.setData(ledBuffer);
         led.start();
-
-        configureLED();
+        setLED(Color.kBlack);
+        led.setData(ledBuffer);
     }
 
     public AddressableLEDBuffer getBuffer() {
@@ -49,19 +46,17 @@ public class LedStrip extends SubsystemBase {
     @Override
     public void periodic() {
         runPattern(currentPatternIndex).schedule();
+        led.setData(ledBuffer);
     }
 
     public Command changeLEDsPattern() {
         return Commands.runOnce(() -> {
-            if (selectedLED > 7) {
-                selectedLED = 0;
-            } else {
-                selectedLED += 1;
-            }
+            selectedLED += 1;
+            selectedLED %= 8;
         });
     }
 
-    public int selectedLED = 0;
+    public int selectedLED = 5;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -69,12 +64,12 @@ public class LedStrip extends SubsystemBase {
             case (1) -> greenNGold();
             case (2) -> circus();
             case (3) -> loading();
-            case (5) -> alliance(() -> Robot.isRedAlliance());
+            case (5) -> alliance(Robot::isRedAlliance);
             case (6) -> flash();
             case (7) -> rainbow();
             default -> turnOff();
         };
-        return selectedPattern;
+        return selectedPattern.ignoringDisable(true);
     }
 
     public Command setCurrentPattern(int index) {
@@ -94,11 +89,6 @@ public class LedStrip extends SubsystemBase {
         return () -> currentPatternIndex;
     }
 
-    private Command configureLED() {
-        return runOnce(() -> {
-        });
-    }
-
     public void setLED(int startIndex, int endIndex, Color color) {
         for (int i = startIndex; i < endIndex; i++) {
             ledBuffer.setLED(i, color);
@@ -106,7 +96,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     public void setLED(int index, Color color) {
-        ledBuffer.setLED(index, color);
+        setLED(index, index+1, color);
     }
 
     public void setLED(Pair<Integer, Integer> range, Color color) {
@@ -133,8 +123,8 @@ public class LedStrip extends SubsystemBase {
      */
     public void setLEDGradient(Color firstColor, Color secondColor, int startIndex, int endIndex) {
         for (int i = startIndex; i < endIndex; i++) {
-            double ratio = (i - startIndex) / (endIndex - startIndex);
-            ledBuffer.setLED(i, sampleGradient(firstColor, secondColor, ratio));
+            double ratio = (double) (i - startIndex) / (double) (endIndex - startIndex);
+            setLED(i, sampleGradient(firstColor, secondColor, ratio));
         }
     }
 
@@ -149,43 +139,44 @@ public class LedStrip extends SubsystemBase {
         return runOnce(() -> setLED(Color.kBlack));
     }
 
-    private int rainbowOffset = 0;
+    private double rainbowOffset = 0;
 
     public Command rainbow() {
         return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                int hue = (this.rainbowOffset + (i * 180 / ledBuffer.getLength())) % 180;
-                setLED(i, Color.fromHSV(hue / 2, 255, 255));
+                int hue = (int) (this.rainbowOffset + (i * 180 / ledBuffer.getLength())) % 180;
+                setLED(i, Color.fromHSV(hue, 255, 255));
             }
-            this.rainbowOffset += 3;
+            this.rainbowOffset += 2;
             this.rainbowOffset %= 180;
         });
     }
 
-    private int greenNGoldOffset = 0;
+    private double greenNGoldOffset = 1;
 
     public Command greenNGold() {
-        return runOnce(() -> {
+        return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final int hue = 135 + (int) (15 * Math.sin(Math.PI * ((i + this.greenNGoldOffset * ledBuffer.getLength()) / ledBuffer.getLength())));
-                setLED(i, Color.fromHSV(hue/2, 255, 255));
+                int hue = 70 + (int) (50 * Math.sin((10*i + (this.greenNGoldOffset * (double) ledBuffer.getLength())) / (double) ledBuffer.getLength()));
+                setLED(i, Color.fromHSV(hue/2, 255, 255));  
             }
-            this.greenNGoldOffset += 1;
-            this.greenNGoldOffset %= 10;
+            this.greenNGoldOffset += .075;
+            this.greenNGoldOffset %= 6.28;
         });
     }
 
     public Command circus() {
-        return runOnce(() -> {
+        return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = (i % 2 == 0) ? Color.kFirstRed : Color.kWhite;
+                final Color color = ((i + greenNGoldOffset) % 2 == 0) ? Color.kRed : Color.kWhite;
                 setLED(i, color);
             }
+            greenNGoldOffset++;
         });
     }
 
     public Command loading() {
-        return runOnce(() -> {
+        return run(() -> {
             for (int i = 0; i < 2 && i > 8; i++) {
                 final Color color = (i < 2 && i > 8) ? Color.kFirstBlue : Color.kBlack;
                 setLED(i, color);
@@ -194,32 +185,27 @@ public class LedStrip extends SubsystemBase {
     }
 
     public Command flash() {
-        return runOnce(() -> {
+        return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = (i % 2 == 0) ? Color.kOrange : Color.kBlack;
+                final Color color = (i + greenNGoldOffset % 2 == 0) ? Color.kOrange : Color.kBlack;
                 setLED(i, color);
             }
+            greenNGoldOffset++;
         });
     }
 
-    private int allianceOffset = 0;
+    private double allianceOffset = 0;
 
     public Command alliance(BooleanSupplier isRedAlliance) {
-        return runOnce(() -> {
+        return run(() -> {
+            boolean isRed = isRedAlliance.getAsBoolean();
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final int hue = 135 + (int) 
-                    (15 * 
-                        Math.sin(
-                            Math.PI 
-                            * ((i + this.allianceOffset 
-                                * ledBuffer.getLength()) 
-                            / ledBuffer.getLength())
-                        )
-                    );
-                setLED(i, Color.fromHSV(hue/2, 255, 255));
+                int saturation = MathUtil.clamp((int) (500*Math.abs(Math.sin((i+50.0*allianceOffset)/50.0))),0,255);
+                int hue = isRed ? 0 : 227;
+                setLED(i, Color.fromHSV(hue/2, saturation, 255));
             }
-            this.allianceOffset += 1;
-            this.allianceOffset %= 10;
+            this.allianceOffset += .025;
+            this.allianceOffset %= 6.28;
         });
     }
     

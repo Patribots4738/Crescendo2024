@@ -427,7 +427,7 @@ public final class Constants {
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
 
-        // See https://www.desmos.com/calculator/e07raajzh5
+        // See https://www.desmos.csafeom/calculator/e07raajzh5
         // And
         // https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
@@ -435,8 +435,8 @@ public final class Constants {
     }
 
     public static final class LEDConstants {
-        public static final int PWM_PORT = 9;
-        public static int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
+        public static final int PWM_PORT = 0;
+        public static int LED_COUNT = 300;
 
         public static final int ELEVATOR_LEFT_START_INDEX = 10;
         public static final int ELEVATOR_LEFT_END_INDEX = 19;

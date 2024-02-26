@@ -24,11 +24,11 @@ public class SafeSparkMax extends CANSparkMax {
     protected final boolean useAbsoluteEncoder;
     SparkPIDController pidController = getPIDController();
 
-    private final int MAX_ATTEMPTS = 20;
+    private final int MAX_ATTEMPTS = 0;
     private final int MEASUREMENT_PERIOD = 16;
     private final int AVERAGE_DEPTH = 2;
-    private final double BURN_FLASH_WAIT_TIME = 0.5;
-    private final double APPLY_PARAMETER_WAIT_TIME = 0.1;
+    private final double BURN_FLASH_WAIT_TIME = 0;
+    private final double APPLY_PARAMETER_WAIT_TIME = 0;
 
     public SafeSparkMax(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
         super(canID, motorType);
