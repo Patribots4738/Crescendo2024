@@ -219,7 +219,7 @@ public class RobotContainer implements Logged {
         
         controller.a().whileTrue(
             Commands.sequence(
-                swerve.resetHDC(),
+                swerve.resetHDCCommand(),
                 new PatritionalCommand(
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
@@ -231,7 +231,7 @@ public class RobotContainer implements Logged {
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
-                    swerve.resetHDC(),
+                    swerve.resetHDCCommand(),
                     new PatritionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
@@ -426,7 +426,7 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j, swerve, limelight));
             }
         }
     }

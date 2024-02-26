@@ -259,10 +259,13 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 7.20;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 6.08;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
+
+        public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
+        public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
 
         /*
          * XY:
@@ -281,12 +284,16 @@ public final class Constants {
 
         private static final PIDController XY_PID = new PIDController(
                 AutoConstants.XY_CORRECTION_P,
-                AutoConstants.XY_CORRECTION_I,
+                0,
                 AutoConstants.XY_CORRECTION_D);
 
         public static final double ROTATION_CORRECTION_P = .8514;
         public static final double ROTATION_CORRECTION_I = 1;
         public static final double ROTATION_CORRECTION_D = 0;
+
+        public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;
+
+        public static final boolean USE_OBJECT_DETECTION = true;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
@@ -339,10 +346,11 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "A W1 A C1-4 S",
-            "S C2-5 S",
             "S W1 A C1-5 S",
             "S W2 S C1-3 S W3-1 S",
             "S W2 S C1-4 S",
+            "S C1-5 S",
+            "S W1 A C1-5 S",
             "S W3-1 S",
             "S W3-1 S C1-3 S"
         };
@@ -428,6 +436,8 @@ public final class Constants {
         public static final double DRIVER_DEADBAND = 0.15;
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
+
+        public static final double ALIGNMENT_DEADBAND = 0.2;
 
         // See https://www.desmos.com/calculator/e07raajzh5
         // And
@@ -568,6 +578,8 @@ public final class Constants {
 
         public static boolean IS_SIMULATION = Robot.isSimulation();
         public static final int CENTER_NOTE_COUNT = 5;
+
+        public static final Pose2d BLUE_ORIGIN = new Pose2d(0, 0, new Rotation2d());
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
@@ -734,9 +746,44 @@ public final class Constants {
         }
 
         public static final Translation2d L_POSE = new Translation2d(5.11,6.23);
-        public static final Translation2d R_POSE = GET_SPEAKER_TRANSLATION();
+        public static final Translation2d R_POSE = new Translation2d(5.88, 1.84);
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
+
+        public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
+            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromDegrees(151.68));
+            Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
+            //Blue
+            add(L_POSE2D);
+            add(R_POSE2D);
+            add(M_POSE2D);
+            add(W3_POSE2D);
+            //Red
+            add(GeometryUtil.flipFieldPose(L_POSE2D));
+            add(GeometryUtil.flipFieldPose(R_POSE2D));
+            add(GeometryUtil.flipFieldPose(M_POSE2D));
+            add(GeometryUtil.flipFieldPose(W3_POSE2D));
+        }};
+
+        public static List<Pose2d> GET_SHOOTING_POSITIONS() {
+            int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;
+            return SHOOTING_POSITIONS.subList(startingIndex, startingIndex + 4);
+        }
+
+        public static List<Pose2d> GET_CENTERLINE_NOTES() {
+            List<Pose2d> notePoses = new ArrayList<Pose2d>();
+            for (int i = CENTERLINE_TRANSLATIONS.length - 1; i >= 0; i--) {
+                notePoses.add(
+                    new Pose2d(
+                        CENTERLINE_TRANSLATIONS[i].toTranslation2d(), 
+                        new Rotation2d()));
+            }
+            return notePoses;
+        }
+
+        
     }
 
     public static final class CameraConstants {

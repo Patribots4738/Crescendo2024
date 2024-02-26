@@ -12,12 +12,15 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.calc.LimelightHelpers;
+import frc.robot.util.calc.LimelightHelpers.LimelightResults;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
 import frc.robot.util.constants.Constants.CameraConstants;
@@ -159,6 +162,26 @@ public class Limelight extends SubsystemBase implements Logged{
         }
 
         visableTags = knownFiducials.toArray(new Pose3d[0]);
+    }
+
+    // TODO: test this logic in real life before running dynamic auto
+    public Pose2d getNotePose2d() {
+        if (noteInVision()) {
+            Translation2d noteTranslation = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d().getTranslation();
+            Pose2d notePose = new Pose2d(noteTranslation, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
+            return notePose.plus(new Transform2d(robotPoseSupplier.get().getTranslation(), new Rotation2d()));
+        }
+        return robotPoseSupplier.get();
+    }
+
+    public boolean noteInVision() {
+        LimelightHelpers.setPipelineIndex(limelightName, 1);
+        Results results = getResults();
+        return (
+            results.valid && (!(results.botpose[0] == 0 && results.botpose[1] == 0))
+            && (LimelightHelpers.getTA("limelight") >= 0.3 
+                || results.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
+            && getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25;
     }
 
     public Pose2d getPose2d() {
