@@ -62,7 +62,9 @@ public class Elevator extends SubsystemBase implements Logged {
             pos,
             TrapConstants.ELEVATOR_BOTTOM_LIMIT,
             TrapConstants.ELEVATOR_TOP_LIMIT);
+
         elevator.setTargetPosition(pos);
+
         RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
             0, 0, pos,
             new Rotation3d()
@@ -87,12 +89,12 @@ public class Elevator extends SubsystemBase implements Logged {
         return setPositionCommand(TrapConstants.TRAP_PLACE_POS);
     }
 
-    public Command indexCommand() {
-        return setPositionCommand(TrapConstants.INDEX_POS);
+    public Command toIndexCommand() {
+        return setPositionCommand(TrapConstants.INDEX_POS).andThen(toBottomCommand());
     }
 
-    public Command stopCommand() {
-        return runOnce(() -> elevator.stopMotor());
+    public Command toDropCommand() {
+        return setPositionCommand(TrapConstants.DROP_POS);
     }
 
     public boolean atDesiredPosition() {

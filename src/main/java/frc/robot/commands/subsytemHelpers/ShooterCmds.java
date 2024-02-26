@@ -103,48 +103,53 @@ public class ShooterCmds {
      * @return The method is returning a Command object.
      */
     public Command prepareSWDCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
-        return Commands.run(() -> {
-            desiredTriplet = shooterCalc.calculateSWDTriplet(robotPose.get(), speeds.get());
-            pivot.setAngle(desiredTriplet.getAngle());
-            shooter.setSpeed(desiredTriplet.getSpeeds());
-        }, pivot, shooter);
+        return Commands.runEnd(
+            () -> {
+                desiredTriplet = shooterCalc.calculateSWDTriplet(robotPose.get(), speeds.get());
+                pivot.setAngle(desiredTriplet.getAngle());
+                shooter.setSpeed(desiredTriplet.getSpeeds());
+            },
+            () -> {
+                if (Robot.gameMode == GameMode.TELEOP) {
+                    pivot.setAngle(0);
+                    shooter.stop();
+                }
+            }, pivot, shooter);
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
         return Commands.runOnce(
             () -> {
                 SpeedAngleTriplet calculationTriplet = shooterCalc.calculateSWDTriplet(pose.get(), speeds.get());
-
+                SpeedAngleTriplet realTriplet = new SpeedAngleTriplet(shooter.getSpeed(), pivot.getAngle());
+                
+                Pose2d currentPose = pose.get();
+                ChassisSpeeds currentSpeeds = speeds.get();
                 new NoteTrajectory(
-                    pose.get(),
-                    speeds.get(),
-                    shooterCalc.rpmToVelocity(calculationTriplet.getSpeeds()), 
-                    calculationTriplet.getAngle()
-                ).andThen(
-                    Commands.waitSeconds(.2)
+                    currentPose,
+                    currentSpeeds,
+                    shooterCalc.rpmToVelocity(realTriplet.getSpeeds()),
+                    realTriplet.getAngle()
+                ).alongWith(
+                    Commands.waitSeconds(0.1)
                     .andThen(
-                            new NoteTrajectory(
-                                pose.get(),
-                                speeds.get(),
-                                shooterCalc.rpmToVelocity(shooter.getSpeed()), 
-                                pivot.getAngle()
-                            )
+                        new NoteTrajectory(
+                            currentPose,
+                            currentSpeeds,
+                            shooterCalc.rpmToVelocity(calculationTriplet.getSpeeds()), 
+                            calculationTriplet.getAngle()
                         )
+                    )
                 ).schedule();
             }
         );
     }
 
-    public Command stopAllMotors() {
-        return shooter.stop().andThen(pivot.stop());
+    public Command stopShooter() {
+        return Commands.run(() -> shooter.stop());
     }
-    /**
-	 * The function is a command that resets the angle of the robot
-	 * to be at the min angle.
-	 * 
-	 * @return The method is returning a Command object.
-	 */
-	public Command angleReset() {
-	    return Commands.runOnce(() -> pivot.setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES));
+
+	public Command stowPivot() {
+	    return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
 }

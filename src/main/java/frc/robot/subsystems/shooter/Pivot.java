@@ -97,15 +97,6 @@ public class Pivot extends SubsystemBase implements Logged {
 	public double getTargetAngle() {
 		return pivot.getTargetPosition();
 	}
-	
-	/**
-	 * The function is a command that stops the motor
-	 * 
-	 * @return The method is returning a Command object.
-	 */
-	public Command stop() {
-		return runOnce(() -> pivot.set(0));
-	}
 
 	/**
 	 * Determines if the pivot rotation is at its target with a small
