@@ -125,20 +125,22 @@ public class ShooterCmds {
                 
                 Pose2d currentPose = pose.get();
                 ChassisSpeeds currentSpeeds = speeds.get();
+
+                // If the shooter is not ready to shoot, 
+                // These notes will veer off from each other
                 new NoteTrajectory(
                     currentPose,
                     currentSpeeds,
                     shooterCalc.rpmToVelocity(realTriplet.getSpeeds()),
-                    realTriplet.getAngle()
+                    realTriplet.getAngle(),
+                    false
                 ).alongWith(
-                    Commands.waitSeconds(0.1)
-                    .andThen(
-                        new NoteTrajectory(
-                            currentPose,
-                            currentSpeeds,
-                            shooterCalc.rpmToVelocity(calculationTriplet.getSpeeds()), 
-                            calculationTriplet.getAngle()
-                        )
+                    new NoteTrajectory(
+                        currentPose,
+                        currentSpeeds,
+                        shooterCalc.rpmToVelocity(calculationTriplet.getSpeeds()),
+                        calculationTriplet.getAngle(),
+                        true
                     )
                 ).schedule();
             }

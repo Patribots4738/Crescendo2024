@@ -730,6 +730,7 @@ public final class Constants {
         private static Translation3d[] SPIKE_TRANSLATIONS_BLUE = new Translation3d[3];
         private static Translation3d[] SPIKE_TRANSLATIONS_RED = new Translation3d[3];
         public static Translation3d[] NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
+        public static Translation3d[] HIGH_NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
 
         static {
             for (int i = 0; i < SPIKE_TRANSLATIONS_BLUE.length; i++) {
@@ -743,6 +744,10 @@ public final class Constants {
             System.arraycopy(SPIKE_TRANSLATIONS_BLUE, 0, NOTE_TRANSLATIONS, 0, SPIKE_TRANSLATIONS_BLUE.length);
             System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length, SPIKE_TRANSLATIONS_RED.length);
             System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
+            for (int i = 0; i < NOTE_TRANSLATIONS.length; i++) {
+                Translation3d noteTranslation3d = NOTE_TRANSLATIONS[i];
+                HIGH_NOTE_TRANSLATIONS[i] = new Translation3d(noteTranslation3d.getX(), noteTranslation3d.getY(), noteTranslation3d.getZ() - 0.1);
+            }
         }
 
         public static final Translation2d L_POSE = new Translation2d(5.11,6.23);

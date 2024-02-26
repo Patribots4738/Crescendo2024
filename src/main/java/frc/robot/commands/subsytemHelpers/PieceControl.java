@@ -47,17 +47,12 @@ public class PieceControl {
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
-                .andThen(noteToShoot()
-                    .alongWith(
-                        Commands.waitSeconds(0),
-                        shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier)
-                    )
-                );
+                .andThen(noteToShoot(poseSupplier, speedSupplier));
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
     // without waiting
-    public Command noteToShoot() {
+    public Command noteToShoot(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from trapper into indexer and then into 
@@ -66,9 +61,10 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(.75),
+                Commands.waitSeconds(.35),
+                shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
+                Commands.waitSeconds(.4),
                 stopIntakeAndIndexer());
-
     }
 
     public Command noteToTrap() {

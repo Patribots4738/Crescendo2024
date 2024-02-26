@@ -99,6 +99,8 @@ public class RobotContainer implements Logged {
     @Log
     public static Pose3d[] notePose3ds = new Pose3d[12];
     @Log
+    public static Pose3d[] highNotePose3ds = new Pose3d[12];
+    @Log
     private boolean freshCode = true;
     @Log
     public static Field2d field2d = new Field2d();
@@ -412,7 +414,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
-        NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
@@ -481,8 +483,10 @@ public class RobotContainer implements Logged {
         }
 
         notePose3ds[0] = new Pose3d();
+        highNotePose3ds[0] = new Pose3d(0,0,-0.1, new Rotation3d());
         for (int i = 1; i < notePose3ds.length; i++) {
             notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
+            highNotePose3ds[i] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
     }
 }

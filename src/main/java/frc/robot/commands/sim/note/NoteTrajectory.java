@@ -32,6 +32,7 @@ public class NoteTrajectory extends Command implements Logged {
     
     Timer timer = new Timer(); 
     Pose3d currentNotePosition = new Pose3d();
+    final boolean realData;
 
     /**
      * Represents a trajectory note.
@@ -41,11 +42,12 @@ public class NoteTrajectory extends Command implements Logged {
      * @param initialVelocity the initial velocity of the note
      * @param pivotAngle      the angle of the pivot
      */
-    public NoteTrajectory(Pose2d initialPose, ChassisSpeeds initialSpeeds, double initialVelocity, double pivotAngle) {
+    public NoteTrajectory(Pose2d initialPose, ChassisSpeeds initialSpeeds, double initialVelocity, double pivotAngle, boolean realData) {
         this.initialPose = initialPose;
         this.initalSpeeds = initialSpeeds;
         this.initialVelocity = initialVelocity;
         this.pivotAngle = pivotAngle;
+        this.realData = realData;
         noteIndex = (int) (Math.random() * FieldConstants.NOTE_TRANSLATIONS.length);
     }
 
@@ -80,7 +82,11 @@ public class NoteTrajectory extends Command implements Logged {
 
         currentNotePosition = getNotePose(initialPose, pivotAngle, x, y, z);
 
-        RobotContainer.notePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
+        if (realData) {
+            RobotContainer.notePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
+        } else {
+            RobotContainer.highNotePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -126,7 +132,11 @@ public class NoteTrajectory extends Command implements Logged {
     }
 
     public void zeroNote() {
-        RobotContainer.notePose3ds[noteIndex+1] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
+        if (realData) {
+            RobotContainer.notePose3ds[noteIndex+1] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
+        } else {
+            RobotContainer.highNotePose3ds[noteIndex+1] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
+        }
     }
 
     /**
