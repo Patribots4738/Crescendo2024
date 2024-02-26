@@ -43,8 +43,12 @@ import frc.robot.util.mod.PatriBoxController;
 import frc.robot.util.motors.Neo;
 import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import frc.robot.util.testing.PatritionalCommand;
+import monologue.Monologue;
+
 
 public class RobotContainer implements Logged {
 
@@ -53,25 +57,37 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
+    @IgnoreLogged
     private Swerve swerve;
+    @IgnoreLogged
     private final Intake intake;
-
+    @IgnoreLogged
     private Limelight limelight;
-    private final LedStrip ledStrip;
+    @IgnoreLogged
     private final Climb climb;
-    private Indexer triggerWheel;
+    @IgnoreLogged
     private Pivot pivot;
+    @IgnoreLogged
     private Shooter shooter;
-    private Trapper trapper;
+    @IgnoreLogged
     private Elevator elevator;
-    private ShooterCmds shooterCmds;
-    private ShooterCalc shooterCalc;
-    private PieceControl pieceControl;
-    private PathPlannerStorage pathPlannerStorage;
+    
+    @IgnoreLogged
     private CalibrationControl calibrationControl;
-    private AlignmentCmds alignmentCmds;
-
+    @IgnoreLogged
+    private PathPlannerStorage pathPlannerStorage;
+    @IgnoreLogged
+    private ShooterCalc shooterCalc;
+    @IgnoreLogged
     public static HDCTuner HDCTuner;
+
+    private final LedStrip ledStrip;
+    private Indexer triggerWheel;
+    private Trapper trapper;
+    private ShooterCmds shooterCmds;
+
+    private PieceControl pieceControl;
+    private AlignmentCmds alignmentCmds;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -144,6 +160,7 @@ public class RobotContainer implements Logged {
         pathPlannerStorage.configureAutoChooser();
         
         configureButtonBindings();
+        configureLoggingPaths();
     }
 
     private void configureButtonBindings() {
@@ -229,7 +246,7 @@ public class RobotContainer implements Logged {
         controller.a().whileTrue(
             Commands.sequence(
                 swerve.resetHDCCommand(),
-                Commands.either(
+                new PatritionalCommand(
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
                     climb::getHooksUp)));
@@ -242,7 +259,7 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(
                 Commands.sequence(
                     swerve.resetHDCCommand(),
-                    Commands.either(
+                    new PatritionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
@@ -430,6 +447,23 @@ public class RobotContainer implements Logged {
                 NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j, swerve, limelight));
             }
         }
+    }
+
+    private void configureLoggingPaths() {
+        Monologue.logObj(shooterCalc, "/Robot/maths/shooterCalc");
+        Monologue.logObj(calibrationControl, "/Robot/maths/calibrationControl");
+        Monologue.logObj(HDCTuner, "/Robot/maths/HDCTuner");
+
+        Monologue.logObj(swerve, "/Robot/swerve");
+
+        Monologue.logObj(intake, "/Robot/subsystems/intake");
+        Monologue.logObj(climb, "/Robot/subsystems/climb");
+        Monologue.logObj(limelight, "/Robot/subsystems/limelight");
+        Monologue.logObj(shooter, "/Robot/subsystems/shooter");
+        Monologue.logObj(elevator, "/Robot/subsystems/elevator");
+        Monologue.logObj(pivot, "/Robot/subsystems/pivot");
+        
+        Monologue.logObj(pathPlannerStorage, "/Robot/autuwu/auto/pathPlannerStorage");
     }
 
     /**
