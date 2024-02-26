@@ -246,10 +246,7 @@ public class RobotContainer implements Logged {
                     
         controller.b()
             .onTrue(pieceControl.stopAllMotors());
-
-        controller.x()
-            .toggleOnTrue(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-
+            
         controller.leftBumper()
             .onTrue(pieceControl.toggleIn());
 

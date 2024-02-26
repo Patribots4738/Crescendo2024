@@ -149,7 +149,8 @@ public class AlignmentCmds {
         return
             new PatritionalCommand(
                 chainRotationalAlignment(driverX, driverY),
-                speakerRotationalAlignment(driverX, driverY, shooterCmds),
+                speakerRotationalAlignment(driverX, driverY, shooterCmds)
+                    .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)),
                 climb::getHooksUp);
     }
 }
