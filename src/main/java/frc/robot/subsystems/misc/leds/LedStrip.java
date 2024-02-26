@@ -52,11 +52,11 @@ public class LedStrip extends SubsystemBase {
     public Command changeLEDsPattern() {
         return Commands.runOnce(() -> {
             selectedLED += 1;
-            selectedLED %= 8;
+            selectedLED %= 9;
         });
     }
 
-    public int selectedLED = 0;
+    public int selectedLED = 8;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -67,6 +67,7 @@ public class LedStrip extends SubsystemBase {
             case (5) -> alliance(Robot::isRedAlliance);
             case (6) -> flash();
             case (7) -> rainbow();
+            case (8) -> elevatorTOPLED();
             default -> turnOff();
         };
         return selectedPattern.ignoringDisable(true);
@@ -129,10 +130,12 @@ public class LedStrip extends SubsystemBase {
     }
 
     public void oohShiny(Color blinkI, Color blinkII, int blinkAmount, int setIndexI, int setIndexII) {
-        for (int j = blinkAmount; j > 0; j--) {
+        System.out.println("Hello");
+        for (int j = setIndexI; j < setIndexII; j++) {
             Color blinkColor = (j % 2 == 0) ? blinkI : blinkII;
-            setLED(setIndexI, setIndexII, blinkColor);
+            setLED(setIndexI, blinkColor);
         }
+        
     }
 
     public Command turnOff() {
@@ -168,10 +171,10 @@ public class LedStrip extends SubsystemBase {
     public Command circus() {
         return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = ((i + greenNGoldOffset) % 2 == 0) ? Color.kRed : Color.kWhite;
+                final Color color = (((int) ((i/5.0) + greenNGoldOffset) % 2 == 0) ? Color.kRed : Color.kWhite);
                 setLED(i, color);
             }
-            greenNGoldOffset++;
+            greenNGoldOffset += .05;
         });
     }
 
@@ -230,9 +233,9 @@ public class LedStrip extends SubsystemBase {
     }
 
     public Command elevatorTOPLED() {
-        return Commands.runOnce(() -> {
-            oohShiny(GreerYeller, TurnOff, 10, 1, 10);
-        });
+        return Commands.run(() -> {
+            oohShiny(GreerYeller, TurnOff, 999999999, 0, ledBuffer.getLength());
+        }).ignoringDisable(true);
     }
 
     public Command cautionCoolDownLED() {
