@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.util.testing;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
@@ -12,85 +8,63 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import java.util.function.BooleanSupplier;
 
-/**
- * A command composition that runs one of two commands, depending on the value
- * of the given
- * condition when this command is initialized.
- *
- * <p>
- * The rules for command compositions apply: command instances that are passed
- * to it cannot be
- * added to any other composition or scheduled individually, and the composition
- * requires all
- * subsystems its components require.
- *
- * <p>
- * This class is provided by the NewCommands VendorDep
- */
 public class PatritionalCommand extends Command {
-    private final Command m_onTrue;
-    private final Command m_onFalse;
-    private final BooleanSupplier m_condition;
-    private Command m_selectedCommand;
+    private final Command onTrueCommand;
+    private final Command onFalseCommand;
+    private final BooleanSupplier condition;
+    private Command selectedCommand;
 
-    /**
-     * Creates a new PatritionalCommand.
-     *
-     * @param onTrue    the command to run if the condition is true
-     * @param onFalse   the command to run if the condition is false
-     * @param condition the condition to determine which command to run
-     */
-    public PatritionalCommand(Command onTrue, Command onFalse, BooleanSupplier condition) {
-        m_onTrue = requireNonNullParam(onTrue, "onTrue", "ConditionalCommand");
-        m_onFalse = requireNonNullParam(onFalse, "onFalse", "ConditionalCommand");
-        m_condition = requireNonNullParam(condition, "condition", "ConditionalCommand");
+    public PatritionalCommand(Command onTrueCommand, Command onFalseCommand, BooleanSupplier condition) {
+        this.onTrueCommand = requireNonNullParam(onTrueCommand, "onTrue", "ConditionalCommand");
+        this.onFalseCommand = requireNonNullParam(onFalseCommand, "onFalse", "ConditionalCommand");
+        this.condition = requireNonNullParam(condition, "condition", "ConditionalCommand");
 
-        CommandScheduler.getInstance().registerComposedCommands(onTrue, onFalse);
+        CommandScheduler.getInstance().registerComposedCommands(onTrueCommand, onFalseCommand);
 
-        m_requirements.addAll(m_onTrue.getRequirements());
-        m_requirements.addAll(m_onFalse.getRequirements());
+        m_requirements.addAll(this.onTrueCommand.getRequirements());
+        m_requirements.addAll(this.onFalseCommand.getRequirements());
     }
 
     @Override
     public void initialize() {
-        if (m_condition.getAsBoolean()) {
-            m_selectedCommand = m_onTrue;
+        if (condition.getAsBoolean()) {
+            selectedCommand = onTrueCommand;
         } else {
-            m_selectedCommand = m_onFalse;
+            selectedCommand = onFalseCommand;
         }
-        m_selectedCommand.initialize();
+        selectedCommand.initialize();
     }
 
     @Override
     public void execute() {
-        if (    m_condition.getAsBoolean() && m_selectedCommand == m_onFalse
-            || !m_condition.getAsBoolean() && m_selectedCommand == m_onTrue) 
+        if (condition.getAsBoolean() && selectedCommand == onFalseCommand 
+            || !condition.getAsBoolean() && selectedCommand == onTrueCommand) 
         {
-            m_selectedCommand.end(true);
+            selectedCommand.end(true);
             this.initialize();
         }
-        m_selectedCommand.execute();
+        selectedCommand.execute();
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_selectedCommand.end(interrupted);
+        selectedCommand.end(interrupted);
     }
 
     @Override
     public boolean isFinished() {
-        return m_selectedCommand.isFinished();
+        return selectedCommand.isFinished();
     }
 
     @Override
     public boolean runsWhenDisabled() {
-        return m_onTrue.runsWhenDisabled() && m_onFalse.runsWhenDisabled();
+        return onTrueCommand.runsWhenDisabled() && onFalseCommand.runsWhenDisabled();
     }
 
     @Override
     public InterruptionBehavior getInterruptionBehavior() {
-        if (m_onTrue.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf
-                || m_onFalse.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
+        if (onTrueCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf
+                || onFalseCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
             return InterruptionBehavior.kCancelSelf;
         } else {
             return InterruptionBehavior.kCancelIncoming;
@@ -100,15 +74,15 @@ public class PatritionalCommand extends Command {
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
-        builder.addStringProperty("onTrue", m_onTrue::getName, null);
-        builder.addStringProperty("onFalse", m_onFalse::getName, null);
+        builder.addStringProperty("onTrue", onTrueCommand::getName, null);
+        builder.addStringProperty("onFalse", onFalseCommand::getName, null);
         builder.addStringProperty(
                 "selected",
                 () -> {
-                    if (m_selectedCommand == null) {
+                    if (selectedCommand == null) {
                         return "null";
                     } else {
-                        return m_selectedCommand.getName();
+                        return selectedCommand.getName();
                     }
                 },
                 null);
