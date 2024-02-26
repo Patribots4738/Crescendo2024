@@ -56,7 +56,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 5;
+    public int selectedLED = 0;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -196,6 +196,8 @@ public class LedStrip extends SubsystemBase {
 
     private double allianceOffset = 0;
 
+
+    // https://www.desmos.com/calculator/pnmtpljhcj
     public Command alliance(BooleanSupplier isRedAlliance) {
         return run(() -> {
             boolean isRed = isRedAlliance.getAsBoolean();
