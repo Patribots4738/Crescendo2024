@@ -63,9 +63,10 @@ public class PatritionalCommand extends Command {
 
     @Override
     public void execute() {
-        if (m_condition.getAsBoolean() && m_selectedCommand == m_onFalse
-                || !m_condition.getAsBoolean() && m_selectedCommand == m_onTrue) {
-            m_selectedCommand.cancel();
+        if (    m_condition.getAsBoolean() && m_selectedCommand == m_onFalse
+            || !m_condition.getAsBoolean() && m_selectedCommand == m_onTrue) 
+        {
+            m_selectedCommand.end(true);
             this.initialize();
         }
         m_selectedCommand.execute();
