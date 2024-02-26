@@ -200,7 +200,7 @@ public class LedStrip extends SubsystemBase {
     private double allianceOffset = 0;
 
 
-    // https://www.desmos.com/calculator/pnmtpljhcj
+    // https://www.desmos.com/calculator/kxx5hbhyy1
     public Command alliance(BooleanSupplier isRedAlliance) {
         return run(() -> {
             boolean isRed = isRedAlliance.getAsBoolean();
