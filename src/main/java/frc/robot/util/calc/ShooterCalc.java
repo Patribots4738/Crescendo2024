@@ -128,7 +128,7 @@ public class ShooterCalc implements Logged {
      * 
      * @return              The angle to the speaker in the form of a Rotation2d object.
      */
-    public Rotation2d calculateSWDRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    public Rotation2d calculateRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
         Translation2d velocityVectorToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity);
         double velocityTangent = velocityVectorToSpeaker.getX();
         // TODO: Check if this velocity should be accounted for in the x component of atan2
@@ -153,6 +153,14 @@ public class ShooterCalc implements Logged {
 
         // Return the desired rotation
         return desiredRotation2d;
+    }
+
+    public Rotation2d calculateRobotAngleToSpeaker(Pose2d pose) {
+        return calculateRobotAngleToSpeaker(pose, new ChassisSpeeds());
+    }
+
+    public Rotation2d calculateRobotAngleToSpeaker(Translation2d translation) {
+        return calculateRobotAngleToSpeaker(new Pose2d(translation, new Rotation2d()));
     }
 
     private Translation2d getVelocityVectorToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {

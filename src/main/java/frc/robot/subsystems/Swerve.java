@@ -223,10 +223,6 @@ public class Swerve extends SubsystemBase implements Logged {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
     }
 
-    public ChassisSpeeds getFieldRelativeVelocity() {
-        return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelativeVelocity(), getPose().getRotation());
-    }
-
     /**
      * Sets the wheels into an X formation to prevent movement.
      */

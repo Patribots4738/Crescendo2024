@@ -7,6 +7,7 @@ import com.pathplanner.lib.util.GeometryUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -158,4 +159,34 @@ public class AlignmentCmds {
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)),
                 climb::getHooksUp);
     }
+
+    public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
+        return Commands.either(
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.L_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.M_POSE),
+            // No way I just found my first XOR use case :D
+            () -> Robot.isRedAlliance() ^ xButtonPressed
+        );
+    }
+
+    private Command prepareFireAndRotateCommand(DoubleSupplier driverX, DoubleSupplier driverY, Translation2d pose) {
+        return shooterCmds.prepareFireCommand(
+            () -> pose,
+            Robot::isRedAlliance
+        ).alongWith(
+            swerve.getDriveCommand(() -> {
+                Translation2d endingPose = pose;
+                if (Robot.isRedAlliance()) {
+                    endingPose = GeometryUtil.flipFieldPosition(pose);
+                }
+                return alignmentCalc.getRotationalSpeeds(
+                    driverX.getAsDouble(), 
+                    driverY.getAsDouble(), 
+                    shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(endingPose));
+                },
+                () -> true
+            )
+        );
+    }
+
 }

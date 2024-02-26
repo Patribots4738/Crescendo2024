@@ -131,7 +131,7 @@ public class AlignmentCalc {
         return new ChassisSpeeds(
             driverY * (Robot.isRedAlliance() ? -1 : 1),
             driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(shooterCmds.shooterCalc.calculateSWDRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity())));
+            getAlignmentSpeeds(shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity())));
     }
 
     /**

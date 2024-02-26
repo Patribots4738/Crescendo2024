@@ -234,6 +234,12 @@ public class RobotContainer implements Logged {
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
                     climb::getHooksUp)));
+                    
+        controller.x()
+            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
+
+        controller.b()
+            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
