@@ -100,7 +100,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         limelight = new Limelight(swerve.getPoseEstimator(), swerve::getPose);
-        ledStrip = new LedStrip(swerve::getPose);
+        ledStrip = new LedStrip();
         triggerWheel = new Indexer();
 
         shooter = new Shooter();
