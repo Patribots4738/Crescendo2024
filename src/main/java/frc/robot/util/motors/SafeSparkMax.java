@@ -75,9 +75,13 @@ public class SafeSparkMax extends CANSparkMax {
             status = parameterSetter.get();
             if (parameterCheckSupplier.getAsBoolean() && status == REVLibError.kOk)
                 break;
+            // If there is an error with the sensor, try to reinitialize it
             if (status == REVLibError.kHALError) {
-                relativeEncoder = getEncoder();
-                absoluteEncoder = getAbsoluteEncoder();
+                if (useAbsoluteEncoder) {
+                    absoluteEncoder = getAbsoluteEncoder();
+                } else {
+                    relativeEncoder = getEncoder();
+                }
             }
             Timer.delay(APPLY_PARAMETER_WAIT_TIME);
         }
@@ -96,8 +100,8 @@ public class SafeSparkMax extends CANSparkMax {
         if (RobotBase.isSimulation())
             return REVLibError.kOk;
 
-        Timer.delay(BURN_FLASH_WAIT_TIME);
-        REVLibError status = super.burnFlash();
+            REVLibError status = super.burnFlash();
+            Timer.delay(BURN_FLASH_WAIT_TIME);
 
         return status;
     }
@@ -114,7 +118,7 @@ public class SafeSparkMax extends CANSparkMax {
             () -> super.restoreFactoryDefaults(),
             () -> true,
             "Restore factory defaults failure!");
-        Timer.delay(0.1);
+        Timer.delay(BURN_FLASH_WAIT_TIME);
         return status;
     }
 
@@ -609,19 +613,23 @@ public class SafeSparkMax extends CANSparkMax {
     }
 
     /**
-     * Represents an error that can occur while using the REVLib library.
+     * Change a periodic status frame period of the motor controller.
      * Rev docs:
      * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
      * 
-     * @param frame  The status frame to reset
-     * @param period The update period for the status frame.
-     * @return error
+     * You can increase this number to ignore updates more / alliviate can bus traffic
+     * or decrease this number to get more frequent updates
+     * 
+     * @param frame  The frame to change
+     * @param period The period to set in milliseconds
+     * @return A REVLibError indicating the result of the operation
      */
     public REVLibError changeStatusFrame(StatusFrame frame, int period) {
         REVLibError error = setPeriodicFramePeriod(frame.getFrame(), period);
         // Add a delay to alleviate bus traffic
         if (!FieldConstants.IS_SIMULATION)
             Timer.delay(0.05);
+
         return error;
     }
 
