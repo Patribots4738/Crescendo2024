@@ -58,7 +58,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 5;
+    public int selectedLED = 7;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -155,17 +155,11 @@ public class LedStrip extends SubsystemBase {
     public Command rainbow() {
         return run(() -> {
             waveHueFunction(
-                50, 
+                180*2, 
                 (double) ledBuffer.getLength(), 
                 2, 
-                2,
-                180);
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                int hue = (int) (this.rainbowOffset + (i * 180 / ledBuffer.getLength())) % 180;
-                setLED(i, Color.fromHSV(hue, 255, 255));
-            }
-            this.rainbowOffset += 2;
-            this.rainbowOffset %= 180;
+                0.05,
+                Math.PI*2);
         });
     }
 
@@ -182,14 +176,14 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    private void evaluateWave(double scale, double spacing, double time, int i, boolean isHue, double waveOffset) {
-        double wave = Math.sin((10*i + (spacing * time)) / spacing);
-        int output = (int) ((waveOffset + scale*wave) / (isHue ? 2 : 1));
-        setLED(i, isHue ? Color.fromHSV(output, 255, 255) : Color.fromHSV(180, 255, output));
+    private void evaluateWave(double scale, double spacing, double time, int x, boolean isHue, double height) {
+        double wave = Math.sin((10*x + (spacing * time)) / spacing);
+        int output = (int) ((height + scale*wave) / (isHue ? 2 : 1));
+        setLED(x, isHue ? Color.fromHSV(output, 255, 255) : Color.fromHSV(180, 255, output));
     }
 
     private double waveHueOffset = 1;
-    public void waveHueFunction(double scale, double spacing, double waveOffset, double waveSpeed, double waveRange) {
+    public void waveHueFunction(double scale, double spacing, double height, double waveSpeed, double waveRange) {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             evaluateWave(
                 scale,
@@ -197,7 +191,7 @@ public class LedStrip extends SubsystemBase {
                 waveHueOffset,
                 i, 
                 true, 
-                waveOffset
+                height
             );
         }
         waveHueOffset += waveSpeed;
@@ -208,15 +202,15 @@ public class LedStrip extends SubsystemBase {
     }
 
     private double waveValueOffset = 1;
-    public void waveValueFunction(double scale, double spacing, double waveOffset, double waveValueIncrement, double waveRange) {
+    public void waveValueFunction(double scale, double spacing, double height, double waveValueIncrement, double waveRange) {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
             evaluateWave(
                 scale,
                 spacing, 
-                waveOffset, 
+                waveValueOffset, 
                 i, 
                 false, 
-                waveValueIncrement
+                height
             );
         }
         waveValueOffset += waveValueIncrement;
