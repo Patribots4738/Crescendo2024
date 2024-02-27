@@ -114,4 +114,8 @@ public class Shooter extends SubsystemBase implements Logged{
     public boolean getAtDesiredRPM() {
         return atDesiredRPM;
     }
+
+    public Pair<Double, Double> getTargetSpeeds() {
+        return new Pair<Double, Double>(targetLeftSpeed, targetRightSpeed);
+    }
 }
