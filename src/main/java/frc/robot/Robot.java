@@ -19,7 +19,6 @@ import frc.robot.util.constants.Constants.NeoMotorConstants;
 import frc.robot.util.motors.Neo;
 import monologue.Monologue;
 
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to

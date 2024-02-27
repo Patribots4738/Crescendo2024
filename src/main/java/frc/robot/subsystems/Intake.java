@@ -18,7 +18,7 @@ public class Intake extends SubsystemBase implements Logged {
     private double desiredSpeed = 0;
     private double startedIntakingTimestamp = 0;
     @Log
-    private boolean notePossession = true; 
+    private boolean notePossession = false; 
 
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID);
@@ -29,8 +29,8 @@ public class Intake extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         if (desiredSpeed == IntakeConstants.INTAKE_PERCENT
-            && Robot.currentTimestamp - startedIntakingTimestamp > 0.1
-            && intakeMotor.getAppliedOutput() < ((Math.abs(IntakeConstants.INTAKE_PERCENT) - 0.2) * Math.signum(IntakeConstants.INTAKE_PERCENT)))
+            && Robot.currentTimestamp - startedIntakingTimestamp > 0.6
+            && intakeMotor.getVelocity() < 7000)
         {
             notePossession = true;
         }
@@ -48,7 +48,7 @@ public class Intake extends SubsystemBase implements Logged {
     public Command setPercentCommand(double desiredPercent) {
         return runOnce(() -> {
             setPercent(desiredPercent);
-            if(desiredPercent > 0) {
+            if(desiredPercent == IntakeConstants.INTAKE_PERCENT) {
                 startedIntakingTimestamp = Robot.currentTimestamp;
             }
         });
@@ -71,14 +71,14 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public boolean getPossession() {
-        return this.notePossession;
+        return notePossession;
     }
 
     public void setPossession(boolean possession) {
         this.notePossession = possession;
     }
 
-    public Trigger possessionTrigger() {
-        return new Trigger(this::getPossession);
+    public Command revokePossesion() {
+        return runOnce(() -> setPossession(false));
     }
 }

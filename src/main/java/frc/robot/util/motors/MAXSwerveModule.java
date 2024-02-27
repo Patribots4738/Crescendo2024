@@ -31,7 +31,12 @@ public class MAXSwerveModule implements Logged{
      */
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
         drivingSpark = new Neo(drivingCANId);
-        turningSpark = new Neo(turningCANId, ModuleConstants.TURNING_ENCODER_INVERTED, true);
+        
+        // Invert the turning encoder, since the output shaft rotates in the opposite
+        // direction of
+        // the steering motor in the MAXSwerve Module.
+
+        turningSpark = new Neo(turningCANId, false, true);
         this.chassisAngularOffset = chassisAngularOffset;
 
         resetEncoders();
@@ -100,7 +105,7 @@ public class MAXSwerveModule implements Logged{
      * Zeroes this driving motor's encoder.
      */
     public void resetEncoders() {
-        drivingSpark.setPosition(0);
+        drivingSpark.resetEncoder();
     }
 
     /**
@@ -131,11 +136,6 @@ public class MAXSwerveModule implements Logged{
         // APIs.
         turningSpark.setPositionConversionFactor(ModuleConstants.TURNING_ENCODER_POSITION_FACTOR);
         turningSpark.setVelocityConversionFactor(ModuleConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-
-        // Invert the turning encoder, since the output shaft rotates in the opposite
-        // direction of
-        // the steering motor in the MAXSwerve Module.
-        turningSpark.setInverted(ModuleConstants.TURNING_ENCODER_INVERTED);
 
         // Enable PID wrap around for the turning motor. This will allow the PID
         // controller to go through 0 to get to the setpoint i.e. going from 350 degrees

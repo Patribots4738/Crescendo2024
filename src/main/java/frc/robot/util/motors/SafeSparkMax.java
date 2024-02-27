@@ -4,10 +4,12 @@ package frc.robot.util.motors;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 import com.revrobotics.jni.CANSparkMaxJNI;
@@ -23,12 +25,14 @@ public class SafeSparkMax extends CANSparkMax {
     protected final int canID;
     protected final boolean useAbsoluteEncoder;
     SparkPIDController pidController = getPIDController();
+    protected RelativeEncoder relativeEncoder = super.getEncoder();
+    protected AbsoluteEncoder absoluteEncoder = super.getAbsoluteEncoder();
 
     private final int MAX_ATTEMPTS = 20;
     private final int MEASUREMENT_PERIOD = 16;
     private final int AVERAGE_DEPTH = 2;
-    private final double BURN_FLASH_WAIT_TIME = 0.5;
-    private final double APPLY_PARAMETER_WAIT_TIME = 0.1;
+    private final double BURN_FLASH_WAIT_TIME = 0.1;
+    private final double APPLY_PARAMETER_WAIT_TIME = 0.02;
 
     public SafeSparkMax(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
         super(canID, motorType);
@@ -41,7 +45,7 @@ public class SafeSparkMax extends CANSparkMax {
         this.canID = canID;
         this.useAbsoluteEncoder = useAbsoluteEncoder;
         if (useAbsoluteEncoder) {
-            setFeedbackDevice(getAbsoluteEncoder());
+            setFeedbackDevice(absoluteEncoder);
         }
     }
 
@@ -71,6 +75,10 @@ public class SafeSparkMax extends CANSparkMax {
             status = parameterSetter.get();
             if (parameterCheckSupplier.getAsBoolean() && status == REVLibError.kOk)
                 break;
+            if (status == REVLibError.kHALError) {
+                relativeEncoder = getEncoder();
+                absoluteEncoder = getAbsoluteEncoder();
+            }
             Timer.delay(APPLY_PARAMETER_WAIT_TIME);
         }
 
@@ -90,7 +98,6 @@ public class SafeSparkMax extends CANSparkMax {
 
         Timer.delay(BURN_FLASH_WAIT_TIME);
         REVLibError status = super.burnFlash();
-        Timer.delay(BURN_FLASH_WAIT_TIME);
 
         return status;
     }
@@ -107,7 +114,7 @@ public class SafeSparkMax extends CANSparkMax {
             () -> super.restoreFactoryDefaults(),
             () -> true,
             "Restore factory defaults failure!");
-
+        Timer.delay(0.1);
         return status;
     }
 
@@ -131,8 +138,8 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public REVLibError fixMeasurementPeriod() {
         REVLibError status = applyParameter(
-                () -> this.getEncoder().setMeasurementPeriod(MEASUREMENT_PERIOD),
-                () -> this.getEncoder().getMeasurementPeriod() == MEASUREMENT_PERIOD,
+                () -> relativeEncoder.setMeasurementPeriod(MEASUREMENT_PERIOD),
+                () -> relativeEncoder.getMeasurementPeriod() == MEASUREMENT_PERIOD,
                 "Set encoder measurement period failure!");
         return status;
     }
@@ -144,8 +151,8 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public REVLibError fixAverageDepth() {
         REVLibError status = applyParameter(
-                () -> this.getEncoder().setAverageDepth(AVERAGE_DEPTH),
-                () -> this.getEncoder().getAverageDepth() == AVERAGE_DEPTH,
+                () -> relativeEncoder.setAverageDepth(AVERAGE_DEPTH),
+                () -> relativeEncoder.getAverageDepth() == AVERAGE_DEPTH,
                 "Set encoder average depth failure!");
         return status;
     }
@@ -205,10 +212,10 @@ public class SafeSparkMax extends CANSparkMax {
         BooleanSupplier parameterCheckSupplier;
 
         if (useAbsoluteEncoder) {
-            parameterSetter = () -> getAbsoluteEncoder().setPositionConversionFactor(factor);
+            parameterSetter = () -> absoluteEncoder.setPositionConversionFactor(factor);
             parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         } else {
-            parameterSetter = () -> super.getEncoder().setPositionConversionFactor(factor);
+            parameterSetter = () -> relativeEncoder.setPositionConversionFactor(factor);
             parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         }
 
@@ -219,9 +226,9 @@ public class SafeSparkMax extends CANSparkMax {
 
     public double getPositionConversionFactor() {
         if (useAbsoluteEncoder) {
-            return getAbsoluteEncoder().getPositionConversionFactor();
+            return absoluteEncoder.getPositionConversionFactor();
         } else {
-            return super.getEncoder().getPositionConversionFactor();
+            return relativeEncoder.getPositionConversionFactor();
         }
     }
 
@@ -240,10 +247,10 @@ public class SafeSparkMax extends CANSparkMax {
         BooleanSupplier parameterCheckSupplier;
 
         if (useAbsoluteEncoder) {
-            parameterSetter = () -> getAbsoluteEncoder().setVelocityConversionFactor(factor);
+            parameterSetter = () -> absoluteEncoder.setVelocityConversionFactor(factor);
             parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
         } else {
-            parameterSetter = () -> super.getEncoder().setVelocityConversionFactor(factor);
+            parameterSetter = () -> relativeEncoder.setVelocityConversionFactor(factor);
             parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
         }
 
@@ -294,9 +301,9 @@ public class SafeSparkMax extends CANSparkMax {
 
     public double getVelocityConversionFactor() {
         if (useAbsoluteEncoder) {
-            return getAbsoluteEncoder().getVelocityConversionFactor();
+            return absoluteEncoder.getVelocityConversionFactor();
         } else {
-            return super.getEncoder().getVelocityConversionFactor();
+            return relativeEncoder.getVelocityConversionFactor();
         }
     }
 
@@ -307,9 +314,9 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public double getPosition() {
         if (useAbsoluteEncoder && !FieldConstants.IS_SIMULATION) {
-            return getAbsoluteEncoder().getPosition();
+            return absoluteEncoder.getPosition();
         } else {
-            return super.getEncoder().getPosition();
+            return relativeEncoder.getPosition();
         }
     }
 
@@ -317,7 +324,7 @@ public class SafeSparkMax extends CANSparkMax {
      * RESET THE RELATIVE ENCODER TO BE THE SET POSITION
      */
     public void setPosition(double position) {
-        super.getEncoder().setPosition(position);
+        relativeEncoder.setPosition(position);
     }
 
     /**
@@ -327,9 +334,9 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public double getVelocity() {
         if (useAbsoluteEncoder) {
-            return getAbsoluteEncoder().getVelocity();
+            return absoluteEncoder.getVelocity();
         } else {
-            return super.getEncoder().getVelocity();
+            return relativeEncoder.getVelocity();
         }
     }
 

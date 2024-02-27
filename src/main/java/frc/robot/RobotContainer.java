@@ -253,7 +253,7 @@ public class RobotContainer implements Logged {
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
                     
-        controller.b()
+        controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
             
         controller.leftBumper()
@@ -266,6 +266,12 @@ public class RobotContainer implements Logged {
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
             .onTrue(elevator.toTopCommand());
+
+        controller.povLeft()
+            .onTrue(elevator.toAmpCommand());
+
+        controller.povRight()
+            .onTrue(trapper.toggleSpeed());
         
         controller.povDown()
             .onTrue(elevator.toBottomCommand());

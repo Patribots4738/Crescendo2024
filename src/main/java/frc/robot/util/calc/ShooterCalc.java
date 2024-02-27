@@ -46,7 +46,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = calculateTriplet(pose.getTranslation());
+        SpeedAngleTriplet currentTriplet = new SpeedAngleTriplet(calculateShooterSpeedsForApex(pose, calculatePivotAngle(pose)), calculatePivotAngle(pose).getDegrees());
         
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
@@ -139,8 +139,8 @@ public class ShooterCalc implements Logged {
         Rotation2d currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
-            // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
+            // rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
+            rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing

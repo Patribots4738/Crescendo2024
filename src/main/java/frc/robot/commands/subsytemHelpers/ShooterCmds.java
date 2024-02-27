@@ -55,7 +55,7 @@ public class ShooterCmds {
             () -> {
                 if (Robot.gameMode == GameMode.TELEOP) {
                     pivot.setAngle(0);
-                    shooter.stop();
+                    shooter.stopCommand();
                 }
             },
             pivot, shooter);
@@ -112,7 +112,7 @@ public class ShooterCmds {
             () -> {
                 if (Robot.gameMode == GameMode.TELEOP) {
                     pivot.setAngle(0);
-                    shooter.stop();
+                    shooter.stopCommand();
                 }
             }, pivot, shooter);
     }
@@ -148,7 +148,7 @@ public class ShooterCmds {
     }
 
     public Command stopShooter() {
-        return Commands.run(() -> shooter.stop());
+        return shooter.stopCommand();
     }
 
 	public Command stowPivot() {

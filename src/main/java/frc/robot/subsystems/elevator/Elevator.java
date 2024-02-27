@@ -23,17 +23,14 @@ public class Elevator extends SubsystemBase implements Logged {
 
     /** Creates a new Elevator. */
     public Elevator() {
-        elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID);
+        elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID, true);
         configMotors();
     }
 
     public void configMotors() {
-        elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
         elevator.setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
+        elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
         elevator.setPID(TrapConstants.ELEVATOR_PID);
-
-        // Change to brake when done testing
-        elevator.setCoastMode();
     }
 
     @Override
@@ -82,11 +79,15 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command toBottomCommand() {
-        return setPositionCommand(TrapConstants.RESET_POS);
+        return setPositionCommand(TrapConstants.BOTTOM_POS);
     }
 
     public Command toTopCommand() {
         return setPositionCommand(TrapConstants.TRAP_PLACE_POS);
+    }
+
+    public Command toAmpCommand() {
+        return setPositionCommand(TrapConstants.AMP_PLACE_POS);
     }
 
     public Command toIndexCommand() {

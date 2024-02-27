@@ -120,18 +120,14 @@ public final class Constants {
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
             0,
-            0.20992,
-            0.0001762,
-            // These are in %
-            -1,
-            1
+            0.006,
+            0.0001762
         );
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
             0.05,
             0,
             0.0083,
-            // These are in %
             -0.25,
             0.25
         );
@@ -144,8 +140,9 @@ public final class Constants {
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 150;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 20;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 45;
+        // It will break things at 27
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 29; 
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 63.3;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -194,29 +191,32 @@ public final class Constants {
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
-        public static final double ELEVATOR_DEADBAND = Units.inchesToMeters(0.5);
+        public static final double ELEVATOR_DEADBAND = 0.03;
         public static final double OUTTAKE_SECONDS = 0.4;
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
 
-        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 25.0;
+        private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
+        private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
 
-        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
+        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 1.0/(GEAR_RATIO*ELEVATOR_HEIGHT);
+        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 40; // amps
 
-        public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(.5, 0, 0, -1, 1);
+        public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
         // TODO: set these values
-        public static final double RESET_POS = 0;
+        public static final double BOTTOM_POS = 0;
         public static final double INTAKE_TIME = 0;
         public static final double TRAPPER_OUTTAKE_PERCENT = -1;
         public static final double TRAPPER_INTAKE_PERCENT = 1;
         public static final double TRAPPER_STOP_PERCENT = 0;
-        public static final double TRAP_PLACE_POS = 0.48;
-        public static final double INDEX_POS = 0.05;
+        public static final double TRAP_PLACE_POS = 0.49;
+        public static final double AMP_PLACE_POS = 0.37;
+        public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.08;
 
-        public static final double ELEVATOR_TOP_LIMIT = 0.48;
+        public static final double ELEVATOR_TOP_LIMIT = 0.49;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
         public static final double TRAPPER_LOWER_PERCENT_LIMIT = -1;
@@ -287,8 +287,8 @@ public final class Constants {
                 0,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = .8514;
-        public static final double ROTATION_CORRECTION_I = 1;
+        public static final double ROTATION_CORRECTION_P = .3;
+        public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
         public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;

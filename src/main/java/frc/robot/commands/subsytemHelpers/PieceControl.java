@@ -76,7 +76,13 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.stopCommand(),
-                Commands.waitUntil(intake.possessionTrigger()),
+                Commands.waitUntil(intake::getPossession),
+                intake.revokePossesion(),
+                Commands.waitSeconds(0.7),
+                intake.stopCommand(),
+                trapper.outtake(),
+                indexer.toElevator(),
+                Commands.waitSeconds(0.5),
                 stopAllMotors(),
                 indexCommand());
 
@@ -116,7 +122,7 @@ public class PieceControl {
         return Commands.sequence(
             elevator.toDropCommand(),
             trapper.outtake(),
-            Commands.waitSeconds(0.1),
+            Commands.waitSeconds(0.5),
             elevator.toBottomCommand()
         );
     }

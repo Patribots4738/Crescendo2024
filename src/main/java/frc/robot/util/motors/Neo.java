@@ -67,8 +67,6 @@ public class Neo extends SafeSparkMax {
         // to minimize any bus traffic.
         // Default is 20ms
         setCANTimeout(50);
-        if (!FieldConstants.IS_SIMULATION)
-            Timer.delay(0.25);
         
         // Turn off alternate and analog encoders
         // we never use them
@@ -294,6 +292,13 @@ public class Neo extends SafeSparkMax {
     }
 
     /**
+     * Set the relative encoder's position to 0
+     */
+    public void resetEncoder() {
+        super.setPosition(0);
+    }
+
+    /**
      * Gets the target position of the Neo in rotations.
      * @return The target position of the Neo in rotations.
      */
@@ -392,7 +397,7 @@ public class Neo extends SafeSparkMax {
         super.setI(I, slotID);
         super.setD(D, slotID);
         super.setFF(FF, slotID);
-        super.setIZone(iZone, slotID);
+        super.setIZone(MathUtil.clamp(iZone, 0, 999), slotID);
         super.setOutputRange(minOutput, maxOutput, slotID);
     }
 
