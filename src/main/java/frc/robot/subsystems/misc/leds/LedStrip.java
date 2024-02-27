@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.constants.Constants.LEDConstants;
+import java.util.List;
+import java.util.ArrayList;
 
 public class LedStrip extends SubsystemBase {
 
@@ -56,7 +58,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 8;
+    public int selectedLED = 5;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -108,6 +110,12 @@ public class LedStrip extends SubsystemBase {
         setLED(0, ledBuffer.getLength(), color);
     }
 
+    public void setLED(List<Color> colors) {
+        for (Color color : colors) {
+            setLED(0, ledBuffer.getLength(), color);
+        }
+    }
+
     /**
      * 
      * firstColor is the color that the gradient starts on
@@ -146,6 +154,12 @@ public class LedStrip extends SubsystemBase {
 
     public Command rainbow() {
         return run(() -> {
+            waveHueFunction(
+                50, 
+                (double) ledBuffer.getLength(), 
+                2, 
+                2,
+                180);
             for (int i = 0; i < ledBuffer.getLength(); i++) {
                 int hue = (int) (this.rainbowOffset + (i * 180 / ledBuffer.getLength())) % 180;
                 setLED(i, Color.fromHSV(hue, 255, 255));
@@ -155,18 +169,63 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    private double greenNGoldOffset = 1;
+    double greenNGoldOffset = 1;
 
     public Command greenNGold() {
         return run(() -> {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                int hue = 70 + (int) (50 * Math.sin((10*i + (this.greenNGoldOffset * (double) ledBuffer.getLength())) / (double) ledBuffer.getLength()));
-                setLED(i, Color.fromHSV(hue/2, 255, 255));  
-            }
-            this.greenNGoldOffset += .075;
-            this.greenNGoldOffset %= 6.28;
+            waveHueFunction(
+                50,
+                (double) ledBuffer.getLength(), 
+                75,
+                .075, 
+                Math.PI*2);
         });
     }
+
+    private void evaluateWave(double scale, double spacing, double time, int i, boolean isHue, double waveOffset) {
+        double wave = Math.sin((10*i + (spacing * time)) / spacing);
+        int output = (int) ((waveOffset + scale*wave) / (isHue ? 2 : 1));
+        setLED(i, isHue ? Color.fromHSV(output, 255, 255) : Color.fromHSV(180, 255, output));
+    }
+
+    private double waveHueOffset = 1;
+    public void waveHueFunction(double scale, double spacing, double waveOffset, double waveSpeed, double waveRange) {
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            evaluateWave(
+                scale,
+                spacing, 
+                waveHueOffset,
+                i, 
+                true, 
+                waveOffset
+            );
+        }
+        waveHueOffset += waveSpeed;
+        waveHueOffset %= waveRange;
+    }
+    public void resetWaveHueOffset() {
+        waveHueOffset = 1;
+    }
+
+    private double waveValueOffset = 1;
+    public void waveValueFunction(double scale, double spacing, double waveOffset, double waveValueIncrement, double waveRange) {
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            evaluateWave(
+                scale,
+                spacing, 
+                waveOffset, 
+                i, 
+                false, 
+                waveValueIncrement
+            );
+        }
+        waveValueOffset += waveValueIncrement;
+        waveValueOffset %= waveRange;
+    }
+    public void resetWaveValueOffset() {
+        waveValueOffset = 1;
+    }
+
 
     public Command circus() {
         return run(() -> {
@@ -204,6 +263,7 @@ public class LedStrip extends SubsystemBase {
     public Command alliance(BooleanSupplier isRedAlliance) {
         return run(() -> {
             boolean isRed = isRedAlliance.getAsBoolean();
+            waveValueFunction(500, 50, 0, .025, 6.28);
             for (int i = 0; i < ledBuffer.getLength(); i++) {
                 int saturation = MathUtil.clamp((int) (500*Math.abs(Math.sin((i+50.0*allianceOffset)/50.0))),0,255);
                 int hue = isRed ? 0 : 227;
