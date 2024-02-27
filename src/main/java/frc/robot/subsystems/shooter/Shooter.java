@@ -52,15 +52,13 @@ public class Shooter extends SubsystemBase implements Logged{
         currentLeftSpeed = motorLeft.getVelocity();
         currentRightSpeed = motorRight.getVelocity();
 
-        atDesiredRPM = MathUtil.applyDeadband(
-                    Math.abs(
-                            currentLeftSpeed
-                            - targetLeftSpeed),
-                    ShooterConstants.SHOOTER_RPM_DEADBAND) == 0
-                && 
-                MathUtil.applyDeadband(
-                    Math.abs(currentRightSpeed - targetRightSpeed),
-                    ShooterConstants.SHOOTER_RPM_DEADBAND) == 0;
+        atDesiredRPM = 
+            MathUtil.isNear(
+                currentLeftSpeed, targetLeftSpeed,
+                ShooterConstants.SHOOTER_RPM_DEADBAND)
+            && MathUtil.isNear(
+                currentRightSpeed, targetRightSpeed,
+                ShooterConstants.SHOOTER_RPM_DEADBAND);
     }
 
     /**
@@ -108,12 +106,16 @@ public class Shooter extends SubsystemBase implements Logged{
      * 
      * @return The method is returning a Command object.
      */
-    public Command stop() {
+    public Command stopCommand() {
         return runOnce(() -> motorLeft.set(0))
             .andThen(runOnce(() -> motorRight.set(0)));
     }
     
     public boolean getAtDesiredRPM() {
         return atDesiredRPM;
+    }
+
+    public Pair<Double, Double> getTargetSpeeds() {
+        return new Pair<Double, Double>(targetLeftSpeed, targetRightSpeed);
     }
 }

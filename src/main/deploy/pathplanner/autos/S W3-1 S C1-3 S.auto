@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8059318609740422,
-      "y": 4.440615856320681
+      "x": 1.4242897057222692,
+      "y": 4.089988751406074
     },
-    "rotation": 121.90810693565317
+    "rotation": 179.5549529345276
   },
   "command": {
     "type": "sequential",
@@ -16,9 +16,9 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "PrepareShooter"
+                  "pathName": "S W3"
                 }
               },
               {
@@ -32,39 +32,39 @@
                       }
                     },
                     {
-                      "type": "path",
-                      "data": {
-                        "pathName": "S W3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W3 W2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W2 W1"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W1 C1"
-                      }
-                    },
-                    {
                       "type": "named",
                       "data": {
-                        "name": "C1toC3"
+                        "name": "Shoot"
                       }
                     }
                   ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W3 W2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2 W1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W1 C1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C1toC4"
           }
         }
       ]

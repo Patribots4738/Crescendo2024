@@ -12,47 +12,21 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "PrepareShooter"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "S W3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W3 W2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W2 W1"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "S W3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W3 W2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W2 W1"
           }
         }
       ]

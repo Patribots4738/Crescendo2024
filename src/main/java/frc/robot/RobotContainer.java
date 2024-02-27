@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -46,6 +47,7 @@ import frc.robot.util.testing.HDCTuner;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import frc.robot.util.testing.PatritionalCommand;
 import monologue.Monologue;
 
 public class RobotContainer implements Logged {
@@ -60,7 +62,9 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private final Intake intake;
     @IgnoreLogged
-    private Limelight limelight;
+    private Limelight limelight3;
+    @IgnoreLogged
+    private Limelight limelight2;
     @IgnoreLogged
     private final Climb climb;
     @IgnoreLogged
@@ -89,18 +93,24 @@ public class RobotContainer implements Logged {
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
-
     @Log
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
-
     @Log
     public static Pose3d[] notePose3ds = new Pose3d[12];
-
+    @Log
+    public static Pose3d[] highNotePose3ds = new Pose3d[12];
     @Log
     private boolean freshCode = true;
-
     @Log
     public static Field2d field2d = new Field2d();
+    @Log
+    public static Pose2d robotPose2d = new Pose2d();
+    @Log
+    public static Pose3d robotPose3d = new Pose3d();
+    @Log
+    public static SwerveModuleState[] swerveMeasuredStates;
+    @Log
+    public static SwerveModuleState[] swerveDesiredStates;
     
     public RobotContainer() {
         
@@ -110,7 +120,8 @@ public class RobotContainer implements Logged {
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        limelight = new Limelight(swerve.getPoseEstimator(), swerve::getPose);
+        limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight");
+        limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight2");
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
 
@@ -162,9 +173,6 @@ public class RobotContainer implements Logged {
     }
 
     private void configureButtonBindings() {
-        if (FieldConstants.IS_SIMULATION) {
-            configureSimulationBindings(driver);
-        }
         configureDriverBindings(driver);
         configureOperatorBindings(operator);
         configureTestBindings();
@@ -180,26 +188,6 @@ public class RobotContainer implements Logged {
         // for more information 
         configureHDCBindings(driver);
         configureCalibrationBindings(operator);
-    }
-    
-    private void configureOperatorBindings(PatriBoxController controller) {
-        controller.povUp()
-            .onTrue(elevator.toTopCommand());
-        
-        controller.povDown()
-            .onTrue(elevator.toBottomCommand());
-
-        controller.leftBumper()
-            .onTrue(pieceControl.toggleIn());
-
-        controller.rightBumper()
-            .onTrue(pieceControl.toggleOut());
-
-        controller.x()
-            .onTrue(pieceControl.setShooterModeCommand(true));
-
-        controller.b()
-            .onTrue(pieceControl.setShooterModeCommand(false));
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
@@ -233,22 +221,24 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
-            .onTrue(shooterCmds.angleReset());
-
-        controller.povUp()
+            .onTrue(shooterCmds.stowPivot())
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
-
         
         controller.povDown().onTrue(climb.toBottomCommand());
         
         controller.a().whileTrue(
             Commands.sequence(
-                swerve.resetHDC(),
-                Commands.either(
+                swerve.resetHDCCommand(),
+                new PatritionalCommand(
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
                     climb::getHooksUp)));
-        
+                    
+        controller.x()
+            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
+
+        controller.b()
+            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -256,31 +246,46 @@ public class RobotContainer implements Logged {
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
-                    swerve.resetHDC(),
-                    Commands.either(
+                    swerve.resetHDCCommand(),
+                    new PatritionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
-                    
-        controller.b()
+
+        controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
-
-        controller.x()
-            .toggleOnTrue(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-
+            
         controller.leftBumper()
             .onTrue(pieceControl.toggleIn());
 
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut());
     }
-    
-    private void configureSimulationBindings(PatriBoxController controller) {
-        controller.rightTrigger().onTrue(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-        controller.rightTrigger().onFalse(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-        controller.rightTrigger()
-            .onTrue(
-                pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+
+    private void configureOperatorBindings(PatriBoxController controller) {
+        controller.povUp()
+            .onTrue(elevator.toTopCommand());
+
+        controller.povLeft()
+            .onTrue(elevator.toAmpCommand());
+
+        controller.povRight()
+            .onTrue(trapper.toggleSpeed());
+        
+        controller.povDown()
+            .onTrue(elevator.toBottomCommand());
+
+        controller.leftBumper()
+            .onTrue(pieceControl.toggleIn());
+
+        controller.rightBumper()
+            .onTrue(pieceControl.toggleOut());
+
+        controller.x()
+            .onTrue(pieceControl.setShooterModeCommand(true));
+
+        controller.b()
+            .onTrue(pieceControl.setShooterModeCommand(false));
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
@@ -357,37 +362,35 @@ public class RobotContainer implements Logged {
     public void onEnabled() {
         if (Robot.gameMode == GameMode.TELEOP) {
             new LPI(ledStrip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
-            pathPlannerStorage.updatePathViewerCommand().schedule();
+        } else if (Robot.gameMode == GameMode.TEST) {
+            CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
+        pathPlannerStorage.updatePathViewerCommand().schedule();
         this.freshCode = false;
     }
 
-    public void onTest() {
-        CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
-    }
-
     public void updateNTGains() {
-        double P = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P")
+        double P = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/0P")
                 .getDouble(-1);
-        double I = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I")
+        double I = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/1I")
                 .getDouble(-1);
-        double D = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D")
+        double D = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/2D")
                 .getDouble(-1);
 
-        double P2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P")
+        double P2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/0P")
                 .getDouble(-1);
-        double I2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I")
+        double I2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/1I")
                 .getDouble(-1);
-        double D2 = NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D")
+        double D2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/2D")
                 .getDouble(-1);
 
         if (P == -1 || I == -1 || D == -1 || P2 == -1 || I2 == -1 || D2 == -1) {
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/0P").setDouble(AutoConstants.XY_CORRECTION_P);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/1I").setDouble(AutoConstants.XY_CORRECTION_I);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Translation/2D").setDouble(AutoConstants.XY_CORRECTION_D);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/0P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/1I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("Auto/Rotation/2D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/0P").setDouble(AutoConstants.XY_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/1I").setDouble(AutoConstants.XY_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/2D").setDouble(AutoConstants.XY_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/0P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/1I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/2D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
             return;
         }
         
@@ -422,7 +425,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
-        NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot());
+        NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
@@ -442,26 +445,27 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j));
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j, swerve, limelight2));
             }
         }
     }
 
     private void configureLoggingPaths() {
-        Monologue.logObj(shooterCalc, "/Robot/maths/shooterCalc");
-        Monologue.logObj(calibrationControl, "/Robot/maths/calibrationControl");
-        Monologue.logObj(HDCTuner, "/Robot/maths/HDCTuner");
+        Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
+        Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
+        Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
 
-        Monologue.logObj(swerve, "/Robot/swerve");
+        Monologue.logObj(swerve, "Robot/Swerve");
 
-        Monologue.logObj(intake, "/Robot/subsystems/intake");
-        Monologue.logObj(climb, "/Robot/subsystems/climb");
-        Monologue.logObj(limelight, "/Robot/subsystems/limelight");
-        Monologue.logObj(shooter, "/Robot/subsystems/shooter");
-        Monologue.logObj(elevator, "/Robot/subsystems/elevator");
-        Monologue.logObj(pivot, "/Robot/subsystems/pivot");
+        Monologue.logObj(intake, "Robot/Subsystems/intake");
+        Monologue.logObj(climb, "Robot/Subsystems/climb");
+        Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
+        Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+        Monologue.logObj(shooter, "Robot/Subsystems/shooter");
+        Monologue.logObj(elevator, "Robot/Subsystems/elevator");
+        Monologue.logObj(pivot, "Robot/Subsystems/pivot");
         
-        Monologue.logObj(pathPlannerStorage, "/Robot/autuwu/auto/pathPlannerStorage");
+        Monologue.logObj(pathPlannerStorage, "Robot");
     }
 
     /**
@@ -490,8 +494,10 @@ public class RobotContainer implements Logged {
         }
 
         notePose3ds[0] = new Pose3d();
+        highNotePose3ds[0] = new Pose3d(0,0,-0.1, new Rotation3d());
         for (int i = 1; i < notePose3ds.length; i++) {
             notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
+            highNotePose3ds[i] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
     }
 }

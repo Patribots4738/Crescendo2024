@@ -26,7 +26,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	public Pivot() {
 		pivot = new Neo(
             ShooterConstants.SHOOTER_PIVOT_CAN_ID, 
-            !FieldConstants.IS_SIMULATION, 
+            false, 
             true);
 		configMotor();
 	}
@@ -41,18 +41,16 @@ public class Pivot extends SubsystemBase implements Logged {
 	@Override
 	public void periodic() {
 
-        realAngle = -getAngle();
+        realAngle = getAngle();
 
 		atDesiredAngle = 
-            MathUtil.applyDeadband(
-                Math.abs(realAngle + desiredAngle),
-                ShooterConstants.PIVOT_DEADBAND) == 0;
+            MathUtil.isNear(realAngle, desiredAngle, ShooterConstants.PIVOT_DEADBAND);
 
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
 			NTConstants.PIVOT_OFFSET_METERS.getZ(),
-			new Rotation3d(0, Units.degreesToRadians(realAngle), 0)
+			new Rotation3d(0, -Units.degreesToRadians(realAngle), 0)
 		);
 	}
 
@@ -96,15 +94,6 @@ public class Pivot extends SubsystemBase implements Logged {
 
 	public double getTargetAngle() {
 		return pivot.getTargetPosition();
-	}
-	
-	/**
-	 * The function is a command that stops the motor
-	 * 
-	 * @return The method is returning a Command object.
-	 */
-	public Command stop() {
-		return runOnce(() -> pivot.set(0));
 	}
 
 	/**

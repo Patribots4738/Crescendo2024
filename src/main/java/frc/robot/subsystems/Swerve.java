@@ -7,15 +7,19 @@ package frc.robot.subsystems;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.ejml.simple.AutomaticSimpleMatrixConvert;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -30,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.commands.drive.ChasePose;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.constants.Constants.AutoConstants;
@@ -63,18 +68,6 @@ public class Swerve extends SubsystemBase implements Logged {
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
             DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
-
-    @Log
-    SwerveModuleState[] swerveMeasuredStates;
-
-    @Log
-    SwerveModuleState[] swerveDesiredStates;
-
-    @Log
-    Pose3d robotPose3d = new Pose3d();
-
-    @Log
-    Pose2d robotPose2d = new Pose2d();
 
     // The gyro sensor
     private final Pigeon2 gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
@@ -126,8 +119,6 @@ public class Swerve extends SubsystemBase implements Logged {
         resetEncoders();
         gyro.setYaw(0);
         setBrakeMode();
-
-        SmartDashboard.putNumber("Swerve/RobotRotation", getPose().getRotation().getDegrees());
     }
 
     @Override
@@ -142,11 +133,11 @@ public class Swerve extends SubsystemBase implements Logged {
 
         Pose2d currentPose = getPose();
 
-        swerveMeasuredStates = new SwerveModuleState[] {
+        RobotContainer.swerveMeasuredStates = new SwerveModuleState[] {
                 frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
         };
 
-        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(swerveMeasuredStates);
+        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(RobotContainer.swerveMeasuredStates);
 
         if (FieldConstants.IS_SIMULATION) {
             resetOdometry(
@@ -157,20 +148,20 @@ public class Swerve extends SubsystemBase implements Logged {
         }
 
         RobotContainer.field2d.setRobotPose(currentPose);
-        SmartDashboard.putNumber("Swerve/RobotRotation", currentPose.getRotation().getRadians());
 
         if ((Double.isNaN(currentPose.getX())
             || Double.isNaN(currentPose.getY())
             || Double.isNaN(currentPose.getRotation().getDegrees())))
         {
             // Something in our pose was NaN...
-            resetOdometry(robotPose2d);
+            resetOdometry(RobotContainer.robotPose2d);
+            resetEncoders();
             resetHDC();
         } else {
-            robotPose2d = currentPose;
+            RobotContainer.robotPose2d = currentPose;
         }
 
-        robotPose3d = new Pose3d(
+        RobotContainer.robotPose3d = new Pose3d(
                 new Translation3d(
                         currentPose.getX(),
                         currentPose.getY(),
@@ -232,10 +223,6 @@ public class Swerve extends SubsystemBase implements Logged {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
     }
 
-    public ChassisSpeeds getFieldRelativeVelocity() {
-        return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelativeVelocity(), getPose().getRotation());
-    }
-
     /**
      * Sets the wheels into an X formation to prevent movement.
      */
@@ -270,7 +257,7 @@ public class Swerve extends SubsystemBase implements Logged {
         rearLeft.setDesiredState(desiredStates[2]);
         rearRight.setDesiredState(desiredStates[3]);
 
-        this.swerveDesiredStates = desiredStates;
+        RobotContainer.swerveDesiredStates = desiredStates;
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -372,8 +359,20 @@ public class Swerve extends SubsystemBase implements Logged {
         return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
-    public Command resetHDC() {
-        return Commands.runOnce(() -> AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians()));
+    public Command updateChasePose(Supplier<Pose2d> poseSupplier) {
+        return Commands.runOnce(() -> ChasePose.updateDesiredPose(poseSupplier.get()));
+    }
+
+    public Command getChaseCommand() {
+        return new ChasePose(this);
+    }
+
+    public void resetHDC() {
+        AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians());
+    }
+
+    public Command resetHDCCommand() {
+        return Commands.runOnce(() -> resetHDC());
     }
 
     public void reconfigureAutoBuilder() {
@@ -385,6 +384,23 @@ public class Swerve extends SubsystemBase implements Logged {
                 AutoConstants.HPFC,
                 Robot::isRedAlliance,
                 this);
+    }
+
+    // Used for note pickup in auto
+    // Because of the fact that we do not have to be perfectly 
+    // on top of a note to intake it, the tolerance is fairly lenient
+    public boolean atPose(Pose2d position) {
+        // More lenient on x axis, less lenient on y axis and rotation
+        Pose2d currentPose = getPose();
+        double angleDiff = currentPose.getRotation().minus(position.getRotation()).getRadians();
+		double distance = currentPose.relativeTo(position).getTranslation().getNorm();
+        return 
+            MathUtil.isNear(0, distance, AutoConstants.AUTO_POSITION_TOLERANCE_METERS)
+            && MathUtil.isNear(0, angleDiff, AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
+    }
+
+    public boolean atHDCPose() {
+        return atPose(desiredHDCPose);
     }
 
 }

@@ -120,18 +120,14 @@ public final class Constants {
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
             0,
-            0.20992,
-            0.0001762,
-            // These are in %
-            -1,
-            1
+            0.006,
+            0.0001762
         );
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
             0.05,
             0,
             0.0083,
-            // These are in %
             -0.25,
             0.25
         );
@@ -144,8 +140,9 @@ public final class Constants {
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 150;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 20;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 45;
+        // It will break things at 27
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 29; 
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 63.3;
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -187,34 +184,39 @@ public final class Constants {
 
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
         public static final double GRAVITY = 9.8;
+        public static final double V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
 
     }
 
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
-        public static final double ELEVATOR_DEADBAND = .05;
+        public static final double ELEVATOR_DEADBAND = 0.03;
         public static final double OUTTAKE_SECONDS = 0.4;
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
 
-        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 25.0;
+        private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
+        private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
 
-        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
+        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 1.0/(GEAR_RATIO*ELEVATOR_HEIGHT);
+        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 40; // amps
 
-        public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(.5, 0, 0, -1, 1);
+        public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
         // TODO: set these values
-        public static final double RESET_POS = 0;
+        public static final double BOTTOM_POS = 0;
         public static final double INTAKE_TIME = 0;
         public static final double TRAPPER_OUTTAKE_PERCENT = -1;
         public static final double TRAPPER_INTAKE_PERCENT = 1;
         public static final double TRAPPER_STOP_PERCENT = 0;
-        public static final double TRAP_PLACE_POS = 0.48;
-        public static final double INDEX_POS = 0.07;
+        public static final double TRAP_PLACE_POS = 0.49;
+        public static final double AMP_PLACE_POS = 0.37;
+        public static final double INDEX_POS = 0.09;
+        public static final double DROP_POS = 0.08;
 
-        public static final double ELEVATOR_TOP_LIMIT = 0.48;
+        public static final double ELEVATOR_TOP_LIMIT = 0.49;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
         public static final double TRAPPER_LOWER_PERCENT_LIMIT = -1;
@@ -257,10 +259,13 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 7.20;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 6.08;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
+
+        public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
+        public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
 
         /*
          * XY:
@@ -279,12 +284,16 @@ public final class Constants {
 
         private static final PIDController XY_PID = new PIDController(
                 AutoConstants.XY_CORRECTION_P,
-                AutoConstants.XY_CORRECTION_I,
+                0,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = .8514;
-        public static final double ROTATION_CORRECTION_I = 1;
+        public static final double ROTATION_CORRECTION_P = .3;
+        public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
+
+        public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;
+
+        public static final boolean USE_OBJECT_DETECTION = false;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
@@ -337,10 +346,11 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "A W1 A C1-4 S",
-            "S C2-5 S",
             "S W1 A C1-5 S",
             "S W2 S C1-3 S W3-1 S",
             "S W2 S C1-4 S",
+            "S C1-5 S",
+            "S W1 A C1-5 S",
             "S W3-1 S",
             "S W3-1 S C1-3 S"
         };
@@ -427,6 +437,8 @@ public final class Constants {
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
 
+        public static final double ALIGNMENT_DEADBAND = 0.2;
+
         // See https://www.desmos.com/calculator/e07raajzh5
         // And
         // https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
@@ -498,8 +510,8 @@ public final class Constants {
             /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
             /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
             /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
-            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator"); // Need to ID
-            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");         // Need to ID
+            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
+            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
             /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
             /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
         }};
@@ -566,6 +578,8 @@ public final class Constants {
 
         public static boolean IS_SIMULATION = Robot.isSimulation();
         public static final int CENTER_NOTE_COUNT = 5;
+
+        public static final Pose2d BLUE_ORIGIN = new Pose2d(0, 0, new Rotation2d());
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
@@ -716,6 +730,7 @@ public final class Constants {
         private static Translation3d[] SPIKE_TRANSLATIONS_BLUE = new Translation3d[3];
         private static Translation3d[] SPIKE_TRANSLATIONS_RED = new Translation3d[3];
         public static Translation3d[] NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
+        public static Translation3d[] HIGH_NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
 
         static {
             for (int i = 0; i < SPIKE_TRANSLATIONS_BLUE.length; i++) {
@@ -729,12 +744,51 @@ public final class Constants {
             System.arraycopy(SPIKE_TRANSLATIONS_BLUE, 0, NOTE_TRANSLATIONS, 0, SPIKE_TRANSLATIONS_BLUE.length);
             System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length, SPIKE_TRANSLATIONS_RED.length);
             System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
+            for (int i = 0; i < NOTE_TRANSLATIONS.length; i++) {
+                Translation3d noteTranslation3d = NOTE_TRANSLATIONS[i];
+                HIGH_NOTE_TRANSLATIONS[i] = new Translation3d(noteTranslation3d.getX(), noteTranslation3d.getY(), noteTranslation3d.getZ() - 0.1);
+            }
         }
 
         public static final Translation2d L_POSE = new Translation2d(5.11,6.23);
-        public static final Translation2d R_POSE = GET_SPEAKER_TRANSLATION();
+        public static final Translation2d R_POSE = new Translation2d(5.88, 1.84);
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
+
+        public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
+            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromDegrees(151.68));
+            Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
+            //Blue
+            add(L_POSE2D);
+            add(R_POSE2D);
+            add(M_POSE2D);
+            add(W3_POSE2D);
+            //Red
+            add(GeometryUtil.flipFieldPose(L_POSE2D));
+            add(GeometryUtil.flipFieldPose(R_POSE2D));
+            add(GeometryUtil.flipFieldPose(M_POSE2D));
+            add(GeometryUtil.flipFieldPose(W3_POSE2D));
+        }};
+
+        public static List<Pose2d> GET_SHOOTING_POSITIONS() {
+            int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;
+            return SHOOTING_POSITIONS.subList(startingIndex, startingIndex + 4);
+        }
+
+        public static List<Pose2d> GET_CENTERLINE_NOTES() {
+            List<Pose2d> notePoses = new ArrayList<Pose2d>();
+            for (int i = CENTERLINE_TRANSLATIONS.length - 1; i >= 0; i--) {
+                notePoses.add(
+                    new Pose2d(
+                        CENTERLINE_TRANSLATIONS[i].toTranslation2d(), 
+                        new Rotation2d()));
+            }
+            return notePoses;
+        }
+
+        
     }
 
     public static final class CameraConstants {

@@ -40,24 +40,19 @@ public class PieceControl {
 
     public Command stopAllMotors() {
         return Commands.parallel(
-                intake.stopCommand(),
-                indexer.stopCommand(),
-                elevator.stopCommand(),
-                trapper.stopCommand(),
-                shooterCmds.stopAllMotors()).ignoringDisable(true);
+                stopIntakeAndIndexer(),
+                shooterCmds.stopShooter()).ignoringDisable(true);
     }
 
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
-                .andThen(noteToShoot()
-                    .alongWith(shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier)))
-                .andThen(shooterCmds.angleReset());
+                .andThen(noteToShoot(poseSupplier, speedSupplier));
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
     // without waiting
-    public Command noteToShoot() {
+    public Command noteToShoot(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from trapper into indexer and then into 
@@ -66,8 +61,10 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(.75));
-
+                Commands.waitSeconds(.35),
+                shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
+                Commands.waitSeconds(.4),
+                stopIntakeAndIndexer());
     }
 
     public Command noteToTrap() {
@@ -79,7 +76,14 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.stopCommand(),
-                Commands.waitUntil(intake.possessionTrigger()),
+                Commands.waitUntil(intake::getPossession),
+                intake.revokePossesion(),
+                Commands.waitSeconds(0.7),
+                intake.stopCommand(),
+                trapper.outtake(),
+                indexer.toElevator(),
+                Commands.waitSeconds(0.5),
+                stopAllMotors(),
                 indexCommand());
 
     }
@@ -116,17 +120,16 @@ public class PieceControl {
 
     public Command dropPieceCommand() {
         return Commands.sequence(
-            elevator.indexCommand(),
+            elevator.toDropCommand(),
             trapper.outtake(),
-            Commands.waitSeconds(0.1),
+            Commands.waitSeconds(0.5),
             elevator.toBottomCommand()
         );
     }
 
     public Command indexCommand() {
-        return elevator.indexCommand()
-            .andThen(elevator.toBottomCommand()
-                .alongWith(intake.stopCommand()));
+        return elevator.toIndexCommand()
+                .alongWith(intake.stopCommand(), trapper.stopCommand());
     }
 
     public Command intakeAuto() {
@@ -160,7 +163,7 @@ public class PieceControl {
             indexer.toElevator(),
             trapper.outtake(),
             Commands.waitSeconds(3),
-            stopAllMotors()
+            indexCommand()
         ); 
     }
 
@@ -182,6 +185,7 @@ public class PieceControl {
     public void setShooterMode(boolean shooterMode) {
         this.shooterMode = shooterMode;
     }
+
     public Command setShooterModeCommand(boolean shooterMode) {
         return Commands.runOnce(() -> setShooterMode(shooterMode));
     }

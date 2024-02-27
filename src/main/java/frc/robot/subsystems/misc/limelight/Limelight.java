@@ -12,7 +12,9 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +30,7 @@ import monologue.Annotations.Log;
 // https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
 public class Limelight extends SubsystemBase implements Logged{
 
-    String limelightName = "limelight";
+    String limelightName;
     private final Supplier<Pose2d> robotPoseSupplier;
     private final SwerveDrivePoseEstimator poseEstimator;
 
@@ -44,9 +46,10 @@ public class Limelight extends SubsystemBase implements Logged{
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
-    public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier) {
+    public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName) {
         // Uses network tables to check status of limelight
-        timingTestEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName,"TIMING_TEST_ENTRY");
+        this.limelightName = limelightName;
+        timingTestEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName, "TIMING_TEST_ENTRY");
         this.robotPoseSupplier = robotPoseSupplier;
         this.poseEstimator = poseEstimator;
         loadAprilTagFieldLayout();
@@ -59,38 +62,13 @@ public class Limelight extends SubsystemBase implements Logged{
         } else {
             updatePoseEstimator();
             getTags();
-            runLimelightCode();
-        }
-    }
-
-    private void runLimelightCode() {
-        // Create an "Optional" object that contains the estimated pose of the robot
-        // This can be present (sees tag) or not present (does not see tag)
-        LimelightHelpers.Results result = getResults();
-        // The skew of the tag represents how confident the camera is
-        // If the result of the estimatedRobotPose exists,
-        // and the skew of the tag is less than 3 degrees,
-        // then we can confirm that the estimated position is realistic
-        if ( // check validity
-            ((!(result.botpose[0] == 0 && result.botpose[1] == 0) )
-            // check if good tag
-            && (LimelightHelpers.getTA("limelight") >= 0.3 
-                || result.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
-            && getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25
-        ) {
-            Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
-            if (Double.isNaN(estimatedRobotPose.getX()) 
-                || Double.isNaN(estimatedRobotPose.getY()) 
-                || Double.isNaN(estimatedRobotPose.getRotation().getRadians())) {
-                return;
-            }
-            poseEstimator.addVisionMeasurement( 
-                estimatedRobotPose,
-                Robot.currentTimestamp - getLatencyDiffSeconds());
         }
     }
 
     private void updatePoseEstimator() {
+        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 0) {
+            LimelightHelpers.setPipelineIndex(limelightName, 0);
+        }
         Results result = getResults();
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
 
@@ -111,16 +89,19 @@ public class Limelight extends SubsystemBase implements Logged{
             double degStds;
             // multiple targets detected
             if (result.targets_Fiducials.length >= 2) {
+                // TODO: TUNE
                 xyStds = 0.5;
                 degStds = 3;
             }
             // 1 target with large area and close to estimated pose
             else if (poseDifference < 0.5 && getBestTargetArea(result) > 0.8) {
+                // TODO: TUNE
                 xyStds = 1.0;
                 degStds = 6;
             }
             // 1 target farther away and estimated pose is close
             else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.1) {
+                // TODO: TUNE
                 xyStds = 2.0;
                 degStds = 12;
             }
@@ -159,6 +140,28 @@ public class Limelight extends SubsystemBase implements Logged{
         }
 
         visableTags = knownFiducials.toArray(new Pose3d[0]);
+    }
+
+    // TODO: test this logic in real life before running dynamic auto
+    public Pose2d getNotePose2d() {
+        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
+            LimelightHelpers.setPipelineIndex(limelightName, 1);
+        }
+        if (noteInVision()) {
+            Translation2d noteTranslation = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d().getTranslation();
+            Pose2d notePose = new Pose2d(noteTranslation, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
+            return notePose.plus(new Transform2d(robotPoseSupplier.get().getTranslation(), new Rotation2d()));
+        }
+        return robotPoseSupplier.get();
+    }
+
+    public boolean noteInVision() {
+        Results results = getResults();
+        return (
+            results.valid && (!(results.botpose[0] == 0 && results.botpose[1] == 0))
+            && (LimelightHelpers.getTA("limelight") >= 0.3 
+                || results.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
+            && getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25;
     }
 
     public Pose2d getPose2d() {

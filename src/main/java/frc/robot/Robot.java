@@ -19,7 +19,6 @@ import frc.robot.util.constants.Constants.NeoMotorConstants;
 import frc.robot.util.motors.Neo;
 import monologue.Monologue;
 
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -50,7 +49,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
-        Monologue.setupMonologue(robotContainer, "Robot", false, true);
+        Monologue.setupMonologue(robotContainer, "Robot/Draggables", false, true);
 
         DataLogManager.start();
         DataLogManager.logNetworkTables(true);
@@ -93,7 +92,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledExit() {
-        robotContainer.onEnabled();
         // Shut off NetworkTables broadcasting for most logging calls
         // if we are at competition
         Monologue.setFileOnly(DriverStation.isFMSAttached());
@@ -104,6 +102,7 @@ public class Robot extends TimedRobot {
         // Update "constants"
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         Robot.gameMode = GameMode.AUTONOMOUS;
+        robotContainer.onEnabled();
         // We only need to update alliance becuase
         // sim GUI starts the bot in a "disconnected"
         // state which won't update the alliance before
@@ -150,7 +149,7 @@ public class Robot extends TimedRobot {
         // Cancels all running commands at the start of test mode.
         Robot.gameMode = GameMode.TEST;
         CommandScheduler.getInstance().cancelAll();
-        robotContainer.onTest();
+        robotContainer.onEnabled();
     }
 
     @Override

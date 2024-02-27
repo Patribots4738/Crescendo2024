@@ -4,10 +4,12 @@ package frc.robot.util.motors;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 import com.revrobotics.jni.CANSparkMaxJNI;
@@ -23,12 +25,14 @@ public class SafeSparkMax extends CANSparkMax {
     protected final int canID;
     protected final boolean useAbsoluteEncoder;
     SparkPIDController pidController = getPIDController();
+    protected RelativeEncoder relativeEncoder = super.getEncoder();
+    protected AbsoluteEncoder absoluteEncoder = super.getAbsoluteEncoder();
 
     private final int MAX_ATTEMPTS = 20;
     private final int MEASUREMENT_PERIOD = 16;
     private final int AVERAGE_DEPTH = 2;
-    private final double BURN_FLASH_WAIT_TIME = 0.5;
-    private final double APPLY_PARAMETER_WAIT_TIME = 0.1;
+    private final double BURN_FLASH_WAIT_TIME = 0.1;
+    private final double APPLY_PARAMETER_WAIT_TIME = 0.02;
 
     public SafeSparkMax(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
         super(canID, motorType);
@@ -41,7 +45,7 @@ public class SafeSparkMax extends CANSparkMax {
         this.canID = canID;
         this.useAbsoluteEncoder = useAbsoluteEncoder;
         if (useAbsoluteEncoder) {
-            setFeedbackDevice(getAbsoluteEncoder());
+            setFeedbackDevice(absoluteEncoder);
         }
     }
 
@@ -71,6 +75,14 @@ public class SafeSparkMax extends CANSparkMax {
             status = parameterSetter.get();
             if (parameterCheckSupplier.getAsBoolean() && status == REVLibError.kOk)
                 break;
+            // If there is an error with the sensor, try to reinitialize it
+            if (status == REVLibError.kHALError) {
+                if (useAbsoluteEncoder) {
+                    absoluteEncoder = getAbsoluteEncoder();
+                } else {
+                    relativeEncoder = getEncoder();
+                }
+            }
             Timer.delay(APPLY_PARAMETER_WAIT_TIME);
         }
 
@@ -88,9 +100,8 @@ public class SafeSparkMax extends CANSparkMax {
         if (RobotBase.isSimulation())
             return REVLibError.kOk;
 
-        Timer.delay(BURN_FLASH_WAIT_TIME);
-        REVLibError status = super.burnFlash();
-        Timer.delay(BURN_FLASH_WAIT_TIME);
+            REVLibError status = super.burnFlash();
+            Timer.delay(BURN_FLASH_WAIT_TIME);
 
         return status;
     }
@@ -107,7 +118,7 @@ public class SafeSparkMax extends CANSparkMax {
             () -> super.restoreFactoryDefaults(),
             () -> true,
             "Restore factory defaults failure!");
-
+        Timer.delay(BURN_FLASH_WAIT_TIME);
         return status;
     }
 
@@ -131,8 +142,8 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public REVLibError fixMeasurementPeriod() {
         REVLibError status = applyParameter(
-                () -> this.getEncoder().setMeasurementPeriod(MEASUREMENT_PERIOD),
-                () -> this.getEncoder().getMeasurementPeriod() == MEASUREMENT_PERIOD,
+                () -> relativeEncoder.setMeasurementPeriod(MEASUREMENT_PERIOD),
+                () -> relativeEncoder.getMeasurementPeriod() == MEASUREMENT_PERIOD,
                 "Set encoder measurement period failure!");
         return status;
     }
@@ -144,8 +155,8 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public REVLibError fixAverageDepth() {
         REVLibError status = applyParameter(
-                () -> this.getEncoder().setAverageDepth(AVERAGE_DEPTH),
-                () -> this.getEncoder().getAverageDepth() == AVERAGE_DEPTH,
+                () -> relativeEncoder.setAverageDepth(AVERAGE_DEPTH),
+                () -> relativeEncoder.getAverageDepth() == AVERAGE_DEPTH,
                 "Set encoder average depth failure!");
         return status;
     }
@@ -205,10 +216,10 @@ public class SafeSparkMax extends CANSparkMax {
         BooleanSupplier parameterCheckSupplier;
 
         if (useAbsoluteEncoder) {
-            parameterSetter = () -> getAbsoluteEncoder().setPositionConversionFactor(factor);
+            parameterSetter = () -> absoluteEncoder.setPositionConversionFactor(factor);
             parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         } else {
-            parameterSetter = () -> super.getEncoder().setPositionConversionFactor(factor);
+            parameterSetter = () -> relativeEncoder.setPositionConversionFactor(factor);
             parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         }
 
@@ -219,9 +230,9 @@ public class SafeSparkMax extends CANSparkMax {
 
     public double getPositionConversionFactor() {
         if (useAbsoluteEncoder) {
-            return getAbsoluteEncoder().getPositionConversionFactor();
+            return absoluteEncoder.getPositionConversionFactor();
         } else {
-            return super.getEncoder().getPositionConversionFactor();
+            return relativeEncoder.getPositionConversionFactor();
         }
     }
 
@@ -240,10 +251,10 @@ public class SafeSparkMax extends CANSparkMax {
         BooleanSupplier parameterCheckSupplier;
 
         if (useAbsoluteEncoder) {
-            parameterSetter = () -> getAbsoluteEncoder().setVelocityConversionFactor(factor);
+            parameterSetter = () -> absoluteEncoder.setVelocityConversionFactor(factor);
             parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
         } else {
-            parameterSetter = () -> super.getEncoder().setVelocityConversionFactor(factor);
+            parameterSetter = () -> relativeEncoder.setVelocityConversionFactor(factor);
             parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
         }
 
@@ -294,9 +305,9 @@ public class SafeSparkMax extends CANSparkMax {
 
     public double getVelocityConversionFactor() {
         if (useAbsoluteEncoder) {
-            return getAbsoluteEncoder().getVelocityConversionFactor();
+            return absoluteEncoder.getVelocityConversionFactor();
         } else {
-            return super.getEncoder().getVelocityConversionFactor();
+            return relativeEncoder.getVelocityConversionFactor();
         }
     }
 
@@ -307,9 +318,9 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public double getPosition() {
         if (useAbsoluteEncoder && !FieldConstants.IS_SIMULATION) {
-            return getAbsoluteEncoder().getPosition();
+            return absoluteEncoder.getPosition();
         } else {
-            return super.getEncoder().getPosition();
+            return relativeEncoder.getPosition();
         }
     }
 
@@ -317,7 +328,7 @@ public class SafeSparkMax extends CANSparkMax {
      * RESET THE RELATIVE ENCODER TO BE THE SET POSITION
      */
     public void setPosition(double position) {
-        super.getEncoder().setPosition(position);
+        relativeEncoder.setPosition(position);
     }
 
     /**
@@ -327,9 +338,9 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public double getVelocity() {
         if (useAbsoluteEncoder) {
-            return getAbsoluteEncoder().getVelocity();
+            return absoluteEncoder.getVelocity();
         } else {
-            return super.getEncoder().getVelocity();
+            return relativeEncoder.getVelocity();
         }
     }
 
@@ -602,19 +613,23 @@ public class SafeSparkMax extends CANSparkMax {
     }
 
     /**
-     * Represents an error that can occur while using the REVLib library.
+     * Change a periodic status frame period of the motor controller.
      * Rev docs:
      * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
      * 
-     * @param frame  The status frame to reset
-     * @param period The update period for the status frame.
-     * @return error
+     * You can increase this number to ignore updates more / alliviate can bus traffic
+     * or decrease this number to get more frequent updates
+     * 
+     * @param frame  The frame to change
+     * @param period The period to set in milliseconds
+     * @return A REVLibError indicating the result of the operation
      */
     public REVLibError changeStatusFrame(StatusFrame frame, int period) {
         REVLibError error = setPeriodicFramePeriod(frame.getFrame(), period);
         // Add a delay to alleviate bus traffic
         if (!FieldConstants.IS_SIMULATION)
             Timer.delay(0.05);
+
         return error;
     }
 

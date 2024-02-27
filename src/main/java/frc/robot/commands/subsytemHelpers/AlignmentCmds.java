@@ -7,6 +7,7 @@ import com.pathplanner.lib.util.GeometryUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,6 +17,8 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.calc.AlignmentCalc;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.constants.Constants.OIConstants;
+import frc.robot.util.testing.PatritionalCommand;
 
 public class AlignmentCmds {
     
@@ -38,8 +41,12 @@ public class AlignmentCmds {
                 ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
                 ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
                 return new ChassisSpeeds(
-                        MathUtil.applyDeadband((controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond), 0.1),
-                        MathUtil.applyDeadband(-(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 0.1),
+                        MathUtil.applyDeadband(
+                            (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond), 
+                            OIConstants.ALIGNMENT_DEADBAND),
+                        MathUtil.applyDeadband(
+                            -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 
+                            OIConstants.ALIGNMENT_DEADBAND),
                         controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
             }, () -> false);
     }
@@ -146,9 +153,40 @@ public class AlignmentCmds {
      */
     public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return
-            Commands.either(
+            new PatritionalCommand(
                 chainRotationalAlignment(driverX, driverY),
-                speakerRotationalAlignment(driverX, driverY, shooterCmds),
+                speakerRotationalAlignment(driverX, driverY, shooterCmds)
+                    .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)),
                 climb::getHooksUp);
     }
+
+    public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
+        return Commands.either(
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.L_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.M_POSE),
+            // No way I just found my first XOR use case :D
+            () -> Robot.isRedAlliance() ^ xButtonPressed
+        );
+    }
+
+    private Command prepareFireAndRotateCommand(DoubleSupplier driverX, DoubleSupplier driverY, Translation2d pose) {
+        return shooterCmds.prepareFireCommand(
+            () -> pose,
+            Robot::isRedAlliance
+        ).alongWith(
+            swerve.getDriveCommand(() -> {
+                Translation2d endingPose = pose;
+                if (Robot.isRedAlliance()) {
+                    endingPose = GeometryUtil.flipFieldPosition(pose);
+                }
+                return alignmentCalc.getRotationalSpeeds(
+                    driverX.getAsDouble(), 
+                    driverY.getAsDouble(), 
+                    shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(endingPose));
+                },
+                () -> true
+            )
+        );
+    }
+
 }
