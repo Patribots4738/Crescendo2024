@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.util.constants.Constants.IntakeConstants;
 import frc.robot.util.motors.Neo;
@@ -42,15 +41,15 @@ public class Intake extends SubsystemBase implements Logged {
                 desiredPercent, 
                 IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
                 IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
+        if(desiredPercent == IntakeConstants.INTAKE_PERCENT) {
+            startedIntakingTimestamp = Robot.currentTimestamp;
+        }
         intakeMotor.set(desiredSpeed);
     }
 
     public Command setPercentCommand(double desiredPercent) {
         return runOnce(() -> {
             setPercent(desiredPercent);
-            if(desiredPercent == IntakeConstants.INTAKE_PERCENT) {
-                startedIntakingTimestamp = Robot.currentTimestamp;
-            }
         });
     }
 
