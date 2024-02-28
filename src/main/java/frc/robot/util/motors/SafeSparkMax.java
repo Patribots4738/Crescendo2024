@@ -28,11 +28,11 @@ public class SafeSparkMax extends CANSparkMax {
     protected RelativeEncoder relativeEncoder = super.getEncoder();
     protected AbsoluteEncoder absoluteEncoder = super.getAbsoluteEncoder();
 
-    private final int MAX_ATTEMPTS = 20;
+    private final int MAX_ATTEMPTS = NeoMotorConstants.SAFE_SPARK_MODE ? 20 : 5;
     private final int MEASUREMENT_PERIOD = 16;
     private final int AVERAGE_DEPTH = 2;
-    private final double BURN_FLASH_WAIT_TIME = 0.1;
-    private final double APPLY_PARAMETER_WAIT_TIME = 0.02;
+    private final double BURN_FLASH_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.1 : 0;
+    private final double APPLY_PARAMETER_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.02 : 0;
 
     public SafeSparkMax(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
         super(canID, motorType);
@@ -77,6 +77,7 @@ public class SafeSparkMax extends CANSparkMax {
                 break;
             // If there is an error with the sensor, try to reinitialize it
             if (status == REVLibError.kHALError) {
+                System.out.println("Reconfiguring encoder for " + canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")\n\n\n");
                 if (useAbsoluteEncoder) {
                     absoluteEncoder = getAbsoluteEncoder();
                 } else {

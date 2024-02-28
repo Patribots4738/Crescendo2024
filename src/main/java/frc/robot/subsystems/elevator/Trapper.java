@@ -16,12 +16,6 @@ public class Trapper extends SubsystemBase {
         trapper.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
     }
 
-    public Command placeCommand() {
-        return outtake()
-            .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-            .andThen(stopCommand());
-    }
-
     public Command intakeFromHandoff() {
         return intake()
             .andThen(Commands.waitSeconds(TrapConstants.INTAKE_TIME))
@@ -40,6 +34,14 @@ public class Trapper extends SubsystemBase {
 
     public Command outtake() {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_OUTTAKE_PERCENT));
+    }
+
+    public Command outtakeSlow() {
+        return runOnce(() -> setSpeed(-0.1));
+    }
+
+    public Command intakeSlow() {
+        return runOnce(() -> setSpeed(0.1));
     }
 
     public Command stopCommand() {
