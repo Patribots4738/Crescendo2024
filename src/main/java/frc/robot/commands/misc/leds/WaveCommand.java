@@ -1,4 +1,4 @@
-package frc.robot.subsystems.misc.leds;
+package frc.robot.commands.misc.leds;
 
 import java.util.Set;
 
@@ -6,8 +6,9 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.subsystems.misc.leds.LedStrip;
 
-class WaveCommand extends LEDFunctionCommand {
+public class WaveCommand extends LEDFunctionCommand {
     static double waveHueOffset = 1;
     static double waveValueOffset = 1;
 
@@ -48,7 +49,7 @@ class WaveCommand extends LEDFunctionCommand {
         ledStrip.setLED(x, Color.fromHSV(output, 255, 255));
     }
 
-    protected class Hue extends WaveCommand {
+    public class Hue extends WaveCommand {
         private final double scale;
         private final double spacing;
         private final double height;
@@ -94,7 +95,7 @@ class WaveCommand extends LEDFunctionCommand {
 
     }
 
-    protected class Value extends WaveCommand {
+    public class Value extends WaveCommand {
         private final double waveValueIncrement;
         private final double waveRange;
         private final double scale;
@@ -141,7 +142,7 @@ class WaveCommand extends LEDFunctionCommand {
         }
     }
 
-    protected class Saturation extends WaveCommand {
+    public class Saturation extends WaveCommand {
         private final double waveSaturationIncrement;
         private final double waveRange;
         private final double scale;

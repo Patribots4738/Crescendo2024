@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.commands.misc.leds.WaveCommand;
 import frc.robot.util.constants.Constants.LEDConstants;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 public class LedStrip extends SubsystemBase {
 
 	private AddressableLED led;
-    AddressableLEDBuffer ledBuffer;
+    public AddressableLEDBuffer ledBuffer;
 
     private int currentPatternIndex;
     //private final Supplier<Pose2d> poseSupplier;
@@ -61,7 +62,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 5;
+    public int selectedLED = 6;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
