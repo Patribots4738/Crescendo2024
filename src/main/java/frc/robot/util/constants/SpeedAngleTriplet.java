@@ -16,16 +16,24 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
      * @param speed the speed value
      * @param angle the angle value
      */
-    public SpeedAngleTriplet(Double leftSpeed, Double rightSpeed, Double angle) {
-        super(new Pair<Double, Double>(leftSpeed, rightSpeed), angle);
+    public SpeedAngleTriplet(Number leftSpeed, Number rightSpeed, Number angle) {
+        super(new Pair<>(leftSpeed.doubleValue(), rightSpeed.doubleValue()), angle.doubleValue());
+    }
+
+    public SpeedAngleTriplet(Pair<Number, Number> speeds, Number angle) {
+        super(new Pair<>(speeds.getFirst().doubleValue(), speeds.getSecond().doubleValue()), angle.doubleValue());
     }
 
     public SpeedAngleTriplet(Pair<Double, Double> speeds, Double angle) {
         super(speeds, angle);
     }
 
+    public SpeedAngleTriplet(Double leftSpeed, Double rightSpeed, Double angle) {
+        super(new Pair<>(leftSpeed, rightSpeed), angle);
+    }
+
     public SpeedAngleTriplet() {
-        super(new Pair<Double, Double>(0.0, 0.0), 0.0);
+        super(new Pair<>(0.0, 0.0), 0.0);
     }
 
     /**
@@ -33,8 +41,8 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
      *
      * @return the speed value, in RPM
      */
-    public Double getLeftSpeed() {
-        return super.getFirst().getFirst();
+    public double getLeftSpeed() {
+        return super.getFirst().getFirst().doubleValue();
     }
 
     /**
@@ -42,8 +50,8 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
      *
      * @return the speed value, in RPM
      */
-    public Double getRightSpeed() {
-        return super.getFirst().getSecond();
+    public double getRightSpeed() {
+        return super.getFirst().getSecond().doubleValue();
     }
 
     public Pair<Double, Double> getSpeeds() {
@@ -59,15 +67,15 @@ public class SpeedAngleTriplet extends Pair<Pair<Double, Double>, Double> implem
      *
      * @return the angle value
      */
-    public Double getAngle() {
-        return super.getSecond();
+    public double getAngle() {
+        return super.getSecond().doubleValue();
     }
 
-    public static SpeedAngleTriplet of(Double leftSpeed, Double rightSpeed, Double angle) {
+    public static SpeedAngleTriplet of(Number leftSpeed, Number rightSpeed, Number angle) {
         return new SpeedAngleTriplet(leftSpeed, rightSpeed, angle);
     }
 
-    public static SpeedAngleTriplet of(Pair<Double, Double> speeds, Double angle) {
+    public static SpeedAngleTriplet of(Pair<Number, Number> speeds, Number angle) {
         return new SpeedAngleTriplet(speeds, angle);
     }
 
