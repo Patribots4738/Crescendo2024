@@ -46,8 +46,8 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = new SpeedAngleTriplet(calculateShooterSpeedsForApex(pose, calculatePivotAngle(pose)), calculatePivotAngle(pose).getDegrees());
-        
+        // SpeedAngleTriplet currentTriplet = new SpeedAngleTriplet(calculateShooterSpeedsForApex(pose, calculatePivotAngle(pose)), calculatePivotAngle(pose).getDegrees());
+        SpeedAngleTriplet currentTriplet = calculateTriplet(pose.getTranslation());
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
@@ -82,7 +82,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS+.3);
+        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS);
     }
 
     /**

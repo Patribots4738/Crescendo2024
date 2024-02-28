@@ -61,36 +61,55 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(.35),
+                Commands.waitSeconds(.7),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
                 Commands.waitSeconds(.4),
                 stopIntakeAndIndexer());
     }
 
-    public Command noteToTrap() {
+    public Command intakeToTrap() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from trapper into indexer and then into 
         // shooter before stopping trapper and indexer
         return Commands.sequence(
-                intake.inCommand(),
-                trapper.intake(),
-                indexer.stopCommand(),
-                Commands.waitUntil(intake::getPossession),
-                intake.revokePossesion(),
-                Commands.waitSeconds(0.7),
-                intake.stopCommand(),
-                trapper.outtake(),
-                indexer.toElevator(),
-                Commands.waitSeconds(0.5),
-                stopAllMotors(),
-                indexCommand());
+            intake.inCommand(),
+            trapper.intake(),
+            indexer.toShooterSlow(),
+            Commands.waitUntil(intake::getPossession),
+            Commands.waitSeconds(0.5),
+            noteToTrap(),
+            noteToIndexer()
+        );
+    }
 
+    public Command noteToIndexer() {
+        return Commands.sequence(
+            trapper.intake(),
+            indexer.toShooterSlow(),
+            Commands.waitSeconds(0.6),
+            indexer.stopCommand(),
+            indexer.toElevatorSlow(),
+            Commands.waitSeconds(0.07),
+            stopIntakeAndIndexer()
+        );
+    }
+
+    public Command noteToTrap() {
+        return Commands.sequence(
+            trapper.outtake(),
+            indexer.toElevator(),
+            Commands.waitSeconds(0.2),
+            stopIntakeAndIndexer(),
+            trapper.outtakeSlow(),
+            Commands.waitSeconds(0.5),
+            stopIntakeAndIndexer()
+        );
     }
 
     public Command toggleIn() {
         return Commands.either(
-            noteToTrap(),
+            intakeToTrap(),
             stopIntakeAndIndexer(),
             intake::isStopped
         );
@@ -110,7 +129,7 @@ public class PieceControl {
         // rotation and speed before sending note from trapper into indexer and then into 
         // shooter before stopping trapper and indexer
         return Commands.sequence(
-            intake.stopCommand(),
+            intake.outCommand(),
             indexer.toElevator(),
             dropPieceCommand(),
             stopAllMotors()
@@ -143,17 +162,25 @@ public class PieceControl {
         // maybe make setPosition a command ORR Make the Elevator Command
         return Commands.either(
             shootWhenReady(poseSupplier, speedSupplier),
-            elevatorPlacementCommand(),
+            placeTrap(),
             this::getShooterMode
         );
     }
 
-    public Command elevatorPlacementCommand() {
-        return Commands.sequence(
-            elevator.toTopCommand(),
-            trapper.placeCommand(),
-            Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
-            elevator.toBottomCommand()
+    public Command placeTrap() {
+        return shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0.0,0.0, 60.0)).alongWith(
+            Commands.sequence(
+                elevator.toTopCommand(),
+                trapper.intake(),
+                Commands.waitSeconds(0.3),
+                trapper.stopCommand(),
+                Commands.waitSeconds(1),
+                trapper.outtake(),
+                Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
+                trapper.stopCommand()
+            )
+        ).andThen(
+            shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0.0,0.0, 0.0))
         );
     }
 
