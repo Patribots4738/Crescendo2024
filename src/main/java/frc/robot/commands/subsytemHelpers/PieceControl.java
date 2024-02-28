@@ -60,9 +60,9 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(.7),
+                Commands.waitSeconds(NT.getSupplier("noteToShoot1").getAsDouble()), // 0.7
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitSeconds(.4),
+                Commands.waitSeconds(NT.getSupplier("noteToShoot2").getAsDouble()), // 0.4
                 stopIntakeAndIndexer());
     }
 
@@ -76,7 +76,7 @@ public class PieceControl {
             trapper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(intake::getPossession),
-            Commands.waitSeconds(0.5),
+            Commands.waitSeconds(NT.getSupplier("intakeToTrap1").getAsDouble()), // 0.5
             noteToTrap(),
             noteToIndexer()
         );
@@ -86,10 +86,10 @@ public class PieceControl {
         return Commands.sequence(
             trapper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitSeconds(0.6),
+            Commands.waitSeconds(NT.getSupplier("noteToIndexer1").getAsDouble()), // 0.6
             indexer.stopCommand(),
             indexer.toElevatorSlow(),
-            Commands.waitSeconds(0.07),
+            Commands.waitSeconds(NT.getSupplier("noteToIndexer2").getAsDouble()), // 0.07
             stopIntakeAndIndexer()
         );
     }
@@ -98,10 +98,10 @@ public class PieceControl {
         return Commands.sequence(
             trapper.outtake(),
             indexer.toElevator(),
-            Commands.waitSeconds(0.2),
+            Commands.waitSeconds(NT.getSupplier("noteToTrap1").getAsDouble()), // 0.2
             stopIntakeAndIndexer(),
             trapper.outtakeSlow(),
-            Commands.waitSeconds(0.5),
+            Commands.waitSeconds(NT.getSupplier("noteToTrap2").getAsDouble()), // 0.5
             stopIntakeAndIndexer()
         );
     }
@@ -130,7 +130,7 @@ public class PieceControl {
         return Commands.sequence(
             elevator.toDropCommand(),
             trapper.outtake(),
-            Commands.waitSeconds(0.5),
+            Commands.waitSeconds(NT.getSupplier("dropPieceCommand1").getAsDouble()), // 0.5
             elevator.toBottomCommand()
         );
     }

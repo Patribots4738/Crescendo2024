@@ -869,5 +869,21 @@ public final class Constants {
             0, 
             PIVOT_OFFSET_Z);
         
+        public static final Map<String, Number> WAIT_TIMES = new HashMap<>() {{
+            put("noteToShoot1", 0.7);
+            put("noteToShoot2", 0.4);
+            put("noteToShoot3", 0.0);
+
+            put("intakeToTrap1", 0.5);
+            put("intakeToTrap2", 0.0);
+
+            put("noteToIndexer1", 0.6);
+            put("noteToIndexer2", 0.07);
+            put("noteToIndexer3", 0.0);
+
+            put("noteToTrap1", 0.2);
+            put("noteToTrap2", 0.5);
+            put("noteToTrap3", 0.0);
+        }};
     }
 }
