@@ -47,7 +47,7 @@ public class Elevator extends SubsystemBase implements Logged {
         // Set back to 0 if we are no longer near the guillotine / not stuck
         if (nearGuillotine() && hitGuillotineTimestamp == 0)
             hitGuillotineTimestamp = Robot.currentTimestamp;
-        else if (hitGuillotineTimestamp != 0) 
+        else if (!nearGuillotine() && hitGuillotineTimestamp != 0) 
             hitGuillotineTimestamp = 0;
         
         updateStuck();
