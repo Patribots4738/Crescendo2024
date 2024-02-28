@@ -36,9 +36,17 @@ public class Indexer extends SubsystemBase {
     public Command toShooter() {
         return setPercentCommand(IntakeConstants.SHOOTER_TRIGGER_WHEEL_PERCENT);
     }
+    
+    public Command toShooterSlow() {
+        return setPercentCommand(IntakeConstants.SHOOTER_TRIGGER_WHEEL_PERCENT/2.0);
+    }
 
     public Command toElevator() {
         return setPercentCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_PERCENT);
+    }
+
+    public Command toElevatorSlow() {
+        return setPercentCommand(.3);
     }
 
     public Command stopCommand() {

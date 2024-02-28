@@ -186,7 +186,7 @@ public class RobotContainer implements Logged {
         // Warning: these buttons are not on the default loop!
         // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
         // for more information 
-        configureHDCBindings(driver);
+        // configureHDCBindings(driver);
         configureCalibrationBindings(operator);
     }
     
@@ -281,6 +281,16 @@ public class RobotContainer implements Logged {
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut());
 
+        controller.rightTrigger()
+            .onTrue(
+                shooter.setSpeedCommand(3000)
+                    .alongWith(pivot.setAngleCommand(30))
+                .andThen(Commands.waitUntil(shooterCalc.readyToShootSupplier()))
+                .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
+                .andThen(shooter.stopCommand()
+                    .alongWith(pivot.setAngleCommand(0)))
+            );
+
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true));
 
@@ -309,7 +319,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .onTrue(pieceControl.noteToTrap());
+            .onTrue(pieceControl.toggleIn());
 
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(pieceControl.ejectNote());
@@ -429,7 +439,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
-        NamedCommands.registerCommand("PlaceAmp", pieceControl.elevatorPlacementCommand());
+        NamedCommands.registerCommand("PlaceAmp", pieceControl.placeTrap());
         NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));

@@ -23,7 +23,7 @@ public class ShooterCmds {
     private Pivot pivot;
     private Shooter shooter;
 
-    private SpeedAngleTriplet desiredTriplet;
+    private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet();
     
     public ShooterCalc shooterCalc;
 
@@ -81,7 +81,7 @@ public class ShooterCmds {
             desiredTriplet = triplet;
             pivot.setAngle(triplet.getAngle());
             shooter.setSpeed(triplet.getSpeeds());
-        }, pivot, shooter);
+        }, pivot, shooter).until(shooterCalc.readyToShootSupplier());
     }
     
     public SpeedAngleTriplet getTriplet() {

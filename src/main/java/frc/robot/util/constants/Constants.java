@@ -138,11 +138,15 @@ public final class Constants {
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
         public static final double PIVOT_DEADBAND = 1;
-        public static final double SHOOTER_RPM_DEADBAND = 150;
+        public static final double SHOOTER_RPM_DEADBAND = 50;
 
-        // It will break things at 27
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 29; 
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 63.3;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 16; 
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+        
+        // This mega decimal number was gotten from REV hardware client, 
+        // and we zeroed the pivot at its minimum angle
+        public static final double ABSOLUTE_ENCODER_ZERO_OFFSET = 128.2069087-PIVOT_LOWER_LIMIT_DEGREES;
+
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -158,19 +162,31 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
-                put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
-                put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
-                put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
-                put(9, SpeedAngleTriplet.of(2465.0, 2465.0, 40.5));
-                put(10, SpeedAngleTriplet.of(2633.0, 2633.0, 38.1));
-                put(11, SpeedAngleTriplet.of(2795.0, 2795.0, 35.8));
-                put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
-                put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
-                put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
-                put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
-                put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
-                put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
+                // put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
+                // put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
+                // put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
+                // put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
+                // put(9, SpeedAngleTriplet.of(2465.0, 2465.0, 40.5));
+                // put(10, SpeedAngleTriplet.of(2633.0, 2633.0, 38.1));
+                // put(11, SpeedAngleTriplet.of(2795.0, 2795.0, 35.8));
+                // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
+                // put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
+                // put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
+                // put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
+                // put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
+                // put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
+
+                // V2
+                put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
+                put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
+                put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
+                put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
+                put(10, SpeedAngleTriplet.of(2884.0, 2894.0, 37.1));
+                put(11, SpeedAngleTriplet.of(2924.0, 2930.0, 33.3));
+                put(12, SpeedAngleTriplet.of(2924.0, 2930.0, 32.3));
+                // V3 (note inside of indexer)
+                put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
+                put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
             }
         };
 
@@ -192,7 +208,7 @@ public final class Constants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = 0.03;
-        public static final double OUTTAKE_SECONDS = 0.4;
+        public static final double OUTTAKE_SECONDS = 3;
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
@@ -214,7 +230,7 @@ public final class Constants {
         public static final double TRAP_PLACE_POS = 0.49;
         public static final double AMP_PLACE_POS = 0.37;
         public static final double INDEX_POS = 0.09;
-        public static final double DROP_POS = 0.08;
+        public static final double DROP_POS = 0.11;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.49;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
@@ -363,7 +379,8 @@ public final class Constants {
         // L3 = 14T (fast, low torque)
         // This changes the drive speed of the module (a pinion gear with more teeth
         // will result in a robot that drives faster).
-        public static final int DRIVING_MOTOR_PINION_TEETH = 14;
+        // Extra high speed settings from REV make this number high thern L3
+        public static final int DRIVING_MOTOR_PINION_TEETH = 16;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
@@ -374,9 +391,10 @@ public final class Constants {
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
         public static final double WHEEL_DIAMETER_METERS = 0.0762;
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-        // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
+        // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
         // teeth on the bevel pinion
-        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (DRIVING_MOTOR_PINION_TEETH * 15);
+        public static final double SPUR_GEAR_TEETH = 19;
+        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
                 * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION;
@@ -487,6 +505,7 @@ public final class Constants {
     }
 
     public static final class NeoMotorConstants {
+        public static final boolean SAFE_SPARK_MODE = false;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 

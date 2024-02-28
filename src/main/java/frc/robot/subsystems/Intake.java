@@ -28,8 +28,9 @@ public class Intake extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         if (desiredSpeed == IntakeConstants.INTAKE_PERCENT
-            && Robot.currentTimestamp - startedIntakingTimestamp > 0.6
-            && intakeMotor.getVelocity() < 7000)
+            && Robot.currentTimestamp - startedIntakingTimestamp > 0.3
+            && intakeMotor.getVelocity() < 8000
+            && intakeMotor.getOutputCurrent() > 21)
         {
             notePossession = true;
         }
@@ -41,7 +42,9 @@ public class Intake extends SubsystemBase implements Logged {
                 desiredPercent, 
                 IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
                 IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
-        if(desiredPercent == IntakeConstants.INTAKE_PERCENT) {
+        
+        if (desiredPercent == IntakeConstants.INTAKE_PERCENT) {
+            notePossession = false;
             startedIntakingTimestamp = Robot.currentTimestamp;
         }
         intakeMotor.set(desiredSpeed);

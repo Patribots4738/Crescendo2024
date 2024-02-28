@@ -12,10 +12,10 @@ import monologue.Annotations.Log;
 
 public class CalibrationControl implements Logged {
 
-    private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet(0.0,0.0,0.0);
+    private SpeedAngleTriplet desiredTriplet = SpeedAngleTriplet.of(3311.0, 3034.0, 30.3);
 
     @Log
-    private double leftSpeed = 3200, rightSpeed = 3800, angle = 26;
+    private double leftSpeed = 3311, rightSpeed = 3034, angle = 30;
 
     @Log
     private boolean pivotLock, leftLock, rightLock;
@@ -27,7 +27,7 @@ public class CalibrationControl implements Logged {
 
     public CalibrationControl(ShooterCmds shooterCmds) {
         this.shooterCmds = shooterCmds;
-    }
+    }   
 
     public Command copyCalcTriplet() {
         return Commands.runOnce(() -> {
