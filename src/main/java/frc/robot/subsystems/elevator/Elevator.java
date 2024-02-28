@@ -10,16 +10,18 @@ import frc.robot.RobotContainer;
 import frc.robot.util.constants.Constants.NTConstants;
 import frc.robot.util.constants.Constants.TrapConstants;
 import frc.robot.util.motors.Neo;
+import frc.robot.Robot;
 import monologue.Logged;
 import monologue.Annotations.Log;
+
 
 public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
     @Log
-    private double pos = 0, desiredPos = 0;
+    private double pos = 0, desiredPos = 0, startedElevationTimestamp = 0;
 
     @Log
-    private boolean atDesiredPos = false;
+    private boolean atDesiredPos = false, stuckOnGuillotine = false;
 
     /** Creates a new Elevator. */
     public Elevator() {
@@ -39,7 +41,7 @@ public class Elevator extends SubsystemBase implements Logged {
         desiredPos = elevator.getTargetPosition();
 
         atDesiredPos = atDesiredPosition();
-
+        stuckOnGuillotine = stuckOnGuillotine(0.6);
         RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
             0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
             new Rotation3d()
@@ -75,8 +77,10 @@ public class Elevator extends SubsystemBase implements Logged {
     public Command setPositionCommand(double pos) {
         return runOnce(() -> this.setPosition(pos))
                 // Keep the subsystem required as it gets there
-                .andThen(Commands.waitUntil(this::atDesiredPosition));
+                .andThen(Commands.waitUntil((() -> (atDesiredPos || stuckOnGuillotine))));
     }
+
+
 
     public Command toBottomCommand() {
         return setPositionCommand(TrapConstants.BOTTOM_POS);
@@ -85,6 +89,8 @@ public class Elevator extends SubsystemBase implements Logged {
     public Command toTopCommand() {
         return setPositionCommand(TrapConstants.TRAP_PLACE_POS);
     }
+
+
 
     public Command toAmpCommand() {
         return setPositionCommand(TrapConstants.AMP_PLACE_POS);
@@ -101,4 +107,8 @@ public class Elevator extends SubsystemBase implements Logged {
     public boolean atDesiredPosition() {
 		return MathUtil.isNear(desiredPos, pos, TrapConstants.ELEVATOR_DEADBAND);
 	}
+
+    public boolean stuckOnGuillotine(double toleranceTime) {
+        return Robot.currentTimestamp - this.startedElevationTimestamp >= toleranceTime;
+    }
 }

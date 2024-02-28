@@ -1,7 +1,6 @@
 package frc.robot.commands.subsytemHelpers;
 
 import java.util.function.Supplier;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -151,10 +150,19 @@ public class PieceControl {
     public Command elevatorPlacementCommand() {
         return Commands.sequence(
             elevator.toTopCommand(),
+            Commands.runOnce(() -> getUnstuck(elevator.getPosition())).onlyIf(() -> !elevator.atDesiredPosition()),
             trapper.placeCommand(),
             Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
             elevator.toBottomCommand()
         );
+    }
+    
+     public Command getUnstuck(double oldPos) {
+        return Commands.sequence(        
+            Commands.runOnce(() -> trapper.setSpeed(-.2)),
+            Commands.waitUntil(() -> Math.abs(elevator.getPosition() - oldPos) >= 0.1),
+            Commands.runOnce(() -> trapper.stopCommand()),
+            Commands.waitUntil(() -> elevator.atDesiredPosition()));
     }
 
     public Command sourceShooterIntake() {
