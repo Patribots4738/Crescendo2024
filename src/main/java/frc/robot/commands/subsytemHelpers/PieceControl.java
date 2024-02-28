@@ -24,6 +24,9 @@ public class PieceControl {
 
     private boolean shooterMode = true;
 
+    // State representing if we are trying to unstuck the elevator
+    private boolean elevatorDislodging = false;
+
     public PieceControl(
             Intake intake,
             Indexer indexer,
@@ -156,12 +159,18 @@ public class PieceControl {
         );
     }
 
+    private Command toggleStuck() {
+        return Commands.runOnce(() -> {
+            elevatorDislodging = !elevatorDislodging;
+        });
+    }
+
     // Same as normally setting elevator position but adds unstuck logic
     public Command setElevatorPosition(double position) {
         return Commands.sequence(
             elevator.setPositionCommand(position, true),
-            getUnstuck(position).onlyIf(elevator::stuckOnGuillotine).repeatedly().until(() -> !elevator.stuckOnGuillotine())
-                .andThen(elevator.setPositionCommand(position))
+            // Run until we are no longer in our unstucking state only if elevator actually gets stuck
+            getUnstuck(position).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
 
@@ -177,11 +186,15 @@ public class PieceControl {
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(
+                // Toggle this state to currently unstucking if we haven't already
+                toggleStuck().onlyIf(() -> !elevatorDislodging),
                 elevator.setPositionCommand(TrapConstants.UNSTUCK_POS),
                 trapper.outtakeSlow(),
                 Commands.waitSeconds(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 trapper.stopCommand(),
-                elevator.setPositionCommand(desiredPose, true)
+                elevator.setPositionCommand(desiredPose, true),
+                // Toggle unstucking state to off if the elevator isn't actually stuck anymore
+                toggleStuck().onlyIf(() -> !elevator.getStuck())
             );
     }
 
