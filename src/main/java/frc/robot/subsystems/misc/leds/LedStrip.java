@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.commands.misc.leds.FlashCommand;
-import frc.robot.commands.misc.leds.LEDCommand;
+import frc.robot.commands.misc.leds.LEDCommands;
 import frc.robot.commands.misc.leds.WaveCommand;
 import frc.robot.util.constants.Constants.LEDConstants;
 import java.util.List;
@@ -30,7 +30,7 @@ public class LedStrip extends SubsystemBase {
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
-    private LEDCommand ledFunctionCommand = new LEDCommand(this);
+    private LEDCommands ledFunctionCommand = new LEDCommands(this);
 
     public LedStrip() {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
@@ -62,7 +62,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 7;
+    public int selectedLED = 6;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -71,7 +71,7 @@ public class LedStrip extends SubsystemBase {
             case (2) -> circus();
             case (3) -> loading();
             case (5) -> alliance(Robot::isRedAlliance);
-            case (6) -> new FlashCommand(this, 30, 5.5, Color.kGreen, Color.kBlack);
+            case (6) -> new FlashCommand(30, 5.5, Color.kGreen, Color.kBlack);
             case (7) -> rainbow();
             case (8) -> elevatorTOPLED();
             default -> turnOff();

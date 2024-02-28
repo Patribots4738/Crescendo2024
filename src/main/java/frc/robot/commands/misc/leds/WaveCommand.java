@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.commands.misc.leds.LEDCommand.HSV;
+import frc.robot.commands.misc.leds.LEDCommands.HSV;
 import frc.robot.subsystems.misc.leds.LedStrip;
 
 public class WaveCommand {
@@ -42,7 +42,7 @@ public class WaveCommand {
         ledStrip.setLED(x, Color.fromHSV(output, 255, 255));
     }
 
-    public class Hue extends LEDCommand {
+    public class Hue extends LEDCommands {
         private final double scale;
         private final double spacing;
         private final double height;
@@ -91,7 +91,7 @@ public class WaveCommand {
 
     }
 
-    public class Value extends LEDCommand {
+    public class Value extends LEDCommands {
         private final double waveValueIncrement;
         private final double waveRange;
         private final double scale;
@@ -142,7 +142,7 @@ public class WaveCommand {
         }
     }
 
-    public class Saturation extends LEDCommand {
+    public class Saturation extends LEDCommands {
         private final double waveSaturationIncrement;
         private final double waveRange;
         private final double scale;
