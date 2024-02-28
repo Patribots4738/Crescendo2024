@@ -41,10 +41,10 @@ Continue reading to learn more! :D
 ## Autonomous 🤖
   ### LED Position Indicator (LPI)
   We have a command callled LPI that runs when the robot is turned on & disabled. This command was created to aid the technicion in positioning the robot in the starting zone by displaying various LED patterns to convey the distance from the desired starting position & the percentage of error of the robots rotation. This allows us to oriente the robot with ease to eliminate the need of aligning to a field object such as the subwoofer, therefore giving us the liberty to start the game anywhere in the starting zone. Please view the section regarding major class functions below if you like to learn more.
-  [LPI Concept Drawing Board](<[https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-3929,-1794,7449,3781&page=page:9NTiPVa29oqzjElya5D6n](https://www.tldraw.com/v/YKJloESPqAyu62wxqEQ8U?viewport=-3929,-1794,7449,3781&page=page:9NTiPVa29oqzjElya5D6n)>)
+  [LPI Concept Drawing Board](<https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-3929,-1794,7449,3781&page=page:9NTiPVa29oqzjElya5D6n](https://www.tldraw.com/v/YKJloESPqAyu62wxqEQ8U?viewport=-3929,-1794,7449,3781&page=page:9NTiPVa29oqzjElya5D6n>)
   
   ### Path Generation & Modular Autonomous Paths
-  We use PathPlanner to construct a modular autonomous. In PathPlanner, we use waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths togethor to make one predetermined autonomous. Using note detection & logic, this also allows us to make a modular autonomous path that can prevent us from going to a note position that has no note detected. This prevents the robot from visiting a location
+  We use PathPlanner to construct a modular autonomous. In PathPlanner, we use waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths togethor to make one predetermined autonomous. Using note detection & logic, this also allows us to make a modular autonomous path that can prevent us from going to a note position that has no note detected. This prevents the robot from visiting a location.
   [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>)
 
   ### Note Detection
