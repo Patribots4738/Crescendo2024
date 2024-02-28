@@ -67,7 +67,8 @@ public class LedStrip extends SubsystemBase {
             case (5) -> alliance(Robot::isRedAlliance);
             case (6) -> flash();
             case (7) -> rainbow();
-            case (8) -> elevatorTOPLED();
+            case (8) -> upwardsElevatorGradientLED();
+            case (9) -> merryBismasLED();
             default -> turnOff();
         };
         return selectedPattern.ignoringDisable(true);
@@ -122,20 +123,62 @@ public class LedStrip extends SubsystemBase {
      * endIndex is the LED that the gradient ends on
      * @param endIndex
      */
-    public void setLEDGradient(Color firstColor, Color secondColor, int startIndex, int endIndex) {
+    public void setLEDGradient(Color ColorI, Color ColorII, int startIndex, int endIndex) {
         for (int i = startIndex; i < endIndex; i++) {
             double ratio = (double) (i - startIndex) / (double) (endIndex - startIndex);
-            setLED(i, sampleGradient(firstColor, secondColor, ratio));
+            setLED(i, sampleGradient(ColorII, ColorI, ratio));
         }
     }
 
-    public void oohShiny(Color blinkI, Color blinkII, int blinkAmount, int setIndexI, int setIndexII) {
-        System.out.println("Hello");
-        for (int j = setIndexI; j < setIndexII; j++) {
-            Color blinkColor = (j % 2 == 0) ? blinkI : blinkII;
-            setLED(setIndexI, blinkColor);
+    int blinkAmount = 0;
+    String blinkStatus = "initialize";
+    public void oohShiny(int startIndex, int endIndex, Color colorOn, Color colorOff, int blinkCount) {
+      if (blinkStatus.equals("initialize")) {
+        blinkAmount = 0;
+        blinkStatus = "execute";
+      }
+      if (blinkStatus.equals("execute")) {
+        if (((int) (Robot.currentTimestamp * 7)) % 2 == 0) {
+          setLED(startIndex, endIndex, colorOff);
+        } else {
+          setLED(startIndex, endIndex, colorOn);
+          blinkAmount--;
         }
+        if (blinkCount == blinkAmount) {
+          blinkStatus = "done";
+        }
+      }
         
+    }
+
+    public void cautionOOhShiny(int startIndex, int endIndex, Color colorOn1, Color colorOn2, Color colorOff, int blinkCount) {
+      if (blinkStatus.equals("initialize")) {
+        blinkAmount = 0;
+        blinkStatus = "execute";
+      }
+      if (blinkStatus.equals("execute")) {
+        if (((int) (Robot.currentTimestamp * 7)) % 2 == 0) {
+          setLED(startIndex, endIndex, colorOff);
+        } else {
+          for (int l = startIndex; l < endIndex; l++) {
+          Color patternColor = (((l/2) % 2 == 0) ? colorOn1 : colorOn2);
+          setLED(l, patternColor);
+          }
+          blinkAmount--;
+        }
+        if (blinkCount == blinkAmount) {
+          blinkStatus = "done";
+        }
+      }
+        
+    }    
+
+    public void blink2(int startIndex, int endIndex, Color color) {
+      if ((Robot.currentTimestamp * 7) % 2 == 0) {
+        setLED(startIndex, endIndex, color);
+      } else {
+        setLED(startIndex, endIndex, Color.kBlack);
+      }
     }
 
     public Command turnOff() {
@@ -213,16 +256,22 @@ public class LedStrip extends SubsystemBase {
             this.allianceOffset %= 6.28;
         });
     }
+
     
-    Color Orange = new Color(250, 160, 30);
-    Color GreerYeller = new Color(50, 250, 0);
+    Color Blue = new Color(0, 0, 255);
+    Color Orange = new Color(255, 80, 0);
+    Color GreerYeller = new Color(213, 255, 0);
     Color Greer = new Color(0, 250, 0);
     Color TurnOff = new Color(0, 0, 0);
     Color Red = new Color(250, 0, 0);
+    Color NoColor = new Color(0, 0, 0);
+
+    Color GradBlue = Color.fromHSV(70, 255, 255);
+    Color GradRed = Color.fromHSV(0, 255, 255);
 
     public Command upwardsElevatorGradientLED() {
         return Commands.run(() -> {
-            setLEDGradient(Orange, GreerYeller, 1, 10);
+            setLEDGradient(GradRed, GradBlue, 0, ledBuffer.getLength());
         });
     }
 
@@ -233,15 +282,19 @@ public class LedStrip extends SubsystemBase {
     }
 
     public Command elevatorTOPLED() {
-        return Commands.run(() -> {
-            oohShiny(GreerYeller, TurnOff, 999999999, 0, ledBuffer.getLength());
-        }).ignoringDisable(true);
+        return Commands.runOnce(() -> blinkStatus = "initialize")
+          .andThen(
+            Commands.run(() -> 
+              oohShiny(10, 60, GreerYeller, Color.kBlack, 27)
+        ).ignoringDisable(true));
     }
 
-    public Command cautionCoolDownLED() {
-        return Commands.runOnce(() -> {
-            oohShiny(Red, TurnOff, 999, 10, 1);
-        });
+    public Command merryBismasLED() {
+        return Commands.runOnce(() -> blinkStatus = "initialize")
+        .andThen(
+          Commands.run(() -> 
+            cautionOOhShiny(200, 250, Red, Greer, NoColor, 27)
+      ).ignoringDisable(true));
     }
 
     public Command roboRiseLED() {
@@ -333,7 +386,7 @@ public class LedStrip extends SubsystemBase {
     private Color sampleGradient(Color firstColor, Color secondColor, double ratio) {
         return new Color(
             firstColor.red * ratio + secondColor.red * (1 - ratio), 
-            firstColor.green * ratio + secondColor.green * (1 - ratio), 
-            firstColor.blue * ratio + secondColor.blue * (1 - ratio));
+            firstColor.blue * ratio + secondColor.blue * (1 - ratio), 
+            firstColor.green * ratio + secondColor.green * (1 - ratio));
     }
 }
