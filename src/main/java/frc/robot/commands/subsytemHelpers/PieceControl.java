@@ -170,7 +170,8 @@ public class PieceControl {
     public Command setElevatorPosition(double position) {
         return Commands.sequence(
             elevator.setPositionCommand(position, true),
-            getUnstuck(position).onlyIf(elevator::stuckOnGuillotine)
+            getUnstuck(position).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevator.getStuck())
+                .andThen(elevator.setPositionCommand(position))
         );
     }
 
@@ -186,11 +187,11 @@ public class PieceControl {
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(
-                elevator.setPositionCommand(TrapConstants.UNSTUCK_POS, false),
+                elevator.setPositionCommand(TrapConstants.UNSTUCK_POS),
                 trapper.outtakeSlow(),
                 Commands.waitSeconds(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 trapper.stopCommand(),
-                setElevatorPosition(desiredPose)
+                elevator.setPositionCommand(desiredPose, true)
             );
     }
 

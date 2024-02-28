@@ -189,6 +189,8 @@ public class RobotContainer implements Logged {
         // configureHDCBindings(driver);
         configureCalibrationBindings(operator);
 
+        operator.a().onTrue(elevator.toggleStuck());
+
     }
     
     private void configureDriverBindings(PatriBoxController controller) {

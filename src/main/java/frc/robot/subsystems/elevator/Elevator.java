@@ -28,6 +28,16 @@ public class Elevator extends SubsystemBase implements Logged {
         elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID, true);
         configMotors();
     }
+    
+    public Command toggleStuck() {
+        return Commands.runOnce(() -> {
+            stuckOnGuillotine = !stuckOnGuillotine;
+        });
+    }
+
+    public boolean getStuck() {
+        return stuckOnGuillotine;
+    }
 
     public void configMotors() {
         elevator.setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
@@ -50,7 +60,7 @@ public class Elevator extends SubsystemBase implements Logged {
         else if (hitGuillotineTimestamp != 0) 
             hitGuillotineTimestamp = 0;
         
-        stuckOnGuillotine = stuckOnGuillotine();
+        // stuckOnGuillotine = stuckOnGuillotine();
         RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
             0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
             new Rotation3d()
@@ -89,11 +99,15 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public Command setPositionCommand(double pos, boolean waitUntilStuck) {
         return Commands.runOnce(() -> this.setPosition(pos))
-                    .andThen(Commands.waitUntil(() -> atDesiredPosition() || (waitUntilStuck && stuckOnGuillotine())));
+                    .andThen(Commands.waitUntil(() -> atDesiredPosition() || (waitUntilStuck && getStuck())));
+    }
+
+    public Command setPositionCommand(double pos) {
+        return setPositionCommand(pos, false);
     }
 
     public Command toBottomCommand() {
-        return setPositionCommand(TrapConstants.BOTTOM_POS, false);
+        return setPositionCommand(TrapConstants.BOTTOM_POS);
     }
 
     public Command toTopCommand() {
@@ -105,11 +119,11 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command toIndexCommand() {
-        return setPositionCommand(TrapConstants.INDEX_POS, false).andThen(toBottomCommand());
+        return setPositionCommand(TrapConstants.INDEX_POS).andThen(toBottomCommand());
     }
 
     public Command toDropCommand() {
-        return setPositionCommand(TrapConstants.DROP_POS, false);
+        return setPositionCommand(TrapConstants.DROP_POS);
     }
 
     public boolean atDesiredPosition() {
