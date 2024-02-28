@@ -190,7 +190,7 @@ public class PieceControl {
                 trapper.outtakeSlow(),
                 Commands.waitSeconds(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 trapper.stopCommand(),
-                elevator.setPositionCommand(desiredPose, false)
+                setElevatorPosition(desiredPose)
             );
     }
 
