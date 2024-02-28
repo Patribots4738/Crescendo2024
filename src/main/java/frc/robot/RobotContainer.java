@@ -188,6 +188,7 @@ public class RobotContainer implements Logged {
         // for more information 
         // configureHDCBindings(driver);
         configureCalibrationBindings(operator);
+
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
@@ -264,10 +265,10 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(elevator.toTopCommand());
+            .onTrue(pieceControl.elevatorToTop());
 
         controller.povLeft()
-            .onTrue(elevator.toAmpCommand());
+            .onTrue(pieceControl.elevatorToAmp());
 
         controller.povRight()
             .onTrue(trapper.toggleSpeed());
