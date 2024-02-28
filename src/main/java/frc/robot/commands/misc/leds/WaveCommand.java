@@ -11,9 +11,10 @@ import frc.robot.subsystems.misc.leds.LedStrip;
 
 public class WaveCommand {
 
-    protected void evaluateWave(LedStrip ledStrip, double scale, double spacing, double time, int x, HSV isHue, double height, int hueVal) {
+    protected void evaluateWave(LedStrip ledStrip, double scale, double spacing, double time, int x, HSV isHue,
+            double height, int hueVal) {
         switch (isHue) {
-            case HUE-> evaluateHueWave(ledStrip, scale, spacing, time, x, height);
+            case HUE -> evaluateHueWave(ledStrip, scale, spacing, time, x, height);
             case VALUE -> evaluateValueWave(ledStrip, scale, spacing, time, x, height, hueVal);
             case SATURATION -> evaluateSaturationWave(ledStrip, scale, spacing, time, x, height, hueVal);
             default -> {
@@ -21,19 +22,21 @@ public class WaveCommand {
         }
     }
 
-    private void evaluateSaturationWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height, int hueVal){
+    private void evaluateSaturationWave(LedStrip ledStrip, double scale, double spacing, double time, int x,
+            double height, int hueVal) {
         double wave = Math.sin((10 * x + (spacing * time)) / spacing);
         int output = (int) ((height + scale * wave) / 1.0);
         ledStrip.setLED(x, Color.fromHSV(hueVal, output, 255));
     }
 
-    private void evaluateValueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height, int hueVal){
+    private void evaluateValueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height,
+            int hueVal) {
         double wave = Math.sin((10 * x + (spacing * time)) / spacing);
         int output = (int) ((height + scale * wave) / 1.0);
         ledStrip.setLED(x, Color.fromHSV(hueVal, 255, output));
     }
 
-    private void evaluateHueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height){
+    private void evaluateHueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height) {
         double wave = Math.sin((10 * x + (spacing * time)) / spacing);
         int output = (int) ((height + scale * wave) / 2.0);
         ledStrip.setLED(x, Color.fromHSV(output, 255, 255));
@@ -68,14 +71,16 @@ public class WaveCommand {
             this(scale, spacing, height, waveSpeed, waveRange, Set.of());
         }
 
-        public Hue(double scale, double spacing, double height, double waveSpeed, double waveRange, Set<Subsystem> requirements) {
+        public Hue(double scale, double spacing, double height, double waveSpeed, double waveRange,
+                Set<Subsystem> requirements) {
             super(ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
             this.height = height;
             this.waveSpeed = waveSpeed;
             this.waveRange = waveRange;
-            this.waveHueFunction = Commands.run(() -> waveHueFunction(), requirements.toArray(new Subsystem[0])).ignoringDisable(true);
+            this.waveHueFunction = Commands.run(() -> waveHueFunction(), requirements.toArray(new Subsystem[0]))
+                    .ignoringDisable(true);
         }
 
         // Called every time the scheduler runs while the command is scheduled.
@@ -99,24 +104,26 @@ public class WaveCommand {
         protected void waveValueFunction() {
             for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
-                        ledStrip,
-                        scale,
-                        spacing,
-                        waveValueOffset,
-                        i,
-                        HSV.VALUE,
-                        height,
-                        hueVal);
+                    ledStrip,
+                    scale,
+                    spacing,
+                    waveValueOffset,
+                    i,
+                    HSV.VALUE,
+                    height,
+                    hueVal);
             }
             waveValueOffset += waveValueIncrement;
             waveValueOffset %= waveRange;
         }
 
-        public Value(double scale, double spacing, double height, double waveValueIncrement, double waveRange, int hueVal) {
+        public Value(double scale, double spacing, double height, double waveValueIncrement, double waveRange,
+                int hueVal) {
             this(scale, spacing, height, waveValueIncrement, waveRange, hueVal, Set.of());
         }
 
-        public Value(double scale, double spacing, double height, double waveValueIncrement, double waveRange, int hueVal, Set<Subsystem> requirements) {
+        public Value(double scale, double spacing, double height, double waveValueIncrement, double waveRange,
+                int hueVal, Set<Subsystem> requirements) {
             super(ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
@@ -124,7 +131,8 @@ public class WaveCommand {
             this.waveValueIncrement = waveValueIncrement;
             this.waveRange = waveRange;
             this.hueVal = hueVal;
-            this.waveValueFunction = Commands.run(() -> waveValueFunction(), requirements.toArray(new Subsystem[0])).ignoringDisable(true);
+            this.waveValueFunction = Commands.run(() -> waveValueFunction(), requirements.toArray(new Subsystem[0]))
+                    .ignoringDisable(true);
         }
 
         // Called every time the scheduler runs while the command is scheduled.
@@ -147,24 +155,26 @@ public class WaveCommand {
         protected void waveSaturationFunction() {
             for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
-                        ledStrip,
-                        scale,
-                        spacing,
-                        waveValueOffset,
-                        i,
-                        HSV.SATURATION,
-                        height,
-                        hueVal);
+                    ledStrip,
+                    scale,
+                    spacing,
+                    waveValueOffset,
+                    i,
+                    HSV.SATURATION,
+                    height,
+                    hueVal);
             }
             waveValueOffset += waveSaturationIncrement;
             waveValueOffset %= waveRange;
         }
 
-        public Saturation(double scale, double spacing, double height, double waveSaturationIncrement, double waveRange, int hueVal) {
+        public Saturation(double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
+                int hueVal) {
             this(scale, spacing, height, waveSaturationIncrement, waveRange, hueVal, Set.of());
         }
 
-        public Saturation(double scale, double spacing, double height, double waveSaturationIncrement, double waveRange, int hueVal, Set<Subsystem> requirements) {
+        public Saturation(double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
+                int hueVal, Set<Subsystem> requirements) {
             super(ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
@@ -172,7 +182,8 @@ public class WaveCommand {
             this.waveSaturationIncrement = waveSaturationIncrement;
             this.waveRange = waveRange;
             this.hueVal = hueVal;
-            this.waveSaturationFunction = Commands.run(() -> waveSaturationFunction(), requirements.toArray(new Subsystem[0])).ignoringDisable(true);
+            this.waveSaturationFunction = Commands
+                .run(() -> waveSaturationFunction(), requirements.toArray(new Subsystem[0])).ignoringDisable(true);
         }
 
         // Called every time the scheduler runs while the command is scheduled.
