@@ -170,7 +170,7 @@ public class PieceControl {
     public Command setElevatorPosition(double position) {
         return Commands.sequence(
             elevator.setPositionCommand(position, true),
-            getUnstuck(position).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevator.getStuck())
+            getUnstuck(position).onlyIf(elevator::stuckOnGuillotine).repeatedly().until(() -> !elevator.stuckOnGuillotine())
                 .andThen(elevator.setPositionCommand(position))
         );
     }
