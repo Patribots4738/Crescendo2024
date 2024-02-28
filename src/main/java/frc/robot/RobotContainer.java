@@ -24,6 +24,7 @@ import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
+import frc.robot.commands.subsytemHelpers.NT;
 import frc.robot.commands.subsytemHelpers.NTPIDTuner;
 import frc.robot.commands.subsytemHelpers.PieceControl;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
@@ -137,7 +138,8 @@ public class RobotContainer implements Logged {
 
         Neo.incinerateMotors();
         new NTPIDTuner().schedule();
-        
+        new NT(NTConstants.WAIT_TIMES);
+
         shooterCalc = new ShooterCalc(shooter, pivot);
         shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
 
@@ -198,14 +200,13 @@ public class RobotContainer implements Logged {
         controller.back().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(
-                    1.31,
+                    Robot.isRedAlliance() ? FieldConstants.FIELD_WIDTH_METERS - 1.31 : 1.31,
                     5.53, 
                     Rotation2d.fromDegrees(
                         Robot.isRedAlliance()
                             ? 0
                             : 180))), 
                 swerve));
-
         // Upon hitting start button
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
