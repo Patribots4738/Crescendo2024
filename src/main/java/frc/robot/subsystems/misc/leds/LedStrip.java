@@ -61,7 +61,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 7;
+    public int selectedLED = 5;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -202,22 +202,15 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    private double allianceOffset = 0;
-
-
-    // https://www.desmos.com/calculator/kxx5hbhyy1
+    // https://www.desmos.com/calculator/kuthptwuki
     public Command alliance(BooleanSupplier isRedAlliance) {
-        return run(() -> {
-            boolean isRed = isRedAlliance.getAsBoolean();
-            // waveValueFunction(500, 50, 0, .025, 6.28);
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                int saturation = MathUtil.clamp((int) (500*Math.abs(Math.sin((i+50.0*allianceOffset)/50.0))),0,255);
-                int hue = isRed ? 0 : 227;
-                setLED(i, Color.fromHSV(hue/2, saturation, 255));
-            }
-            this.allianceOffset += .025;
-            this.allianceOffset %= 6.28;
-        });
+        return waveCommand.new Saturation(
+            340, 
+            65, 
+            255, 
+            .025, 
+            6.28, 
+            isRedAlliance.getAsBoolean() ? 180 : 117);
     }
     
     Color Orange = new Color(250, 160, 30);

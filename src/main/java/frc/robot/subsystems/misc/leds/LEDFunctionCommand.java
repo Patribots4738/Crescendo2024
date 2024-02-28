@@ -24,4 +24,7 @@ public abstract class LEDFunctionCommand extends DeferredCommand {
         LEDFunctionCommand.ledStrip = ledStrip;
     }
 
+    public enum HSV {
+        HUE, SATURATION, VALUE
+    }
 }
