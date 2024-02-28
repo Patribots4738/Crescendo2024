@@ -30,7 +30,6 @@ public class LedStrip extends SubsystemBase {
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
-    private WaveCommand waveCommand = new WaveCommand(this);
     private LEDCommand ledFunctionCommand = new LEDCommand(this);
 
     public LedStrip() {
@@ -63,7 +62,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 6;
+    public int selectedLED = 7;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -156,7 +155,7 @@ public class LedStrip extends SubsystemBase {
     }
 
     public Command rainbow() {
-        return waveCommand.new Hue(
+        return new WaveCommand().new Hue(
             180, 
             (double) ledBuffer.getLength(), 
             180, 
@@ -167,7 +166,7 @@ public class LedStrip extends SubsystemBase {
     double greenNGoldOffset = 1;
 
     public Command greenNGold() {
-        return waveCommand.new Hue(
+        return new WaveCommand().new Hue(
             50, 
             (double) ledBuffer.getLength(), 
             75, 
@@ -196,7 +195,7 @@ public class LedStrip extends SubsystemBase {
 
     // https://www.desmos.com/calculator/kuthptwuki
     public Command alliance(BooleanSupplier isRedAlliance) {
-        return waveCommand.new Saturation(
+        return new WaveCommand().new Saturation(
             340, 
             65, 
             255, 

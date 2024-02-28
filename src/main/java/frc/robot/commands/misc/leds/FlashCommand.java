@@ -2,12 +2,12 @@ package frc.robot.commands.misc.leds;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.subsystems.misc.leds.LedStrip;
 
 import java.util.Set;
 
 public class FlashCommand extends LEDCommand {
-    private final LedStrip ledStrip;
     private final Color color1;
     private final Color color2;
     private final double blinkTime;
@@ -21,7 +21,6 @@ public class FlashCommand extends LEDCommand {
 
     public FlashCommand(LedStrip ledStrip, double blinkTime, double blinkSpeed, Color color1, Color color2, Set<Subsystem> requirements) {
         super(ledStrip, requirements);
-        this.ledStrip = ledStrip;
         this.color1 = color1;
         this.color2 = color2;
         this.blinkTime = blinkTime;
@@ -31,7 +30,7 @@ public class FlashCommand extends LEDCommand {
 
     @Override
     public void initialize() {
-        startTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+        startTime = Robot.currentTimestamp;
     }
 
     @Override

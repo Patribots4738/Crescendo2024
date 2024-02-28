@@ -6,50 +6,40 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.commands.misc.leds.LEDCommand.HSV;
 import frc.robot.subsystems.misc.leds.LedStrip;
 
-public class WaveCommand extends LEDCommand {
-    static double waveHueOffset = 1;
-    static double waveValueOffset = 1;
+public class WaveCommand {
 
-
-    public WaveCommand(LedStrip ledStrip) {
-        super(ledStrip);
-    }
-
-    public WaveCommand(LedStrip ledStrip, Set<Subsystem> requirements) {
-        super(ledStrip, requirements);
-    }
-
-    protected void evaluateWave(double scale, double spacing, double time, int x, HSV isHue, double height, int hueVal) {
+    protected void evaluateWave(LedStrip ledStrip, double scale, double spacing, double time, int x, HSV isHue, double height, int hueVal) {
         switch (isHue) {
-            case HUE-> evaluateHueWave(scale, spacing, time, x, height);
-            case VALUE -> evaluateValueWave(scale, spacing, time, x, height, hueVal);
-            case SATURATION -> evaluateSaturationWave(scale, spacing, time, x, height, hueVal);
+            case HUE-> evaluateHueWave(ledStrip, scale, spacing, time, x, height);
+            case VALUE -> evaluateValueWave(ledStrip, scale, spacing, time, x, height, hueVal);
+            case SATURATION -> evaluateSaturationWave(ledStrip, scale, spacing, time, x, height, hueVal);
             default -> {
             }
         }
     }
 
-    protected void evaluateSaturationWave(double scale, double spacing, double time, int x, double height, int hueVal){
+    private void evaluateSaturationWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height, int hueVal){
         double wave = Math.sin((10 * x + (spacing * time)) / spacing);
         int output = (int) ((height + scale * wave) / 1.0);
         ledStrip.setLED(x, Color.fromHSV(hueVal, output, 255));
     }
 
-    protected void evaluateValueWave(double scale, double spacing, double time, int x, double height, int hueVal){
+    private void evaluateValueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height, int hueVal){
         double wave = Math.sin((10 * x + (spacing * time)) / spacing);
         int output = (int) ((height + scale * wave) / 1.0);
         ledStrip.setLED(x, Color.fromHSV(hueVal, 255, output));
     }
 
-    protected void evaluateHueWave(double scale, double spacing, double time, int x, double height){
+    private void evaluateHueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height){
         double wave = Math.sin((10 * x + (spacing * time)) / spacing);
         int output = (int) ((height + scale * wave) / 2.0);
         ledStrip.setLED(x, Color.fromHSV(output, 255, 255));
     }
 
-    public class Hue extends WaveCommand {
+    public class Hue extends LEDCommand {
         private final double scale;
         private final double spacing;
         private final double height;
@@ -59,8 +49,9 @@ public class WaveCommand extends LEDCommand {
         private Command waveHueFunction;
 
         protected void waveHueFunction() {
-            for (int i = 0; i < ledStrip.ledBuffer.getLength(); i++) {
+            for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
+                    ledStrip,
                     scale,
                     spacing,
                     waveHueOffset,
@@ -95,7 +86,7 @@ public class WaveCommand extends LEDCommand {
 
     }
 
-    public class Value extends WaveCommand {
+    public class Value extends LEDCommand {
         private final double waveValueIncrement;
         private final double waveRange;
         private final double scale;
@@ -106,8 +97,9 @@ public class WaveCommand extends LEDCommand {
         private final Command waveValueFunction;
 
         protected void waveValueFunction() {
-            for (int i = 0; i < ledStrip.ledBuffer.getLength(); i++) {
+            for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
+                        ledStrip,
                         scale,
                         spacing,
                         waveValueOffset,
@@ -142,7 +134,7 @@ public class WaveCommand extends LEDCommand {
         }
     }
 
-    public class Saturation extends WaveCommand {
+    public class Saturation extends LEDCommand {
         private final double waveSaturationIncrement;
         private final double waveRange;
         private final double scale;
@@ -153,8 +145,9 @@ public class WaveCommand extends LEDCommand {
         private final Command waveSaturationFunction;
 
         protected void waveSaturationFunction() {
-            for (int i = 0; i < ledStrip.ledBuffer.getLength(); i++) {
+            for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
+                        ledStrip,
                         scale,
                         spacing,
                         waveValueOffset,
