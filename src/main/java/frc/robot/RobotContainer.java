@@ -256,10 +256,12 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors());
             
         controller.leftBumper()
-            .onTrue(pieceControl.toggleIn());
+            .whileTrue(pieceControl.intakeToTrap())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
-            .onTrue(pieceControl.toggleOut());
+            .onTrue(pieceControl.ejectNote())
+            .onFalse(pieceControl.stopEjecting());
     }
 
     private void configureOperatorBindings(PatriBoxController controller) {
@@ -276,10 +278,12 @@ public class RobotContainer implements Logged {
             .onTrue(elevator.toBottomCommand());
 
         controller.leftBumper()
-            .onTrue(pieceControl.toggleIn());
+            .whileTrue(pieceControl.intakeToTrap())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
-            .onTrue(pieceControl.toggleOut());
+            .onTrue(pieceControl.ejectNote())
+            .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
             .onTrue(
@@ -319,7 +323,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .onTrue(pieceControl.toggleIn());
+            .onTrue(pieceControl.noteToTrap());
 
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(pieceControl.ejectNote());

@@ -107,22 +107,6 @@ public class PieceControl {
         );
     }
 
-    public Command toggleIn() {
-        return Commands.either(
-            intakeToTrap(),
-            stopIntakeAndIndexer(),
-            intake::isStopped
-        );
-    }
-
-    public Command toggleOut() {
-        return Commands.either(
-            ejectNote(),
-            stopIntakeAndIndexer(),
-            intake::isStopped
-        );
-    }
-
     public Command ejectNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
@@ -134,7 +118,13 @@ public class PieceControl {
             dropPieceCommand(),
             stopAllMotors()
         );
+    }
 
+    public Command stopEjecting() {
+        return Commands.parallel(
+            elevator.toBottomCommand(),
+            stopAllMotors()
+        );
     }
 
     public Command dropPieceCommand() {
