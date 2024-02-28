@@ -14,9 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.commands.misc.leds.FlashCommand;
-import frc.robot.commands.misc.leds.LEDCommands;
-import frc.robot.commands.misc.leds.WaveCommand;
+import frc.robot.commands.misc.leds.animations.FlashCommand;
+import frc.robot.commands.misc.leds.animations.LEDCommands;
+import frc.robot.commands.misc.leds.animations.WaveCommand;
 import frc.robot.util.constants.Constants.LEDConstants;
 import java.util.List;
 

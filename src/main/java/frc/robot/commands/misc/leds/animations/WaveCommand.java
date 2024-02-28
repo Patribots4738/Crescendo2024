@@ -1,4 +1,4 @@
-package frc.robot.commands.misc.leds;
+package frc.robot.commands.misc.leds.animations;
 
 import java.util.Set;
 
@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.commands.misc.leds.LEDCommands.HSV;
+import frc.robot.commands.misc.leds.animations.LEDCommands.HSV;
 import frc.robot.subsystems.misc.leds.LedStrip;
 
 public class WaveCommand {
