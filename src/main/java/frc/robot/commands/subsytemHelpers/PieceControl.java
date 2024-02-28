@@ -1,7 +1,6 @@
 package frc.robot.commands.subsytemHelpers;
 
 import java.util.function.Supplier;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -157,10 +156,39 @@ public class PieceControl {
         );
     }
 
+    // Same as normally setting elevator position but adds unstuck logic
+    public Command setElevatorPosition(double position) {
+        return Commands.sequence(
+            elevator.setPositionCommand(position, true),
+            getUnstuck(position).onlyIf(elevator::stuckOnGuillotine).repeatedly().until(() -> !elevator.stuckOnGuillotine())
+                .andThen(elevator.setPositionCommand(position))
+        );
+    }
+
+    // Same as above
+    public Command elevatorToTop() {
+        return setElevatorPosition(TrapConstants.TRAP_PLACE_POS);
+    }
+
+    public Command elevatorToAmp() {
+        return setElevatorPosition(TrapConstants.AMP_PLACE_POS);
+    }
+
+    public Command getUnstuck(double desiredPose) {
+        return 
+            Commands.sequence(
+                elevator.setPositionCommand(TrapConstants.UNSTUCK_POS),
+                trapper.outtakeSlow(),
+                Commands.waitSeconds(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
+                trapper.stopCommand(),
+                elevator.setPositionCommand(desiredPose, true)
+            );
+    }
+
     public Command placeTrap() {
         return shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0.0,0.0, 60.0)).alongWith(
             Commands.sequence(
-                elevator.toTopCommand(),
+                elevatorToTop(),
                 trapper.intake(),
                 Commands.waitSeconds(0.3),
                 trapper.stopCommand(),

@@ -10,16 +10,18 @@ import frc.robot.RobotContainer;
 import frc.robot.util.constants.Constants.NTConstants;
 import frc.robot.util.constants.Constants.TrapConstants;
 import frc.robot.util.motors.Neo;
+import frc.robot.Robot;
 import monologue.Logged;
 import monologue.Annotations.Log;
+
 
 public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
     @Log
-    private double pos = 0, desiredPos = 0;
+    private double pos = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
 
     @Log
-    private boolean atDesiredPos = false;
+    private boolean atDesiredPos = false, stuckOnGuillotine = false;
 
     /** Creates a new Elevator. */
     public Elevator() {
@@ -35,11 +37,20 @@ public class Elevator extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        pos = elevator.getPosition();
-        desiredPos = elevator.getTargetPosition();
+        pos = getPosition();
+        desiredPos = getDesiredPosition();
 
         atDesiredPos = atDesiredPosition();
 
+        // A value of 0 on hitGuillotineTimestamp indicates that we are not hitting the guillotine
+        // Sets hitGuillotineTimestamp only on first hit of guillotine
+        // Set back to 0 if we are no longer near the guillotine / not stuck
+        if (nearGuillotine() && hitGuillotineTimestamp == 0)
+            hitGuillotineTimestamp = Robot.currentTimestamp;
+        else if (hitGuillotineTimestamp != 0) 
+            hitGuillotineTimestamp = 0;
+        
+        stuckOnGuillotine = stuckOnGuillotine();
         RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
             0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
             new Rotation3d()
@@ -52,6 +63,10 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public double getPosition() {
         return elevator.getPosition();
+    }
+
+    public double getDesiredPosition() {
+        return elevator.getTargetPosition();
     }
 
     public void setPosition(double pos) {
@@ -72,10 +87,13 @@ public class Elevator extends SubsystemBase implements Logged {
         );
     }
 
+    public Command setPositionCommand(double pos, boolean waitUntilStuck) {
+        return Commands.runOnce(() -> this.setPosition(pos))
+                    .andThen(Commands.waitUntil(() -> atDesiredPosition() || (waitUntilStuck && stuckOnGuillotine())));
+    }
+
     public Command setPositionCommand(double pos) {
-        return runOnce(() -> this.setPosition(pos))
-                // Keep the subsystem required as it gets there
-                .andThen(Commands.waitUntil(this::atDesiredPosition));
+        return setPositionCommand(pos, false);
     }
 
     public Command toBottomCommand() {
@@ -83,11 +101,11 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command toTopCommand() {
-        return setPositionCommand(TrapConstants.TRAP_PLACE_POS);
+        return setPositionCommand(TrapConstants.TRAP_PLACE_POS, true);
     }
 
     public Command toAmpCommand() {
-        return setPositionCommand(TrapConstants.AMP_PLACE_POS);
+        return setPositionCommand(TrapConstants.AMP_PLACE_POS, true);
     }
 
     public Command toIndexCommand() {
@@ -101,4 +119,18 @@ public class Elevator extends SubsystemBase implements Logged {
     public boolean atDesiredPosition() {
 		return MathUtil.isNear(desiredPos, pos, TrapConstants.ELEVATOR_DEADBAND);
 	}
+
+    public boolean nearGuillotine() {
+        return MathUtil.isNear(TrapConstants.GUILLOTONE_POS, pos, TrapConstants.ELEVATOR_DEADBAND);
+    }
+
+    // If we are trying to get up but we have been near guillotine for more than 0.1s then we are stuck
+    public boolean stuckOnGuillotine() {
+        return 
+            hitGuillotineTimestamp != 0
+            && Robot.currentTimestamp - this.hitGuillotineTimestamp >= TrapConstants.STUCK_TIME_SECONDS
+            && desiredPos > pos
+            && nearGuillotine()
+            && elevator.getOutputCurrent() > 41.0;
+    }
 }
