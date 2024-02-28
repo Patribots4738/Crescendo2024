@@ -484,6 +484,7 @@ public class RobotContainer implements Logged {
 
     /**
      * This is explained in detail in discussion #180 of the 2024 repository of 4738
+     * https://github.com/Patribots4738/Crescendo2024/discussions/180
      */
     private void fixPathPlannerCommands() {
         registerPathToPathCommands();
