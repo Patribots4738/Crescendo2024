@@ -6,7 +6,7 @@ import frc.robot.subsystems.misc.leds.LedStrip;
 
 import java.util.Set;
 
-public class FlashCommand extends LEDFunctionCommand {
+public class FlashCommand extends LEDCommand {
     private final LedStrip ledStrip;
     private final Color color1;
     private final Color color2;

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.commands.misc.leds.FlashCommand;
-import frc.robot.commands.misc.leds.LEDFunctionCommand;
+import frc.robot.commands.misc.leds.LEDCommand;
 import frc.robot.commands.misc.leds.WaveCommand;
 import frc.robot.util.constants.Constants.LEDConstants;
 import java.util.List;
@@ -31,7 +31,7 @@ public class LedStrip extends SubsystemBase {
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
     private WaveCommand waveCommand = new WaveCommand(this);
-    private LEDFunctionCommand ledFunctionCommand = new LEDFunctionCommand(this);
+    private LEDCommand ledFunctionCommand = new LEDCommand(this);
 
     public LedStrip() {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);

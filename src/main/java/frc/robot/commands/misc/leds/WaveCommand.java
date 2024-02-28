@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.misc.leds.LedStrip;
 
-public class WaveCommand extends LEDFunctionCommand {
+public class WaveCommand extends LEDCommand {
     static double waveHueOffset = 1;
     static double waveValueOffset = 1;
 
