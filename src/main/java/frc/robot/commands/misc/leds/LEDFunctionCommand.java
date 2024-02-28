@@ -9,10 +9,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.subsystems.misc.leds.LedStrip;
 
-public abstract class LEDFunctionCommand extends DeferredCommand {
+public class LEDFunctionCommand extends DeferredCommand {
     protected static LedStrip ledStrip;
+    protected double startTime = Robot.currentTimestamp;
+
 
     public LEDFunctionCommand(LedStrip ledStrip, Set<Subsystem> requirements) {
         super(() -> Commands.none(), requirements);
@@ -20,7 +23,7 @@ public abstract class LEDFunctionCommand extends DeferredCommand {
         LEDFunctionCommand.ledStrip = ledStrip;
     }
 
-    protected LEDFunctionCommand(LedStrip ledStrip) {
+    public LEDFunctionCommand(LedStrip ledStrip) {
         super(() -> Commands.none(), Set.of(ledStrip));
         LEDFunctionCommand.ledStrip = ledStrip;
     }

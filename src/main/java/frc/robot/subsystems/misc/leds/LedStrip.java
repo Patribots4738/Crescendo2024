@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.commands.misc.leds.FlashCommand;
+import frc.robot.commands.misc.leds.LEDFunctionCommand;
 import frc.robot.commands.misc.leds.WaveCommand;
 import frc.robot.util.constants.Constants.LEDConstants;
 import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
 
 public class LedStrip extends SubsystemBase {
 
@@ -31,6 +31,7 @@ public class LedStrip extends SubsystemBase {
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
     private WaveCommand waveCommand = new WaveCommand(this);
+    private LEDFunctionCommand ledFunctionCommand = new LEDFunctionCommand(this);
 
     public LedStrip() {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
@@ -71,7 +72,7 @@ public class LedStrip extends SubsystemBase {
             case (2) -> circus();
             case (3) -> loading();
             case (5) -> alliance(Robot::isRedAlliance);
-            case (6) -> flash();
+            case (6) -> new FlashCommand(this, 30, 5.5, Color.kGreen, Color.kBlack);
             case (7) -> rainbow();
             case (8) -> elevatorTOPLED();
             default -> turnOff();
@@ -190,16 +191,6 @@ public class LedStrip extends SubsystemBase {
                 final Color color = (i < 2 && i > 8) ? Color.kFirstBlue : Color.kBlack;
                 setLED(i, color);
             }
-        });
-    }
-
-    public Command flash() {
-        return run(() -> {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = (i + greenNGoldOffset % 2 == 0) ? Color.kOrange : Color.kBlack;
-                setLED(i, color);
-            }
-            greenNGoldOffset++;
         });
     }
 
