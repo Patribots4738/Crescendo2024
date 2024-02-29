@@ -212,8 +212,10 @@ public class PieceControl {
 
     public Command placeTrap() {
         return Commands.sequence(
-                setElevatorPosition(NT.getSupplier("ampPosition"))
-                    .alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60))),
+                Commands.defer(
+                    () -> setElevatorPosition(NT.getSupplier("ampPosition")),
+                    Set.of(elevator)
+                ).alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60))), 
                 trapper.intake(),
                 Commands.waitSeconds(0.3),
                 trapper.stopCommand(),
