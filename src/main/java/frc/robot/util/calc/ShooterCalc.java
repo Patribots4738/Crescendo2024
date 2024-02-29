@@ -9,12 +9,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.shooter.Pivot;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.util.constants.SpeedAngleTriplet;
-import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.NTConstants;
-import frc.robot.util.constants.Constants.ShooterConstants;
+import frc.robot.subsystems.Pivot;
+import frc.robot.subsystems.Shooter;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
