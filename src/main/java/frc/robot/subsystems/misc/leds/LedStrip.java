@@ -30,9 +30,11 @@ public class LedStrip extends SubsystemBase {
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
+    private DoubleSupplier elevatorPositionSupplier;
     private LEDCommands ledFunctionCommand = new LEDCommands(this);
 
-    public LedStrip() {
+    public LedStrip(DoubleSupplier elevatorPositionSupplier) {
+        this.elevatorPositionSupplier = elevatorPositionSupplier;
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
         ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
         LEDConstants.LED_COUNT = ledBuffer.getLength();
@@ -51,7 +53,7 @@ public class LedStrip extends SubsystemBase {
     
     @Override
     public void periodic() {
-        runPattern(currentPatternIndex).execute();
+        // runPattern(currentPatternIndex).execute();
         led.setData(ledBuffer);
     }
 
@@ -62,7 +64,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 6;
+    public int selectedLED = 7;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -73,7 +75,8 @@ public class LedStrip extends SubsystemBase {
             case (5) -> alliance(Robot::isRedAlliance);
             case (6) -> new FlashCommand(30, 5.5, Color.kGreen, Color.kBlack);
             case (7) -> rainbow();
-            case (8) -> elevatorTOPLED();
+            // case (8) -> new ElevatorCommand(elevatorPositionSupplier, Color.kRed);
+            // elevatorTOPLED();
             default -> turnOff();
         };
         return selectedPattern.ignoringDisable(true);

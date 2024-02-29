@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,6 +24,7 @@ import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
+import frc.robot.commands.misc.leds.animations.LEDFollowChangeCommand;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
 import frc.robot.commands.subsytemHelpers.PieceControl;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
@@ -34,11 +36,13 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.constants.Constants.AutoConstants;
+import frc.robot.util.constants.Constants.ClimbConstants;
 import frc.robot.util.constants.Constants.DriveConstants;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.constants.Constants.NTConstants;
 import frc.robot.util.constants.Constants.NeoMotorConstants;
 import frc.robot.util.constants.Constants.OIConstants;
+import frc.robot.util.constants.Constants.TrapConstants;
 import frc.robot.util.mod.PatriBoxController;
 import frc.robot.util.motors.Neo;
 import frc.robot.util.testing.CalibrationControl;
@@ -100,15 +104,15 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         limelight = new Limelight(swerve.getPoseEstimator(), swerve::getPose);
-        ledStrip = new LedStrip();
         triggerWheel = new Indexer();
-
+        
         shooter = new Shooter();
         elevator = new Elevator();
         trapper = new Trapper();
         
         pivot = new Pivot();
-
+        ledStrip = new LedStrip(elevator::getPosition);
+        
         HDCTuner = new HDCTuner(
             AutoConstants.HDC.getXController(),
             AutoConstants.HDC.getThetaController());
@@ -176,13 +180,11 @@ public class RobotContainer implements Logged {
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
             .onTrue(elevator.toTopCommand())
-            .whileTrue(ledStrip.upwardsElevatorGradientLED()
-                .andThen(ledStrip.elevatorTOPLED()));
+            .whileTrue(new LEDFollowChangeCommand(elevator::getPosition, TrapConstants.TRAPPER_POSITION_MULTIPLIER, Color.kGreen));
         
         controller.povDown()
             .onTrue(elevator.toBottomCommand())
-            .whileTrue(ledStrip.backwardsElevatorGradientLED()
-                .andThen(ledStrip.elevatorTOPLED()));
+            .whileTrue(new LEDFollowChangeCommand(elevator::getPosition, TrapConstants.TRAPPER_POSITION_MULTIPLIER, Color.kRed));
 
         controller.leftBumper()
             .onTrue(pieceControl.toggleIn())
@@ -233,10 +235,11 @@ public class RobotContainer implements Logged {
 
         controller.povUp()
             .toggleOnTrue(climb.povUpCommand(swerve::getPose))
-            .whileTrue(ledStrip.roboRiseLED());
+            .whileTrue(new LEDFollowChangeCommand(climb.getPosition()::getFirst, ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR, Color.kGreen));
         
-        controller.povDown().onTrue(climb.toBottomCommand())
-        .whileTrue(ledStrip.roboLowerLED());
+        controller.povDown()
+            .onTrue(climb.toBottomCommand())
+            .whileTrue(new LEDFollowChangeCommand(climb.getPosition()::getFirst, ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR, Color.kRed));
         
         controller.a().whileTrue(
             Commands.sequence(

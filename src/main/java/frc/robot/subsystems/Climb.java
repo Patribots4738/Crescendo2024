@@ -106,6 +106,10 @@ public class Climb extends SubsystemBase implements Logged {
         );
     }
 
+    public Pair<Double, Double> getPosition() {
+        return new Pair<>(leftMotor.getPosition(), rightMotor.getPosition());
+    }
+
     public void toTop() {
         setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT);
     }
