@@ -20,12 +20,12 @@ public class LEDFollowChangeCommand extends LEDCommands {
 
     @Override
     public void execute() {
-        double elevatorPose = motorPose.getAsDouble();
+        double newMotorPose = motorPose.getAsDouble();
 
-        elevatorPose = MathUtil.applyDeadband(elevatorPose * multiplier * ledStrip.getBuffer().getLength(), 0.01);
+        newMotorPose = MathUtil.applyDeadband(newMotorPose * multiplier * ledStrip.getBuffer().getLength(), 0.01);
 
         for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
-            if (i < elevatorPose) {
+            if (i < newMotorPose) {
                 ledStrip.setLED(i, color);
             } else {
                 ledStrip.setLED(i, Color.kBlack);
