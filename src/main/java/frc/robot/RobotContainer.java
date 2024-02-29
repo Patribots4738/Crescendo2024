@@ -24,6 +24,7 @@ import frc.robot.commands.autonomous.ChoreoStorage;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.misc.leds.LPI;
+import frc.robot.commands.misc.leds.animations.ColorCommand;
 import frc.robot.commands.misc.leds.animations.LEDFollowChangeCommand;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
 import frc.robot.commands.subsytemHelpers.PieceControl;
@@ -188,11 +189,11 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .onTrue(pieceControl.toggleIn())
-            .onTrue(ledStrip.blueLED());
+            .onTrue(new ColorCommand(Color.kBlue));
 
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut())
-            .onTrue(ledStrip.almmondLED());
+            .onTrue(new ColorCommand(Color.kBlanchedAlmond));
 
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true))
@@ -263,18 +264,18 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.stopAllMotors())
-            .whileTrue(ledStrip.redLED());
+            .whileTrue(new ColorCommand(Color.kRed));
 
         controller.x()
             .toggleOnTrue(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.leftBumper()
             .onTrue(pieceControl.toggleIn())
-            .onTrue(ledStrip.blueLED());
+            .onTrue(new ColorCommand(Color.kBlue));
 
         controller.rightBumper()
             .onTrue(pieceControl.toggleOut())
-            .onTrue(ledStrip.almmondLED());
+            .onTrue(new ColorCommand(Color.kBlanchedAlmond));
 
         controller.povLeft()
             .onTrue(ledStrip.changeLEDsPattern());

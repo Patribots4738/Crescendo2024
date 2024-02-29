@@ -200,34 +200,4 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public Command yellowgreerLED() {
-        return Commands.runOnce(() -> {
-            setLED(Color.kGreenYellow);
-        });
-    }
-
-    public Command redLED() {
-        return Commands.runOnce(() -> {
-            setLED(Color.kRed);
-        });
-    }
-
-    public Command almmondLED() {
-        return Commands.run(() -> {
-            setLED(Color.kBlanchedAlmond);
-        });
-    }
-
-    public Command blueLED() {
-        return Commands.run(() -> {
-            setLED(Color.kBlue);
-        });
-    }
-
-    public Command greerLED() {
-        return Commands.runOnce(() -> {
-            setLED(Color.kGreen);
-        });
-    }
-
 }
