@@ -30,8 +30,8 @@ public class Shooter extends SubsystemBase implements Logged{
 
     public Shooter() {
 
-        motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID);
-        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true);
+        motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID, true);
+        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true, true);
 
         configMotors();
     }

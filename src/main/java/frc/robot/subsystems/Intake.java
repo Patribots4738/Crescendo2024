@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.rev.Neo;
-import frc.robot.util.rev.SafeSparkMax.TelemetryPreference;
+import frc.robot.util.rev.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -20,7 +20,7 @@ public class Intake extends SubsystemBase implements Logged {
     private boolean notePossession = false; 
 
     public Intake() {
-        intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID);
+        intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID, false);
         intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
         intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }

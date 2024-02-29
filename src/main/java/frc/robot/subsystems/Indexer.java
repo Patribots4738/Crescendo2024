@@ -5,14 +5,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.rev.Neo;
-import frc.robot.util.rev.SafeSparkMax.TelemetryPreference;
+import frc.robot.util.rev.SafeSpark.TelemetryPreference;
 
 public class Indexer extends SubsystemBase {
     private final Neo indexer;
     private double desiredPercent = 0;
 
     public Indexer() {
-        indexer = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID);
+        indexer = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID, false);
         indexer.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_CURRENT_LIMIT_AMPS);
         indexer.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }

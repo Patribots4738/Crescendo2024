@@ -12,7 +12,7 @@ public class Trapper extends SubsystemBase {
     private double desiredSpeed = 0;
 
     public Trapper() {
-        trapper = new Neo(TrapConstants.TRAP_CAN_ID, true);
+        trapper = new Neo(TrapConstants.TRAP_CAN_ID, false, TrapConstants.TRAP_INVERTION);
         trapper.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
     }
 

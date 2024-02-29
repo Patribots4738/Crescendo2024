@@ -27,7 +27,7 @@ public class Elevator extends SubsystemBase implements Logged {
 
     /** Creates a new Elevator. */
     public Elevator() {
-        elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID, true);
+        elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID, false, true);
         configMotors();
     }
 

@@ -31,9 +31,9 @@ public class Climb extends SubsystemBase implements Logged {
     private boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
-        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, true);
         // invert right motor in real life, not in sim
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, !FieldConstants.IS_SIMULATION);
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true, !FieldConstants.IS_SIMULATION);
 
         configureMotors();
     }

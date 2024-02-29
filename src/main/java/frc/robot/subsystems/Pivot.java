@@ -7,7 +7,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.rev.Neo;
@@ -25,7 +24,8 @@ public class Pivot extends SubsystemBase implements Logged {
 
 	public Pivot() {
 		pivot = new Neo(
-            ShooterConstants.SHOOTER_PIVOT_CAN_ID, 
+            ShooterConstants.SHOOTER_PIVOT_CAN_ID,
+            false,
             false, 
             true);
 		configMotor();

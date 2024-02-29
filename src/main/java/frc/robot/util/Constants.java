@@ -223,6 +223,7 @@ public final class Constants {
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
+        public static final boolean TRAP_INVERTION = true;
 
         private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
         private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
@@ -402,7 +403,8 @@ public final class Constants {
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
         // the steering motor in the MAXSwerve Module.
-        public static final boolean TURNING_ENCODER_INVERTED = true;
+        // Update 2-29-24: I don't know how this needed to turn false but it is now false... -aleg
+        public static final boolean TURNING_ENCODER_INVERTED = false;
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;

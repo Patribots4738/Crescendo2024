@@ -3,7 +3,6 @@
 package frc.robot.util.rev;
 
 import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.MathUtil;
@@ -16,50 +15,47 @@ import frc.robot.util.custom.PatrIDConstants;
  * Some of this is adapted from 3005's 2022 Code
  * Original source published at https://github.com/FRC3005/Rapid-React-2022-Public/tree/d499655448ed592c85f9cfbbd78336d8841f46e2
  */
-public class Neo extends SafeSparkMax {
+public class Neo extends SafeSpark {
 
     private ControlLoopType controlType = ControlLoopType.PERCENT;
     private double targetPosition = 0;
     private double targetVelocity = 0;
     private double targetPercent = 0;
 
-    
     /**
      * Creates a new Neo motor with the default settings.
-     * @see Neo.NeoBuilder for more configuration options
+     * This assumes no inversion and is relative encoder only
      * 
-     * @param id the CANID of the SparkMax/Flex the Neo is connected to
+     * @param id          CANID of the Spark the Neo is connected to.
+     * @param isSparkFlex Whether the Spark is a SparkMax or SparkMax Flex
      */
-    public Neo(int id) {
-        this(id, false, false);
+    public Neo(int id, boolean isSparkFlex) {
+        this(id, isSparkFlex, false, false);
     }
 
     /**
      * Creates a new Neo motor with the default settings.
-     * @see Neo.NeoBuilder for more configuration options
+     * This only assumes no absolute encoder
      * 
-     * @param id       the CANID of the SparkMax/Flex the Neo is connected to
-     * @param inverted whether the motor is reversed or not
+     * @param id          CANID of the Spark the Neo is connected to.
+     * @param isSparkFlex Whether the Spark is a SparkMax or SparkMax Flex
+     * @param inverted    Whether the motor is reversed or not.
      */
-    public Neo(int id, boolean inverted) {
-        this(id, inverted, false);
+    public Neo(int id, boolean isSparkFlex, boolean inverted) {
+        this(id, isSparkFlex, inverted, false);
     }
 
     /**
-     * Creates a new Neo motor
+     * Creates a new Neo motor using custom settings
      * 
-     * @param id       CANID of the SparkMax the Neo is connected to.
-     * @param inverted Whether the motor is reversed or not.
-     * @param mode     The idle mode of the motor. If true, the motor will brake
-     *                 when not powered. If false, the motor will coast when not
-     *                 powered.
+     * @param id                CANID of the Spark the Neo is connected to.
+     * @param isSparkFlex       Whether the Spark is a SparkMax or SparkMax Flex
+     * @param inverted          Whether the motor is reversed or not.
+     * @param useAbsoluteEncoder Whether the motor uses an absolute encoder or not.
      */
-    public Neo(int id, boolean inverted, boolean useAbsoluteEncoder) {
-        super(id, useAbsoluteEncoder, CANSparkLowLevel.MotorType.kBrushless);
-        // Set the motor to factory default settings
-        // we do this so we can hot-swap sparks without needing to reconfigure them
-        // this requires the code to configure the sparks after construction
-        restoreFactoryDefaults();
+    public Neo(int id, boolean isSparkFlex, boolean inverted, boolean useAbsoluteEncoder) {
+        super(id, useAbsoluteEncoder, CANSparkLowLevel.MotorType.kBrushless, isSparkFlex);
+        
         setInverted(inverted);
         
         // Turn off alternate and analog encoders
@@ -67,7 +63,6 @@ public class Neo extends SafeSparkMax {
         setTelemetryPreference(TelemetryPreference.DEFAULT);
         if (useAbsoluteEncoder) {
             setTelemetryPreference(TelemetryPreference.ONLY_ABSOLUTE_ENCODER);
-            pidController.setFeedbackDevice(getAbsoluteEncoder());
         } else {
             setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
         }
@@ -76,7 +71,7 @@ public class Neo extends SafeSparkMax {
         // If a parameter set fails, this will add more time 
         // to minimize any bus traffic.
         // Default is 20ms
-        setCANTimeout(200);
+        setCANTimeout(50);
         
         setBrakeMode();
         register();
@@ -257,8 +252,10 @@ public class Neo extends SafeSparkMax {
     public void register() {
         NeoMotorConstants.MOTOR_MAP.put(canID, this);
         
-        if (FieldConstants.IS_SIMULATION)
-            REVPhysicsSim.getInstance().addSparkMax(this, DCMotor.getNEO(1));  
+        if (FieldConstants.IS_SIMULATION) {
+            DCMotor motor = isSparkFlex ? DCMotor.getNeoVortex(1) : DCMotor.getNeo550(1);
+            NeoPhysicsSim.getInstance().addNeo(this, motor);  
+        }
     }
 
     /**
