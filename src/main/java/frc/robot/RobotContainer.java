@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
 import frc.robot.commands.autonomous.PathPlannerStorage;
 import frc.robot.commands.drive.Drive;
+import frc.robot.commands.drive.DriveHDC;
 import frc.robot.commands.misc.leds.LPI;
 import frc.robot.commands.subsytemHelpers.AlignmentCmds;
 import frc.robot.commands.subsytemHelpers.NT;
@@ -226,7 +227,11 @@ public class RobotContainer implements Logged {
             .onTrue(shooterCmds.stowPivot())
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
-        controller.povDown().onTrue(climb.toBottomCommand());
+        controller.povDown()
+            .onTrue(
+                shooterCmds.stowPivot()
+                .alongWith(climb.toBottomCommand())
+            );
         
         controller.a().whileTrue(
             Commands.sequence(
@@ -325,7 +330,8 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .onTrue(pieceControl.noteToTrap());
+            .whileTrue(pieceControl.intakeToTrap())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(pieceControl.ejectNote());
@@ -340,20 +346,28 @@ public class RobotContainer implements Logged {
     private void configureHDCBindings(PatriBoxController controller) {
         controller.pov(0, 270, testButtonBindingLoop)
             .onTrue(HDCTuner.controllerDecrementCommand());
+
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(HDCTuner.controllerIncrementCommand());
+
         controller.pov(0, 0, testButtonBindingLoop)
             .onTrue(HDCTuner.increaseCurrentConstantCommand(.1));
+
         controller.pov(0, 180, testButtonBindingLoop)
             .onTrue(HDCTuner.increaseCurrentConstantCommand(-.1));
+
         controller.rightBumper(testButtonBindingLoop)
             .onTrue(HDCTuner.constantIncrementCommand());
+
         controller.leftBumper(testButtonBindingLoop)
             .onTrue(HDCTuner.constantDecrementCommand());
+
         controller.a(testButtonBindingLoop)
             .onTrue(HDCTuner.logCommand());
+
         controller.x(testButtonBindingLoop)
             .onTrue(HDCTuner.multiplyPIDCommand(2));
+
         controller.b(testButtonBindingLoop)
             .onTrue(HDCTuner.multiplyPIDCommand(.5));
     }

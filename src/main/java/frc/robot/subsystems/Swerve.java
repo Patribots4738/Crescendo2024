@@ -107,7 +107,6 @@ public class Swerve extends SubsystemBase implements Logged {
      * Creates a new DriveSu1stem.
      */
     public Swerve() {
-        gyro.optimizeBusUtilization(0.02);
         AutoBuilder.configureHolonomic(
                 this::getPose,
                 this::resetOdometry,

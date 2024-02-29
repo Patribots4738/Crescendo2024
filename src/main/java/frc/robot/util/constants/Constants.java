@@ -172,9 +172,9 @@ public final class Constants {
                 // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
                 // put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
                 // put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
-                // put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
-                // put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
-                // put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
+                put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
+                put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
+                put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
 
                 // V2
                 put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
@@ -187,6 +187,14 @@ public final class Constants {
                 // V3 (note inside of indexer)
                 put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
                 put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
+                // 2/28/24 - this was the day after bands were added
+                put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
+
+                // Random untested schenanagains
+                put(18, SpeedAngleTriplet.of(3928.0, 3928.0, 28.6));
+                put(19, SpeedAngleTriplet.of(4200.0, 4200.0, 28.3));
+                put(20, SpeedAngleTriplet.of(4200.0, 4200.0, 27.9));
+
             }
         };
 
@@ -208,6 +216,7 @@ public final class Constants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = 0.03;
+        public static final double GUILLOTINE_DEADBAND = 0.075;
         public static final double OUTTAKE_SECONDS = 3;
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
@@ -226,16 +235,16 @@ public final class Constants {
         public static final double INTAKE_TIME = 0;
         public static final double TRAPPER_OUTTAKE_PERCENT = -1;
         public static final double TRAPPER_INTAKE_PERCENT = 1;
-        public static final double TRAPPER_OUTTAKE_SLOW = 0.3;
+        public static final double TRAPPER_OUTTAKE_SLOW = -0.3;
         public static final double TRAPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
         public static final double AMP_PLACE_POS = 0.37;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
-        public static final double GUILLOTONE_POS = 0.25;
+        public static final double GUILLOTONE_POS = 0.224;
         public static final double UNSTUCK_POS = 0.15;
 
-        public static final double STUCK_TIME_SECONDS = 0.1;
+        public static final double STUCK_TIME_SECONDS = 0.2;
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.49;
@@ -516,7 +525,7 @@ public final class Constants {
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
         public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
-        public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
+        public static final int FAST_PERIODIC_STATUS_TIME_MS = 20;
       
         // This gets filled out as motors are created on the robot
         public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
@@ -884,6 +893,9 @@ public final class Constants {
             put("noteToTrap1", 0.2);
             put("noteToTrap2", 0.5);
             put("noteToTrap3", 0.0);
+
+            put("ampPosition", 0.37);
+            put("atan++", 0.0);
         }};
     }
 }
