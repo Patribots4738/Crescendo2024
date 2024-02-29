@@ -1,5 +1,6 @@
 package frc.robot.commands.managers;
 
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -67,9 +68,9 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(NT.getSupplier("noteToShoot1").getAsDouble()), // 0.7
+                NT.getWaitCommand("noteToShoot1"), // 0.7
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitSeconds(NT.getSupplier("noteToShoot2").getAsDouble()), // 0.4
+                NT.getWaitCommand("noteToShoot2"), // 0.4
                 stopIntakeAndIndexer());
     }
 
@@ -83,7 +84,7 @@ public class PieceControl {
             trapper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(intake::getPossession),
-            Commands.waitSeconds(NT.getSupplier("intakeToTrap1").getAsDouble()), // 0.5
+            NT.getWaitCommand("intakeToTrap1"), // 0.5
             Commands.either(
                 noteToTrap().andThen(noteToIndexer()), 
                 noteToTrap(), 
@@ -95,10 +96,10 @@ public class PieceControl {
         return Commands.sequence(
             trapper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitSeconds(NT.getSupplier("noteToIndexer1").getAsDouble()), // 0.6
+            NT.getWaitCommand("noteToIndexer1"), // 0.6
             indexer.stopCommand(),
             indexer.toElevatorSlow(),
-            Commands.waitSeconds(NT.getSupplier("noteToIndexer2").getAsDouble()), // 0.07
+            NT.getWaitCommand("noteToIndexer2"), // 0.07
             stopIntakeAndIndexer()
         );
     }
@@ -107,10 +108,10 @@ public class PieceControl {
         return Commands.sequence(
             trapper.outtake(),
             indexer.toElevator(),
-            Commands.waitSeconds(NT.getSupplier("noteToTrap1").getAsDouble()), // 0.2
+            NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             trapper.outtakeSlow(),
-            Commands.waitSeconds(NT.getSupplier("noteToTrap2").getAsDouble()), // 0.5
+            NT.getWaitCommand("noteToTrap2"), // 0.5
             stopIntakeAndIndexer()
         );
     }
@@ -139,7 +140,7 @@ public class PieceControl {
         return Commands.sequence(
             elevator.toDropCommand(),
             trapper.outtake(),
-            Commands.waitSeconds(NT.getSupplier("dropPieceCommand1").getAsDouble()), // 0.5
+            NT.getWaitCommand("dropPieceCommand1"), // 0.5
             elevator.toBottomCommand()
         );
     }
