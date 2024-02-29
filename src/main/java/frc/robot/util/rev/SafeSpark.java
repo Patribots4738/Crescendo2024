@@ -17,6 +17,8 @@ import com.revrobotics.jni.CANSparkMaxJNI;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 
@@ -29,13 +31,13 @@ public class SafeSpark extends CANSparkBase {
     protected RelativeEncoder relativeEncoder;
     protected SparkAbsoluteEncoder absoluteEncoder;
 
-    private final int MAX_ATTEMPTS = NeoMotorConstants.SAFE_SPARK_MODE ? 10 : 2;
+    private final int MAX_ATTEMPTS = NeoMotorConstants.SAFE_SPARK_MODE ? 20 : 2;
     private final int SPARK_MAX_MEASUREMENT_PERIOD = 16;
     private final int SPARK_FLEX_MEASUREMENT_PERIOD = 32;
     private final int SPARK_MAX_AVERAGE_DEPTH = 2;
     private final int SPARK_FLEX_AVERAGE_DEPTH = 8;
-    private final double BURN_FLASH_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.1 : 0;
-    private final double APPLY_PARAMETER_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.02 : 0;
+    private final double BURN_FLASH_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.5 : 0;
+    private final double APPLY_PARAMETER_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.05 : 0;
 
     public SafeSpark(int canID, boolean useAbsoluteEncoder, MotorType motorType, boolean isSparkFlex) {
         super(canID, motorType, isSparkFlex ? SparkModel.SparkFlex : SparkModel.SparkMax);
@@ -139,9 +141,20 @@ public class SafeSpark extends CANSparkBase {
      * @param errorMessage Error message to print
      */
     public void checkStatus(REVLibError status, String errorMessage) {
-        if (status != REVLibError.kOk)
+        if (status != REVLibError.kOk) {
             System.err.println(canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ") " + errorMessage + " - "
                     + status.toString());
+        }
+        if (getFault(FaultID.kSensorFault)) {
+            String message = "\nSensor fault detected on motor " +
+                canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")" +
+                ". Power cycle the robot to fix.";
+            if (Robot.gameMode == GameMode.DISABLED) {
+                throw new IllegalStateException(message);
+            } else {
+                System.err.println(message);
+            }
+        }
     }
 
     @Override
