@@ -84,8 +84,10 @@ public class PieceControl {
             indexer.toShooterSlow(),
             Commands.waitUntil(intake::getPossession),
             Commands.waitSeconds(NT.getSupplier("intakeToTrap1").getAsDouble()), // 0.5
-            noteToTrap()
-            // noteToIndexer()
+            Commands.either(
+                noteToTrap().andThen(noteToIndexer()), 
+                noteToTrap(), 
+                this::getShooterMode)
         );
     }
 
@@ -253,10 +255,16 @@ public class PieceControl {
     public Command setShooterModeCommand(boolean shooterMode) {
         return Commands.either(
                 Commands.runOnce(() -> setShooterMode(shooterMode))
-                    .andThen(Commands.either(
-                        noteToIndexer(),
-                        noteToTrap(),
-                        () -> shooterMode)),
+                    .andThen(
+                        Commands.either(
+                            Commands.either(
+                                noteToIndexer(),
+                                noteToTrap(),
+                                () -> shooterMode), 
+                            Commands.none(), 
+                            intake::getPossession
+                        )
+                    ),
                 Commands.none(),
                 () -> getShooterMode() != shooterMode);
     }
