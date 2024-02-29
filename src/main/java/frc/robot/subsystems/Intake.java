@@ -37,17 +37,22 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public void setPercent(double desiredPercent) {
-        desiredSpeed = 
+        desiredPercent = 
             MathUtil.clamp(
                 desiredPercent, 
                 IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
                 IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
         
-        if (desiredPercent == IntakeConstants.INTAKE_PERCENT) {
-            notePossession = false;
-            startedIntakingTimestamp = Robot.currentTimestamp;
+        if (desiredSpeed != desiredPercent) {
+            desiredSpeed = desiredPercent;
+            if (desiredSpeed == IntakeConstants.INTAKE_PERCENT) {
+                notePossession = false;
+                startedIntakingTimestamp = Robot.currentTimestamp;
+            }
+            
+            intakeMotor.set(desiredSpeed);
         }
-        intakeMotor.set(desiredSpeed);
+
     }
 
     public Command setPercentCommand(double desiredPercent) {

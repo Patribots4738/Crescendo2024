@@ -8,13 +8,13 @@ import frc.robot.util.motors.Neo;
 import frc.robot.util.motors.SafeSparkMax.TelemetryPreference;
 
 public class Indexer extends SubsystemBase {
-    private final Neo triggerWheel;
+    private final Neo indexer;
     private double desiredPercent = 0;
 
     public Indexer() {
-        triggerWheel = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID);
-        triggerWheel.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_CURRENT_LIMIT_AMPS);
-        triggerWheel.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+        indexer = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID);
+        indexer.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_CURRENT_LIMIT_AMPS);
+        indexer.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
     public double getDesiredPercent() {
@@ -22,11 +22,15 @@ public class Indexer extends SubsystemBase {
     }
 
     public void setDesiredPercent(double percent) {
-        desiredPercent = MathUtil.clamp(
+        percent = MathUtil.clamp(
             percent, 
             IntakeConstants.INDEXER_PERCENT_LOWER_LIMIT, 
             IntakeConstants.INDEXER_PERCENT_UPPER_LIMIT);
-        triggerWheel.set(desiredPercent);
+
+        if (percent != desiredPercent) {
+            desiredPercent = percent;
+            indexer.set(desiredPercent);
+        }
     }
 
     public Command setPercentCommand(double percent) {
@@ -51,5 +55,9 @@ public class Indexer extends SubsystemBase {
 
     public Command stopCommand() {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
+    }
+
+    public boolean hasPiece() {
+        return false;
     }
 }

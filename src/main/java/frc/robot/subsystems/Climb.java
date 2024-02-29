@@ -85,7 +85,12 @@ public class Climb extends SubsystemBase implements Logged {
                 ClimbConstants.BOTTOM_LIMIT,
                 ClimbConstants.TOP_LIMIT);
 
-        leftMotor.setTargetPosition(pos1);
+        if (targetPosLeft != pos1) {
+            leftMotor.setTargetPosition(pos1);
+        }
+
+        if (targetPosRight != pos2)
+
         rightMotor.setTargetPosition(pos2);
 
         RobotContainer.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
