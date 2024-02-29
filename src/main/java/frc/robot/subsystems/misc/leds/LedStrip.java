@@ -1,5 +1,6 @@
 package frc.robot.subsystems.misc.leds;
 
+import java.lang.reflect.Method;
 //import frc.robot.DriverUI;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
@@ -56,7 +57,7 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public int selectedLED = 8;
+    public int selectedLED = 0;
 
     private Command runPattern(int index) {
         Command selectedPattern = switch (selectedLED) {
@@ -232,11 +233,7 @@ public class LedStrip extends SubsystemBase {
 
     public Command flash() {
         return run(() -> {
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = (i + greenNGoldOffset % 2 == 0) ? Color.kOrange : Color.kBlack;
-                setLED(i, color);
-            }
-            greenNGoldOffset++;
+            oohShiny(0, 300, Color.kWheat, NoColor, 1);
         });
     }
 
@@ -266,12 +263,14 @@ public class LedStrip extends SubsystemBase {
     Color Red = new Color(250, 0, 0);
     Color NoColor = new Color(0, 0, 0);
 
-    Color GradBlue = Color.fromHSV(70, 255, 255);
-    Color GradRed = Color.fromHSV(0, 255, 255);
+    Color GradBlue = PatriColor.fromHSV(140, 255, 255);
+    Color GradRed = PatriColor.fromHSV(360, 255, 255);
+    Color GradOrange = PatriColor.fromHSV(40, 255, 255);
+    Color GradNoColor = PatriColor.fromHSV(0, 0, 0);
 
     public Command upwardsElevatorGradientLED() {
         return Commands.run(() -> {
-            setLEDGradient(GradRed, GradBlue, 0, ledBuffer.getLength());
+            setLEDGradient(GradOrange, GradNoColor, 0, ledBuffer.getLength());
         });
     }
 
@@ -389,4 +388,11 @@ public class LedStrip extends SubsystemBase {
             firstColor.blue * ratio + secondColor.blue * (1 - ratio), 
             firstColor.green * ratio + secondColor.green * (1 - ratio));
     }
+
+    public class PatriColor extends Color {
+      public static Color fromHSV(int h, int s, int v) {
+        return Color.fromHSV(h/2, s, v);
+      } 
+    }
 }
+

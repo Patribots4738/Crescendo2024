@@ -539,7 +539,7 @@ public final class Constants {
 
     public static final class FieldConstants {
 
-        public static boolean IS_SIMULATION = Robot.isSimulation();
+        public static boolean IS_SIMULATION = true;//Robot.isSimulation();
         public static final int CENTER_NOTE_COUNT = 5;
 
         public static final double ALIGNMENT_SPEED = 3;
