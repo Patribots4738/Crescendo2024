@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Robot;
 import java.util.Set;
 
-public class FlashCommand extends LEDCommands {
+public class LEDFlashCommand extends LEDCommands {
     private final Color color1;
     private final Color color2;
     private final double blinkTime;
@@ -13,11 +13,11 @@ public class FlashCommand extends LEDCommands {
     private double startTime;
     private boolean isFinished;
 
-    public FlashCommand(double blinkTime, double blinkSpeed, Color color1, Color color2) {
+    public LEDFlashCommand(double blinkTime, double blinkSpeed, Color color1, Color color2) {
         this(blinkTime, blinkSpeed, color1, color2, Set.of(ledStrip));
     }
 
-    public FlashCommand(double blinkTime, double blinkSpeed, Color color1, Color color2, Set<Subsystem> requirements) {
+    public LEDFlashCommand(double blinkTime, double blinkSpeed, Color color1, Color color2, Set<Subsystem> requirements) {
         super(ledStrip, requirements);
         this.color1 = color1;
         this.color2 = color2;

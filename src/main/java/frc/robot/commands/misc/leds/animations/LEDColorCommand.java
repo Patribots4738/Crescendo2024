@@ -2,10 +2,10 @@ package frc.robot.commands.misc.leds.animations;
 
 import edu.wpi.first.wpilibj.util.Color;
 
-public class ColorCommand extends LEDCommands {
+public class LEDColorCommand extends LEDCommands {
     private Color color;
 
-    public ColorCommand(Color color) {
+    public LEDColorCommand(Color color) {
         super(ledStrip);
         this.color = color;
     }
