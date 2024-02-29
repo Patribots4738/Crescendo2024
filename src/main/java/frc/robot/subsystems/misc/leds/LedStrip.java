@@ -126,8 +126,7 @@ public class LedStrip extends SubsystemBase {
             Math.PI*2);
     }
 
-    double greenNGoldOffset = 1;
-
+    
     public Command greenNGold() {
         return new LEDWaveCommand().new Hue(
             50, 
@@ -136,14 +135,15 @@ public class LedStrip extends SubsystemBase {
             .075, 
             Math.PI*2);
     }
-
+        
+    double circusOffset = 1;
     public Command circus() {
         return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = (((int) ((i/5.0) + greenNGoldOffset) % 2 == 0) ? Color.kRed : Color.kWhite);
+                final Color color = (((int) ((i/5.0) + circusOffset) % 2 == 0) ? Color.kRed : Color.kWhite);
                 setLED(i, color);
             }
-            greenNGoldOffset += .05;
+            circusOffset += .05;
         });
     }
 
