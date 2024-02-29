@@ -30,11 +30,9 @@ public class LedStrip extends SubsystemBase {
 
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
-    private DoubleSupplier elevatorPositionSupplier;
     private LEDCommands ledFunctionCommand = new LEDCommands(this);
 
     public LedStrip(DoubleSupplier elevatorPositionSupplier) {
-        this.elevatorPositionSupplier = elevatorPositionSupplier;
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
         ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
         LEDConstants.LED_COUNT = ledBuffer.getLength();
@@ -121,78 +119,6 @@ public class LedStrip extends SubsystemBase {
         }
     }
 
-    /**
-     * 
-     * firstColor is the color that the gradient starts on
-     * @param firstColor
-     * 
-     * second Color is the color that the gradient ends on
-     * @param secondColor
-     * 
-     * startIndex is the LED that the gradient starts on
-     * @param startIndex
-     * 
-     * endIndex is the LED that the gradient ends on
-     * @param endIndex
-     */
-    public void setLEDGradient(Color ColorI, Color ColorII, int startIndex, int endIndex) {
-        for (int i = startIndex; i < endIndex; i++) {
-            double ratio = (double) (i - startIndex) / (double) (endIndex - startIndex);
-            setLED(i, sampleGradient(ColorII, ColorI, ratio));
-        }
-    }
-
-    int blinkAmount = 0;
-    String blinkStatus = "initialize";
-    public void oohShiny(int startIndex, int endIndex, Color colorOn, Color colorOff, int blinkCount) {
-      if (blinkStatus.equals("initialize")) {
-        blinkAmount = 0;
-        blinkStatus = "execute";
-      }
-      if (blinkStatus.equals("execute")) {
-        if (((int) (Robot.currentTimestamp * 7)) % 2 == 0) {
-          setLED(startIndex, endIndex, colorOff);
-        } else {
-          setLED(startIndex, endIndex, colorOn);
-          blinkAmount--;
-        }
-        if (blinkCount == blinkAmount) {
-          blinkStatus = "done";
-        }
-      }
-        
-    }
-
-    public void cautionOOhShiny(int startIndex, int endIndex, Color colorOn1, Color colorOn2, Color colorOff, int blinkCount) {
-      if (blinkStatus.equals("initialize")) {
-        blinkAmount = 0;
-        blinkStatus = "execute";
-      }
-      if (blinkStatus.equals("execute")) {
-        if (((int) (Robot.currentTimestamp * 7)) % 2 == 0) {
-          setLED(startIndex, endIndex, colorOff);
-        } else {
-          for (int l = startIndex; l < endIndex; l++) {
-          Color patternColor = (((l/2) % 2 == 0) ? colorOn1 : colorOn2);
-          setLED(l, patternColor);
-          }
-          blinkAmount--;
-        }
-        if (blinkCount == blinkAmount) {
-          blinkStatus = "done";
-        }
-      }
-        
-    }    
-
-    public void blink2(int startIndex, int endIndex, Color color) {
-      if ((Robot.currentTimestamp * 7) % 2 == 0) {
-        setLED(startIndex, endIndex, color);
-      } else {
-        setLED(startIndex, endIndex, Color.kBlack);
-      }
-    }
-
     public Command turnOff() {
         return runOnce(() -> setLED(Color.kBlack));
     }
@@ -259,46 +185,6 @@ public class LedStrip extends SubsystemBase {
     Color GradBlue = Color.fromHSV(70, 255, 255);
     Color GradRed = Color.fromHSV(0, 255, 255);
 
-    public Command upwardsElevatorGradientLED() {
-        return Commands.run(() -> {
-            setLEDGradient(GradRed, GradBlue, 0, ledBuffer.getLength());
-        });
-    }
-
-    public Command backwardsElevatorGradientLED() {
-        return Commands.run(() -> {
-            setLEDGradient(GreerYeller, Orange, 10, 1);
-        });
-    }
-
-    public Command elevatorTOPLED() {
-        return Commands.runOnce(() -> blinkStatus = "initialize")
-          .andThen(
-            Commands.run(() -> 
-              oohShiny(10, 60, GreerYeller, Color.kBlack, 27)
-        ).ignoringDisable(true));
-    }
-
-    public Command merryBismasLED() {
-        return Commands.runOnce(() -> blinkStatus = "initialize")
-        .andThen(
-          Commands.run(() -> 
-            cautionOOhShiny(200, 250, Red, Greer, NoColor, 27)
-      ).ignoringDisable(true));
-    }
-
-    public Command roboRiseLED() {
-        return Commands.run(() -> {
-            setLEDGradient(Greer, GreerYeller, 1, 100);
-        });
-    }
-
-    public Command roboLowerLED() {
-        return Commands.run(() -> {
-            setLEDGradient(GreerYeller, Greer, 100, 1);
-        });
-    }
-
     public Command lightsoffLED() {
         return Commands.runOnce(() -> {
             setLED(Color.kBlack);
@@ -344,39 +230,4 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
-    public Command trackElevator(DoubleSupplier elevatorPositionSupplier) {
-        return Commands.run(() -> {
-            double currentElevatorPosition = elevatorPositionSupplier.getAsDouble();
-            // convert the elevator position [0,1] 
-            // to an LED index (int minIndex, int maxIndex)
-            // did someone say interpolation???
-            int topmostActiveLED = (int) Math.round(
-                MathUtil.interpolate(
-                    0, 
-                    LEDConstants.ELEVATOR_LED_COUNT, 
-                    currentElevatorPosition
-                ));
-
-        }).until(() -> {
-            return elevatorPositionSupplier.getAsDouble() == 0;
-        });
-    }
-
-    public Command fullElevatorCommand(DoubleSupplier elevatorPositionSupplier) {
-        return Commands.sequence(
-            Commands.run(() -> {})
-                .until(() -> elevatorPositionSupplier.getAsDouble() == 1),
-            Commands.run(()-> {})
-                .until(() -> elevatorPositionSupplier.getAsDouble() < 0.95),
-            Commands.run(()-> {})
-                .until(() -> elevatorPositionSupplier.getAsDouble() == 0)
-        );
-    }
-
-    private Color sampleGradient(Color firstColor, Color secondColor, double ratio) {
-        return new Color(
-            firstColor.red * ratio + secondColor.red * (1 - ratio), 
-            firstColor.blue * ratio + secondColor.blue * (1 - ratio), 
-            firstColor.green * ratio + secondColor.green * (1 - ratio));
-    }
 }

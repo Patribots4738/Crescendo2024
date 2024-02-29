@@ -199,8 +199,7 @@ public class RobotContainer implements Logged {
             .whileTrue(ledStrip.cautionLED());
 
         controller.b()
-            .onTrue(pieceControl.setShooterModeCommand(false))
-            .onTrue(ledStrip.merryBismasLED());
+            .onTrue(pieceControl.setShooterModeCommand(false));
     }
     
     private void configureDriverBindings(PatriBoxController controller) {
