@@ -262,7 +262,7 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
-            .onTrue(pieceControl.ejectNote())
+            .whileTrue(pieceControl.ejectNote())
             .onFalse(pieceControl.stopEjecting());
     }
 
