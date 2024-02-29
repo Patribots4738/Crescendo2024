@@ -528,9 +528,9 @@ public final class Constants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
-        public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
+        public static final int MAX_PERIODIC_STATUS_TIME_MS = 5000;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 20;
-      
+
         // This gets filled out as motors are created on the robot
         public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
 
