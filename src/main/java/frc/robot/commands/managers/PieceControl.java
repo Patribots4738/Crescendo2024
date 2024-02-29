@@ -155,12 +155,17 @@ public class PieceControl {
     }
 
     public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        // maybe make setPosition a command ORR Make the Elevator Command
-        return Commands.either(
+        // Defer the command to not require anyhing until it is actually ran
+        // This is becuase placeTrap requires pivot, but shootWhenReady does not
+        // If they are both required, then we would cancel any command that requires pivot
+        // such as prepareSWDCommand
+        return Commands.defer(() -> Commands.either(
             shootWhenReady(poseSupplier, speedSupplier),
             placeTrap(),
             this::getShooterMode
-        );
+        ), this.getShooterMode()
+            ? shootWhenReady(poseSupplier, speedSupplier).getRequirements() 
+            : placeTrap().getRequirements());
     }
 
     private Command setDislodging(boolean dislodging) {
@@ -203,20 +208,17 @@ public class PieceControl {
     }
 
     public Command placeTrap() {
-        return shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0.0,0.0, 60.0)).alongWith(
-            Commands.sequence(
-                setElevatorPosition(NT.getSupplier("ampPosition")),
+        return Commands.sequence(
+                setElevatorPosition(NT.getSupplier("ampPosition"))
+                    .alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60))),
                 trapper.intake(),
                 Commands.waitSeconds(0.3),
                 trapper.stopCommand(),
                 Commands.waitSeconds(1),
                 trapper.outtake(),
                 Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
-                trapper.stopCommand()
-            )
-        ).andThen(
-            shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0.0,0.0, 0.0))
-        );
+                trapper.stopCommand(),
+                shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0)));
     }
 
     public Command sourceShooterIntake() {
