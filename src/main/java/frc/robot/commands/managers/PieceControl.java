@@ -251,6 +251,13 @@ public class PieceControl {
     }
 
     public Command setShooterModeCommand(boolean shooterMode) {
-        return Commands.runOnce(() -> setShooterMode(shooterMode));
+        return Commands.either(
+                Commands.runOnce(() -> setShooterMode(shooterMode))
+                    .andThen(Commands.either(
+                        noteToIndexer(),
+                        noteToTrap(),
+                        () -> shooterMode)),
+                Commands.none(),
+                () -> getShooterMode() != shooterMode);
     }
 }
