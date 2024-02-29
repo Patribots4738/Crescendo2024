@@ -15,6 +15,7 @@ import frc.robot.Robot;
 import frc.robot.commands.misc.leds.animations.LEDColorCommand;
 import frc.robot.commands.misc.leds.animations.LEDFlashCommand;
 import frc.robot.commands.misc.leds.animations.LEDCommands;
+import frc.robot.commands.misc.leds.animations.LEDConditionalCommand;
 import frc.robot.commands.misc.leds.animations.LEDWaveCommand;
 import frc.robot.util.constants.Constants.LEDConstants;
 import java.util.List;
@@ -170,8 +171,7 @@ public class LedStrip extends SubsystemBase {
     public Command cautionLED() {
         return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = (i % 2 == 0) ? Color.kYellow : Color.kDarkGray;
-                setLED(i, color);
+                new LEDConditionalCommand(Color.kYellow, Color.kDarkGray, (i % 2 == 0), i).execute();
             }
         });
     }

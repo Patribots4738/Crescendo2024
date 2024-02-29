@@ -23,7 +23,6 @@ public class LEDFollowChangeCommand extends LEDCommands {
         double elevatorPose = motorPose.getAsDouble();
 
         elevatorPose = MathUtil.applyDeadband(elevatorPose * multiplier * ledStrip.getBuffer().getLength(), 0.01);
-        System.out.println("Elevator Pose: " + elevatorPose);
 
         for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
             if (i < elevatorPose) {
