@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -75,25 +77,37 @@ public class Elevator extends SubsystemBase implements Logged {
             TrapConstants.ELEVATOR_BOTTOM_LIMIT,
             TrapConstants.ELEVATOR_TOP_LIMIT);
 
-        elevator.setTargetPosition(pos);
+        if (desiredPos != pos) {
+            desiredPos = pos;
+            elevator.setTargetPosition(pos);
+    
+            RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+                0, 0, pos,
+                new Rotation3d()
+            );
+            RobotContainer.desiredComponents3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
+                0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER,
+                new Rotation3d()
+            );
+        }
 
-        RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
-            0, 0, pos,
-            new Rotation3d()
-        );
-        RobotContainer.desiredComponents3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
-            0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER,
-            new Rotation3d()
-        );
     }
 
-    public Command setPositionCommand(double pos, boolean waitUntilStuck) {
-        return Commands.runOnce(() -> this.setPosition(pos))
+    public Command setPositionCommand(DoubleSupplier pos, boolean waitUntilStuck) {
+        return Commands.runOnce(() -> this.setPosition(pos.getAsDouble()))
                     .andThen(Commands.waitUntil(() -> atDesiredPosition() || (waitUntilStuck && getStuck())));
     }
 
-    public Command setPositionCommand(double pos) {
+    public Command setPositionCommand(DoubleSupplier pos) {
         return setPositionCommand(pos, false);
+    }
+
+    public Command setPositionCommand(double pos) {
+        return setPositionCommand(() -> pos, false);
+    }
+
+    public Command setPositionCommand(double pos, boolean waitUntilStuck) {
+        return setPositionCommand(() -> pos, waitUntilStuck);
     }
 
     public Command toBottomCommand() {
@@ -121,7 +135,7 @@ public class Elevator extends SubsystemBase implements Logged {
 	}
 
     public boolean nearGuillotine() {
-        return MathUtil.isNear(TrapConstants.GUILLOTONE_POS, pos, TrapConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(TrapConstants.GUILLOTONE_POS, pos, TrapConstants.GUILLOTINE_DEADBAND);
     }
 
     public boolean getStuck() {
@@ -135,6 +149,6 @@ public class Elevator extends SubsystemBase implements Logged {
             && Robot.currentTimestamp - this.hitGuillotineTimestamp >= TrapConstants.STUCK_TIME_SECONDS
             && desiredPos > pos
             && nearGuillotine()
-            && elevator.getOutputCurrent() > 41.0;
+            && elevator.getOutputCurrent() > 35.0;
     }
 }

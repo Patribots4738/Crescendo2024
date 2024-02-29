@@ -41,7 +41,7 @@ public class ShooterCmds {
      * @return the prepared fire command
      */
     public Command prepareFireCommand(Supplier<Translation2d> shootingPose, BooleanSupplier shouldMirror) {
-        return Commands.runEnd(() -> {
+        return Commands.run(() -> {
                 Translation2d desiredPose = shootingPose.get();
 
                 if (shouldMirror.getAsBoolean()) {
@@ -52,14 +52,7 @@ public class ShooterCmds {
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
-            }, 
-            () -> {
-                if (Robot.gameMode == GameMode.TELEOP) {
-                    pivot.setAngle(0);
-                    shooter.stopCommand();
-                }
-            },
-            pivot, shooter);
+            }, pivot, shooter);
     }
 
     public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {
@@ -104,17 +97,11 @@ public class ShooterCmds {
      * @return The method is returning a Command object.
      */
     public Command prepareSWDCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
-        return Commands.runEnd(
+        return Commands.run(
             () -> {
                 desiredTriplet = shooterCalc.calculateSWDTriplet(robotPose.get(), speeds.get());
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
-            },
-            () -> {
-                if (Robot.gameMode == GameMode.TELEOP) {
-                    pivot.setAngle(0);
-                    shooter.stopCommand();
-                }
             }, pivot, shooter);
     }
 
@@ -143,9 +130,9 @@ public class ShooterCmds {
                         calculationTriplet.getAngle(),
                         false
                     )
-                ).schedule();
+                ).asProxy().schedule();
             }
-        );
+        ).asProxy();
     }
 
     public Command stopShooter() {

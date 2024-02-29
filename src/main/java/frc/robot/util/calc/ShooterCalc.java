@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.util.Constants.FieldConstants;
@@ -60,8 +61,8 @@ public class ShooterCalc implements Logged {
         return 
             SpeedAngleTriplet.of(
                 Pair.of(
-                    velocityToRPM(newv0),
-                    velocityToRPM(newv0)
+                    4200,
+                    4200
                 ),
                 newAngle.getDegrees()
             );
@@ -82,7 +83,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS);
+        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS + NT.getValue("atan++"));
     }
 
     /**

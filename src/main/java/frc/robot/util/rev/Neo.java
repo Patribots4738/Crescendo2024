@@ -8,7 +8,6 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.custom.PatrIDConstants;
@@ -62,11 +61,6 @@ public class Neo extends SafeSparkMax {
         // this requires the code to configure the sparks after construction
         restoreFactoryDefaults();
         setInverted(inverted);
-        // Add a delay to let the spark reset
-        // If a parameter set fails, this will add more time 
-        // to minimize any bus traffic.
-        // Default is 20ms
-        setCANTimeout(50);
         
         // Turn off alternate and analog encoders
         // we never use them
@@ -77,6 +71,13 @@ public class Neo extends SafeSparkMax {
         } else {
             setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
         }
+
+        // Add a delay to let the spark reset
+        // If a parameter set fails, this will add more time 
+        // to minimize any bus traffic.
+        // Default is 20ms
+        setCANTimeout(200);
+        
         setBrakeMode();
         register();
     }

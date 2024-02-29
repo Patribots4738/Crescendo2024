@@ -28,8 +28,11 @@ public class Trapper extends SubsystemBase {
                 percent, 
                 TrapConstants.TRAPPER_LOWER_PERCENT_LIMIT, 
                 TrapConstants.TRAPPER_UPPER_PERCENT_LIMIT);
-        desiredSpeed = percent;
-        trapper.set(percent);
+        if (desiredSpeed != percent) {
+            desiredSpeed = percent;
+            
+            trapper.set(percent);
+        }
     }
 
     public Command outtake() {
@@ -57,6 +60,10 @@ public class Trapper extends SubsystemBase {
             outtake(), 
             stopCommand(), 
             () -> desiredSpeed == 0);
+    }
+
+    public boolean hasPiece() {
+        return false;
     }
 
 }
