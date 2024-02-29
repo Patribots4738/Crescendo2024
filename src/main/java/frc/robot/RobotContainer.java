@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -38,6 +39,7 @@ import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
@@ -508,8 +510,8 @@ public class RobotContainer implements Logged {
         Pose3d initialShooterPose = new Pose3d(
                 NTConstants.PIVOT_OFFSET_METERS.getX(),
                 0,
-                NTConstants.PIVOT_OFFSET_METERS.getY(),
-            new Rotation3d()
+                NTConstants.PIVOT_OFFSET_METERS.getZ(),
+            new Rotation3d(0, -Units.degreesToRadians(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES), 0)
         );
 
         components3d[0] = initialShooterPose;

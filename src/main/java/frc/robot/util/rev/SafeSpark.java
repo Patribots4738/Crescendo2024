@@ -798,6 +798,7 @@ public class SafeSpark extends CANSparkBase {
             // Disable all telemetry that is unrelated to absolute encoders
             case ONLY_ABSOLUTE_ENCODER:
                 changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
+                changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, maxDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, minDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, minDelay);
                 break;
@@ -805,6 +806,8 @@ public class SafeSpark extends CANSparkBase {
             case ONLY_RELATIVE_ENCODER:
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, maxDelay);
+                changeStatusFrame(StatusFrame.ENCODER_POSITION, minDelay);
+                changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, minDelay);
                 break;
             // Disable everything
             case NO_TELEMETRY:
@@ -818,6 +821,7 @@ public class SafeSpark extends CANSparkBase {
             default:
                 break;
         }
+        
     }
 
 }
