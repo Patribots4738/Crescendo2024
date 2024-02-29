@@ -3,9 +3,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.constants.Constants.IntakeConstants;
-import frc.robot.util.motors.Neo;
-import frc.robot.util.motors.SafeSparkMax.TelemetryPreference;
+import frc.robot.util.Constants.IntakeConstants;
+import frc.robot.util.rev.Neo;
+import frc.robot.util.rev.SafeSparkMax.TelemetryPreference;
 
 public class Indexer extends SubsystemBase {
     private final Neo indexer;
