@@ -5,16 +5,15 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.util.constants.Constants.TrapConstants;
 
 public class LEDFollowChangeCommand extends LEDCommands {
     private DoubleSupplier motorPose;
     private final double multiplier;
     private Color color;
 
-    public LEDFollowChangeCommand(DoubleSupplier elevatorMotorPosition, double multiplier, Color color) {
+    public LEDFollowChangeCommand(DoubleSupplier motorPosition, double multiplier, Color color) {
         super(ledStrip, Set.of());
-        this.motorPose = elevatorMotorPosition;
+        this.motorPose = motorPosition;
         this.color = color;
         this.multiplier = multiplier;
     }
@@ -34,7 +33,6 @@ public class LEDFollowChangeCommand extends LEDCommands {
             }
         }
     }
-    
 
     @Override
     public boolean isFinished() {
