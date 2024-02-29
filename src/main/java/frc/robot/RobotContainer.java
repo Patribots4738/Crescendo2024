@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -86,6 +88,7 @@ public class RobotContainer implements Logged {
 
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
+    private final BooleanSupplier robotRelativeSupplier;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -149,14 +152,14 @@ public class RobotContainer implements Logged {
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
+        robotRelativeSupplier = () -> !driver.getYButton();
         swerve.setDefaultCommand(new Drive(
             swerve,
             driver::getLeftY,
             driver::getLeftX,
-            () -> -driver.getRightX(),
-            () -> !driver.getYButton(),
-            () -> (!driver.getYButton()
-                && Robot.isRedAlliance())));
+            () -> -driver.getRightX()/1.6,
+            robotRelativeSupplier,
+            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())));
 
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();
@@ -249,8 +252,8 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDCCommand(),
                     new ActiveConditionalCommand(
-                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
-                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
 
         controller.povLeft()
