@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command setPositionCommand(DoubleSupplier pos, boolean waitUntilStuck) {
-        return Commands.runOnce(() -> this.setPosition(pos.getAsDouble()))
+        return runOnce(() -> this.setPosition(pos.getAsDouble()))
                     .andThen(Commands.waitUntil(() -> atDesiredPosition() || (waitUntilStuck && getStuck())));
     }
 

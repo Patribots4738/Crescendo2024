@@ -218,7 +218,7 @@ public final class Constants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = 0.03;
-        public static final double GUILLOTINE_DEADBAND = 0.075;
+        public static final double GUILLOTINE_DEADBAND = 0.04;
         public static final double OUTTAKE_SECONDS = 3;
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
@@ -245,9 +245,9 @@ public final class Constants {
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
-        public static final double UNSTUCK_POS = 0.15;
+        public static final double UNSTUCK_POS = 0.175;
 
-        public static final double STUCK_TIME_SECONDS = 0.2;
+        public static final double STUCK_TIME_SECONDS = 0.25;
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.49;

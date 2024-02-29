@@ -225,10 +225,9 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
         controller.povDown()
-            .onTrue(
-                shooterCmds.stowPivot()
-                .alongWith(climb.toBottomCommand())
-            );
+            .onTrue(shooterCmds.stowPivot()
+            .alongWith(climb.toBottomCommand())
+        );
         
         controller.a().whileTrue(
             Commands.sequence(
