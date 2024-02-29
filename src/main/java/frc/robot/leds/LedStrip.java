@@ -1,4 +1,4 @@
-package frc.robot.leds.Strips;
+package frc.robot.leds;
 
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
