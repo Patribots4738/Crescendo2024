@@ -18,11 +18,7 @@ public class LEDColorCommand extends LEDCommands {
     
     @Override
     public void execute() {
-        if (index == -1) {
-            ledStrip.setLED(color);
-        } else {
-            ledStrip.setLED(index, color);
-        }
+        ledStrip.setLED(index, color);
     }
 
     @Override

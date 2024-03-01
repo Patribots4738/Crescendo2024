@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.leds.LedStrip;
+import frc.robot.leds.commands.animations.LEDWaveCommand;
+import frc.robot.leds.commands.animations.LEDWaveCommand.Hue;
 import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.custom.PatriBoxController;
@@ -146,7 +148,14 @@ public class LPI extends Command implements Logged{
     @Override
     public void end(boolean interrupted) {
         cancel();
-        ledStrip.greenNGold();
+        new LEDWaveCommand().new Hue(
+            50, 
+            (double) ledStrip.getBuffer().getLength(), 
+            75, 
+            .075, 
+            Math.PI*2)
+        .ignoringDisable(true)
+        .schedule();
         xboxController.setRumble(() -> 0);
     }
 

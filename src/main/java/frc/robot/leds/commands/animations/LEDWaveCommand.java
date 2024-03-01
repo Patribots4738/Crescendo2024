@@ -11,9 +11,9 @@ import frc.robot.leds.commands.animations.LEDCommands.HSV;
 
 public class LEDWaveCommand {
 
-    protected void evaluateWave(LedStrip ledStrip, double scale, double spacing, double time, int x, HSV isHue,
+    protected void evaluateWave(LedStrip ledStrip, double scale, double spacing, double time, int x, HSV hsvMode,
             double height, int hueVal) {
-        switch (isHue) {
+        switch (hsvMode) {
             case HUE -> evaluateHueWave(ledStrip, scale, spacing, time, x, height);
             case VALUE -> evaluateValueWave(ledStrip, scale, spacing, time, x, height, hueVal);
             case SATURATION -> evaluateSaturationWave(ledStrip, scale, spacing, time, x, height, hueVal);
@@ -131,7 +131,11 @@ public class LEDWaveCommand {
             this.waveValueIncrement = waveValueIncrement;
             this.waveRange = waveRange;
             this.hueVal = hueVal;
-            this.waveValueFunction = Commands.run(() -> waveValueFunction(), requirements.toArray(new Subsystem[0]))
+            // we wrap this in a commands.run so that we can run it without worrying about the end condition
+            // as we want this to run indefinitely until the top level command is ended
+            this.waveValueFunction = 
+                Commands.run(() -> waveValueFunction(), 
+                    requirements.toArray(new Subsystem[0]))
                     .ignoringDisable(true);
         }
 
@@ -179,6 +183,7 @@ public class LEDWaveCommand {
             this.scale = scale;
             this.spacing = spacing;
             this.height = height;
+            // this is the speed of the wave
             this.waveSaturationIncrement = waveSaturationIncrement;
             this.waveRange = waveRange;
             this.hueVal = hueVal;

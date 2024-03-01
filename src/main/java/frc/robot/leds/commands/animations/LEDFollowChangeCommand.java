@@ -7,29 +7,26 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class LEDFollowChangeCommand extends LEDCommands {
-    private DoubleSupplier motorPose;
+    private DoubleSupplier motorPoseSupplier;
     private final double multiplier;
     private Color color;
 
     public LEDFollowChangeCommand(DoubleSupplier motorPosition, double multiplier, Color color) {
         super(ledStrip, Set.of());
-        this.motorPose = motorPosition;
+        this.motorPoseSupplier = motorPosition;
         this.color = color;
         this.multiplier = multiplier;
     }
 
     @Override
     public void execute() {
-        double newMotorPose = motorPose.getAsDouble();
+        double motorPose = motorPoseSupplier.getAsDouble();
 
-        newMotorPose = MathUtil.applyDeadband(newMotorPose * multiplier * ledStrip.getBuffer().getLength(), 0.01);
-
+        System.out.println("newMotorPose: " + motorPose + " multiplier: " + multiplier + " ledStrip.getBuffer().getLength(): " + ledStrip.getBuffer().getLength());
+        motorPose = MathUtil.applyDeadband(motorPose * multiplier * ledStrip.getBuffer().getLength(), 0.01);
+        
         for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
-            if (i < newMotorPose) {
-                ledStrip.setLED(i, color);
-            } else {
-                ledStrip.setLED(i, Color.kBlack);
-            }
+            ledStrip.setLED(i, (i < motorPose) ? color : Color.kBlack);
         }
     }
 

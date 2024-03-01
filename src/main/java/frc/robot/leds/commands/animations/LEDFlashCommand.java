@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Robot;
 import java.util.Set;
 
+// TODO: convert this to use wave logic with shortened stip length
 public class LEDFlashCommand extends LEDCommands {
     private final Color color1;
     private final Color color2;
@@ -33,17 +34,18 @@ public class LEDFlashCommand extends LEDCommands {
 
     @Override
     public void execute() {
-        double currentTime = edu.wpi.first.wpilibj.Timer.getFPGATimestamp() - startTime;
+        double currentTime = Robot.currentTimestamp - startTime;
         double blinkInterval = blinkTime / (blinkSpeed*blinkSpeed);
-        for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
-            ledStrip.setLED(i, (currentTime % (2 * blinkInterval)) < blinkInterval ? color1 : color2);
-        }
+        ledStrip.setLED((currentTime % (2 * blinkInterval)) < blinkInterval ? color1 : color2);
         if (currentTime >= blinkTime) {
-            isFinished = true;
-            for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
-                ledStrip.setLED(i, color2);
-            }
+            end(true);
         }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        ledStrip.setLED(color1);
+        isFinished = true;
     }
 
     @Override

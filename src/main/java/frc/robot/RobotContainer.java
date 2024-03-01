@@ -34,9 +34,9 @@ import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.LedStrip;
 import frc.robot.leds.commands.LPI;
+import frc.robot.leds.commands.animations.LEDFollowChangeCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
-import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -46,6 +46,7 @@ import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -273,7 +274,11 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(pieceControl.elevatorToTop());
+            .onTrue(pieceControl.elevatorToTop())
+            .whileTrue(new LEDFollowChangeCommand(
+                elevator::getPosition, 
+                TrapConstants.ELEVATOR_TOP_LIMIT, 
+                Color.kBlue));
 
         controller.povLeft()
             .onTrue(pieceControl.elevatorToAmp());
@@ -282,7 +287,11 @@ public class RobotContainer implements Logged {
             .onTrue(trapper.toggleSpeed());
         
         controller.povDown()
-            .onTrue(elevator.toBottomCommand());
+            .onTrue(elevator.toBottomCommand())
+            .whileTrue(new LEDFollowChangeCommand(
+                elevator::getPosition, 
+                TrapConstants.ELEVATOR_TOP_LIMIT, 
+                Color.kRed));
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeToTrap())
