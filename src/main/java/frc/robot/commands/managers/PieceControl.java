@@ -28,7 +28,8 @@ public class PieceControl {
 
     private boolean shooterMode = true;
 
-    private boolean ampMode = true;
+    // Between amp and trap
+    private boolean ampPlaceMode = true;
 
     // State representing if we are trying to unstuck the elevator
     @Log
@@ -187,19 +188,23 @@ public class PieceControl {
             getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
-    
-    public Command elevatorToTrap() {
-        return setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS)
-                .alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60)))
-                .andThen(prepPiece());
+
+    public Command elevatorToTop() {
+        return setElevatorPosition(() -> TrapConstants.ELEVATOR_TOP_LIMIT);
     }
 
-    public Command elevatorToAmp() {
+    // Goes to amp position if the driver has toggled amp placement mode on, to trap otherwise
+    public Command elevatorToPlacement() {
         return 
             Commands.defer(
-                () -> setElevatorPosition(NT.getSupplier("ampPosition")),
-                Set.of(elevator)
-            ).andThen(prepPiece());
+                () -> 
+                    Commands.either(
+                        setElevatorPosition(NT.getSupplier("ampPosition")), 
+                        setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
+                        () -> ampPlaceMode)
+                    .andThen(prepPiece()),
+                Set.of(elevator, trapper)
+            );
     }
 
     public Command prepPiece() {
@@ -222,15 +227,19 @@ public class PieceControl {
     }
 
     public Command placeWhenReady() {
-        return Commands.sequence(
-                Commands.waitUntil(
-                    () -> elevator.atPosition(
-                        ampMode 
-                        ? TrapConstants.AMP_PLACE_POS 
-                        : TrapConstants.TRAP_PLACE_POS)),
-                trapper.outtake(TrapConstants.OUTTAKE_SECONDS),
-                shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
-                    .onlyIf(() -> elevator.getDesiredPosition() == TrapConstants.TRAP_PLACE_POS)
+        return 
+            Commands.defer(
+                () -> Commands.sequence(
+                    Commands.waitUntil(
+                        () -> elevator.atPosition(
+                            ampPlaceMode 
+                            ? NT.getSupplier("ampPosition").getAsDouble()
+                            : TrapConstants.TRAP_PLACE_POS)),
+                    trapper.outtake(TrapConstants.OUTTAKE_SECONDS),
+                    shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
+                        .onlyIf(() -> !ampPlaceMode)
+                ),
+                ampPlaceMode ? Set.of(trapper) : Set.of(trapper)
             );
     }
 
@@ -261,6 +270,18 @@ public class PieceControl {
 
     public void setShooterMode(boolean shooterMode) {
         this.shooterMode = shooterMode;
+    }
+
+    public boolean getAmpPlaceMode() {
+        return ampPlaceMode;
+    }
+
+    public void setAmpPlaceMode(boolean ampPlaceMode) {
+        this.ampPlaceMode = ampPlaceMode;
+    }
+
+    public Command toggleAmpPlaceModeCommand() {
+        return Commands.runOnce(() -> setAmpPlaceMode(!ampPlaceMode));
     }
 
     public Command setShooterModeCommand(boolean shooterMode) {
