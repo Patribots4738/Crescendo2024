@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.constants.Constants.AutoConstants;
+import frc.robot.util.Constants.AutoConstants;
 
 public class ChasePose extends Command {
 

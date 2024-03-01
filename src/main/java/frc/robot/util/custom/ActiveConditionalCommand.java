@@ -1,4 +1,4 @@
-package frc.robot.util.testing;
+package frc.robot.util.custom;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import java.util.function.BooleanSupplier;
 
-public class PatritionalCommand extends Command {
+public class ActiveConditionalCommand extends Command {
     private final Command onTrueCommand;
     private final Command onFalseCommand;
     private final BooleanSupplier condition;
     private Command selectedCommand;
 
-    public PatritionalCommand(Command onTrueCommand, Command onFalseCommand, BooleanSupplier condition) {
+    public ActiveConditionalCommand(Command onTrueCommand, Command onFalseCommand, BooleanSupplier condition) {
         this.onTrueCommand = requireNonNullParam(onTrueCommand, "onTrue", "ConditionalCommand");
         this.onFalseCommand = requireNonNullParam(onFalseCommand, "onFalse", "ConditionalCommand");
         this.condition = requireNonNullParam(condition, "condition", "ConditionalCommand");

@@ -9,8 +9,8 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.ModuleConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

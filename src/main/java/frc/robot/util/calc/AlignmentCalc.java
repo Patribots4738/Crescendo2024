@@ -10,8 +10,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Robot;
 import frc.robot.commands.subsytemHelpers.ShooterCmds;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.constants.Constants.AutoConstants;
-import frc.robot.util.constants.Constants.FieldConstants;
+import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.FieldConstants;
 
 public class AlignmentCalc {
 

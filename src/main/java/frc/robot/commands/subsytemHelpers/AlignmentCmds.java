@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.calc.AlignmentCalc;
 import frc.robot.util.calc.PoseCalculations;
-import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.OIConstants;
-import frc.robot.util.testing.PatritionalCommand;
+import frc.robot.util.custom.ActiveConditionalCommand;
 
 public class AlignmentCmds {
     
@@ -153,7 +153,7 @@ public class AlignmentCmds {
      */
     public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
         return
-            new PatritionalCommand(
+            new ActiveConditionalCommand(
                 chainRotationalAlignment(driverX, driverY),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)),

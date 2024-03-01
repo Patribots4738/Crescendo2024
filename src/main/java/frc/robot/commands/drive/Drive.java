@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.constants.Constants.DriveConstants;
+import frc.robot.util.Constants.DriveConstants;
 
 public class Drive extends Command {
 

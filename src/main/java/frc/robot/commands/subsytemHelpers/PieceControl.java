@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.elevator.Trapper;
+import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.util.constants.SpeedAngleTriplet;
-import frc.robot.util.constants.Constants.TrapConstants;
 
 public class PieceControl {
 

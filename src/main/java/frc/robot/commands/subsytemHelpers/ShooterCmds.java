@@ -14,9 +14,9 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.commands.sim.note.NoteTrajectory;
 import frc.robot.subsystems.shooter.*;
+import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.ShooterCalc;
-import frc.robot.util.constants.Constants.ShooterConstants;
-import frc.robot.util.constants.SpeedAngleTriplet;
+import frc.robot.util.custom.SpeedAngleTriplet;
 
 public class ShooterCmds {
 

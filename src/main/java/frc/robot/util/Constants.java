@@ -1,4 +1,4 @@
-package frc.robot.util.constants;
+package frc.robot.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +27,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import frc.robot.util.custom.PatrIDConstants;
+import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.motors.Neo;
 import monologue.Logged;
 

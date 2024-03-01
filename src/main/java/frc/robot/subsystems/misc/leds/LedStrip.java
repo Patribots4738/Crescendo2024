@@ -17,7 +17,8 @@ import frc.robot.commands.misc.leds.animations.LEDFlashCommand;
 import frc.robot.commands.misc.leds.animations.LEDCommands;
 import frc.robot.commands.misc.leds.animations.LEDConditionalCommand;
 import frc.robot.commands.misc.leds.animations.LEDWaveCommand;
-import frc.robot.util.constants.Constants.LEDConstants;
+import frc.robot.util.Constants.LEDConstants;
+
 import java.util.List;
 
 public class LedStrip extends SubsystemBase {

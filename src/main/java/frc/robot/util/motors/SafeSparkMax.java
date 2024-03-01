@@ -17,8 +17,8 @@ import com.revrobotics.jni.CANSparkMaxJNI;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
 
 public class SafeSparkMax extends CANSparkMax {
 

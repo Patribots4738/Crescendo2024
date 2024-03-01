@@ -36,22 +36,22 @@ import frc.robot.subsystems.misc.limelight.Limelight;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.Constants.DriveConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NTConstants;
+import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.ShooterCalc;
-import frc.robot.util.constants.Constants.AutoConstants;
-import frc.robot.util.constants.Constants.ClimbConstants;
-import frc.robot.util.constants.Constants.DriveConstants;
-import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.NTConstants;
-import frc.robot.util.constants.Constants.OIConstants;
-import frc.robot.util.mod.PatriBoxController;
+import frc.robot.util.custom.ActiveConditionalCommand;
+import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.motors.Neo;
 import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
-import frc.robot.util.testing.PatritionalCommand;
 import monologue.Monologue;
 
 public class RobotContainer implements Logged {
@@ -236,7 +236,7 @@ public class RobotContainer implements Logged {
         controller.a().whileTrue(
             Commands.sequence(
                 swerve.resetHDCCommand(),
-                new PatritionalCommand(
+                new ActiveConditionalCommand(
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
                     climb::getHooksUp)));
@@ -254,7 +254,7 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(
                 Commands.sequence(
                     swerve.resetHDCCommand(),
-                    new PatritionalCommand(
+                    new ActiveConditionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.alignmentCalc::onOppositeSide)));

@@ -6,7 +6,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.constants.Constants.AutoConstants;
+import frc.robot.util.Constants.AutoConstants;
 import monologue.Annotations.Log;
 import monologue.Logged;
 

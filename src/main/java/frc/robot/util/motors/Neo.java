@@ -9,9 +9,9 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.util.constants.PatrIDConstants;
-import frc.robot.util.constants.Constants.FieldConstants;
-import frc.robot.util.constants.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.custom.PatrIDConstants;
 
 /*
  * Some of this is adapted from 3005's 2022 Code

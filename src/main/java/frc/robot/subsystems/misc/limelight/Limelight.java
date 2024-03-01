@@ -19,11 +19,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.util.Constants.CameraConstants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
-import frc.robot.util.constants.Constants.CameraConstants;
-import frc.robot.util.constants.Constants.FieldConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
