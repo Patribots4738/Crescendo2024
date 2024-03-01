@@ -23,7 +23,7 @@ public class Elevator extends SubsystemBase implements Logged {
     private double pos = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
 
     @Log
-    private boolean atDesiredPos = false, stuckOnGuillotine = false;
+    private boolean atDesiredPos = false, stuckOnGuillotine = false, ampMode;
 
     /** Creates a new Elevator. */
     public Elevator() {
@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase implements Logged {
     public void periodic() {
         pos = getPosition();
         desiredPos = getDesiredPosition();
-
+        updateAmpMode();
         atDesiredPos = atDesiredPosition();
 
         // A value of 0 on hitGuillotineTimestamp indicates that we are not hitting the guillotine
@@ -136,6 +136,23 @@ public class Elevator extends SubsystemBase implements Logged {
 
     public boolean atPosition(double position) {
         return MathUtil.isNear(position, pos, TrapConstants.ELEVATOR_DEADBAND);
+    }
+
+    public void setAmpMode(boolean amp) {
+        this.ampMode = amp;
+    }   
+
+    public void updateAmpMode() {
+        setAmpMode(this.desiredPos != TrapConstants.AMP_PLACE_POS
+            ? false 
+            : true);
+    }
+    public Command setAmpModeCommand(boolean amp) {
+        return runOnce(() -> setAmpMode(amp));
+    }  
+
+    public boolean getAmpMode() {
+        return this.ampMode;
     }
 
     public boolean nearGuillotine() {

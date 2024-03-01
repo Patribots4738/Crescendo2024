@@ -28,7 +28,7 @@ public class PieceControl {
 
     private boolean shooterMode = true;
 
-    private boolean ampMode = true;
+
 
     // State representing if we are trying to unstuck the elevator
     @Log
@@ -223,12 +223,10 @@ public class PieceControl {
         return Commands.sequence(
                 Commands.waitUntil(
                     () -> elevator.atPosition(
-                        ampMode 
+                        elevator.getAmpMode()
                         ? TrapConstants.AMP_PLACE_POS 
                         : TrapConstants.TRAP_PLACE_POS)),
-                trapper.outtake(TrapConstants.OUTTAKE_SECONDS),
-                shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
-                    .onlyIf(() -> elevator.getDesiredPosition() == TrapConstants.TRAP_PLACE_POS)
+                trapper.outtake(TrapConstants.OUTTAKE_SECONDS)
             );
     }
 
@@ -240,6 +238,9 @@ public class PieceControl {
             indexCommand()
         ); 
     }
+
+
+
 
     public Command intakeToTrapper() { 
         return intake.inCommand()
