@@ -62,6 +62,10 @@ public class Trapper extends SubsystemBase {
             () -> desiredSpeed == 0);
     }
 
+    public Command setCoastMode() {
+        return runOnce(() -> trapper.setCoastMode());
+    }
+
     public boolean hasPiece() {
         return false;
     }

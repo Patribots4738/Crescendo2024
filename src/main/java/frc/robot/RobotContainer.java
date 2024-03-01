@@ -84,7 +84,7 @@ public class RobotContainer implements Logged {
     public static HDCTuner HDCTuner;
 
     private final LedStrip ledStrip;
-    private Indexer triggerWheel;
+    private Indexer indexer;
     private Trapper trapper;
     private ShooterCmds shooterCmds;
 
@@ -124,7 +124,7 @@ public class RobotContainer implements Logged {
         limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight");
         limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight2");
         ledStrip = new LedStrip(swerve::getPose);
-        triggerWheel = new Indexer();
+        indexer = new Indexer();
 
         shooter = new Shooter();
         elevator = new Elevator();
@@ -147,7 +147,7 @@ public class RobotContainer implements Logged {
 
         pieceControl = new PieceControl(
             intake,
-            triggerWheel,
+            indexer,
             elevator,
             trapper,
             shooterCmds);
@@ -190,6 +190,9 @@ public class RobotContainer implements Logged {
     private void configureTimedEvents() {
         new Trigger(() -> Robot.currentTimestamp >= 119.8 && intake.getPossession() && DriverStation.isFMSAttached())
             .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
+
+        new Trigger(() -> Robot.gameMode == Robot.GameMode.DISABLED)
+            .onTrue(setAllCoast());
     }
 
     private void configureTestBindings() {
@@ -403,6 +406,14 @@ public class RobotContainer implements Logged {
         }
         pathPlannerStorage.updatePathViewerCommand().schedule();
         this.freshCode = false;
+    }
+
+    public Command setAllCoast() {
+        return Commands.sequence(
+            intake.setCoastMode(),
+            indexer.setCoastMode(),
+            trapper.setCoastMode()
+        );
     }
 
     public void updateNTGains() {
