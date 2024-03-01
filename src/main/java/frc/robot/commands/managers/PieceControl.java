@@ -136,6 +136,14 @@ public class PieceControl {
         );
     }
 
+    public Command panicEjectNote() {
+        return trapper.intake().andThen(indexer.toElevator());
+    }
+
+    public Command stopPanicEject() {
+        return trapper.stopCommand().andThen(indexer.stopCommand());
+    }
+
     public Command dropPieceCommand() {
         return Commands.sequence(
             elevator.toDropCommand(),
