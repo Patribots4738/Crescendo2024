@@ -23,37 +23,6 @@ public class LedStrip extends SubsystemBase {
     
     private LEDCommands ledFunctionCommand = new LEDCommands(this);
 
-    // public Command rainbowCommand =
-    //     new LEDWaveCommand().new Hue(
-    //         180, 
-    //         (double) ledBuffer.getLength(), 
-    //         180, 
-    //         0.05, 
-    //         Math.PI*2).ignoringDisable(true);
-
-    // public Command greenNGold = 
-    //     new LEDWaveCommand().new Hue(
-    //         50, 
-    //         (double) ledBuffer.getLength(), 
-    //         75, 
-    //         .075, 
-    //         Math.PI*2).ignoringDisable(true);
-
-    // public Command allianceCommand = 
-    //     new LEDWaveCommand().new Saturation(
-    //         340, 
-    //         65, 
-    //         255, 
-    //         .025, 
-    //         6.28, 
-    //         isRedAlliance.getAsBoolean() ? 180 : 117).ignoringDisable(true);
-
-    // public Command cautionLEDs = run(() -> {
-    //     for (int i = 0; i < ledBuffer.getLength(); i++) {
-    //         new LEDConditionalCommand(Color.kYellow, Color.kDarkGray, (i % 2 == 0), i).ignoringDisable(true).execute();
-    //     }
-    // }).ignoringDisable(true);
-
     public LedStrip(DoubleSupplier elevatorPositionSupplier) {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
         ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);

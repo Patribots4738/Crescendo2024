@@ -22,7 +22,6 @@ public class LEDFollowerCommand extends LEDCommands {
     public void execute() {
         double motorPose = motorPoseSupplier.getAsDouble();
 
-        System.out.println("newMotorPose: " + motorPose + " multiplier: " + multiplier + " ledStrip.getBuffer().getLength(): " + ledStrip.getBuffer().getLength());
         motorPose = MathUtil.applyDeadband(motorPose * multiplier * ledStrip.getBuffer().getLength(), 0.01);
         
         for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
