@@ -1,4 +1,4 @@
-package frc.robot.commands.autonomous;
+package frc.robot.util.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -125,7 +125,7 @@ public class ChoreoStorage implements Logged {
 
             PathPlannerPath skipShot = pathCache.get(skippingPathName + i);
             PathPlannerPath getNextPiece = pathCache.get(shootingPathName + (shootingIndex));
-
+            //TODO: patritional command or no? not used so shouldn't matter smile
             fullPath.addCommands(
                     Commands.either(
                             AutoBuilder.followPath(shootPiece).andThen(AutoBuilder.followPath(getNextPiece)),
