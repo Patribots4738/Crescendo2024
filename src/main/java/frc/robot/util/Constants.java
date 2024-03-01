@@ -295,8 +295,9 @@ public final class Constants {
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 6.08;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
+        // Below is gotten from choreo
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
 
         public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
         public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
@@ -321,7 +322,7 @@ public final class Constants {
                 0,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = .3;
+        public static final double ROTATION_CORRECTION_P = 3.725;
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -357,7 +358,7 @@ public final class Constants {
                 AutoConstants.XY_CORRECTION_D),
             new PIDConstants(
                     AutoConstants.ROTATION_CORRECTION_P,
-                    1,
+                    AutoConstants.ROTATION_CORRECTION_I,
                     AutoConstants.ROTATION_CORRECTION_D,
                     Units.degreesToRadians(45)),
             MAX_SPEED_METERS_PER_SECOND,

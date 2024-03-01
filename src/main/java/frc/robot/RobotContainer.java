@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
 import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.Drive;
+import frc.robot.commands.drive.DriveHDC;
 import frc.robot.commands.logging.NT;
 import frc.robot.commands.logging.NTPIDTuner;
 import frc.robot.commands.managers.CalibrationControl;
@@ -161,7 +162,8 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX()/1.6,
             robotRelativeSupplier,
-            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())));
+            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
+        ));
 
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();

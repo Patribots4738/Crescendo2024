@@ -162,7 +162,7 @@ public class PieceControl {
         return Commands.sequence(
                 intake.inCommand(),
                 trapper.intake(),
-                indexer.stopCommand());
+                indexer.toShooter());
     }
 
     public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
