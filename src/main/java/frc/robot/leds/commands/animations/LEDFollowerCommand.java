@@ -17,6 +17,7 @@ public class LEDFollowerCommand extends LEDCommands {
         this.motorPoseSupplier = motorPosition;
         this.color = color;
         this.multiplier = multiplier;
+        this.root = root;
     }
 
     @Override

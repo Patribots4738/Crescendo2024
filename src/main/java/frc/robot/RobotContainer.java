@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -33,6 +34,7 @@ import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.LedStrip;
 import frc.robot.leds.commands.LPI;
+import frc.robot.leds.commands.animations.LEDFollowerCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -44,6 +46,7 @@ import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -83,7 +86,7 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     public static HDCTuner HDCTuner;
 
-    public static LedStrip ledStrip;
+    public static final LedStrip ledStrip = new LedStrip();
     private Indexer triggerWheel;
     private Trapper trapper;
     private ShooterCmds shooterCmds;
@@ -130,7 +133,6 @@ public class RobotContainer implements Logged {
         trapper = new Trapper();
         
         pivot = new Pivot();
-        ledStrip = new LedStrip(elevator::getPosition);
         
         HDCTuner = new HDCTuner(
             AutoConstants.HDC.getXController(),
@@ -182,6 +184,15 @@ public class RobotContainer implements Logged {
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
+        
+        new Trigger(() -> elevator.getDesiredPosition() != 0)
+            .whileTrue(
+                new LEDFollowerCommand(
+                    ledStrip.getLEDCommands(), 
+                    elevator::getPosition, 
+                    TrapConstants.ELEVATOR_TOP_LIMIT, 
+                    Color.kAqua)
+            );
     }
 
     private void configureTestBindings() {

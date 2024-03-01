@@ -23,7 +23,7 @@ public class LedStrip extends SubsystemBase {
     
     private LEDCommands ledFunctionCommand = new LEDCommands(this);
 
-    public LedStrip(DoubleSupplier elevatorPositionSupplier) {
+    public LedStrip() {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
         ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
     
