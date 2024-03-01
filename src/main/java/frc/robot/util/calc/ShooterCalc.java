@@ -28,6 +28,7 @@ public class ShooterCalc implements Logged {
         this.pivot = pivot;
     }
     
+    
     @Log
     double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
 
@@ -44,19 +45,18 @@ public class ShooterCalc implements Logged {
      */
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
+
+        // SpeedAngleTriplet currentTriplet = new SpeedAngleTriplet(calculateShooterSpeedsForApex(pose, calculatePivotAngle(pose)), calculatePivotAngle(pose).getDegrees());
         SpeedAngleTriplet currentTriplet = calculateTriplet(pose.getTranslation());
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);
+        double v0z = originalv0 * Math.sin(Units.degreesToRadians(currentTriplet.getAngle()));
         double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
 
         double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
-        realHeight = getOriginalEstimatedImpactHeight(pose, newv0, newAngle);
-        gravitySpeedL = getGravityCompensatedTriplet(pose, newv0, newAngle).getLeftSpeed();
-        gravitySpeedR = getGravityCompensatedTriplet(pose, newv0, newAngle).getRightSpeed();
-        gravityAngle = getGravityCompensatedTriplet(pose, newv0, newAngle).getAngle();
+
         return 
             SpeedAngleTriplet.of(
                 Pair.of(
@@ -65,41 +65,7 @@ public class ShooterCalc implements Logged {
                 ),
                 newAngle.getDegrees()
             );
-            // getGravityCompensatedTriplet(pose, newv0, newAngle);
     }
-    // finds the height the not should go 
-    private double getOriginalEstimatedImpactHeight(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
-        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-        double v0x = shooterSpeeds * Math.cos(initialAngle.getRadians());
-        // D/V
-        double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
-        double v0z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT);  
-        // final height of the note should be where it starts + the average vy * time
-        double vzFinal = v0z - (time * ShooterConstants.GRAVITY);
-        double vzAverage = (v0z + vzFinal) / 2;
-        double heightFinal = NTConstants.PIVOT_OFFSET_Z + (vzAverage * time);
-        
-        return heightFinal;
-    }
-    // Compensates for gravity by solving for the extra velocity we need to reach the height
-    // based on our time (which is the main inaccuracy of this because of drag) and 
-    private SpeedAngleTriplet getGravityCompensatedTriplet(Pose2d robotPose, double shooterSpeeds, Rotation2d initialAngle) {
-        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-        double v0x = shooterSpeeds * initialAngle.getCos();
-        double time = poseRelativeToSpeaker.getTranslation().getNorm()/ v0x;
-        // should be sqrt(9.8 * 2 * speaker height):
-        double v0z = shooterSpeeds * initialAngle.getSin();
-        // integral of (compensation + v0y - 9.8t)  = speaker height - pivot offset
-        // solved for compensation
-        double compensation = ((FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_Z) - (v0z*time + 4.9)*Math.pow(time, 2))/time;
-        // solve for new angle with added v0z and the same v0x
-        Rotation2d newAngle = new Rotation2d(v0x, v0z + compensation);
-        // get new speed with the same v0x and the added v0z
-        double newSpeed = Math.hypot(v0x, (v0z + compensation));
-        return SpeedAngleTriplet.of(Pair.of(velocityToRPM(newSpeed), velocityToRPM(newSpeed)), newAngle.getDegrees());
-    }
-
-
 
     /**
      * Calculates the pivot angle based on the robot's pose.
@@ -116,7 +82,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT+.3);
+        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS);
     }
 
     /**
@@ -162,7 +128,7 @@ public class ShooterCalc implements Logged {
      * 
      * @return              The angle to the speaker in the form of a Rotation2d object.
      */
-    public Rotation2d calculateSWDRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    public Rotation2d calculateRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
         Translation2d velocityVectorToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity);
         double velocityTangent = velocityVectorToSpeaker.getX();
         // TODO: Check if this velocity should be accounted for in the x component of atan2
@@ -173,8 +139,8 @@ public class ShooterCalc implements Logged {
         Rotation2d currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
-            // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
+            // rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
+            rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
@@ -187,6 +153,14 @@ public class ShooterCalc implements Logged {
 
         // Return the desired rotation
         return desiredRotation2d;
+    }
+
+    public Rotation2d calculateRobotAngleToSpeaker(Pose2d pose) {
+        return calculateRobotAngleToSpeaker(pose, new ChassisSpeeds());
+    }
+
+    public Rotation2d calculateRobotAngleToSpeaker(Translation2d translation) {
+        return calculateRobotAngleToSpeaker(new Pose2d(translation, new Rotation2d()));
     }
 
     private Translation2d getVelocityVectorToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
@@ -266,8 +240,7 @@ public class ShooterCalc implements Logged {
      * @return              a pair of shooter speeds (left and right) required to reach the speaker position
      */
     private Pair<Double, Double> calculateShooterSpeedsForApex(Pose2d robotPose, Rotation2d pivotAngle) {
-        double desiredRPM = velocityToRPM(Math.sqrt(2 * ShooterConstants.GRAVITY * FieldConstants.SPEAKER_HEIGHT) / (pivotAngle.getSin()));
+        double desiredRPM = velocityToRPM(ShooterConstants.V0Z / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
-
 }
