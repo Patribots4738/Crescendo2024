@@ -36,8 +36,8 @@ public class LedStrip extends SubsystemBase {
 
         led.setData(ledBuffer);
         led.start();
-        setLED(Color.kBlack);
         led.setData(ledBuffer);
+        prettyFlow().ignoringDisable(true);
     }
 
     public AddressableLEDBuffer getBuffer() {
@@ -46,34 +46,34 @@ public class LedStrip extends SubsystemBase {
     
     @Override
     public void periodic() {
-        runPattern(currentPatternIndex).schedule();
+        // runPattern(currentPatternIndex).schedule();
         led.setData(ledBuffer);
     }
 
     public Command changeLEDsPattern() {
         return Commands.runOnce(() -> {
             selectedLED += 1;
-            selectedLED %= 9;
+            selectedLED %= 10;
         });
     }
 
-    public int selectedLED = 0;
+    public int selectedLED = 10;
 
-    private Command runPattern(int index) {
-        Command selectedPattern = switch (selectedLED) {
-            case (0) -> turnOff();
-            case (1) -> greenNGold();
-            case (2) -> circus();
-            case (3) -> loading();
-            case (5) -> alliance(Robot::isRedAlliance);
-            case (6) -> flash();
-            case (7) -> rainbow();
-            case (8) -> upwardsElevatorGradientLED();
-            case (9) -> merryBismasLED();
-            default -> turnOff();
-        };
-        return selectedPattern.ignoringDisable(true);
-    }
+    //private Command runPattern(int index) {
+        //Command selectedPattern = switch (selectedLED) {
+          //  case (0) -> turnOff();
+          //  case (1) -> greenNGold();
+          //  case (2) -> circus();
+          //  case (3) -> loading();
+          //  case (5) -> alliance(Robot::isRedAlliance);
+          //  case (6) -> flash();
+          //  case (7) -> rainbow();
+          //  case (8) -> upwardsElevatorGradientLED();
+          //  case (9) -> merryBismasLED();
+          //  default -> turnOff();
+        //};
+        //return selectedPattern.ignoringDisable(true);
+    //}
 
     public Command setCurrentPattern(int index) {
         return runOnce(() -> {
@@ -124,6 +124,15 @@ public class LedStrip extends SubsystemBase {
      * endIndex is the LED that the gradient ends on
      * @param endIndex
      */
+    double startingTimestamp = 0;
+    public void setLEDWave(Color color, int startIndex, int endIndex, double speed) {
+      int middleIndex = (endIndex - startIndex)/2 + startIndex;
+      int leftBound = -((int) easeOutCubic(startingTimestamp, speed, middleIndex));
+      int rightBound =  (int) easeOutCubic(startingTimestamp, speed, middleIndex);
+      setLED(middleIndex + leftBound, color);
+      setLED(middleIndex + rightBound, color);
+    }
+    
     public void setLEDGradient(Color ColorI, Color ColorII, int startIndex, int endIndex) {
         for (int i = startIndex; i < endIndex; i++) {
             double ratio = (double) (i - startIndex) / (double) (endIndex - startIndex);
@@ -268,6 +277,15 @@ public class LedStrip extends SubsystemBase {
     Color GradOrange = PatriColor.fromHSV(40, 255, 255);
     Color GradNoColor = PatriColor.fromHSV(0, 0, 0);
 
+    public Command prettyFlow() {
+      return Commands.run(() -> {
+        setLEDWave(GreerYeller, 0, 300, 4);
+      }).beforeStarting(() -> {
+        System.out.println("Starting flow!");
+        startingTimestamp = Robot.currentTimestamp;
+      });
+    }
+
     public Command upwardsElevatorGradientLED() {
         return Commands.run(() -> {
             setLEDGradient(GradOrange, GradNoColor, 0, ledBuffer.getLength());
@@ -392,7 +410,18 @@ public class LedStrip extends SubsystemBase {
     public class PatriColor extends Color {
       public static Color fromHSV(int h, int s, int v) {
         return Color.fromHSV(h/2, s, v);
-      } 
+      }
+    }
+
+    /**
+     * A cubic ease out equation.
+     * 
+     * @param x The input of time for the equation [0-1]
+     * @return A sample at that time using the ease out formula
+     * https://easings.net/#easeOutCubic
+     */
+    public double easeOutCubic(double startingTimestamp, double animationDuration, double stripLength) {
+      return stripLength * (1 - Math.pow(1 - ((Robot.currentTimestamp-startingTimestamp)/animationDuration), 3));
     }
 }
 
