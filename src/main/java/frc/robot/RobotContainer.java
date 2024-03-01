@@ -193,6 +193,15 @@ public class RobotContainer implements Logged {
                     TrapConstants.ELEVATOR_TOP_LIMIT, 
                     Color.kAqua)
             );
+
+        new Trigger(() -> elevator.getDesiredPosition() == 0)
+            .whileTrue(
+                new LEDFollowerCommand(
+                    ledStrip.getLEDCommands(), 
+                    elevator::getPosition, 
+                    TrapConstants.ELEVATOR_TOP_LIMIT, 
+                    Color.kRed)
+            );
     }
 
     private void configureTestBindings() {
