@@ -13,8 +13,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -170,6 +172,9 @@ public class RobotContainer implements Logged {
         
         configureButtonBindings();
         configureLoggingPaths();
+        configureTimedEvents();
+
+
     }
 
     private void configureButtonBindings() {
@@ -180,6 +185,11 @@ public class RobotContainer implements Logged {
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
+    }
+
+    private void configureTimedEvents() {
+        new Trigger(() -> Robot.currentTimestamp >= 119.8 && intake.getPossession() && DriverStation.isFMSAttached())
+            .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
     }
 
     private void configureTestBindings() {
