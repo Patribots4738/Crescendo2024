@@ -34,7 +34,7 @@ import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.LedStrip;
 import frc.robot.leds.commands.LPI;
-import frc.robot.leds.commands.animations.LEDFollowChangeCommand;
+import frc.robot.leds.commands.animations.LEDFollowerCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -274,11 +274,7 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(pieceControl.elevatorToTop())
-            .whileTrue(new LEDFollowChangeCommand(
-                elevator::getPosition, 
-                TrapConstants.ELEVATOR_TOP_LIMIT, 
-                Color.kBlue));
+            .onTrue(pieceControl.elevatorToTop());
 
         controller.povLeft()
             .onTrue(pieceControl.elevatorToAmp());
@@ -287,11 +283,7 @@ public class RobotContainer implements Logged {
             .onTrue(trapper.toggleSpeed());
         
         controller.povDown()
-            .onTrue(elevator.toBottomCommand())
-            .whileTrue(new LEDFollowChangeCommand(
-                elevator::getPosition, 
-                TrapConstants.ELEVATOR_TOP_LIMIT, 
-                Color.kRed));
+            .onTrue(elevator.toBottomCommand());
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeToTrap())

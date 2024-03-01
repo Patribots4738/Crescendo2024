@@ -6,12 +6,12 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.util.Color;
 
-public class LEDFollowChangeCommand extends LEDCommands {
+public class LEDFollowerCommand extends LEDCommands {
     private DoubleSupplier motorPoseSupplier;
     private final double multiplier;
     private Color color;
 
-    public LEDFollowChangeCommand(DoubleSupplier motorPosition, double multiplier, Color color) {
+    public LEDFollowerCommand(DoubleSupplier motorPosition, double multiplier, Color color) {
         super(ledStrip, Set.of());
         this.motorPoseSupplier = motorPosition;
         this.color = color;

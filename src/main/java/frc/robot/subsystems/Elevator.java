@@ -5,10 +5,12 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.leds.commands.animations.LEDFollowerCommand;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.rev.Neo;
@@ -80,7 +82,9 @@ public class Elevator extends SubsystemBase implements Logged {
         if (desiredPos != pos) {
             desiredPos = pos;
             elevator.setTargetPosition(pos);
-    
+
+            new LEDFollowerCommand(this::getPosition, TrapConstants.ELEVATOR_TOP_LIMIT, Color.kAqua).schedule();
+
             RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
                 0, 0, pos,
                 new Rotation3d()
