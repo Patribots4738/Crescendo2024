@@ -486,7 +486,6 @@ public final class Constants {
     public static final class LEDConstants {
         public static final int PWM_PORT = 9;
         public static final int LED_COUNT = 300;
-        // new AddressableLEDBuffer(PWM_PORT).getLength();
 
         public static final Integer patternMap = null;
 
