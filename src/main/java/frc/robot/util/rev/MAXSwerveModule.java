@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.util.motors;
+package frc.robot.util.rev;
 
 import com.revrobotics.SparkPIDController;
 
@@ -30,13 +30,13 @@ public class MAXSwerveModule implements Logged{
      * Encoder.
      */
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
-        drivingSpark = new Neo(drivingCANId);
+        drivingSpark = new Neo(drivingCANId, true);
         
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
         // the steering motor in the MAXSwerve Module.
 
-        turningSpark = new Neo(turningCANId, false, true);
+        turningSpark = new Neo(turningCANId, false, ModuleConstants.TURNING_ENCODER_INVERTED, true);
         this.chassisAngularOffset = chassisAngularOffset;
 
         resetEncoders();

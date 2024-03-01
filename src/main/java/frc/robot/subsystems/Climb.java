@@ -15,7 +15,7 @@ import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.calc.PoseCalculations;
-import frc.robot.util.motors.Neo;
+import frc.robot.util.rev.Neo;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

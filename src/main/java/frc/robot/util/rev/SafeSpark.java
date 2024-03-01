@@ -1,51 +1,62 @@
 // Primarily referenced from https://github.com/lasarobotics/PurpleLib/blob/master/src/main/java/org/lasarobotics/hardware/revrobotics/Spark.java
-package frc.robot.util.motors;
+package frc.robot.util.rev;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
+import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.jni.CANSparkMaxJNI;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 
-public class SafeSparkMax extends CANSparkMax {
+public class SafeSpark extends CANSparkBase {
 
+    protected final boolean isSparkFlex;
     protected final int canID;
     protected final boolean useAbsoluteEncoder;
     SparkPIDController pidController = getPIDController();
-    protected RelativeEncoder relativeEncoder = super.getEncoder();
-    protected AbsoluteEncoder absoluteEncoder = super.getAbsoluteEncoder();
+    protected RelativeEncoder relativeEncoder;
+    protected SparkAbsoluteEncoder absoluteEncoder;
 
-    private final int MAX_ATTEMPTS = NeoMotorConstants.SAFE_SPARK_MODE ? 20 : 5;
-    private final int MEASUREMENT_PERIOD = 16;
-    private final int AVERAGE_DEPTH = 2;
-    private final double BURN_FLASH_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.1 : 0;
-    private final double APPLY_PARAMETER_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.02 : 0;
+    private final int MAX_ATTEMPTS = NeoMotorConstants.SAFE_SPARK_MODE ? 20 : 2;
+    private final int SPARK_MAX_MEASUREMENT_PERIOD = 16;
+    private final int SPARK_FLEX_MEASUREMENT_PERIOD = 32;
+    private final int SPARK_MAX_AVERAGE_DEPTH = 2;
+    private final int SPARK_FLEX_AVERAGE_DEPTH = 8;
+    private final double BURN_FLASH_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.5 : 0;
+    private final double APPLY_PARAMETER_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.05 : 0;
 
-    public SafeSparkMax(int canID, boolean useAbsoluteEncoder, CANSparkBase.MotorType motorType) {
-        super(canID, motorType);
-
-        if (motorType == CANSparkBase.MotorType.kBrushless) {
-            fixMeasurementPeriod();
-            fixAverageDepth();
-        }
+    public SafeSpark(int canID, boolean useAbsoluteEncoder, MotorType motorType, boolean isSparkFlex) {
+        super(canID, motorType, isSparkFlex ? SparkModel.SparkFlex : SparkModel.SparkMax);
 
         this.canID = canID;
         this.useAbsoluteEncoder = useAbsoluteEncoder;
+        this.isSparkFlex = isSparkFlex;
+
+        // Set the motor to factory default settings
+        // we do this so we can hot-swap sparks without needing to reconfigure them
+        // this requires the code to configure the sparks after construction
+        restoreFactoryDefaults();
+
         if (useAbsoluteEncoder) {
-            setFeedbackDevice(absoluteEncoder);
+            setFeedbackDevice(getAbsoluteEncoder());
+        }
+        if (motorType == CANSparkBase.MotorType.kBrushless) {
+            fixMeasurementPeriod();
+            fixAverageDepth();
         }
     }
 
@@ -79,9 +90,9 @@ public class SafeSparkMax extends CANSparkMax {
             if (status == REVLibError.kHALError) {
                 System.out.println("Reconfiguring encoder for " + canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")\n\n\n");
                 if (useAbsoluteEncoder) {
-                    absoluteEncoder = getAbsoluteEncoder();
+                    getAbsoluteEncoder();
                 } else {
-                    relativeEncoder = getEncoder();
+                    getEncoder();
                 }
             }
             Timer.delay(APPLY_PARAMETER_WAIT_TIME);
@@ -130,9 +141,44 @@ public class SafeSparkMax extends CANSparkMax {
      * @param errorMessage Error message to print
      */
     public void checkStatus(REVLibError status, String errorMessage) {
-        if (status != REVLibError.kOk)
+        if (status != REVLibError.kOk) {
             System.err.println(canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ") " + errorMessage + " - "
                     + status.toString());
+        }
+        if (getFault(FaultID.kSensorFault)) {
+            String message = "\nSensor fault detected on motor " +
+                canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")" +
+                ". Power cycle the robot to fix.";
+            if (Robot.gameMode == GameMode.DISABLED) {
+                throw new IllegalStateException(message);
+            } else {
+                System.err.println(message);
+            }
+        }
+    }
+
+    @Override
+    public RelativeEncoder getEncoder() {
+        if (relativeEncoder == null) {
+            if (isSparkFlex) {
+                relativeEncoder = super.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 7168);
+            } else {
+                relativeEncoder = super.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
+            }
+        }
+        return relativeEncoder;
+    }
+
+    public RelativeEncoder getRelativeEncoder() {
+        return this.getEncoder();
+    }
+
+    @Override
+    public SparkAbsoluteEncoder getAbsoluteEncoder() {
+        if (absoluteEncoder == null) {
+            absoluteEncoder = super.getAbsoluteEncoder();
+        }
+        return absoluteEncoder;
     }
 
     /**
@@ -142,9 +188,10 @@ public class SafeSparkMax extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError fixMeasurementPeriod() {
+        final int MEASUREMENT_PERIOD = isSparkFlex ? SPARK_FLEX_MEASUREMENT_PERIOD : SPARK_MAX_MEASUREMENT_PERIOD;
         REVLibError status = applyParameter(
-                () -> relativeEncoder.setMeasurementPeriod(MEASUREMENT_PERIOD),
-                () -> relativeEncoder.getMeasurementPeriod() == MEASUREMENT_PERIOD,
+                () -> getEncoder().setMeasurementPeriod(MEASUREMENT_PERIOD),
+                () -> getEncoder().getMeasurementPeriod() == MEASUREMENT_PERIOD,
                 "Set encoder measurement period failure!");
         return status;
     }
@@ -155,9 +202,10 @@ public class SafeSparkMax extends CANSparkMax {
      * @return {@link REVLibError#kOk} if successful
      */
     public REVLibError fixAverageDepth() {
+        final int AVERAGE_DEPTH = isSparkFlex ? SPARK_FLEX_AVERAGE_DEPTH : SPARK_MAX_AVERAGE_DEPTH;
         REVLibError status = applyParameter(
-                () -> relativeEncoder.setAverageDepth(AVERAGE_DEPTH),
-                () -> relativeEncoder.getAverageDepth() == AVERAGE_DEPTH,
+                () -> getEncoder().setAverageDepth(AVERAGE_DEPTH),
+                () -> getEncoder().getAverageDepth() == AVERAGE_DEPTH,
                 "Set encoder average depth failure!");
         return status;
     }
@@ -194,7 +242,7 @@ public class SafeSparkMax extends CANSparkMax {
      * @param invert Set slave to output opposite of the master
      * @return {@link REVLibError#kOk} if successful
      */
-    public REVLibError follow(SafeSparkMax leader, boolean invert) {
+    public REVLibError follow(SafeSpark leader, boolean invert) {
         REVLibError status = applyParameter(
                 () -> super.follow(ExternalFollower.kFollowerSpark, leader.canID, invert),
                 () -> super.isFollower(),
@@ -217,10 +265,10 @@ public class SafeSparkMax extends CANSparkMax {
         BooleanSupplier parameterCheckSupplier;
 
         if (useAbsoluteEncoder) {
-            parameterSetter = () -> absoluteEncoder.setPositionConversionFactor(factor);
+            parameterSetter = () -> getAbsoluteEncoder().setPositionConversionFactor(factor);
             parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         } else {
-            parameterSetter = () -> relativeEncoder.setPositionConversionFactor(factor);
+            parameterSetter = () -> getEncoder().setPositionConversionFactor(factor);
             parameterCheckSupplier = () -> getPositionConversionFactor() == factor;
         }
 
@@ -231,9 +279,9 @@ public class SafeSparkMax extends CANSparkMax {
 
     public double getPositionConversionFactor() {
         if (useAbsoluteEncoder) {
-            return absoluteEncoder.getPositionConversionFactor();
+            return getAbsoluteEncoder().getPositionConversionFactor();
         } else {
-            return relativeEncoder.getPositionConversionFactor();
+            return getRelativeEncoder().getPositionConversionFactor();
         }
     }
 
@@ -252,10 +300,10 @@ public class SafeSparkMax extends CANSparkMax {
         BooleanSupplier parameterCheckSupplier;
 
         if (useAbsoluteEncoder) {
-            parameterSetter = () -> absoluteEncoder.setVelocityConversionFactor(factor);
+            parameterSetter = () -> getAbsoluteEncoder().setVelocityConversionFactor(factor);
             parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
         } else {
-            parameterSetter = () -> relativeEncoder.setVelocityConversionFactor(factor);
+            parameterSetter = () -> getRelativeEncoder().setVelocityConversionFactor(factor);
             parameterCheckSupplier = () -> getVelocityConversionFactor() == factor;
         }
 
@@ -306,9 +354,9 @@ public class SafeSparkMax extends CANSparkMax {
 
     public double getVelocityConversionFactor() {
         if (useAbsoluteEncoder) {
-            return absoluteEncoder.getVelocityConversionFactor();
+            return getAbsoluteEncoder().getVelocityConversionFactor();
         } else {
-            return relativeEncoder.getVelocityConversionFactor();
+            return getRelativeEncoder().getVelocityConversionFactor();
         }
     }
 
@@ -319,9 +367,9 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public double getPosition() {
         if (useAbsoluteEncoder && !FieldConstants.IS_SIMULATION) {
-            return absoluteEncoder.getPosition();
+            return getAbsoluteEncoder().getPosition();
         } else {
-            return relativeEncoder.getPosition();
+            return getRelativeEncoder().getPosition();
         }
     }
 
@@ -329,7 +377,7 @@ public class SafeSparkMax extends CANSparkMax {
      * RESET THE RELATIVE ENCODER TO BE THE SET POSITION
      */
     public void setPosition(double position) {
-        relativeEncoder.setPosition(position);
+        getRelativeEncoder().setPosition(position);
     }
 
     /**
@@ -339,9 +387,9 @@ public class SafeSparkMax extends CANSparkMax {
      */
     public double getVelocity() {
         if (useAbsoluteEncoder) {
-            return absoluteEncoder.getVelocity();
+            return getAbsoluteEncoder().getVelocity();
         } else {
-            return relativeEncoder.getVelocity();
+            return getRelativeEncoder().getVelocity();
         }
     }
 
@@ -614,6 +662,40 @@ public class SafeSparkMax extends CANSparkMax {
     }
 
     /**
+     * Set the free speed of the motor being simulated.
+     *
+     * @param freeSpeed the free speed (RPM) of the motor connected to SPARK
+     * @return {@link REVLibError#kOk} if successful
+     */
+    @SuppressWarnings("all")
+    public REVLibError setSimFreeSpeed(float freeSpeed) {
+        return applyParameter(
+                () -> {
+                    throwIfClosed();
+                    return REVLibError.fromInt(CANSparkMaxJNI.c_SparkMax_SetSimFreeSpeed(sparkMaxHandle, freeSpeed));
+                },
+                () -> true,
+                "Set Sim Free Speed failure!");
+    }
+
+    /**
+     * Set the stall torque of the motor being simulated.
+     *
+     * @param stallTorque The stall torque (N m) of the motor connected to SPARK
+     * @return {@link REVLibError#kOk} if successful
+     */
+    @SuppressWarnings("all")
+    public REVLibError setSimStallTorque(float stallTorque) {
+        return applyParameter(
+                () -> {
+                    throwIfClosed();
+                    return REVLibError.fromInt(CANSparkMaxJNI.c_SparkMax_SetSimStallTorque(sparkMaxHandle, stallTorque));
+                },
+                () -> true,
+                "Set Sim Stall Torque failure!");
+    }
+
+    /**
      * Change a periodic status frame period of the motor controller.
      * Rev docs:
      * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
@@ -729,6 +811,7 @@ public class SafeSparkMax extends CANSparkMax {
             // Disable all telemetry that is unrelated to absolute encoders
             case ONLY_ABSOLUTE_ENCODER:
                 changeStatusFrame(StatusFrame.ENCODER_POSITION, maxDelay);
+                changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, maxDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, minDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, minDelay);
                 break;
@@ -736,6 +819,8 @@ public class SafeSparkMax extends CANSparkMax {
             case ONLY_RELATIVE_ENCODER:
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_VELO, maxDelay);
                 changeStatusFrame(StatusFrame.ABSOLUTE_ENCODER_POS, maxDelay);
+                changeStatusFrame(StatusFrame.ENCODER_POSITION, minDelay);
+                changeStatusFrame(StatusFrame.VELO_TEMP_VOLTAGE_CURRENT, minDelay);
                 break;
             // Disable everything
             case NO_TELEMETRY:
@@ -749,6 +834,7 @@ public class SafeSparkMax extends CANSparkMax {
             default:
                 break;
         }
+        
     }
 
 }

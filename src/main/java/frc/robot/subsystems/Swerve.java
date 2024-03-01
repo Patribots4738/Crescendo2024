@@ -40,7 +40,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.motors.MAXSwerveModule;
+import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

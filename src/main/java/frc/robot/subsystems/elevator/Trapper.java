@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.TrapConstants;
-import frc.robot.util.motors.Neo;
+import frc.robot.util.rev.Neo;
 
 public class Trapper extends SubsystemBase {
     private final Neo trapper;

@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import frc.robot.util.motors.Neo;
+import frc.robot.util.rev.Neo;
 import monologue.Logged;
 
 /**

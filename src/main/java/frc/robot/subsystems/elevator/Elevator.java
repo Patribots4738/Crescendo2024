@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.TrapConstants;
-import frc.robot.util.motors.Neo;
+import frc.robot.util.rev.Neo;
 import frc.robot.Robot;
 import monologue.Logged;
 import monologue.Annotations.Log;

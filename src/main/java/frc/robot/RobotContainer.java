@@ -46,7 +46,7 @@ import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.PatriBoxController;
-import frc.robot.util.motors.Neo;
+import frc.robot.util.rev.Neo;
 import frc.robot.util.testing.CalibrationControl;
 import frc.robot.util.testing.HDCTuner;
 import monologue.Annotations.IgnoreLogged;
