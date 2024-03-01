@@ -11,16 +11,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.constants.Constants.FieldConstants;
 import frc.robot.util.constants.Constants.ModuleConstants;
-import frc.robot.util.testing.PIDNotConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class MAXSwerveModule implements Logged{
     private final Neo drivingSpark;
     private final Neo turningSpark;
-
-    private PIDNotConstants turningPID;
-    private PIDNotConstants drivingPID;
 
     private double chassisAngularOffset = 0;
 
@@ -35,7 +31,12 @@ public class MAXSwerveModule implements Logged{
      */
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
         drivingSpark = new Neo(drivingCANId);
-        turningSpark = new Neo(turningCANId, ModuleConstants.TURNING_ENCODER_INVERTED, true);
+        
+        // Invert the turning encoder, since the output shaft rotates in the opposite
+        // direction of
+        // the steering motor in the MAXSwerve Module.
+
+        turningSpark = new Neo(turningCANId, false, true);
         this.chassisAngularOffset = chassisAngularOffset;
 
         resetEncoders();
@@ -55,15 +56,10 @@ public class MAXSwerveModule implements Logged{
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
     }
 
-    public PIDNotConstants getTurningPIDNotConstants() {
-        return turningPID;
-    }
-    public PIDNotConstants getDrivingPIDNotConstnats() {
-        return drivingPID;
-    }
     public SparkPIDController getDrivingPIDController() {
         return drivingSpark.getPIDController();
     }
+    
     public SparkPIDController getTurningPIDController() {
         return turningSpark.getPIDController();
     }
@@ -109,7 +105,7 @@ public class MAXSwerveModule implements Logged{
      * Zeroes this driving motor's encoder.
      */
     public void resetEncoders() {
-        drivingSpark.setPosition(0);
+        drivingSpark.resetEncoder();
     }
 
     /**
@@ -140,11 +136,6 @@ public class MAXSwerveModule implements Logged{
         // APIs.
         turningSpark.setPositionConversionFactor(ModuleConstants.TURNING_ENCODER_POSITION_FACTOR);
         turningSpark.setVelocityConversionFactor(ModuleConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-
-        // Invert the turning encoder, since the output shaft rotates in the opposite
-        // direction of
-        // the steering motor in the MAXSwerve Module.
-        turningSpark.setInverted(ModuleConstants.TURNING_ENCODER_INVERTED);
 
         // Enable PID wrap around for the turning motor. This will allow the PID
         // controller to go through 0 to get to the setpoint i.e. going from 350 degrees

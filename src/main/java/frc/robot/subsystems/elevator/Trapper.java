@@ -9,16 +9,11 @@ import frc.robot.util.motors.Neo;
 
 public class Trapper extends SubsystemBase {
     private final Neo trapper;
+    private double desiredSpeed = 0;
 
     public Trapper() {
-        trapper = new Neo(TrapConstants.TRAP_CAN_ID);
+        trapper = new Neo(TrapConstants.TRAP_CAN_ID, true);
         trapper.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
-    }
-
-    public Command placeCommand() {
-        return outtake()
-            .andThen(Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS))
-            .andThen(stopCommand());
     }
 
     public Command intakeFromHandoff() {
@@ -33,11 +28,20 @@ public class Trapper extends SubsystemBase {
                 percent, 
                 TrapConstants.TRAPPER_LOWER_PERCENT_LIMIT, 
                 TrapConstants.TRAPPER_UPPER_PERCENT_LIMIT);
+        desiredSpeed = percent;
         trapper.set(percent);
     }
 
     public Command outtake() {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_OUTTAKE_PERCENT));
+    }
+
+    public Command outtakeSlow() {
+        return runOnce(() -> setSpeed(TrapConstants.TRAPPER_OUTTAKE_SLOW));
+    }
+
+    public Command intakeSlow() {
+        return runOnce(() -> setSpeed(0.1));
     }
 
     public Command stopCommand() {
@@ -46,6 +50,13 @@ public class Trapper extends SubsystemBase {
 
     public Command intake() {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_INTAKE_PERCENT));
+    }
+
+    public Command toggleSpeed() {
+        return Commands.either(
+            outtake(), 
+            stopCommand(), 
+            () -> desiredSpeed == 0);
     }
 
 }

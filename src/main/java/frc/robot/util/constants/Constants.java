@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -17,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -119,18 +119,14 @@ public final class Constants {
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
             0,
-            0.20992,
-            0.0001762,
-            // These are in %
-            -1,
-            1
+            0.006,
+            0.0001762
         );
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
             0.05,
             0,
             0.0083,
-            // These are in %
             -0.25,
             0.25
         );
@@ -141,10 +137,15 @@ public final class Constants {
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
         public static final double PIVOT_DEADBAND = 1;
-        public static final double SHOOTER_RPM_DEADBAND = 150;
+        public static final double SHOOTER_RPM_DEADBAND = 50;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 17;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 16; 
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+        
+        // This mega decimal number was gotten from REV hardware client, 
+        // and we zeroed the pivot at its minimum angle
+        public static final double ABSOLUTE_ENCODER_ZERO_OFFSET = 128.2069087-PIVOT_LOWER_LIMIT_DEGREES;
+
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -160,19 +161,31 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
-                put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
-                put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
-                put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
-                put(9, SpeedAngleTriplet.of(2465.0, 2465.0, 40.5));
-                put(10, SpeedAngleTriplet.of(2633.0, 2633.0, 38.1));
-                put(11, SpeedAngleTriplet.of(2795.0, 2795.0, 35.8));
-                put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
-                put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
-                put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
-                put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
-                put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
-                put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
+                // put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
+                // put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
+                // put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
+                // put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
+                // put(9, SpeedAngleTriplet.of(2465.0, 2465.0, 40.5));
+                // put(10, SpeedAngleTriplet.of(2633.0, 2633.0, 38.1));
+                // put(11, SpeedAngleTriplet.of(2795.0, 2795.0, 35.8));
+                // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
+                // put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
+                // put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
+                // put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
+                // put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
+                // put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
+
+                // V2
+                put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
+                put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
+                put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
+                put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
+                put(10, SpeedAngleTriplet.of(2884.0, 2894.0, 37.1));
+                put(11, SpeedAngleTriplet.of(2924.0, 2930.0, 33.3));
+                put(12, SpeedAngleTriplet.of(2924.0, 2930.0, 32.3));
+                // V3 (note inside of indexer)
+                put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
+                put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
             }
         };
 
@@ -186,34 +199,45 @@ public final class Constants {
 
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
         public static final double GRAVITY = 9.8;
+        public static final double V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
 
     }
 
     public static final class TrapConstants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
-        public static final double ELEVATOR_DEADBAND = .05;
-        public static final double OUTTAKE_SECONDS = 1;
-        public static final double TRAPPER_POSITION_MULTIPLIER = 1.83;
+        public static final double ELEVATOR_DEADBAND = 0.03;
+        public static final double OUTTAKE_SECONDS = 3;
+        public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
 
-        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 25.0;
+        private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
+        private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
 
-        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 20; // amps
+        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 1.0/(GEAR_RATIO*ELEVATOR_HEIGHT);
+        public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 40; // amps
 
-        public static final PatrIDConstants TRAP_PID = new PatrIDConstants(0.5, 0, 0, -1, 1);
+        public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
         // TODO: set these values
-        public static final double RESET_POS = 0;
+        public static final double BOTTOM_POS = 0;
         public static final double INTAKE_TIME = 0;
         public static final double TRAPPER_OUTTAKE_PERCENT = -1;
         public static final double TRAPPER_INTAKE_PERCENT = 1;
+        public static final double TRAPPER_OUTTAKE_SLOW = 0.3;
         public static final double TRAPPER_STOP_PERCENT = 0;
-        public static final double TRAP_PLACE_POS = 0.48;
-        public static final double INDEX_POS = 0.07;
+        public static final double TRAP_PLACE_POS = 0.49;
+        public static final double AMP_PLACE_POS = 0.37;
+        public static final double INDEX_POS = 0.09;
+        public static final double DROP_POS = 0.11;
+        public static final double GUILLOTONE_POS = 0.25;
+        public static final double UNSTUCK_POS = 0.15;
 
-        public static final double ELEVATOR_TOP_LIMIT = 0.48;
+        public static final double STUCK_TIME_SECONDS = 0.1;
+        public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
+
+        public static final double ELEVATOR_TOP_LIMIT = 0.49;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
         public static final double TRAPPER_LOWER_PERCENT_LIMIT = -1;
@@ -256,10 +280,13 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 7.20;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 6.08;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
+
+        public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
+        public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
 
         /*
          * XY:
@@ -278,12 +305,16 @@ public final class Constants {
 
         private static final PIDController XY_PID = new PIDController(
                 AutoConstants.XY_CORRECTION_P,
-                AutoConstants.XY_CORRECTION_I,
+                0,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = .8514;
-        public static final double ROTATION_CORRECTION_I = 1;
+        public static final double ROTATION_CORRECTION_P = .3;
+        public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
+
+        public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;
+
+        public static final boolean USE_OBJECT_DETECTION = false;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
@@ -335,10 +366,12 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
-            "A W1A C1-5 S",
-            "S C1-3 S",
+            "A W1 A C1-4 S",
+            "S W1 A C1-5 S",
+            "S W2 S C1-3 S W3-1 S",
+            "S W2 S C1-4 S",
             "S C1-5 S",
-            "S W1A C1-5",
+            "S W1 A C1-5 S",
             "S W3-1 S",
             "S W3-1 S C1-3 S"
         };
@@ -351,7 +384,8 @@ public final class Constants {
         // L3 = 14T (fast, low torque)
         // This changes the drive speed of the module (a pinion gear with more teeth
         // will result in a robot that drives faster).
-        public static final int DRIVING_MOTOR_PINION_TEETH = 14;
+        // Extra high speed settings from REV make this number high thern L3
+        public static final int DRIVING_MOTOR_PINION_TEETH = 16;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
@@ -362,9 +396,10 @@ public final class Constants {
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
         public static final double WHEEL_DIAMETER_METERS = 0.0762;
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-        // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
+        // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
         // teeth on the bevel pinion
-        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (DRIVING_MOTOR_PINION_TEETH * 15);
+        public static final double SPUR_GEAR_TEETH = 19;
+        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
                 * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION;
@@ -425,7 +460,9 @@ public final class Constants {
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
 
-        // See https://www.desmos.csafeom/calculator/e07raajzh5
+        public static final double ALIGNMENT_DEADBAND = 0.2;
+
+        // See https://www.desmos.com/calculator/e07raajzh5
         // And
         // https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
@@ -501,6 +538,7 @@ public final class Constants {
     }
 
     public static final class NeoMotorConstants {
+        public static final boolean SAFE_SPARK_MODE = false;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
@@ -508,27 +546,60 @@ public final class Constants {
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
       
         // This gets filled out as motors are created on the robot
-        public static ArrayList<Neo> MOTOR_LIST = new ArrayList<>();
+        public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
 
         public static final HashMap<Integer, String> CAN_ID_MAP = new HashMap<Integer, String>() {{
-                /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "FrontRightDrive");
-                /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "FrontRightTurn");
-                /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "FrontLeftDrive");
-                /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "FrontLeftTurn");
-                /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "RearLeftDrive");
-                /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "RearLeftTurn");
-                /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "RearRightDrive");
-                /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "RearRightTurn");
-                /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
-                /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "TriggerWheel");
-                /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
-                /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
-                /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
-                /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
-                /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
-                /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
-                /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
-            }};
+            /*  1  */ put(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, "FrontRightDrive");
+            /*  2  */ put(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID, "FrontRightTurn");
+            /*  3  */ put(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID, "FrontLeftDrive");
+            /*  4  */ put(DriveConstants.FRONT_LEFT_TURNING_CAN_ID, "FrontLeftTurn");
+            /*  5  */ put(DriveConstants.REAR_LEFT_DRIVING_CAN_ID, "RearLeftDrive");
+            /*  6  */ put(DriveConstants.REAR_LEFT_TURNING_CAN_ID, "RearLeftTurn");
+            /*  7  */ put(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID, "RearRightDrive");
+            /*  8  */ put(DriveConstants.REAR_RIGHT_TURNING_CAN_ID, "RearRightTurn");
+            /*  9  */ put(IntakeConstants.INTAKE_CAN_ID, "Intake");
+            /* 10  */ put(IntakeConstants.TRIGGER_WHEEL_CAN_ID, "TriggerWheel");
+            /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
+            /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
+            /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
+            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
+            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
+            /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
+            /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
+        }};
+
+        public static final HashMap<String, List<Neo>> MOTOR_GROUPS = new HashMap<String, List<Neo>>();
+
+        public static Map<String, List<Neo>> initializeMotorGroupMap() {
+            MOTOR_GROUPS.put("Drive", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(DriveConstants.FRONT_LEFT_DRIVING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_LEFT_DRIVING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_RIGHT_DRIVING_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Turn", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(DriveConstants.FRONT_LEFT_TURNING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.FRONT_RIGHT_TURNING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_LEFT_TURNING_CAN_ID));
+                add(MOTOR_MAP.get(DriveConstants.REAR_RIGHT_TURNING_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Shooter", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(ShooterConstants.LEFT_SHOOTER_CAN_ID));
+                add(MOTOR_MAP.get(ShooterConstants.RIGHT_SHOOTER_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Pivot", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(ShooterConstants.SHOOTER_PIVOT_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Elevator", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(TrapConstants.ELEVATOR_CAN_ID));
+            }});
+            MOTOR_GROUPS.put("Climb", new ArrayList<Neo>() {{
+                add(MOTOR_MAP.get(ClimbConstants.LEFT_CLIMB_CAN_ID));
+                add(MOTOR_MAP.get(ClimbConstants.RIGHT_CLIMB_CAN_ID));
+            }});
+
+            return MOTOR_GROUPS;
+        }
     }
 
     public static final class IntakeConstants {
@@ -559,6 +630,8 @@ public final class Constants {
 
         public static boolean IS_SIMULATION = Robot.isSimulation();
         public static final int CENTER_NOTE_COUNT = 5;
+
+        public static final Pose2d BLUE_ORIGIN = new Pose2d(0, 0, new Rotation2d());
 
         public static final double ALIGNMENT_SPEED = 3;
         public static final double SNAP_TO_ANGLE_P = 0.0025;
@@ -645,14 +718,10 @@ public final class Constants {
             // All relative to the blue origin
             // Blue Speaker
             Pose2d blueSpeaker = new Pose2d(0, 5.547, Rotation2d.fromDegrees(0));
+            Pose2d redSpeaker = GeometryUtil.flipFieldPose(blueSpeaker).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
             add(blueSpeaker);
-
-            // Red Speaker
-            add(GeometryUtil.flipFieldPose(blueSpeaker));
+            add(redSpeaker);
         }};
-
-        public static final double SPEAKER_HEIGHT = 2.08;
-
     
         public static final List<Pose2d> AMP_POSITIONS = new ArrayList<Pose2d>() {{
             // All points are in meters and radians
@@ -697,6 +766,8 @@ public final class Constants {
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
+        public static double BLUE_WING_X = 5.84;
+        public static double RED_WING_X = 10.7;
 
         // need to update
         private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);
@@ -711,6 +782,7 @@ public final class Constants {
         private static Translation3d[] SPIKE_TRANSLATIONS_BLUE = new Translation3d[3];
         private static Translation3d[] SPIKE_TRANSLATIONS_RED = new Translation3d[3];
         public static Translation3d[] NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
+        public static Translation3d[] HIGH_NOTE_TRANSLATIONS = new Translation3d[5 + 3 + 3]; // all staged + preload
 
         static {
             for (int i = 0; i < SPIKE_TRANSLATIONS_BLUE.length; i++) {
@@ -724,12 +796,51 @@ public final class Constants {
             System.arraycopy(SPIKE_TRANSLATIONS_BLUE, 0, NOTE_TRANSLATIONS, 0, SPIKE_TRANSLATIONS_BLUE.length);
             System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length, SPIKE_TRANSLATIONS_RED.length);
             System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
+            for (int i = 0; i < NOTE_TRANSLATIONS.length; i++) {
+                Translation3d noteTranslation3d = NOTE_TRANSLATIONS[i];
+                HIGH_NOTE_TRANSLATIONS[i] = new Translation3d(noteTranslation3d.getX(), noteTranslation3d.getY(), noteTranslation3d.getZ() - 0.1);
+            }
         }
 
         public static final Translation2d L_POSE = new Translation2d(5.11,6.23);
-        public static final Translation2d R_POSE = GET_SPEAKER_TRANSLATION();
+        public static final Translation2d R_POSE = new Translation2d(5.88, 1.84);
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
+
+        public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
+            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromDegrees(151.68));
+            Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
+            //Blue
+            add(L_POSE2D);
+            add(R_POSE2D);
+            add(M_POSE2D);
+            add(W3_POSE2D);
+            //Red
+            add(GeometryUtil.flipFieldPose(L_POSE2D));
+            add(GeometryUtil.flipFieldPose(R_POSE2D));
+            add(GeometryUtil.flipFieldPose(M_POSE2D));
+            add(GeometryUtil.flipFieldPose(W3_POSE2D));
+        }};
+
+        public static List<Pose2d> GET_SHOOTING_POSITIONS() {
+            int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;
+            return SHOOTING_POSITIONS.subList(startingIndex, startingIndex + 4);
+        }
+
+        public static List<Pose2d> GET_CENTERLINE_NOTES() {
+            List<Pose2d> notePoses = new ArrayList<Pose2d>();
+            for (int i = CENTERLINE_TRANSLATIONS.length - 1; i >= 0; i--) {
+                notePoses.add(
+                    new Pose2d(
+                        CENTERLINE_TRANSLATIONS[i].toTranslation2d(), 
+                        new Rotation2d()));
+            }
+            return notePoses;
+        }
+
+        
     }
 
     public static final class CameraConstants {
@@ -785,5 +896,21 @@ public final class Constants {
             0, 
             PIVOT_OFFSET_Z);
         
+        public static final Map<String, Number> WAIT_TIMES = new HashMap<>() {{
+            put("noteToShoot1", 0.7);
+            put("noteToShoot2", 0.4);
+            put("noteToShoot3", 0.0);
+
+            put("intakeToTrap1", 0.5);
+            put("intakeToTrap2", 0.0);
+
+            put("noteToIndexer1", 0.6);
+            put("noteToIndexer2", 0.07);
+            put("noteToIndexer3", 0.0);
+
+            put("noteToTrap1", 0.2);
+            put("noteToTrap2", 0.5);
+            put("noteToTrap3", 0.0);
+        }};
     }
 }

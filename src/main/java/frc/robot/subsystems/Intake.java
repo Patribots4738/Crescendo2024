@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.util.constants.Constants.IntakeConstants;
 import frc.robot.util.motors.Neo;
@@ -18,7 +17,7 @@ public class Intake extends SubsystemBase implements Logged {
     private double desiredSpeed = 0;
     private double startedIntakingTimestamp = 0;
     @Log
-    private boolean notePossession = true; 
+    private boolean notePossession = false; 
 
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID);
@@ -29,8 +28,9 @@ public class Intake extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         if (desiredSpeed == IntakeConstants.INTAKE_PERCENT
-            && Robot.currentTimestamp - startedIntakingTimestamp > 0.1
-            && intakeMotor.getAppliedOutput() < ((Math.abs(IntakeConstants.INTAKE_PERCENT) - 0.2) * Math.signum(IntakeConstants.INTAKE_PERCENT)))
+            && Robot.currentTimestamp - startedIntakingTimestamp > 0.3
+            && intakeMotor.getVelocity() < 8000
+            && intakeMotor.getOutputCurrent() > 21)
         {
             notePossession = true;
         }
@@ -42,15 +42,17 @@ public class Intake extends SubsystemBase implements Logged {
                 desiredPercent, 
                 IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
                 IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
+        
+        if (desiredPercent == IntakeConstants.INTAKE_PERCENT) {
+            notePossession = false;
+            startedIntakingTimestamp = Robot.currentTimestamp;
+        }
         intakeMotor.set(desiredSpeed);
     }
 
     public Command setPercentCommand(double desiredPercent) {
         return runOnce(() -> {
             setPercent(desiredPercent);
-            if(desiredPercent > 0) {
-                startedIntakingTimestamp = Robot.currentTimestamp;
-            }
         });
     }
 
@@ -71,14 +73,14 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public boolean getPossession() {
-        return this.notePossession;
+        return notePossession;
     }
 
     public void setPossession(boolean possession) {
         this.notePossession = possession;
     }
 
-    public Trigger possessionTrigger() {
-        return new Trigger(this::getPossession);
+    public Command revokePossesion() {
+        return runOnce(() -> setPossession(false));
     }
 }
