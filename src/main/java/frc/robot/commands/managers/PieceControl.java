@@ -233,11 +233,11 @@ public class PieceControl {
                             ampPlaceMode 
                             ? NT.getSupplier("ampPosition").getAsDouble()
                             : TrapConstants.TRAP_PLACE_POS)),
-                    trapper.outtake(TrapConstants.OUTTAKE_SECONDS),
-                    shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
-                        .onlyIf(() -> !ampPlaceMode)
+                    trapper.outtake(TrapConstants.OUTTAKE_SECONDS)
+                    // shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
+                    //     .onlyIf(() -> !ampPlaceMode)
                 ),
-                ampPlaceMode ? Set.of(trapper) : Set.of(trapper)
+                Set.of(trapper)
             );
     }
 
