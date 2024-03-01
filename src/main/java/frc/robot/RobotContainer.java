@@ -261,11 +261,11 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors());
             
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeToTrap())
+            .onTrue(pieceControl.intakeToTrap())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
-            .whileTrue(pieceControl.ejectNote())
+            .onTrue(pieceControl.ejectNote())
             .onFalse(pieceControl.stopEjecting());
     }
 
@@ -305,6 +305,10 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
+
+        controller.a()
+            .onTrue(pieceControl.panicEjectNote())
+            .onFalse(pieceControl.stopPanicEject());
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
