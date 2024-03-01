@@ -6,12 +6,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.logging.NT;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.elevator.Trapper;
+import frc.robot.subsystems.Trapper;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import frc.robot.subsystems.elevator.Elevator;
 
 public class PieceControl {
 
