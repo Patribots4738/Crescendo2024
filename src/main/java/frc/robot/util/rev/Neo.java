@@ -25,7 +25,7 @@ public class Neo extends SafeSpark implements Logged {
     private double targetVelocity = 0;
     private double targetPercent = 0;
 
-    private double possiblyControlled = 0;
+    private double lastDesiredChangeTimestamp = 0;
 
     @Log
     private boolean hasControl = false;
@@ -127,7 +127,14 @@ public class Neo extends SafeSpark implements Logged {
         if (!FieldConstants.IS_SIMULATION) {
             setPIDReference(position, ControlType.kPosition, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
         }
-        targetPosition = position;
+
+        if (targetPosition != position){
+            setHasControl(false);
+            targetPosition = position;
+        } else {
+            setHasControl(true);
+        }
+
         controlType = ControlLoopType.POSITION;
     }
 
@@ -173,7 +180,14 @@ public class Neo extends SafeSpark implements Logged {
         } else {
             setPIDReference(percent, ControlType.kDutyCycle, slot, arbitraryFeedForward, ArbFFUnits.kPercentOut);
         }
-        targetPercent = percent;
+        
+        if (targetPercent != percent){
+            setHasControl(false);
+            targetPercent = percent;
+        } else {
+            setHasControl(true);
+        }
+        
         controlType = ControlLoopType.PERCENT;
     }
 
@@ -220,7 +234,14 @@ public class Neo extends SafeSpark implements Logged {
         } else {
             setPIDReference(velocity, ControlType.kVelocity, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
         }
-        targetVelocity = velocity;
+
+        if (targetVelocity != velocity){
+            setHasControl(false);
+            targetVelocity = velocity;
+        } else {
+            setHasControl(true);
+        }
+
         controlType = ControlLoopType.VELOCITY;
     }
     
@@ -470,15 +491,15 @@ public class Neo extends SafeSpark implements Logged {
         this.hasControl = hasControl;
     }
 
-    public boolean updateHasControl(double movementSpeed, double dt, double velocityMax, double currentMax) {
-        return getTargetPercent() == movementSpeed 
-        && Robot.currentTimestamp - possiblyControlled > dt
-        && this.getVelocity() < velocityMax
-        && this.getOutputCurrent() > currentMax;
+    public boolean updateHasControl(double requiredDesiredSpeed, double dt, double velocityThreshold, double currentThreshold) {
+        return getTargetPercent() == requiredDesiredSpeed 
+            && Robot.currentTimestamp - lastDesiredChangeTimestamp > dt
+            && this.getVelocity() < velocityThreshold
+            && this.getOutputCurrent() > currentThreshold;
     }
 
     public void setPossiblyControlled() {
-        possiblyControlled = Robot.currentTimestamp;
+        lastDesiredChangeTimestamp = Robot.currentTimestamp;
     }
 
     /**

@@ -37,7 +37,6 @@ public class Intake extends SubsystemBase implements Logged {
         if (desiredSpeed != desiredPercent) {
             desiredSpeed = desiredPercent;
             if (desiredSpeed == IntakeConstants.INTAKE_PERCENT) {
-                intakeMotor.setHasControl(false);
                 intakeMotor.setPossiblyControlled();
             }
             
