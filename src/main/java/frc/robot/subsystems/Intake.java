@@ -16,9 +16,7 @@ public class Intake extends SubsystemBase implements Logged {
     @Log
     private double desiredSpeed = 0;
     private double startedIntakingTimestamp = 0;
-    @Log
-    private boolean notePossession = false; 
-
+    
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID, false);
         intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
@@ -27,13 +25,7 @@ public class Intake extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        if (desiredSpeed == IntakeConstants.INTAKE_PERCENT
-            && Robot.currentTimestamp - startedIntakingTimestamp > 0.3
-            && intakeMotor.getVelocity() < 8000
-            && intakeMotor.getOutputCurrent() > 21)
-        {
-            notePossession = true;
-        }
+        intakeMotor.updateHasControl(IntakeConstants.INTAKE_PERCENT, 0.3, 8000, 21);
     }
 
     public void setPercent(double desiredPercent) {
@@ -46,7 +38,7 @@ public class Intake extends SubsystemBase implements Logged {
         if (desiredSpeed != desiredPercent) {
             desiredSpeed = desiredPercent;
             if (desiredSpeed == IntakeConstants.INTAKE_PERCENT) {
-                notePossession = false;
+                intakeMotor.setHasControl(false);
                 startedIntakingTimestamp = Robot.currentTimestamp;
             }
             
@@ -78,14 +70,10 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public boolean getPossession() {
-        return notePossession;
+        return intakeMotor.getHasControl();
     }
 
-    public void setPossession(boolean possession) {
-        this.notePossession = possession;
-    }
-
-    public Command revokePossesion() {
-        return runOnce(() -> setPossession(false));
+    public Command revokePossession() {
+        return runOnce(() -> intakeMotor.setHasControl(false));
     }
 }

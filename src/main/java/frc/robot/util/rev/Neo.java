@@ -7,20 +7,28 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
+import frc.robot.Robot;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.custom.PatrIDConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
 /*
  * Some of this is adapted from 3005's 2022 Code
  * Original source published at https://github.com/FRC3005/Rapid-React-2022-Public/tree/d499655448ed592c85f9cfbbd78336d8841f46e2
  */
-public class Neo extends SafeSpark {
+public class Neo extends SafeSpark implements Logged {
 
     private ControlLoopType controlType = ControlLoopType.PERCENT;
     private double targetPosition = 0;
     private double targetVelocity = 0;
     private double targetPercent = 0;
+
+    private double possiblyControlled = 0;
+
+    @Log
+    private boolean hasControl = false;
 
     /**
      * Creates a new Neo motor with the default settings.
@@ -452,6 +460,21 @@ public class Neo extends SafeSpark {
      */
     public double getFF() {
         return getPIDController().getFF();
+    }
+
+    public boolean getHasControl() {
+        return hasControl;
+    }
+
+    public void setHasControl(boolean hasControl) {
+        this.hasControl = hasControl;
+    }
+
+    public boolean updateHasControl(double movementSpeed, double dt, double velocityMax, double currentMax) {
+        return getTargetPercent() == movementSpeed 
+        && Robot.currentTimestamp - possiblyControlled > dt
+        && this.getVelocity() < velocityMax
+        && this.getOutputCurrent() > currentMax;
     }
 
     /**
