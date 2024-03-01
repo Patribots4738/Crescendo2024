@@ -15,7 +15,6 @@ public class Intake extends SubsystemBase implements Logged {
 
     @Log
     private double desiredSpeed = 0;
-    private double startedIntakingTimestamp = 0;
     
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID, false);
@@ -39,7 +38,7 @@ public class Intake extends SubsystemBase implements Logged {
             desiredSpeed = desiredPercent;
             if (desiredSpeed == IntakeConstants.INTAKE_PERCENT) {
                 intakeMotor.setHasControl(false);
-                startedIntakingTimestamp = Robot.currentTimestamp;
+                intakeMotor.setPossiblyControlled();
             }
             
             intakeMotor.set(desiredSpeed);

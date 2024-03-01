@@ -477,6 +477,10 @@ public class Neo extends SafeSpark implements Logged {
         && this.getOutputCurrent() > currentMax;
     }
 
+    public void setPossiblyControlled() {
+        possiblyControlled = Robot.currentTimestamp;
+    }
+
     /**
      * Enum representing the control loop types for the Neo motor.
      * The control loop types include POSITION, VELOCITY, and PERCENT.
