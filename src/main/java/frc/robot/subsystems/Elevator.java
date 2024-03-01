@@ -134,8 +134,12 @@ public class Elevator extends SubsystemBase implements Logged {
 		return MathUtil.isNear(desiredPos, pos, TrapConstants.ELEVATOR_DEADBAND);
 	}
 
+    public boolean atPosition(double position) {
+        return MathUtil.isNear(position, pos, TrapConstants.ELEVATOR_DEADBAND);
+    }
+
     public boolean nearGuillotine() {
-        return MathUtil.isNear(TrapConstants.GUILLOTONE_POS, pos, TrapConstants.GUILLOTINE_DEADBAND);
+        return atPosition(TrapConstants.GUILLOTONE_POS);
     }
 
     public boolean getStuck() {

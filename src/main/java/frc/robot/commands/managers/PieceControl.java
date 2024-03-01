@@ -28,6 +28,8 @@ public class PieceControl {
 
     private boolean shooterMode = true;
 
+    private boolean ampMode = true;
+
     // State representing if we are trying to unstuck the elevator
     @Log
     private boolean elevatorDislodging = false;
@@ -164,11 +166,11 @@ public class PieceControl {
         // such as prepareSWDCommand
         return Commands.defer(() -> Commands.either(
             shootWhenReady(poseSupplier, speedSupplier),
-            placeTrap(),
+            placeWhenReady(),
             this::getShooterMode
         ), this.getShooterMode()
             ? shootWhenReady(poseSupplier, speedSupplier).getRequirements() 
-            : placeTrap().getRequirements());
+            : placeWhenReady().getRequirements());
     }
 
     private Command setDislodging(boolean dislodging) {
@@ -185,14 +187,23 @@ public class PieceControl {
             getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
-
-    // Same as above
-    public Command elevatorToTop() {
-        return setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS);
+    
+    public Command elevatorToTrap() {
+        return setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS)
+                .alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60)))
+                .andThen(prepPiece());
     }
 
     public Command elevatorToAmp() {
-        return setElevatorPosition(() -> TrapConstants.AMP_PLACE_POS);
+        return 
+            Commands.defer(
+                () -> setElevatorPosition(NT.getSupplier("ampPosition")),
+                Set.of(elevator)
+            ).andThen(prepPiece());
+    }
+
+    public Command prepPiece() {
+        return trapper.outtake(TrapConstants.PREP_PIECE_SECONDS);
     }
 
     public Command getUnstuck(double desiredPose) {
@@ -210,20 +221,17 @@ public class PieceControl {
             );
     }
 
-    public Command placeTrap() {
+    public Command placeWhenReady() {
         return Commands.sequence(
-                Commands.defer(
-                    () -> setElevatorPosition(NT.getSupplier("ampPosition")),
-                    Set.of(elevator)
-                ).alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60))), 
-                trapper.intake(),
-                Commands.waitSeconds(0.3),
-                trapper.stopCommand(),
-                Commands.waitSeconds(1),
-                trapper.outtake(),
-                Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
-                trapper.stopCommand(),
-                shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0)));
+                Commands.waitUntil(
+                    () -> elevator.atPosition(
+                        ampMode 
+                        ? TrapConstants.AMP_PLACE_POS 
+                        : TrapConstants.TRAP_PLACE_POS)),
+                trapper.outtake(TrapConstants.OUTTAKE_SECONDS),
+                shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
+                    .onlyIf(() -> elevator.getDesiredPosition() == TrapConstants.TRAP_PLACE_POS)
+            );
     }
 
     public Command sourceShooterIntake() {

@@ -55,6 +55,22 @@ public class Trapper extends SubsystemBase {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_INTAKE_PERCENT));
     }
 
+    public Command intake(double seconds) {
+        return Commands.sequence(
+            intake(),
+            Commands.waitSeconds(seconds),
+            stopCommand()  
+        );
+    }
+
+    public Command outtake(double seconds) {
+        return Commands.sequence(
+            outtake(),
+            Commands.waitSeconds(seconds),
+            stopCommand()  
+        );
+    }
+
     public Command toggleSpeed() {
         return Commands.either(
             outtake(), 

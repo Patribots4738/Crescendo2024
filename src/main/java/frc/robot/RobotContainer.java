@@ -271,7 +271,7 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(pieceControl.elevatorToTop());
+            .onTrue(pieceControl.elevatorToTrap());
 
         controller.povLeft()
             .onTrue(pieceControl.elevatorToAmp());
@@ -457,7 +457,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
-        NamedCommands.registerCommand("PlaceAmp", pieceControl.placeTrap());
+        NamedCommands.registerCommand("PlaceAmp", pieceControl.placeWhenReady());
         NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));
