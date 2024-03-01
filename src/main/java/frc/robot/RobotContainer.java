@@ -307,7 +307,6 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
-
         controller.a()
             .onTrue(pieceControl.panicEjectNote())
             .onFalse(pieceControl.stopPanicEject());

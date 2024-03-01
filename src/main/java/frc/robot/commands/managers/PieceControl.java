@@ -31,6 +31,8 @@ public class PieceControl {
     // State representing if we are trying to unstuck the elevator
     @Log
     private boolean elevatorDislodging = false;
+    @Log
+    private boolean readyToMoveNote = true;
 
     public PieceControl(
             Intake intake,
@@ -94,25 +96,33 @@ public class PieceControl {
 
     public Command noteToIndexer() {
         return Commands.sequence(
+            Commands.waitUntil(this::readyToMoveNote),
+            Commands.print("Moving note to indexer"),
+            setReadyToMoveNote(false),
             trapper.intake(),
             indexer.toShooterSlow(),
             NT.getWaitCommand("noteToIndexer1"), // 0.6
             indexer.stopCommand(),
             indexer.toElevatorSlow(),
             NT.getWaitCommand("noteToIndexer2"), // 0.07
-            stopIntakeAndIndexer()
+            stopIntakeAndIndexer(),
+            setReadyToMoveNote(true)
         );
     }
 
     public Command noteToTrap() {
         return Commands.sequence(
+            Commands.waitUntil(this::readyToMoveNote),
+            Commands.print("Moving note to indexer"),
+            setReadyToMoveNote(false),
             trapper.outtake(),
             indexer.toElevator(),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             trapper.outtakeSlow(),
             NT.getWaitCommand("noteToTrap2"), // 0.5
-            stopIntakeAndIndexer()
+            stopIntakeAndIndexer(),
+            setReadyToMoveNote(true)
         );
     }
 
@@ -261,6 +271,16 @@ public class PieceControl {
 
     public void setShooterMode(boolean shooterMode) {
         this.shooterMode = shooterMode;
+    }
+
+    public Command setReadyToMoveNote(boolean readyToMove) {
+        return Commands.runOnce(() -> {
+            this.readyToMoveNote = readyToMove;
+        });
+    }
+
+    public boolean readyToMoveNote() {
+        return readyToMoveNote;
     }
 
     public Command setShooterModeCommand(boolean shooterMode) {
