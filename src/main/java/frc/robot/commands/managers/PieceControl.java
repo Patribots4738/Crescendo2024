@@ -149,7 +149,7 @@ public class PieceControl {
 
     public Command indexCommand() {
         return elevator.toIndexCommand()
-                .alongWith(intake.stopCommand(), trapper.stopCommand());
+                .alongWith(intake.stopCommand());
     }
 
     public Command intakeAuto() {
@@ -212,9 +212,7 @@ public class PieceControl {
                 // Toggle this state to currently unstucking if we haven't already
                 setDislodging(true),
                 elevator.setPositionCommand(TrapConstants.UNSTUCK_POS),
-                trapper.outtakeSlow(),
-                Commands.waitSeconds(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
-                trapper.stopCommand(),
+                trapper.outtakeSlow(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 elevator.setPositionCommand(desiredPose, true),
                 // Toggle unstucking state to off if the elevator isn't actually stuck anymore
                 setDislodging(false).onlyIf(() -> !elevator.getStuck())
@@ -238,8 +236,7 @@ public class PieceControl {
         return Commands.sequence(
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 45.0)),
             indexer.toElevator(),
-            trapper.outtake(),
-            Commands.waitSeconds(3),
+            trapper.outtake(3.0),
             indexCommand()
         ); 
     }

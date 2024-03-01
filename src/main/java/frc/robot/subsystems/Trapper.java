@@ -43,6 +43,14 @@ public class Trapper extends SubsystemBase {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_OUTTAKE_SLOW));
     }
 
+    public Command outtakeSlow(double seconds) {
+        return 
+            Commands.sequence(
+                intakeSlow(),
+                Commands.waitSeconds(seconds),
+                stopCommand());
+    }
+
     public Command intakeSlow() {
         return runOnce(() -> setSpeed(0.1));
     }
