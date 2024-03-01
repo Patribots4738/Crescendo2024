@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.leds.commands.animations.LEDCommands.HSV;
 import frc.robot.leds.LedStrip;
+import frc.robot.leds.commands.animations.LEDCommands.HSV;
 
 public class LEDWaveCommand {
 
