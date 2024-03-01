@@ -485,6 +485,8 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
+        Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
+
         
         Monologue.logObj(pathPlannerStorage, "Robot");
     }
