@@ -13,13 +13,15 @@ public class LEDFlashCommand extends LEDCommands {
     private final double blinkSpeed;
     private double startTime;
     private boolean isFinished;
+    private LEDCommands root;
 
-    public LEDFlashCommand(double blinkTime, double blinkSpeed, Color color1, Color color2) {
-        this(blinkTime, blinkSpeed, color1, color2, Set.of(ledStrip));
+    public LEDFlashCommand(LEDCommands root, double blinkTime, double blinkSpeed, Color color1, Color color2) {
+        this(root, blinkTime, blinkSpeed, color1, color2, Set.of(root.ledStrip));
     }
 
-    public LEDFlashCommand(double blinkTime, double blinkSpeed, Color color1, Color color2, Set<Subsystem> requirements) {
-        super(ledStrip, requirements);
+    public LEDFlashCommand(LEDCommands root, double blinkTime, double blinkSpeed, Color color1, Color color2, Set<Subsystem> requirements) {
+        super(root.ledStrip, requirements);
+        this.root = root;
         this.color1 = color1;
         this.color2 = color2;
         this.blinkTime = blinkTime;
@@ -36,7 +38,7 @@ public class LEDFlashCommand extends LEDCommands {
     public void execute() {
         double currentTime = Robot.currentTimestamp - startTime;
         double blinkInterval = blinkTime / (blinkSpeed*blinkSpeed);
-        ledStrip.setLED((currentTime % (2 * blinkInterval)) < blinkInterval ? color1 : color2);
+        root.ledStrip.setLED((currentTime % (2 * blinkInterval)) < blinkInterval ? color1 : color2);
         if (currentTime >= blinkTime) {
             end(true);
         }
@@ -44,7 +46,7 @@ public class LEDFlashCommand extends LEDCommands {
 
     @Override
     public void end(boolean interrupted) {
-        ledStrip.setLED(color1);
+        root.ledStrip.setLED(color1);
         isFinished = true;
     }
 

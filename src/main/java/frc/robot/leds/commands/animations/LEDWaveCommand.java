@@ -11,12 +11,12 @@ import frc.robot.leds.commands.animations.LEDCommands.HSV;
 
 public class LEDWaveCommand {
 
-    protected void evaluateWave(LedStrip ledStrip, double scale, double spacing, double time, int x, HSV hsvMode,
+    protected void evaluateWave(LEDCommands root, double scale, double spacing, double time, int x, HSV hsvMode,
             double height, int hueVal) {
         switch (hsvMode) {
-            case HUE -> evaluateHueWave(ledStrip, scale, spacing, time, x, height);
-            case VALUE -> evaluateValueWave(ledStrip, scale, spacing, time, x, height, hueVal);
-            case SATURATION -> evaluateSaturationWave(ledStrip, scale, spacing, time, x, height, hueVal);
+            case HUE -> evaluateHueWave(root.ledStrip, scale, spacing, time, x, height);
+            case VALUE -> evaluateValueWave(root.ledStrip, scale, spacing, time, x, height, hueVal);
+            case SATURATION -> evaluateSaturationWave(root.ledStrip, scale, spacing, time, x, height, hueVal);
             default -> {
             }
         }
@@ -48,13 +48,13 @@ public class LEDWaveCommand {
         private final double height;
         private final double waveSpeed;
         private final double waveRange;
-
+        private LEDCommands root;
         private Command waveHueFunction;
 
         protected void waveHueFunction() {
             for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
-                    ledStrip,
+                    root,
                     scale,
                     spacing,
                     waveHueOffset,
@@ -67,13 +67,13 @@ public class LEDWaveCommand {
             waveHueOffset %= waveRange;
         }
 
-        public Hue(double scale, double spacing, double height, double waveSpeed, double waveRange) {
-            this(scale, spacing, height, waveSpeed, waveRange, Set.of());
+        public Hue(LEDCommands root, double scale, double spacing, double height, double waveSpeed, double waveRange) {
+            this(root, scale, spacing, height, waveSpeed, waveRange, Set.of());
         }
 
-        public Hue(double scale, double spacing, double height, double waveSpeed, double waveRange,
+        public Hue(LEDCommands root, double scale, double spacing, double height, double waveSpeed, double waveRange,
                 Set<Subsystem> requirements) {
-            super(ledStrip, requirements);
+            super(root.ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
             this.height = height;
@@ -98,13 +98,13 @@ public class LEDWaveCommand {
         private final double spacing;
         private final double height;
         private final int hueVal;
-
+        private LEDCommands root;
         private final Command waveValueFunction;
 
         protected void waveValueFunction() {
-            for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
+            for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
-                    ledStrip,
+                    root,
                     scale,
                     spacing,
                     waveValueOffset,
@@ -117,14 +117,14 @@ public class LEDWaveCommand {
             waveValueOffset %= waveRange;
         }
 
-        public Value(double scale, double spacing, double height, double waveValueIncrement, double waveRange,
+        public Value(LEDCommands root, double scale, double spacing, double height, double waveValueIncrement, double waveRange,
                 int hueVal) {
-            this(scale, spacing, height, waveValueIncrement, waveRange, hueVal, Set.of());
+            this(root, scale, spacing, height, waveValueIncrement, waveRange, hueVal, Set.of());
         }
 
-        public Value(double scale, double spacing, double height, double waveValueIncrement, double waveRange,
+        public Value(LEDCommands root, double scale, double spacing, double height, double waveValueIncrement, double waveRange,
                 int hueVal, Set<Subsystem> requirements) {
-            super(ledStrip, requirements);
+            super(root.ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
             this.height = height;
@@ -153,13 +153,13 @@ public class LEDWaveCommand {
         private final double spacing;
         private final double height;
         private final int hueVal;
-
+        private LEDCommands root;
         private final Command waveSaturationFunction;
 
         protected void waveSaturationFunction() {
-            for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
+            for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
-                    ledStrip,
+                    root,
                     scale,
                     spacing,
                     waveValueOffset,
@@ -172,14 +172,14 @@ public class LEDWaveCommand {
             waveValueOffset %= waveRange;
         }
 
-        public Saturation(double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
+        public Saturation(LEDCommands root, double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
                 int hueVal) {
-            this(scale, spacing, height, waveSaturationIncrement, waveRange, hueVal, Set.of());
+            this(root, scale, spacing, height, waveSaturationIncrement, waveRange, hueVal, Set.of());
         }
 
-        public Saturation(double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
+        public Saturation(LEDCommands root, double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
                 int hueVal, Set<Subsystem> requirements) {
-            super(ledStrip, requirements);
+            super(root.ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
             this.height = height;

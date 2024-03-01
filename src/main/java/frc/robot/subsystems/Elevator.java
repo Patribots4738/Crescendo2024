@@ -83,7 +83,7 @@ public class Elevator extends SubsystemBase implements Logged {
             desiredPos = pos;
             elevator.setTargetPosition(pos);
 
-            new LEDFollowerCommand(this::getPosition, TrapConstants.ELEVATOR_TOP_LIMIT, Color.kAqua).schedule();
+            new LEDFollowerCommand(RobotContainer.ledStrip.getLEDCommands(), this::getPosition, TrapConstants.ELEVATOR_TOP_LIMIT, Color.kAqua).schedule();
 
             RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
                 0, 0, pos,

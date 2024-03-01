@@ -149,6 +149,7 @@ public class LPI extends Command implements Logged{
     public void end(boolean interrupted) {
         cancel();
         new LEDWaveCommand().new Hue(
+            ledStrip.getLEDCommands(),
             50, 
             (double) ledStrip.getBuffer().getLength(), 
             75, 

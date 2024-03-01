@@ -12,26 +12,28 @@ public class LEDConditionalCommand extends LEDCommands {
     private final Color color1;
     private final Color color2;
     private final BooleanSupplier condition;
+    private LEDCommands root;
     private int index = -1;
 
-    public LEDConditionalCommand(Color color1, Color color2, BooleanSupplier condition) {
-        super(ledStrip);
+    public LEDConditionalCommand(LEDCommands root, Color color1, Color color2, BooleanSupplier condition) {
+        super(root.ledStrip);
+        this.root = root;
         this.color1 = color1;
         this.color2 = color2;
         this.condition = condition;
     }
 
-    public LEDConditionalCommand(Color color1, Color color2, BooleanSupplier condition, int i) {
-        this(color1, color2, condition);
+    public LEDConditionalCommand(LEDCommands root, Color color1, Color color2, BooleanSupplier condition, int i) {
+        this(root, color1, color2, condition);
         this.index = i;
     }
 
     @Override
     public void execute() {
         if (condition.getAsBoolean()) {
-            ledStrip.setLED(index, color1);
+            root.ledStrip.setLED(index, color1);
         } else {
-            ledStrip.setLED(index, color2);
+            root.ledStrip.setLED(index, color2);
         }
     }
 }

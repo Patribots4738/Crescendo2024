@@ -10,9 +10,10 @@ public class LEDFollowerCommand extends LEDCommands {
     private DoubleSupplier motorPoseSupplier;
     private final double multiplier;
     private Color color;
+    private LEDCommands root;
 
-    public LEDFollowerCommand(DoubleSupplier motorPosition, double multiplier, Color color) {
-        super(ledStrip, Set.of());
+    public LEDFollowerCommand(LEDCommands root, DoubleSupplier motorPosition, double multiplier, Color color) {
+        super(root.ledStrip, Set.of());
         this.motorPoseSupplier = motorPosition;
         this.color = color;
         this.multiplier = multiplier;
@@ -22,10 +23,10 @@ public class LEDFollowerCommand extends LEDCommands {
     public void execute() {
         double motorPose = motorPoseSupplier.getAsDouble();
 
-        motorPose = MathUtil.applyDeadband(motorPose * multiplier * ledStrip.getBuffer().getLength(), 0.01);
+        motorPose = MathUtil.applyDeadband(motorPose * multiplier * root.ledStrip.getBuffer().getLength(), 0.01);
         
-        for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
-            ledStrip.setLED(i, (i < motorPose) ? color : Color.kBlack);
+        for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
+            root.ledStrip.setLED(i, (i < motorPose) ? color : Color.kBlack);
         }
     }
 

@@ -41,7 +41,6 @@ public class LedStrip extends SubsystemBase {
     
     @Override
     public void periodic() {
-        // runPattern(currentPatternIndex).execute();
         led.setData(ledBuffer);
     }
 
@@ -72,7 +71,12 @@ public class LedStrip extends SubsystemBase {
             setLED(0, ledBuffer.getLength(), color);
         }
     }
-        
+
+    public LEDCommands getLEDCommands() {
+        return ledFunctionCommand;
+    }
+    
+    //TODO: remove circus and loading when the commands have been made
     double circusOffset = 1;
     public Command circus() {
         return run(() -> {

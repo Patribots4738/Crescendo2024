@@ -5,20 +5,22 @@ import edu.wpi.first.wpilibj.util.Color;
 public class LEDColorCommand extends LEDCommands {
     private Color color;
     private int index = -1;
+    private LEDCommands root;
 
-    public LEDColorCommand(Color color) {
-        super(ledStrip);
+    public LEDColorCommand(LEDCommands root, Color color) {
+        super(root.ledStrip);
+        this.root = root;
         this.color = color;
     }
 
-    public LEDColorCommand(Color color, int i) {
-        this(color);
+    public LEDColorCommand(LEDCommands root, Color color, int i) {
+        this(root, color);
         this.index = i;
     }
     
     @Override
     public void execute() {
-        ledStrip.setLED(index, color);
+        root.ledStrip.setLED(index, color);
     }
 
     @Override
