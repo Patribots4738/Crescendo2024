@@ -18,7 +18,9 @@ import monologue.Annotations.Log;
 
 
 public class Elevator extends SubsystemBase implements Logged {
+    
     private final Neo elevator;
+
     @Log
     private double pos = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
 
