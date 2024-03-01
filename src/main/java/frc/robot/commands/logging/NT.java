@@ -1,4 +1,4 @@
-package frc.robot.commands.subsytemHelpers;
+package frc.robot.commands.logging;
 
 import java.util.Map;
 import java.util.function.DoubleSupplier;

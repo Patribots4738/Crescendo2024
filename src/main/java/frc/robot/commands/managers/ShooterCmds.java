@@ -1,4 +1,4 @@
-package frc.robot.commands.subsytemHelpers;
+package frc.robot.commands.managers;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
-import frc.robot.commands.sim.note.NoteTrajectory;
+import frc.robot.commands.logging.NoteTrajectory;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.ShooterCalc;
