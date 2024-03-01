@@ -20,7 +20,7 @@ import monologue.Annotations.Log;
 public class Elevator extends SubsystemBase implements Logged {
     private final Neo elevator;
     @Log
-    private double pos = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
+    private double position = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
 
     @Log
     private boolean atDesiredPos = false, stuckOnGuillotine = false, ampMode = true;
@@ -39,9 +39,8 @@ public class Elevator extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        pos = getPosition();
+        position = getPosition();
         desiredPos = getDesiredPosition();
-        updateAmpMode();
         atDesiredPos = atDesiredPosition();
 
         // A value of 0 on hitGuillotineTimestamp indicates that we are not hitting the guillotine
@@ -54,11 +53,11 @@ public class Elevator extends SubsystemBase implements Logged {
         
         updateStuck();
         RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
-            0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
+            0, 0, position * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
             new Rotation3d()
         );
         RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
-            0, 0, pos,
+            0, 0, position,
             new Rotation3d()
         );
     }
@@ -76,6 +75,12 @@ public class Elevator extends SubsystemBase implements Logged {
             pos,
             TrapConstants.ELEVATOR_BOTTOM_LIMIT,
             TrapConstants.ELEVATOR_TOP_LIMIT);
+        
+        if (desiredPos != TrapConstants.AMP_PLACE_POS && pos == TrapConstants.AMP_PLACE_POS) {
+            setAmpMode(true);
+        } else if (desiredPos == TrapConstants.AMP_PLACE_POS && pos != TrapConstants.AMP_PLACE_POS) {
+            setAmpMode(false);
+        }
 
         if (desiredPos != pos) {
             desiredPos = pos;
@@ -131,25 +136,16 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public boolean atDesiredPosition() {
-		return MathUtil.isNear(desiredPos, pos, TrapConstants.ELEVATOR_DEADBAND);
+		return MathUtil.isNear(desiredPos, position, TrapConstants.ELEVATOR_DEADBAND);
 	}
 
     public boolean atPosition(double position) {
-        return MathUtil.isNear(position, pos, TrapConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(position, position, TrapConstants.ELEVATOR_DEADBAND);
     }
 
     public void setAmpMode(boolean amp) {
         this.ampMode = amp;
     }   
-
-    public void updateAmpMode() {
-        setAmpMode(this.desiredPos != TrapConstants.AMP_PLACE_POS
-            ? false 
-            : true);
-    }
-    public Command setAmpModeCommand(boolean amp) {
-        return runOnce(() -> setAmpMode(amp));
-    }  
 
     public boolean getAmpMode() {
         return this.ampMode;
@@ -168,7 +164,7 @@ public class Elevator extends SubsystemBase implements Logged {
         stuckOnGuillotine =  
             hitGuillotineTimestamp != 0
             && Robot.currentTimestamp - this.hitGuillotineTimestamp >= TrapConstants.STUCK_TIME_SECONDS
-            && desiredPos > pos
+            && desiredPos > position
             && nearGuillotine()
             && elevator.getOutputCurrent() > 35.0;
     }

@@ -901,6 +901,9 @@ public final class Constants {
 
             put("ampPosition", 0.37);
             put("atan++", 0.0);
+
+            put("placeOuttake", 3.0);
+            put("prepPiece", 0.3);
         }};
     }
 }

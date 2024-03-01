@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
@@ -186,6 +187,7 @@ public class PieceControl implements Logged{
     // Same as normally setting elevator position but adds unstuck logic
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
+            setReadyToPlaceCommand(false),
             elevator.setPositionCommand(position, true),
             // Run until we are no longer in our unstucking state only if elevator actually gets stuck
             getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
@@ -204,7 +206,7 @@ public class PieceControl implements Logged{
         return Commands.runOnce(() -> setReadyToPlace(readyToPlace));
     }
 
-    // Goes to amp position if the driver has toggled amp placement mode on, to trap otherwise
+    // TODO: remove defer when amp position is finalized
     public Command elevatorToPlacement(boolean amp) {
         return 
             Commands.defer(
@@ -221,8 +223,13 @@ public class PieceControl implements Logged{
             );
     }
 
+    public Command elevatorToBottom() {
+        return setReadyToPlaceCommand(false)
+                .andThen(elevator.toBottomCommand());
+    }
+
     public Command prepPiece() {
-        return trapper.intake(TrapConstants.PREP_PIECE_SECONDS);
+        return trapper.intake(NT.getSupplier("prepPiece").getAsDouble());
     }
 
     public Command getUnstuck(double desiredPose) {
@@ -242,11 +249,9 @@ public class PieceControl implements Logged{
         return 
             Commands.sequence(
                 Commands.waitUntil(() -> readyToPlace),
-                trapper.outtake(TrapConstants.OUTTAKE_SECONDS),
+                trapper.outtake(NT.getSupplier("placeOuttake").getAsDouble()),
                 setReadyToPlaceCommand(false),
                 elevator.toBottomCommand()
-                // shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
-                //     .onlyIf(() -> !ampPlaceMode)
             );
     }
 
@@ -280,6 +285,19 @@ public class PieceControl implements Logged{
 
 
     public Command setShooterModeCommand(boolean shooterMode) {
-        return Commands.runOnce(() -> setShooterMode(shooterMode));
+        return Commands.either(
+            Commands.runOnce(() -> setShooterMode(shooterMode))
+                .andThen(
+                    Commands.either(
+                        Commands.either(
+                            noteToIndexer(),
+                            noteToTrap(),
+                            () -> shooterMode), 
+                        Commands.none(), 
+                        intake::getPossession
+                    )
+                ),
+            Commands.none(),
+            () -> this.shooterMode != shooterMode);
     }
 }
