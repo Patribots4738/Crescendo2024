@@ -142,4 +142,5 @@ public class ShooterCmds {
 	public Command stowPivot() {
 	    return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
+    
 }
