@@ -1,10 +1,10 @@
-package frc.robot.commands.misc.leds.animations;
+package frc.robot.leds.commands.animations;
 
 import java.util.Set;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.subsystems.misc.leds.LedStrip;
+import frc.robot.leds.LedStrip;
 
 public class LEDCommands extends DeferredCommand {
     protected static LedStrip ledStrip;    

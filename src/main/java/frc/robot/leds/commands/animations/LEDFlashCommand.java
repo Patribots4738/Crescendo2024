@@ -1,4 +1,4 @@
-package frc.robot.commands.misc.leds.animations;
+package frc.robot.leds.commands.animations;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Subsystem;

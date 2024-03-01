@@ -25,6 +25,7 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 import frc.robot.util.custom.PatrIDConstants;
@@ -173,9 +174,9 @@ public final class Constants {
                 // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
                 // put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
                 // put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
-                // put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
-                // put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
-                // put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
+                put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
+                put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
+                put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
 
                 // V2
                 put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
@@ -188,6 +189,14 @@ public final class Constants {
                 // V3 (note inside of indexer)
                 put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
                 put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
+                // 2/28/24 - this was the day after bands were added
+                put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
+
+                // Random untested schenanagains
+                put(18, SpeedAngleTriplet.of(3928.0, 3928.0, 28.6));
+                put(19, SpeedAngleTriplet.of(4200.0, 4200.0, 28.3));
+                put(20, SpeedAngleTriplet.of(4200.0, 4200.0, 27.9));
+
             }
         };
 
@@ -209,10 +218,12 @@ public final class Constants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = 0.03;
+        public static final double GUILLOTINE_DEADBAND = 0.04;
         public static final double OUTTAKE_SECONDS = 3;
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int TRAP_CURRENT_LIMIT = 15;
+        public static final boolean TRAP_INVERTION = true;
 
         private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
         private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
@@ -227,16 +238,16 @@ public final class Constants {
         public static final double INTAKE_TIME = 0;
         public static final double TRAPPER_OUTTAKE_PERCENT = -1;
         public static final double TRAPPER_INTAKE_PERCENT = 1;
-        public static final double TRAPPER_OUTTAKE_SLOW = 0.3;
+        public static final double TRAPPER_OUTTAKE_SLOW = -0.3;
         public static final double TRAPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
         public static final double AMP_PLACE_POS = 0.37;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
-        public static final double GUILLOTONE_POS = 0.25;
-        public static final double UNSTUCK_POS = 0.15;
+        public static final double GUILLOTONE_POS = 0.224;
+        public static final double UNSTUCK_POS = 0.175;
 
-        public static final double STUCK_TIME_SECONDS = 0.1;
+        public static final double STUCK_TIME_SECONDS = 0.25;
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.49;
@@ -392,7 +403,8 @@ public final class Constants {
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
         // the steering motor in the MAXSwerve Module.
-        public static final boolean TURNING_ENCODER_INVERTED = true;
+        // Update 2-29-24: I don't know how this needed to turn false but it is now false... -aleg
+        public static final boolean TURNING_ENCODER_INVERTED = false;
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
@@ -472,39 +484,11 @@ public final class Constants {
     }
 
     public static final class LEDConstants {
-        public static final int PWM_PORT = 0;
-        public static int LED_COUNT = 300;
-        
+        public static final int PWM_PORT = 9;
+        public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
+
         public static final Integer patternMap = null;
 
-        public static final HashMap<LED_SECTIONS, Pair<Integer,Integer>> LED_SECTION_MAP = new HashMap<>(){{
-            put(LED_SECTIONS.ELEVATOR1, LED_SECTIONS.ELEVATOR1.getIndexRange());
-            put(LED_SECTIONS.ELEVATOR2, LED_SECTIONS.ELEVATOR2.getIndexRange());
-            put(LED_SECTIONS.PIVOT, LED_SECTIONS.PIVOT.getIndexRange());
-            put(LED_SECTIONS.CLIMB1, LED_SECTIONS.CLIMB1.getIndexRange());
-            put(LED_SECTIONS.CLIMB2, LED_SECTIONS.CLIMB2.getIndexRange());
-            put(LED_SECTIONS.BUMPERS, LED_SECTIONS.BUMPERS.getIndexRange());
-        }};
-
-        public enum LED_SECTIONS {
-            ELEVATOR1(Pair.of(0, 50)),
-            ELEVATOR2(Pair.of(51, 100)),
-            PIVOT(Pair.of(101, 150)),
-            CLIMB1(Pair.of(151, 200)),
-            CLIMB2(Pair.of(201, 250)),
-            BUMPERS(Pair.of(251, 300));
-    
-            private Pair<Integer, Integer> indexRange;
-    
-            LED_SECTIONS(Pair<Integer, Integer> indexRange) {
-                this.indexRange = indexRange;
-            }
-    
-            public Pair<Integer, Integer> getIndexRange() {
-                return indexRange;
-            }
-        }
-        
         public static final double OUTER_ZONE = 2.262;
         public static final double INNER_ZONE = 1.131;
         public static final double RIN_STAR_BIN = 0.1;
@@ -544,9 +528,9 @@ public final class Constants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
-        public static final int MAX_PERIODIC_STATUS_TIME_MS = 65535;
-        public static final int FAST_PERIODIC_STATUS_TIME_MS = 10;
-      
+        public static final int MAX_PERIODIC_STATUS_TIME_MS = 10000;
+        public static final int FAST_PERIODIC_STATUS_TIME_MS = 20;
+
         // This gets filled out as motors are created on the robot
         public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
 
@@ -913,6 +897,9 @@ public final class Constants {
             put("noteToTrap1", 0.2);
             put("noteToTrap2", 0.5);
             put("noteToTrap3", 0.0);
+
+            put("ampPosition", 0.37);
+            put("atan++", 0.0);
         }};
     }
 }

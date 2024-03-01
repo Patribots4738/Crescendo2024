@@ -1,4 +1,4 @@
-package frc.robot.commands.misc.leds.animations;
+package frc.robot.leds.commands.animations;
 
 import java.util.Set;
 import java.util.function.DoubleSupplier;

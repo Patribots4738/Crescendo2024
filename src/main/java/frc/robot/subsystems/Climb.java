@@ -31,9 +31,9 @@ public class Climb extends SubsystemBase implements Logged {
     private boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
-        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID);
+        leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, true);
         // invert right motor in real life, not in sim
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, !FieldConstants.IS_SIMULATION);
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true, !FieldConstants.IS_SIMULATION);
 
         configureMotors();
     }
@@ -85,7 +85,12 @@ public class Climb extends SubsystemBase implements Logged {
                 ClimbConstants.BOTTOM_LIMIT,
                 ClimbConstants.TOP_LIMIT);
 
-        leftMotor.setTargetPosition(pos1);
+        if (targetPosLeft != pos1) {
+            leftMotor.setTargetPosition(pos1);
+        }
+
+        if (targetPosRight != pos2)
+
         rightMotor.setTargetPosition(pos2);
 
         RobotContainer.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
@@ -96,10 +101,6 @@ public class Climb extends SubsystemBase implements Logged {
             0, 0, pos2,
             new Rotation3d()
         );
-    }
-
-    public Pair<Double, Double> getPosition() {
-        return new Pair<>(leftMotor.getPosition(), rightMotor.getPosition());
     }
 
     public void toTop() {

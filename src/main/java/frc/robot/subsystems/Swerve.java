@@ -47,6 +47,7 @@ import monologue.Annotations.Log;
 public class Swerve extends SubsystemBase implements Logged {
 
     public static double twistScalar = 4;
+    private Rotation2d gyroRotation2d = new Rotation2d();
 
     private double speedMultiplier = 1;
     private final MAXSwerveModule frontLeft = new MAXSwerveModule(
@@ -106,7 +107,6 @@ public class Swerve extends SubsystemBase implements Logged {
      * Creates a new DriveSu1stem.
      */
     public Swerve() {
-
         AutoBuilder.configureHolonomic(
                 this::getPose,
                 this::resetOdometry,
@@ -123,7 +123,8 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        poseEstimator.updateWithTime(Robot.currentTimestamp, gyro.getRotation2d(), getModulePositions());
+        gyroRotation2d = gyro.getRotation2d();
+        poseEstimator.updateWithTime(Robot.currentTimestamp, gyroRotation2d, getModulePositions());
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
@@ -267,7 +268,7 @@ public class Swerve extends SubsystemBase implements Logged {
         }
 
         poseEstimator.resetPosition(
-                gyro.getRotation2d(),
+                gyroRotation2d,
                 getModulePositions(),
                 pose);
     }
