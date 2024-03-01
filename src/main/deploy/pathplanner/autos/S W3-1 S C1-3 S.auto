@@ -2,45 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4242897057222692,
-      "y": 4.089988751406074
+      "x": 0.7412377646703784,
+      "y": 4.3334957369796125
     },
-    "rotation": 179.5549529345276
+    "rotation": 119.91938193435101
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "S W3"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Shoot"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "S W3"
           }
         },
         {

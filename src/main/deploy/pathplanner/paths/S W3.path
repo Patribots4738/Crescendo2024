@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.4242897057222692,
-        "y": 4.089988751406074
+        "x": 0.7412377646703784,
+        "y": 4.3334957369796125
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6207264414528846,
-        "y": 4.966624333248666
+        "x": 1.2790248200877137,
+        "y": 4.69202044059117
       },
       "isLocked": false,
       "linkedName": null
@@ -43,6 +43,12 @@
               "data": {
                 "name": "PrepareShooter"
               }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
             }
           ]
         }
@@ -63,7 +69,7 @@
   "reversed": false,
   "folder": "Preloads",
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": 122.79953127261922,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -47,23 +47,6 @@
           ]
         }
       }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 0.7,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot"
-              }
-            }
-          ]
-        }
-      }
     }
   ],
   "globalConstraints": {
