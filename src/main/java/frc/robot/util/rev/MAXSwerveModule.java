@@ -149,7 +149,7 @@ public class MAXSwerveModule implements Logged{
         drivingSpark.setPID(ModuleConstants.DRIVING_PID);
         turningSpark.setPID(ModuleConstants.TURNING_PID);
 
-        drivingSpark.setSmartCurrentLimit(ModuleConstants.VORTEX_CURRENT_LIMIT);
+        drivingSpark.setSmartCurrentLimit(ModuleConstants.NEO_CURRENT_LIMIT);
         turningSpark.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
         setBrakeMode();
     }
