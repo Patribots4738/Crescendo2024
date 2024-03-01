@@ -96,33 +96,25 @@ public class PieceControl {
 
     public Command noteToIndexer() {
         return Commands.sequence(
-            Commands.waitUntil(this::readyToMoveNote),
-            Commands.print("Moving note to indexer"),
-            setReadyToMoveNote(false),
             trapper.intake(),
             indexer.toShooterSlow(),
             NT.getWaitCommand("noteToIndexer1"), // 0.6
             indexer.stopCommand(),
             indexer.toElevatorSlow(),
             NT.getWaitCommand("noteToIndexer2"), // 0.07
-            stopIntakeAndIndexer(),
-            setReadyToMoveNote(true)
+            stopIntakeAndIndexer()
         );
     }
 
     public Command noteToTrap() {
         return Commands.sequence(
-            Commands.waitUntil(this::readyToMoveNote),
-            Commands.print("Moving note to indexer"),
-            setReadyToMoveNote(false),
             trapper.outtake(),
             indexer.toElevator(),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             trapper.outtakeSlow(),
             NT.getWaitCommand("noteToTrap2"), // 0.5
-            stopIntakeAndIndexer(),
-            setReadyToMoveNote(true)
+            stopIntakeAndIndexer()
         );
     }
 
@@ -287,6 +279,8 @@ public class PieceControl {
         return Commands.either(
                 Commands.runOnce(() -> setShooterMode(shooterMode))
                     .andThen(
+                        Commands.waitUntil(this::readyToMoveNote),
+                        setReadyToMoveNote(false),
                         Commands.either(
                             Commands.either(
                                 noteToIndexer(),
@@ -294,7 +288,8 @@ public class PieceControl {
                                 () -> shooterMode), 
                             Commands.none(), 
                             intake::getPossession
-                        )
+                        ),
+                        setReadyToMoveNote(true)
                     ),
                 Commands.none(),
                 () -> getShooterMode() != shooterMode);
