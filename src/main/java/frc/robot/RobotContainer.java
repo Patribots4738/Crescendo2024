@@ -259,9 +259,7 @@ public class RobotContainer implements Logged {
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
 
-        controller.povRight()
-            .onTrue(pieceControl.toggleAmpPlaceModeCommand());
-            
+ 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeToTrap())
             .onFalse(pieceControl.stopIntakeAndIndexer());
@@ -273,10 +271,10 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(pieceControl.elevatorToTop());
+            .onTrue(pieceControl.elevatorToPlacement(false));
 
         controller.povLeft()
-            .onTrue(pieceControl.elevatorToPlacement());
+            .onTrue(pieceControl.elevatorToPlacement(true));
 
         controller.povRight()
             .onTrue(trapper.toggleSpeed());
