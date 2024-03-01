@@ -23,7 +23,7 @@ public class Elevator extends SubsystemBase implements Logged {
     private double pos = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
 
     @Log
-    private boolean atDesiredPos = false, stuckOnGuillotine = false, ampMode;
+    private boolean atDesiredPos = false, stuckOnGuillotine = false, ampMode = true;
 
     /** Creates a new Elevator. */
     public Elevator() {

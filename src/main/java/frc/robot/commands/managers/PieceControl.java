@@ -233,7 +233,8 @@ public class PieceControl {
                             elevator.getAmpMode()
                             ? NT.getSupplier("ampPosition").getAsDouble()
                             : TrapConstants.TRAP_PLACE_POS)),
-                    trapper.outtake(TrapConstants.OUTTAKE_SECONDS)
+                    trapper.outtake(TrapConstants.OUTTAKE_SECONDS),
+                    elevator.toBottomCommand()
                     // shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0))
                     //     .onlyIf(() -> !ampPlaceMode)
                 ),

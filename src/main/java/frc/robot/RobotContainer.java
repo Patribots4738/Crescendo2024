@@ -291,14 +291,7 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
-            .onTrue(
-                shooter.setSpeedCommand(3000)
-                    .alongWith(pivot.setAngleCommand(30))
-                .andThen(Commands.waitUntil(shooterCalc.readyToShootSupplier()))
-                .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
-                .andThen(shooter.stopCommand()
-                    .alongWith(pivot.setAngleCommand(0)))
-            );
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)); 
 
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true));
