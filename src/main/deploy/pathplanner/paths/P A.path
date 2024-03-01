@@ -36,7 +36,42 @@
     }
   ],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Elevate",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "RaiseElevator"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PlaceAmp",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PlaceAmp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 6.08,
     "maxAcceleration": 7.378,
@@ -49,7 +84,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Amp",
+  "folder": "Preloads",
   "previewStartingState": {
     "rotation": -90.16021861577292,
     "velocity": 0

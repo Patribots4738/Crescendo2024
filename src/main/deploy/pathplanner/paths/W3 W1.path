@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.892385986339722,
-        "y": 6.9912317204253664
+        "x": 2.5685447337679963,
+        "y": 4.3334957369796125
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.448666263038041,
-        "y": 7.247413422118338
+        "x": 1.7938295227094376,
+        "y": 4.559698794649549
       },
       "isLocked": false,
-      "linkedName": "W1"
+      "linkedName": "W3"
     },
     {
       "anchor": {
-        "x": 1.8337621392595704,
-        "y": 7.619282085683008
+        "x": 2.892385986339722,
+        "y": 6.9912317204253664
       },
       "prevControl": {
-        "x": 2.151979138149327,
-        "y": 7.431237692079727
+        "x": 1.4904624658073509,
+        "y": 6.7660046630283635
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A"
+      "linkedName": "W1"
     }
   ],
   "rotationTargets": [],
@@ -49,8 +49,8 @@
       }
     },
     {
-      "name": "Elevate",
-      "waypointRelativePos": 0.0,
+      "name": "PrepareShooter",
+      "waypointRelativePos": 0.45,
       "command": {
         "type": "parallel",
         "data": {
@@ -58,7 +58,7 @@
             {
               "type": "named",
               "data": {
-                "name": "RaiseElevator"
+                "name": "PrepareShooter"
               }
             }
           ]
@@ -66,8 +66,8 @@
       }
     },
     {
-      "name": "PlaceAmp",
-      "waypointRelativePos": 1.0,
+      "name": "Shoot",
+      "waypointRelativePos": 0.75,
       "command": {
         "type": "parallel",
         "data": {
@@ -75,7 +75,7 @@
             {
               "type": "named",
               "data": {
-                "name": "PlaceAmp"
+                "name": "Shoot"
               }
             }
           ]
@@ -91,13 +91,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.48881492042018,
+    "rotation": -153.6913860214855,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Wings",
   "previewStartingState": {
-    "rotation": -91.51540121645418,
+    "rotation": 155.97197955215407,
     "velocity": 0
   },
   "useDefaultConstraints": true

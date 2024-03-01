@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5216890220257315,
-        "y": 5.375482352388193
+        "x": 1.585543742516057,
+        "y": 5.394680503646721
       },
       "isLocked": false,
       "linkedName": "W2"
     },
     {
       "anchor": {
-        "x": 2.890547398116074,
-        "y": 6.875164023163159
+        "x": 2.892385986339722,
+        "y": 6.9912317204253664
       },
       "prevControl": {
-        "x": 1.6775001047036495,
-        "y": 6.1784355568974645
+        "x": 1.6793386929272973,
+        "y": 6.294503254159672
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0.5,
+      "name": "PrepareShooter",
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "PrepareShooter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 0.7,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
               }
             }
           ]

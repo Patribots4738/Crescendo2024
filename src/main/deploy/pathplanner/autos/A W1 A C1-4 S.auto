@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3127322708546125,
-      "y": 5.531086239477443
+      "x": 1.4441167166799957,
+      "y": 7.308104890618046
     },
-    "rotation": 179.27393174384346
+    "rotation": -90.0
   },
   "command": {
     "type": "sequential",
@@ -14,37 +14,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S C1"
+            "pathName": "P A"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A W1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W1 A"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A C1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "C1toC3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "M W3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W3 W2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W2 W1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopAll"
+            "name": "C1toC4"
           }
         }
       ]

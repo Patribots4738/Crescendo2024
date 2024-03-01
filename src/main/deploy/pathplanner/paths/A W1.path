@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.890547398116074,
-        "y": 6.88490221583053
+        "x": 2.892385986339722,
+        "y": 6.9912317204253664
       },
       "prevControl": {
-        "x": 1.8430493800489391,
-        "y": 5.691525923528969
+        "x": 1.844887968272587,
+        "y": 5.797855428123806
       },
       "nextControl": null,
       "isLocked": false,
@@ -38,6 +38,12 @@
         "type": "parallel",
         "data": {
           "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "LowerElevator"
+              }
+            },
             {
               "type": "named",
               "data": {
