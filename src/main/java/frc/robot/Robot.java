@@ -4,8 +4,6 @@ import java.util.Optional;
 
 import org.littletonrobotics.urcl.URCL;
 
-import com.revrobotics.REVPhysicsSim;
-
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -17,6 +15,7 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.rev.Neo;
+import frc.robot.util.rev.NeoPhysicsSim;
 import monologue.Monologue;
 
 /**
@@ -168,7 +167,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void simulationPeriodic() {
-        REVPhysicsSim.getInstance().run();
+        NeoPhysicsSim.getInstance().run();
         Robot.alliance = DriverStation.getAlliance();
 
         for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {

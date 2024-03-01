@@ -1,5 +1,7 @@
 package frc.robot.commands.managers;
 
+import java.util.Set;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,6 +14,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Trapper;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
+import monologue.Annotations.Log;
 
 public class PieceControl {
 
@@ -26,6 +29,7 @@ public class PieceControl {
     private boolean shooterMode = true;
 
     // State representing if we are trying to unstuck the elevator
+    @Log
     private boolean elevatorDislodging = false;
 
     public PieceControl(
@@ -64,9 +68,9 @@ public class PieceControl {
                 intake.inCommand(),
                 trapper.intake(),
                 indexer.toShooter(),
-                Commands.waitSeconds(NT.getSupplier("noteToShoot1").getAsDouble()), // 0.7
+                NT.getWaitCommand("noteToShoot1"), // 0.7
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitSeconds(NT.getSupplier("noteToShoot2").getAsDouble()), // 0.4
+                NT.getWaitCommand("noteToShoot2"), // 0.4
                 stopIntakeAndIndexer());
     }
 
@@ -80,9 +84,11 @@ public class PieceControl {
             trapper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(intake::getPossession),
-            Commands.waitSeconds(NT.getSupplier("intakeToTrap1").getAsDouble()), // 0.5
-            noteToTrap(),
-            noteToIndexer()
+            NT.getWaitCommand("intakeToTrap1"), // 0.5
+            Commands.either(
+                noteToTrap().andThen(noteToIndexer()), 
+                noteToTrap(), 
+                this::getShooterMode)
         );
     }
 
@@ -90,10 +96,10 @@ public class PieceControl {
         return Commands.sequence(
             trapper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitSeconds(NT.getSupplier("noteToIndexer1").getAsDouble()), // 0.6
+            NT.getWaitCommand("noteToIndexer1"), // 0.6
             indexer.stopCommand(),
             indexer.toElevatorSlow(),
-            Commands.waitSeconds(NT.getSupplier("noteToIndexer2").getAsDouble()), // 0.07
+            NT.getWaitCommand("noteToIndexer2"), // 0.07
             stopIntakeAndIndexer()
         );
     }
@@ -102,10 +108,10 @@ public class PieceControl {
         return Commands.sequence(
             trapper.outtake(),
             indexer.toElevator(),
-            Commands.waitSeconds(NT.getSupplier("noteToTrap1").getAsDouble()), // 0.2
+            NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             trapper.outtakeSlow(),
-            Commands.waitSeconds(NT.getSupplier("noteToTrap2").getAsDouble()), // 0.5
+            NT.getWaitCommand("noteToTrap2"), // 0.5
             stopIntakeAndIndexer()
         );
     }
@@ -130,11 +136,19 @@ public class PieceControl {
         );
     }
 
+    public Command panicEjectNote() {
+        return trapper.intake().andThen(indexer.toElevator());
+    }
+
+    public Command stopPanicEject() {
+        return trapper.stopCommand().andThen(indexer.stopCommand());
+    }
+
     public Command dropPieceCommand() {
         return Commands.sequence(
             elevator.toDropCommand(),
             trapper.outtake(),
-            Commands.waitSeconds(NT.getSupplier("dropPieceCommand1").getAsDouble()), // 0.5
+            NT.getWaitCommand("dropPieceCommand1"), // 0.5
             elevator.toBottomCommand()
         );
     }
@@ -152,68 +166,72 @@ public class PieceControl {
     }
 
     public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        // maybe make setPosition a command ORR Make the Elevator Command
-        return Commands.either(
+        // Defer the command to not require anyhing until it is actually ran
+        // This is becuase placeTrap requires pivot, but shootWhenReady does not
+        // If they are both required, then we would cancel any command that requires pivot
+        // such as prepareSWDCommand
+        return Commands.defer(() -> Commands.either(
             shootWhenReady(poseSupplier, speedSupplier),
             placeTrap(),
             this::getShooterMode
-        );
+        ), this.getShooterMode()
+            ? shootWhenReady(poseSupplier, speedSupplier).getRequirements() 
+            : placeTrap().getRequirements());
     }
 
-    private Command toggleStuck() {
+    private Command setDislodging(boolean dislodging) {
         return Commands.runOnce(() -> {
-            elevatorDislodging = !elevatorDislodging;
+            elevatorDislodging = dislodging;
         });
     }
 
     // Same as normally setting elevator position but adds unstuck logic
-    public Command setElevatorPosition(double position) {
+    public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
             elevator.setPositionCommand(position, true),
             // Run until we are no longer in our unstucking state only if elevator actually gets stuck
-            getUnstuck(position).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
+            getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
 
     // Same as above
     public Command elevatorToTop() {
-        return setElevatorPosition(TrapConstants.TRAP_PLACE_POS);
+        return setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS);
     }
 
     public Command elevatorToAmp() {
-        return setElevatorPosition(TrapConstants.AMP_PLACE_POS);
+        return setElevatorPosition(() -> TrapConstants.AMP_PLACE_POS);
     }
 
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(
                 // Toggle this state to currently unstucking if we haven't already
-                toggleStuck().onlyIf(() -> !elevatorDislodging),
+                setDislodging(true),
                 elevator.setPositionCommand(TrapConstants.UNSTUCK_POS),
                 trapper.outtakeSlow(),
                 Commands.waitSeconds(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 trapper.stopCommand(),
                 elevator.setPositionCommand(desiredPose, true),
                 // Toggle unstucking state to off if the elevator isn't actually stuck anymore
-                toggleStuck().onlyIf(() -> !elevator.getStuck())
+                setDislodging(false).onlyIf(() -> !elevator.getStuck())
             );
     }
 
     public Command placeTrap() {
-        return shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0.0,0.0, 60.0)).alongWith(
-            Commands.sequence(
-                elevatorToTop(),
+        return Commands.sequence(
+                Commands.defer(
+                    () -> setElevatorPosition(NT.getSupplier("ampPosition")),
+                    Set.of(elevator)
+                ).alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60))), 
                 trapper.intake(),
                 Commands.waitSeconds(0.3),
                 trapper.stopCommand(),
                 Commands.waitSeconds(1),
                 trapper.outtake(),
                 Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
-                trapper.stopCommand()
-            )
-        ).andThen(
-            shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0.0,0.0, 0.0))
-        );
+                trapper.stopCommand(),
+                shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0)));
     }
 
     public Command sourceShooterIntake() {
@@ -246,6 +264,19 @@ public class PieceControl {
     }
 
     public Command setShooterModeCommand(boolean shooterMode) {
-        return Commands.runOnce(() -> setShooterMode(shooterMode));
+        return Commands.either(
+                Commands.runOnce(() -> setShooterMode(shooterMode))
+                    .andThen(
+                        Commands.either(
+                            Commands.either(
+                                noteToIndexer(),
+                                noteToTrap(),
+                                () -> shooterMode), 
+                            Commands.none(), 
+                            intake::getPossession
+                        )
+                    ),
+                Commands.none(),
+                () -> getShooterMode() != shooterMode);
     }
 }

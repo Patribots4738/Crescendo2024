@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -35,6 +38,8 @@ import frc.robot.leds.commands.animations.LEDFollowChangeCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.subsystems.*;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -43,6 +48,11 @@ import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.PatriBoxController;
+import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.auto.PathPlannerStorage;
+import frc.robot.util.calc.ShooterCalc;
+import frc.robot.util.custom.PatriBoxController;
+import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.rev.Neo;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -89,6 +99,7 @@ public class RobotContainer implements Logged {
 
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
+    private final BooleanSupplier robotRelativeSupplier;
     
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
@@ -152,14 +163,14 @@ public class RobotContainer implements Logged {
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
+        robotRelativeSupplier = () -> !driver.getYButton();
         swerve.setDefaultCommand(new Drive(
             swerve,
             driver::getLeftY,
             driver::getLeftX,
-            () -> -driver.getRightX(),
-            () -> !driver.getYButton(),
-            () -> (!driver.getYButton()
-                && Robot.isRedAlliance())));
+            () -> -driver.getRightX()/1.6,
+            robotRelativeSupplier,
+            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())));
 
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();
@@ -225,8 +236,9 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(climb.povUpCommand(swerve::getPose));
         
         controller.povDown()
-            .onTrue(climb.toBottomCommand())
-            .whileTrue(new LEDFollowChangeCommand(climb.getPosition()::getFirst, ClimbConstants.CLIMB_POSITION_CONVERSION_FACTOR, Color.kRed));
+            .onTrue(shooterCmds.stowPivot()
+            .alongWith(climb.toBottomCommand())
+        );
         
         controller.a().whileTrue(
             Commands.sequence(
@@ -250,15 +262,15 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDCCommand(),
                     new ActiveConditionalCommand(
-                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY),
-                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY),
+                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.alignmentCalc::onOppositeSide)));
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
             
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeToTrap())
+            .onTrue(pieceControl.intakeToTrap())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -302,6 +314,10 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
+
+        controller.a()
+            .onTrue(pieceControl.panicEjectNote())
+            .onFalse(pieceControl.stopPanicEject());
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
@@ -325,7 +341,8 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .onTrue(pieceControl.noteToTrap());
+            .whileTrue(pieceControl.intakeToTrap())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(pieceControl.ejectNote());
@@ -340,20 +357,28 @@ public class RobotContainer implements Logged {
     private void configureHDCBindings(PatriBoxController controller) {
         controller.pov(0, 270, testButtonBindingLoop)
             .onTrue(HDCTuner.controllerDecrementCommand());
+
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(HDCTuner.controllerIncrementCommand());
+
         controller.pov(0, 0, testButtonBindingLoop)
             .onTrue(HDCTuner.increaseCurrentConstantCommand(.1));
+
         controller.pov(0, 180, testButtonBindingLoop)
             .onTrue(HDCTuner.increaseCurrentConstantCommand(-.1));
+
         controller.rightBumper(testButtonBindingLoop)
             .onTrue(HDCTuner.constantIncrementCommand());
+
         controller.leftBumper(testButtonBindingLoop)
             .onTrue(HDCTuner.constantDecrementCommand());
+
         controller.a(testButtonBindingLoop)
             .onTrue(HDCTuner.logCommand());
+
         controller.x(testButtonBindingLoop)
             .onTrue(HDCTuner.multiplyPIDCommand(2));
+
         controller.b(testButtonBindingLoop)
             .onTrue(HDCTuner.multiplyPIDCommand(.5));
     }
@@ -498,8 +523,8 @@ public class RobotContainer implements Logged {
         Pose3d initialShooterPose = new Pose3d(
                 NTConstants.PIVOT_OFFSET_METERS.getX(),
                 0,
-                NTConstants.PIVOT_OFFSET_METERS.getY(),
-            new Rotation3d()
+                NTConstants.PIVOT_OFFSET_METERS.getZ(),
+            new Rotation3d(0, -Units.degreesToRadians(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES), 0)
         );
 
         components3d[0] = initialShooterPose;

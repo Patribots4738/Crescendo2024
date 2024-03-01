@@ -1,5 +1,6 @@
 package frc.robot.commands.drive;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -66,11 +67,11 @@ public class AlignmentCmds {
             );
     }
 
-    public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
+    public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return 
             swerve.getDriveCommand(
                 alignmentCalc.getChainRotationalSpeedsSupplier(driverX, driverY), 
-                () -> true
+                robotRelativeSupplier
         );
     }    
 
@@ -81,11 +82,11 @@ public class AlignmentCmds {
      * @param driverY the driver's y input
      * @return        the command to align the robot to the source
      */
-    public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
+    public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return 
             swerve.getDriveCommand(
                 alignmentCalc.getSourceRotationalSpeedsSupplier(driverX, driverY), 
-                () -> true
+                robotRelativeSupplier
         );
     }
 
@@ -152,10 +153,10 @@ public class AlignmentCmds {
      * @param driverY the driver's y input
      * @return        the command to align the robot to the wing
      */
-    public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY) {
+    public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
             new ActiveConditionalCommand(
-                chainRotationalAlignment(driverX, driverY),
+                chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)),
                 climb::getHooksUp);

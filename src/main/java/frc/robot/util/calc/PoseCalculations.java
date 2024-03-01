@@ -27,7 +27,7 @@ public class PoseCalculations implements Logged {
         double leftIntercept = getChainIntercept(relativePosition.getY() - ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
         double rightIntercept = getChainIntercept(relativePosition.getY() + ClimbConstants.DISTANCE_FROM_ORIGIN_METERS);
 
-        return Pair.of(leftIntercept - 0.6, rightIntercept - 0.6);
+        return Pair.of(leftIntercept - 0.45, rightIntercept - 0.45);
     }
 
     /**
