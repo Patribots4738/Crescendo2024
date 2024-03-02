@@ -535,4 +535,8 @@ public class RobotContainer implements Logged {
             highNotePose3ds[i] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
     }
+
+    public Command getAutomaticShooterSpeeds() {
+        return shooterCmds.prepareFireCommandAuto(swerve::getPose);
+    }
 }

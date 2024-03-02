@@ -137,6 +137,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        robotContainer.getAutomaticShooterSpeeds().schedule();
     }
 
     @Override

@@ -51,7 +51,7 @@ public class Shooter extends SubsystemBase implements Logged{
     public void periodic() {
         currentLeftSpeed = motorLeft.getVelocity();
         currentRightSpeed = motorRight.getVelocity();
-
+        
         atDesiredRPM = 
             MathUtil.isNear(
                 currentLeftSpeed, targetLeftSpeed,

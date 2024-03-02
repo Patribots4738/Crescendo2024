@@ -153,6 +153,8 @@ public final class Constants {
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
 
+        public static final double SHOOTER_DEFAULT_RPM = 3000;
+        
         public static final double SHOOTER_PASS_SECONDS = 2;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
@@ -810,6 +812,9 @@ public final class Constants {
             add(GeometryUtil.flipFieldPose(M_POSE2D));
             add(GeometryUtil.flipFieldPose(W3_POSE2D));
         }};
+
+        // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
+        public static final double AUTO_SHOOTER_DISTANCE_THRESHOLD = 6.5;
 
         public static List<Pose2d> GET_SHOOTING_POSITIONS() {
             int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;

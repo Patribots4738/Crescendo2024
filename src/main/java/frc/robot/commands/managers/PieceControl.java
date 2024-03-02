@@ -11,7 +11,10 @@ import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Trapper;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Annotations.Log;
@@ -278,5 +281,19 @@ public class PieceControl {
                     ),
                 Commands.none(),
                 () -> getShooterMode() != shooterMode);
+    }
+
+    // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
+    public Command setAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speedSupplier) {
+        return Commands.run(() -> {
+            Pose2d pose = robotPose.get();
+            Pose2d distance = pose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
+            double distanceToSpeaker = distance.getTranslation().getNorm();
+
+            if (distanceToSpeaker < FieldConstants.AUTO_SHOOTER_DISTANCE_THRESHOLD) {
+                shooterCmds.setTriplet(SpeedAngleTriplet.of(ShooterConstants.SHOOTER_DEFAULT_RPM, ShooterConstants.SHOOTER_DEFAULT_RPM, shooterCmds.getTriplet().getAngle()));
+            }
+        }, 
+        shooterCmds.getShooter(), intake);
     }
 }
