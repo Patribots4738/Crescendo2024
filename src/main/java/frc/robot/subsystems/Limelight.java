@@ -163,11 +163,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public boolean noteInVision() {
         Results results = getResults();
-        return (
-            results.valid && (!(results.botpose[0] == 0 && results.botpose[1] == 0))
-            && (LimelightHelpers.getTA("limelight") >= 0.3 
-                || results.targets_Detector.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
-            && getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25;
+        return (hasTarget(results));
     }
 
     public Pose2d getPose2d() {
@@ -256,6 +252,17 @@ public class Limelight extends SubsystemBase implements Logged{
         boolean isFacing = Math.signum(tagPose.getRotation().toRotation2d().minus(cameraPose.getRotation().toRotation2d()).getDegrees()) == -1;
         
         return angleCheck && distanceCheck && isFacing;
+    }
+
+    public boolean hasTarget(Results results) {
+        if(results == null) return false;
+        if(!results.valid) return false;
+        if(results.botpose[0] == 0 && results.botpose[1] == 0) return false;
+        if((LimelightHelpers.getTA("limelight") >= 0.3 
+            || results.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4)) 
+            return false;
+        if(getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25) return false;
+        return true;
     }
 
     // https://github.com/StuyPulse/Alfred/blob/c7ebcdf0e586a32e6e28b5b808fb6aee6deee325/src/main/java/frc/util/Limelight.java#L28

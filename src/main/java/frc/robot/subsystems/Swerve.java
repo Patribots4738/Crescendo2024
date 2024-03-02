@@ -13,7 +13,9 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -26,6 +28,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -93,14 +97,22 @@ public class Swerve extends SubsystemBase implements Logged {
             // This is because we assume that the IMU is very accurate.
             // You can visualize these graphs working together here:
             // https://www.desmos.com/calculator/a0kszyrwfe
-            VecBuilder.fill(0.1, 0.1, 0.05),
             // State measurement
             // standard deviations
             // X, Y, theta
-            VecBuilder.fill(0.8, 0.8, 2.5)
-    // Vision measurement
-    // standard deviations
-    // X, Y, theta
+            VecBuilder.fill(
+                Units.feetToMeters(0.3), 
+                Units.feetToMeters(0.3), 
+                Units.degreesToRadians(3)
+            ),
+            // Vision measurement
+            // standard deviations
+            // X, Y, theta
+            VecBuilder.fill(
+                Units.feetToMeters(2.5), 
+                Units.feetToMeters(2.5), 
+                Units.degreesToRadians(20)
+            )
     );
 
     /**
