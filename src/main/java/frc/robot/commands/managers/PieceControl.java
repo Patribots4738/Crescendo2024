@@ -3,6 +3,7 @@ package frc.robot.commands.managers;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,7 +12,6 @@ import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Trapper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -30,6 +30,8 @@ public class PieceControl {
     private ShooterCmds shooterCmds;
 
     private boolean shooterMode = true;
+
+    private boolean automaticShooting = false;
 
     // State representing if we are trying to unstuck the elevator
     @Log
@@ -70,11 +72,13 @@ public class PieceControl {
         return Commands.sequence(
                 intake.inCommand(),
                 trapper.intake(),
+                setAutomaticShooterSpeeds(() -> false),
                 indexer.toShooter(),
                 NT.getWaitCommand("noteToShoot1"), // 0.7
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
                 NT.getWaitCommand("noteToShoot2"), // 0.4
-                stopIntakeAndIndexer());
+                stopIntakeAndIndexer(),
+                setAutomaticShooterSpeeds(() -> true));
     }
 
     public Command intakeToTrap() {
@@ -283,8 +287,14 @@ public class PieceControl {
                 () -> getShooterMode() != shooterMode);
     }
 
+    public Command setAutomaticShooterSpeeds(BooleanSupplier automaticShooting) {
+        return Commands.runOnce(() -> {
+            this.automaticShooting = automaticShooting.getAsBoolean();
+        });
+    }
+
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-    public Command setAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speedSupplier) {
+    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.run(() -> {
             Pose2d pose = robotPose.get();
             Pose2d distance = pose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
@@ -293,7 +303,6 @@ public class PieceControl {
             if (distanceToSpeaker < FieldConstants.AUTO_SHOOTER_DISTANCE_THRESHOLD) {
                 shooterCmds.setTriplet(SpeedAngleTriplet.of(ShooterConstants.SHOOTER_DEFAULT_RPM, ShooterConstants.SHOOTER_DEFAULT_RPM, shooterCmds.getTriplet().getAngle()));
             }
-        }, 
-        shooterCmds.getShooter(), intake);
+        }).onlyIf(() -> shooterMode && automaticShooting);
     }
 }

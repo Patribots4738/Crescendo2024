@@ -165,6 +165,13 @@ public class RobotContainer implements Logged {
             () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
         ));
 
+        shooter.setDefaultCommand(
+            pieceControl.getAutomaticShooterSpeeds(
+                swerve::getPose,
+                swerve::getRobotRelativeVelocity
+            )
+        );
+        
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();
         prepareNamedCommands();
@@ -534,9 +541,5 @@ public class RobotContainer implements Logged {
             notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
             highNotePose3ds[i] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
-    }
-
-    public Command getAutomaticShooterSpeeds() {
-        return shooterCmds.prepareFireCommandAuto(swerve::getPose);
     }
 }
