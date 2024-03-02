@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
@@ -41,6 +40,7 @@ public class Robot extends TimedRobot {
 
     public static double currentTimestamp = 0;
     public static double previousTimestamp = 0;
+    public static double teleopStart = 0;
 
     private Command autonomousCommand;
 
@@ -69,11 +69,12 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        Monologue.updateAll();
-        CommandScheduler.getInstance().run();
-
+        // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
+        
+        Monologue.updateAll();
+        CommandScheduler.getInstance().run();
     }
 
     @Override

@@ -112,6 +112,8 @@ public class RobotContainer implements Logged {
     public static SwerveModuleState[] swerveMeasuredStates;
     @Log
     public static SwerveModuleState[] swerveDesiredStates;
+    @Log
+    public static double gamemodeStart = 0;
     
     public RobotContainer() {
         
@@ -172,27 +174,25 @@ public class RobotContainer implements Logged {
         
         configureButtonBindings();
         configureLoggingPaths();
-        configureTimedEvents();
-
-
+        
+        
     }
-
+    
     private void configureButtonBindings() {
         configureDriverBindings(driver);
         configureOperatorBindings(operator);
         configureTestBindings();
-
+        configureTimedEvents();
+    }
+    
+    private void configureTimedEvents() {
+        new Trigger(() -> Robot.currentTimestamp - gamemodeStart >= 134.8 && intake.getPossession())
+        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
+            .alongWith(pieceControl.coastIntakeAndIndexer()));
+        
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
-    }
-
-    private void configureTimedEvents() {
-        new Trigger(() -> Robot.currentTimestamp >= 119.8 && intake.getPossession() && DriverStation.isFMSAttached())
-            .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
-
-        new Trigger(() -> Robot.gameMode == Robot.GameMode.DISABLED)
-            .onTrue(setAllCoast());
     }
 
     private void configureTestBindings() {
@@ -404,16 +404,9 @@ public class RobotContainer implements Logged {
         } else if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
+        gamemodeStart = Robot.currentTimestamp;
         pathPlannerStorage.updatePathViewerCommand().schedule();
         this.freshCode = false;
-    }
-
-    public Command setAllCoast() {
-        return Commands.sequence(
-            intake.setCoastMode(),
-            indexer.setCoastMode(),
-            trapper.setCoastMode()
-        );
     }
 
     public void updateNTGains() {
