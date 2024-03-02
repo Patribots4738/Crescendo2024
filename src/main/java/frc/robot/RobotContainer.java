@@ -35,6 +35,7 @@ import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.LedStrip;
 import frc.robot.leds.commands.LPI;
 import frc.robot.leds.commands.animations.LEDFollowerCommand;
+import frc.robot.leds.commands.animations.LEDWaveCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -201,6 +202,20 @@ public class RobotContainer implements Logged {
                     elevator::getPosition, 
                     TrapConstants.ELEVATOR_TOP_LIMIT, 
                     Color.kRed)
+            );
+
+        driver.povUp()
+            .onTrue(
+                new LEDWaveCommand()
+                    .new Flash(
+                        ledStrip.getLEDCommands(),  
+                        255, 
+                        ledStrip.getBuffer().getLength(),    
+                        127.5, 
+                        0.9,    
+                        Math.PI*2, 
+                        0,
+                        1.0)
             );
     }
 

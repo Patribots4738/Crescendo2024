@@ -8,8 +8,8 @@ import frc.robot.leds.LedStrip;
 
 public class LEDCommands extends Command {
     protected LedStrip ledStrip;    
-    static double waveHueOffset = 1;
-    static double waveValueOffset = 1;
+    static double hueTime = 1;
+    static double valueTime = 1;
     
     public LEDCommands(LedStrip ledStrip, Set<Subsystem> requirements) {
         super();
@@ -22,7 +22,11 @@ public class LEDCommands extends Command {
         this(ledStrip, Set.of());
     }
 
-    public enum HSV {
-        HUE, SATURATION, VALUE
+    public enum HSV_Flash {
+        HUE, SATURATION, VALUE, FLASH
+    }
+
+    protected boolean evalRoot(LEDCommands root) {
+        return root == null;
     }
 }

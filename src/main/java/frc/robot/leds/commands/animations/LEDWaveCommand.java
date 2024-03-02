@@ -2,22 +2,37 @@ package frc.robot.leds.commands.animations;
 
 import java.util.Set;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.leds.LedStrip.PatriColors;
-import frc.robot.leds.commands.animations.LEDCommands.HSV;
+import frc.robot.leds.commands.animations.LEDCommands.HSV_Flash;
 
 public class LEDWaveCommand {
 
-    protected void evaluateWave(LEDCommands root, double scale, double spacing, double time, int x, HSV hsvMode,
+    private void evaluateWave(LEDCommands root, double scale, double spacing, double time, int x, HSV_Flash hsvMode,
             double height, int hueVal) {
+        
+        if (root == null)
+            return;
+        
         double wave = Math.sin((10 * x + (spacing * time)) / spacing);
         int output = (int) ((height + scale * wave));
+        
         switch (hsvMode) {
             case HUE -> root.ledStrip.setLED(x, PatriColors.fromHSV360(output, 255, 255));
             case VALUE -> root.ledStrip.setLED(x, PatriColors.fromHSV360(hueVal, 255, output));
             case SATURATION -> root.ledStrip.setLED(x, PatriColors.fromHSV360(hueVal, output, 255));
+            case FLASH -> {
+                output = (int) Math.signum(wave);
+                if(output > 0) {
+                    root.ledStrip.setLED(PatriColors.fromHSV360(hueVal, 255, 255));
+                } else {
+                    root.ledStrip.setLED(PatriColors.fromHSV360(0, 0, 0));
+                }
+            }
             default -> {
             }
         }
@@ -32,20 +47,20 @@ public class LEDWaveCommand {
         private LEDCommands root;
         private Command waveHueFunction;
 
-        protected void waveHueFunction() {
+        private void waveHueFunction() {
             for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
                     root,
                     scale,
                     spacing,
-                    waveHueOffset,
+                    hueTime,
                     i,
-                    HSV.HUE,
+                    HSV_Flash.HUE,
                     height,
                     180);
             }
-            waveHueOffset += waveSpeed;
-            waveHueOffset %= waveRange;
+            hueTime += waveSpeed;
+            hueTime %= waveRange;
         }
 
         public Hue(LEDCommands root, double scale, double spacing, double height, double waveSpeed, double waveRange) {
@@ -61,7 +76,7 @@ public class LEDWaveCommand {
             this.waveSpeed = waveSpeed;
             this.waveRange = waveRange;
             this.waveHueFunction = Commands.run(() -> waveHueFunction(), requirements.toArray(new Subsystem[0]))
-                    .ignoringDisable(true);
+                .ignoringDisable(true);
         }
 
         // Called every time the scheduler runs while the command is scheduled.
@@ -82,20 +97,20 @@ public class LEDWaveCommand {
         private LEDCommands root;
         private final Command waveValueFunction;
 
-        protected void waveValueFunction() {
+        private void waveValueFunction() {
             for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
                     root,
                     scale,
                     spacing,
-                    waveValueOffset,
+                    valueTime,
                     i,
-                    HSV.VALUE,
+                    HSV_Flash.VALUE,
                     height,
                     hueVal);
             }
-            waveValueOffset += waveValueIncrement;
-            waveValueOffset %= waveRange;
+            valueTime += waveValueIncrement;
+            valueTime %= waveRange;
         }
 
         public Value(LEDCommands root, double scale, double spacing, double height, double waveValueIncrement, double waveRange,
@@ -137,20 +152,20 @@ public class LEDWaveCommand {
         private LEDCommands root;
         private final Command waveSaturationFunction;
 
-        protected void waveSaturationFunction() {
+        private void waveSaturationFunction() {
             for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
                 evaluateWave(
                     root,
                     scale,
                     spacing,
-                    waveValueOffset,
+                    valueTime,
                     i,
-                    HSV.SATURATION,
+                    HSV_Flash.SATURATION,
                     height,
                     hueVal);
             }
-            waveValueOffset += waveSaturationIncrement;
-            waveValueOffset %= waveRange;
+            valueTime += waveSaturationIncrement;
+            valueTime %= waveRange;
         }
 
         public Saturation(LEDCommands root, double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
@@ -177,5 +192,68 @@ public class LEDWaveCommand {
         public void execute() {
             waveSaturationFunction.execute();
         }
+    }
+
+    public class Flash extends LEDCommands {
+        private LEDCommands root;
+        private final double timeIncrement;
+        private final double waveRange;
+        private final double scale;
+        private final double spacing;
+        private final double height;
+        private final int hueVal;
+        private final double duration;
+        private double startTime;
+
+        public Flash(LEDCommands root, double scale, double spacing, double height, double timeIncrement, double waveRange,
+                int hueVal, double duration) {
+            this(root, scale, spacing, height, timeIncrement, waveRange, hueVal, duration, Set.of());
+        }
+
+        public Flash(LEDCommands root, double scale, double spacing, double height, double timeIncrement, double waveRange,
+                int hueVal, double duration, Set<Subsystem> requirements) {
+            super(root.ledStrip, requirements);
+            this.scale = scale;
+            this.spacing = spacing;
+            this.height = height;
+            this.timeIncrement = timeIncrement;
+            this.waveRange = waveRange;
+            this.hueVal = hueVal;
+            this.root = root;
+            this.duration = duration;
+        }
+
+        @Override
+        public void initialize() {
+            startTime = Robot.currentTimestamp;
+        }
+
+        // Called every time the scheduler runs while the command is scheduled.
+        @Override
+        public void execute() {
+            for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
+                evaluateWave(
+                    root,
+                    scale,
+                    spacing,
+                    valueTime,
+                    i,
+                    HSV_Flash.FLASH,
+                    height,
+                    hueVal);
+            }
+            valueTime += timeIncrement;
+            valueTime %= waveRange;
+        }
+
+        @Override
+        public boolean isFinished() {
+            return Robot.currentTimestamp - startTime > duration;
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            root.ledStrip.setLED(Color.kBlack);
+        };
     }
 }
