@@ -500,6 +500,35 @@ public final class Constants {
                 10
         );
 
+
+        public static final HashMap<LED_SECTIONS, Pair<Integer,Integer>> LED_SECTION_MAP = new HashMap<>(){{
+            put(LED_SECTIONS.ELEVATOR1, LED_SECTIONS.ELEVATOR1.getIndexRange());
+            put(LED_SECTIONS.ELEVATOR2, LED_SECTIONS.ELEVATOR2.getIndexRange());
+            put(LED_SECTIONS.PIVOT, LED_SECTIONS.PIVOT.getIndexRange());
+            put(LED_SECTIONS.CLIMB1, LED_SECTIONS.CLIMB1.getIndexRange());
+            put(LED_SECTIONS.CLIMB2, LED_SECTIONS.CLIMB2.getIndexRange());
+            put(LED_SECTIONS.BUMPERS, LED_SECTIONS.BUMPERS.getIndexRange());
+        }};
+
+        public enum LED_SECTIONS {
+            ELEVATOR1(Pair.of(0, 50)),
+            ELEVATOR2(Pair.of(51, 100)),
+            PIVOT(Pair.of(101, 150)),
+            CLIMB1(Pair.of(151, 200)),
+            CLIMB2(Pair.of(201, 250)),
+            BUMPERS(Pair.of(251, 300));
+    
+            private Pair<Integer, Integer> indexRange;
+    
+            LED_SECTIONS(Pair<Integer, Integer> indexRange) {
+                this.indexRange = indexRange;
+            }
+    
+            public Pair<Integer, Integer> getIndexRange() {
+                return indexRange;
+            }
+        }
+        
         public static final int NORTH = 0;
         public static final int NORTHEAST = 1;
         public static final int EAST = 2;
