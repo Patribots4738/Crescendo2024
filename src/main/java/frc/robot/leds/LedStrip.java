@@ -97,4 +97,63 @@ public class LedStrip extends SubsystemBase {
         });
     }
 
+    public class PatriColors extends Color {
+
+        /**
+         * Creates a new PatriColors object with the specified HSV values.
+         * 
+         * @param h the hue value (0-360)
+         * @param s the saturation value (0-100)
+         * @param v the value/brightness value (0-100)
+         */
+        public PatriColors(int h, int s, int v) {
+            PatriColors.fromHSV360(h, s, v);
+        }
+
+        /**
+         * Creates a Color from HSV values.
+         *
+         * @param h The h value [0-360)
+         * @param s The s value [0-255]
+         * @param v The v value [0-255]
+         * @return The color
+         */
+        public static Color fromHSV360(int h, int s, int v) {
+            // Loosely based on
+            // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+            // The hue range is split into 60 degree regions where in each region there
+            // is one rgb component at a low value (m), one at a high value (v) and one
+            // that changes (X) from low to high (X+m) or high to low (v-X)
+
+            // Difference between highest and lowest value of any rgb component
+            final int chroma = (s * v) / 255;
+
+            // Because hue is 0-360 rather than 0-180 use 60 not 30
+            final int region = (h / 60) % 6;
+
+            // Remainder converted from 0-30 to 0-255
+            final int remainder = (int) Math.round((h % 30) * (255 / 30.0));
+
+            // Value of the lowest rgb component
+            final int m = v - chroma;
+
+            // Goes from 0 to chroma as hue increases
+            final int X = (chroma * remainder) >> 8;
+
+            switch (region) {
+                case 0:
+                    return new Color(v, X + m, m);
+                case 1:
+                    return new Color(v - X, v, m);
+                case 2:
+                    return new Color(m, v, X + m);
+                case 3:
+                    return new Color(m, v - X, v);
+                case 4:
+                    return new Color(X + m, m, v);
+                default:
+                    return new Color(v, m, v - X);
+            }
+        }
+    }
 }

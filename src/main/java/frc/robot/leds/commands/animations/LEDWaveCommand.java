@@ -2,44 +2,25 @@ package frc.robot.leds.commands.animations;
 
 import java.util.Set;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.leds.LedStrip;
+import frc.robot.leds.LedStrip.PatriColors;
 import frc.robot.leds.commands.animations.LEDCommands.HSV;
 
 public class LEDWaveCommand {
 
     protected void evaluateWave(LEDCommands root, double scale, double spacing, double time, int x, HSV hsvMode,
             double height, int hueVal) {
+        double wave = Math.sin((10 * x + (spacing * time)) / spacing);
+        int output = (int) ((height + scale * wave));
         switch (hsvMode) {
-            case HUE -> evaluateHueWave(root.ledStrip, scale, spacing, time, x, height);
-            case VALUE -> evaluateValueWave(root.ledStrip, scale, spacing, time, x, height, hueVal);
-            case SATURATION -> evaluateSaturationWave(root.ledStrip, scale, spacing, time, x, height, hueVal);
+            case HUE -> root.ledStrip.setLED(x, PatriColors.fromHSV360(output, 255, 255));
+            case VALUE -> root.ledStrip.setLED(x, PatriColors.fromHSV360(hueVal, 255, output));
+            case SATURATION -> root.ledStrip.setLED(x, PatriColors.fromHSV360(hueVal, output, 255));
             default -> {
             }
         }
-    }
-
-    private void evaluateSaturationWave(LedStrip ledStrip, double scale, double spacing, double time, int x,
-            double height, int hueVal) {
-        double wave = Math.sin((10 * x + (spacing * time)) / spacing);
-        int output = (int) ((height + scale * wave) / 1.0);
-        ledStrip.setLED(x, Color.fromHSV(hueVal, output, 255));
-    }
-
-    private void evaluateValueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height,
-            int hueVal) {
-        double wave = Math.sin((10 * x + (spacing * time)) / spacing);
-        int output = (int) ((height + scale * wave) / 1.0);
-        ledStrip.setLED(x, Color.fromHSV(hueVal, 255, output));
-    }
-
-    private void evaluateHueWave(LedStrip ledStrip, double scale, double spacing, double time, int x, double height) {
-        double wave = Math.sin((10 * x + (spacing * time)) / spacing);
-        int output = (int) ((height + scale * wave) / 2.0);
-        ledStrip.setLED(x, Color.fromHSV(output, 255, 255));
     }
 
     public class Hue extends LEDCommands {
