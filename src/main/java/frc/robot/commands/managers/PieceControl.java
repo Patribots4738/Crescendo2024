@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
@@ -188,9 +187,9 @@ public class PieceControl implements Logged{
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
             setReadyToPlaceCommand(false),
-            elevator.setPositionCommand(position, true),
+            elevator.setPositionCommand(position, true)
             // Run until we are no longer in our unstucking state only if elevator actually gets stuck
-            getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
+            // getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
 
@@ -229,9 +228,14 @@ public class PieceControl implements Logged{
     }
 
     public Command prepPiece() {
-        return trapper.intake(NT.getSupplier("prepPiece").getAsDouble());
+        return Commands.sequence(
+            trapper.intake(),
+            NT.getWaitCommand("prepPiece"),
+            trapper.stopCommand()
+        );
     }
 
+    // TODO: possible repurpose for getting unstuck from any position where we have unforeseen problems
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(
@@ -249,7 +253,9 @@ public class PieceControl implements Logged{
         return 
             Commands.sequence(
                 Commands.waitUntil(() -> readyToPlace),
-                trapper.outtake(NT.getSupplier("placeOuttake").getAsDouble()),
+                trapper.outtake(),
+                NT.getWaitCommand("placeOuttake"),
+                trapper.stopCommand(),
                 setReadyToPlaceCommand(false),
                 elevator.toBottomCommand()
             );

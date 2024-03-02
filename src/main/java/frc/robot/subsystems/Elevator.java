@@ -76,11 +76,7 @@ public class Elevator extends SubsystemBase implements Logged {
             TrapConstants.ELEVATOR_BOTTOM_LIMIT,
             TrapConstants.ELEVATOR_TOP_LIMIT);
         
-        if (desiredPos != TrapConstants.AMP_PLACE_POS && pos == TrapConstants.AMP_PLACE_POS) {
-            setAmpMode(true);
-        } else if (desiredPos == TrapConstants.AMP_PLACE_POS && pos != TrapConstants.AMP_PLACE_POS) {
-            setAmpMode(false);
-        }
+        setAmpMode(pos == TrapConstants.AMP_PLACE_POS);
 
         if (desiredPos != pos) {
             desiredPos = pos;
