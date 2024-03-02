@@ -6,9 +6,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.rev.Neo;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Trapper extends SubsystemBase {
+public class Trapper extends SubsystemBase implements Logged {
     private final Neo trapper;
+
+    @Log
     private double desiredSpeed = 0;
 
     public Trapper() {

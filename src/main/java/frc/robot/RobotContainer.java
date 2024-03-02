@@ -280,7 +280,7 @@ public class RobotContainer implements Logged {
             .onTrue(trapper.toggleSpeed());
         
         controller.povDown()
-            .onTrue(elevator.toBottomCommand());
+            .onTrue(pieceControl.elevatorToBottom());
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeToTrap())
@@ -298,6 +298,9 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
+
+        controller.y()
+            .onTrue(pieceControl.placeWhenReady());
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
@@ -485,6 +488,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
+        Monologue.logObj(trapper, "Robot/Subsystems/trapper");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
 
         

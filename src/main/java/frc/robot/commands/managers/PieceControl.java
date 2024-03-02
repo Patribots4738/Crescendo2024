@@ -205,26 +205,9 @@ public class PieceControl implements Logged{
         return Commands.runOnce(() -> setReadyToPlace(readyToPlace));
     }
 
-    // TODO: remove defer when amp position is finalized
-    public Command elevatorToPlacement(boolean amp) {
-        return 
-            Commands.defer(
-                () -> 
-                    Commands.sequence(
-                        Commands.either(
-                            setElevatorPosition(NT.getSupplier("ampPosition")), 
-                            setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
-                            () -> amp),
-                        prepPiece(),
-                        setReadyToPlaceCommand(true)
-                    ),
-                Set.of(elevator, trapper)
-            );
-    }
-
     public Command elevatorToBottom() {
-        return setReadyToPlaceCommand(false)
-                .andThen(elevator.toBottomCommand());
+        return setElevatorPosition(() -> TrapConstants.ELEVATOR_BOTTOM_LIMIT)
+            .andThen(setPlaceWhenReadyCommand(false));
     }
 
     public Command prepPiece() {
@@ -249,16 +232,47 @@ public class PieceControl implements Logged{
             );
     }
 
+    // TODO: remove defer when amp position is finalized
+    public Command elevatorToPlacement(boolean amp) {
+        return 
+            Commands.defer(
+                () -> 
+                    Commands.sequence(
+                        Commands.either(
+                            setElevatorPosition(NT.getSupplier("ampPosition")), 
+                            setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
+                            () -> amp),
+                        prepPiece(),
+                        setReadyToPlaceCommand(true),
+                        placeWhenReady().onlyIf(this::shouldPlaceWhenReady)
+                    ),
+                Set.of(elevator, trapper)
+            );
+    }
+
     public Command placeWhenReady() {
         return 
-            Commands.sequence(
-                Commands.waitUntil(() -> readyToPlace),
-                trapper.outtake(),
-                NT.getWaitCommand("placeOuttake"),
-                trapper.stopCommand(),
-                setReadyToPlaceCommand(false),
-                elevator.toBottomCommand()
-            );
+            new SelectiveConditionalCommand(
+                Commands.sequence(
+                    Commands.sequence(
+                        trapper.outtake(),
+                        NT.getWaitCommand("placeOuttake"),
+                        trapper.stopCommand(),
+                        elevatorToBottom()
+                    )),
+                setPlaceWhenReadyCommand(true),
+                () -> readyToPlace);
+    }
+
+    @Log
+    private boolean placeWhenReady = false;
+
+    public boolean shouldPlaceWhenReady() {
+        return placeWhenReady;
+    }
+
+    public Command setPlaceWhenReadyCommand(boolean placeWhenReady) {
+        return Commands.runOnce(() -> this.placeWhenReady = placeWhenReady);
     }
 
     public Command sourceShooterIntake() {
