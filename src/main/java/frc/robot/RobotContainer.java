@@ -261,7 +261,7 @@ public class RobotContainer implements Logged {
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
-            
+
         controller.leftBumper()
             .onTrue(pieceControl.intakeToTrap())
             .onFalse(pieceControl.stopIntakeAndIndexer());

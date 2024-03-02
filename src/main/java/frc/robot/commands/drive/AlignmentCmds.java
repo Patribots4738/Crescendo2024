@@ -16,6 +16,7 @@ import frc.robot.Robot;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.calc.AlignmentCalc;
@@ -44,12 +45,12 @@ public class AlignmentCmds {
                 ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
                 return new ChassisSpeeds(
                         MathUtil.applyDeadband(
-                            (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond), 
+                            (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond / DriveConstants.MAX_SPEED_METERS_PER_SECOND), 
                             OIConstants.ALIGNMENT_DEADBAND),
                         MathUtil.applyDeadband(
-                            -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 
+                            -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond / DriveConstants.MAX_SPEED_METERS_PER_SECOND), 
                             OIConstants.ALIGNMENT_DEADBAND),
-                        controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
+                        autoSpeedsGet.omegaRadiansPerSecond / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND);
             }, () -> false);
     }
 
