@@ -168,13 +168,12 @@ public class PieceControl implements Logged{
         // This is becuase placeTrap requires pivot, but shootWhenReady does not
         // If they are both required, then we would cancel any command that requires pivot
         // such as prepareSWDCommand
-        return Commands.defer(() -> Commands.either(
-            shootWhenReady(poseSupplier, speedSupplier),
-            placeWhenReady(),
-            this::getShooterMode
-        ), this.getShooterMode()
-            ? shootWhenReady(poseSupplier, speedSupplier).getRequirements() 
-            : placeWhenReady().getRequirements());
+        return 
+            new SelectiveConditionalCommand(
+                shootWhenReady(poseSupplier, speedSupplier),
+                placeWhenReady(),
+                this::getShooterMode
+            );
     }
 
     private Command setDislodging(boolean dislodging) {

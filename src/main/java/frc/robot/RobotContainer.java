@@ -246,7 +246,8 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
         
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)); 
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
+
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
@@ -299,8 +300,6 @@ public class RobotContainer implements Logged {
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
 
-        controller.y()
-            .onTrue(pieceControl.placeWhenReady());
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
