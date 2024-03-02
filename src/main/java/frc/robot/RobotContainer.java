@@ -186,7 +186,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-        new Trigger(() -> Robot.currentTimestamp - gamemodeStart >= 134.8 && intake.getPossession() && !climb.getHooksUp())
+        new Trigger(() -> Robot.currentTimestamp - gamemodeStart >= 134.8)
         .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
             .alongWith(pieceControl.coastIntakeAndIndexer()));
         
