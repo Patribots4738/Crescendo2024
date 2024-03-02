@@ -1,4 +1,4 @@
-package frc.robot.util.custom;
+package frc.robot.commands.managers;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
@@ -8,27 +8,50 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import java.util.function.BooleanSupplier;
 
-public class ActiveConditionalCommand extends Command {
-    
+/**
+ * A command composition that runs a list of commands in sequence.
+ *
+ * <p>
+ * The rules for command compositions apply: command instances that are passed
+ * to it cannot be
+ * added to any other composition or scheduled individually, and the composition
+ * requires all
+ * subsystems its components require.
+ *
+ * <p>
+ * This class is provided by the NewCommands VendorDep
+ */
+public class SelectiveConditionalCommand extends Command {
     private final Command onTrueCommand;
     private final Command onFalseCommand;
-    private final BooleanSupplier condition;
+    private final BooleanSupplier conditionSupplier;
     private Command selectedCommand;
 
-    public ActiveConditionalCommand(Command onTrueCommand, Command onFalseCommand, BooleanSupplier condition) {
-        this.onTrueCommand = requireNonNullParam(onTrueCommand, "onTrue", "ConditionalCommand");
-        this.onFalseCommand = requireNonNullParam(onFalseCommand, "onFalse", "ConditionalCommand");
-        this.condition = requireNonNullParam(condition, "condition", "ConditionalCommand");
+    /**
+     * Creates a new ConditionalCommand.
+     *
+     * @param onTrue    the command to run if the condition is true
+     * @param onFalse   the command to run if the condition is false
+     * @param condition the condition to determine which command to run
+     */
+    public SelectiveConditionalCommand(Command onTrue, Command onFalse, BooleanSupplier condition) {
+        onTrueCommand = requireNonNullParam(onTrue, "onTrue", "ConditionalCommand");
+        onFalseCommand = requireNonNullParam(onFalse, "onFalse", "ConditionalCommand");
+        conditionSupplier = requireNonNullParam(condition, "condition", "ConditionalCommand");
 
-        CommandScheduler.getInstance().registerComposedCommands(onTrueCommand, onFalseCommand);
+        CommandScheduler.getInstance().registerComposedCommands(onTrue, onFalse);
+    }
 
-        m_requirements.addAll(this.onTrueCommand.getRequirements());
-        m_requirements.addAll(this.onFalseCommand.getRequirements());
+    @Override
+    public void schedule() {
+        // Only require the requirements of the command which is about to run
+        m_requirements = conditionSupplier.getAsBoolean() ? onTrueCommand.getRequirements() : onFalseCommand.getRequirements();
+        super.schedule();
     }
 
     @Override
     public void initialize() {
-        if (condition.getAsBoolean()) {
+        if (conditionSupplier.getAsBoolean()) {
             selectedCommand = onTrueCommand;
         } else {
             selectedCommand = onFalseCommand;
@@ -38,11 +61,6 @@ public class ActiveConditionalCommand extends Command {
 
     @Override
     public void execute() {
-        if (condition.getAsBoolean() ^ (selectedCommand == onTrueCommand))
-        {
-            selectedCommand.end(true);
-            this.initialize();
-        }
         selectedCommand.execute();
     }
 

@@ -89,6 +89,7 @@ public class RobotContainer implements Logged {
     private Trapper trapper;
     private ShooterCmds shooterCmds;
 
+    @IgnoreLogged
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
     private final BooleanSupplier robotRelativeSupplier;
@@ -263,7 +264,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors());
             
         controller.leftBumper()
-            .onTrue(pieceControl.intakeToTrap())
+            .onTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -285,7 +286,7 @@ public class RobotContainer implements Logged {
             .onTrue(elevator.toBottomCommand());
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeToTrap())
+            .whileTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -307,6 +308,7 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
+            
         controller.a()
             .onTrue(pieceControl.panicEjectNote())
             .onFalse(pieceControl.stopPanicEject());
@@ -333,7 +335,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeToTrap())
+            .whileTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
@@ -487,6 +489,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
         Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
         Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
+        Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
 
         Monologue.logObj(swerve, "Robot/Swerve");
 
