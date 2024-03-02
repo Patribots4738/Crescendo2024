@@ -18,6 +18,8 @@ public class Drive extends Command {
     private final DoubleSupplier rotationSupplier;
     private final BooleanSupplier fieldRelativeSupplier;
     private final BooleanSupplier shouldMirror;
+    private final BooleanSupplier multiplyXY;
+    private final BooleanSupplier multiplyTheta;
 
     public Drive(
             Swerve swerve,
@@ -25,7 +27,9 @@ public class Drive extends Command {
             DoubleSupplier ySupplier,
             DoubleSupplier rotationsSupplier,
             BooleanSupplier fieldRelativeSupplier,
-            BooleanSupplier shouldMirror) {
+            BooleanSupplier shouldMirror,
+            BooleanSupplier multiplyXY,
+            BooleanSupplier multiplyTheta) {
 
         this.swerve = swerve;
 
@@ -35,11 +39,19 @@ public class Drive extends Command {
 
         this.fieldRelativeSupplier = fieldRelativeSupplier;
         this.shouldMirror = shouldMirror;
+        this.multiplyXY = multiplyXY;
+        this.multiplyTheta = multiplyTheta;
 
         addRequirements(swerve);
     }
 
-    public Drive(Swerve swerve, Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelativeSupplier, BooleanSupplier shouldMirror) {
+    public Drive(
+            Swerve swerve, 
+            Supplier<ChassisSpeeds> speeds, 
+            BooleanSupplier fieldRelativeSupplier, 
+            BooleanSupplier shouldMirror,
+            BooleanSupplier multiplyXY,
+            BooleanSupplier multiplyTheta) {
 
         this.swerve = swerve;
 
@@ -49,6 +61,8 @@ public class Drive extends Command {
 
         this.fieldRelativeSupplier = fieldRelativeSupplier;
         this.shouldMirror = shouldMirror;
+        this.multiplyXY = multiplyXY;
+        this.multiplyTheta = multiplyTheta;
 
         addRequirements(swerve);
     }
@@ -73,9 +87,9 @@ public class Drive extends Command {
         }
         else {
             swerve.drive(
-                x * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
-                y * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
-                rotation * DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * swerve.getSpeedMultiplier(),
+                x * (multiplyXY.getAsBoolean() ? DriveConstants.MAX_SPEED_METERS_PER_SECOND : 1) * swerve.getSpeedMultiplier(),
+                y * (multiplyXY.getAsBoolean() ? DriveConstants.MAX_SPEED_METERS_PER_SECOND : 1) * swerve.getSpeedMultiplier(),
+                rotation * (multiplyTheta.getAsBoolean() ? DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND : 1) * swerve.getSpeedMultiplier(),
                 fieldRelativeSupplier.getAsBoolean());
         }
     }

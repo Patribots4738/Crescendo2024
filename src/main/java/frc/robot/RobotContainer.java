@@ -162,7 +162,9 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX()/1.6,
             robotRelativeSupplier,
-            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
+            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance()),
+            () -> true,
+            () -> true
         ));
 
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
@@ -261,7 +263,7 @@ public class RobotContainer implements Logged {
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
-            
+
         controller.leftBumper()
             .onTrue(pieceControl.intakeToTrap())
             .onFalse(pieceControl.stopIntakeAndIndexer());

@@ -50,7 +50,11 @@ public class AlignmentCmds {
                             -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 
                             OIConstants.ALIGNMENT_DEADBAND),
                         controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
-            }, () -> false);
+            }, () -> false, () -> false, () -> false);
+    }
+
+    public Command getRotationalAlignmentCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier robotRelativeSupplier) {
+            return swerve.getDriveCommand(speeds, robotRelativeSupplier, () -> true, () -> false);
     }
 
     public Command ampAlignmentCommand(DoubleSupplier driverX) {
@@ -69,10 +73,7 @@ public class AlignmentCmds {
 
     public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return 
-            swerve.getDriveCommand(
-                alignmentCalc.getChainRotationalSpeedsSupplier(driverX, driverY), 
-                robotRelativeSupplier
-        );
+            getRotationalAlignmentCommand(alignmentCalc.getChainRotationalSpeedsSupplier(driverX, driverY), robotRelativeSupplier);
     }    
 
     /**
@@ -84,15 +85,13 @@ public class AlignmentCmds {
      */
     public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return 
-            swerve.getDriveCommand(
-                alignmentCalc.getSourceRotationalSpeedsSupplier(driverX, driverY), 
-                robotRelativeSupplier
-        );
+            getRotationalAlignmentCommand(alignmentCalc.getSourceRotationalSpeedsSupplier(driverX, driverY), robotRelativeSupplier);
+
     }
 
     public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return 
-            swerve.getDriveCommand(
+            getRotationalAlignmentCommand(
                 alignmentCalc.getSpeakerRotationalSpeedsSupplier(
                     driverX,
                     driverY,
@@ -176,7 +175,7 @@ public class AlignmentCmds {
             () -> pose,
             Robot::isRedAlliance
         ).alongWith(
-            swerve.getDriveCommand(() -> {
+            getRotationalAlignmentCommand(() -> {
                 Translation2d endingPose = pose;
                 if (Robot.isRedAlliance()) {
                     endingPose = GeometryUtil.flipFieldPosition(pose);
