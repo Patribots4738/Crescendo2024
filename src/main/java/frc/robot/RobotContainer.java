@@ -33,7 +33,9 @@ import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.LedStrip;
+import frc.robot.leds.LedStrip.PatriColors;
 import frc.robot.leds.commands.LPI;
+import frc.robot.leds.commands.animations.LEDColorCommand;
 import frc.robot.leds.commands.animations.LEDFollowerCommand;
 import frc.robot.leds.commands.animations.LEDWaveCommand;
 import frc.robot.subsystems.*;
@@ -178,9 +180,9 @@ public class RobotContainer implements Logged {
     }
 
     private void configureButtonBindings() {
-        configureDriverBindings(driver);
-        configureOperatorBindings(operator);
-        configureTestBindings();
+        // configureDriverBindings(driver);
+        // configureOperatorBindings(operator);
+        // configureTestBindings();
 
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
@@ -192,7 +194,7 @@ public class RobotContainer implements Logged {
                     ledStrip.getLEDCommands(), 
                     elevator::getPosition, 
                     TrapConstants.ELEVATOR_TOP_LIMIT, 
-                    Color.kAqua)
+                    Color.kBlue)
             );
 
         new Trigger(() -> elevator.getDesiredPosition() == 0)
@@ -204,7 +206,7 @@ public class RobotContainer implements Logged {
                     Color.kRed)
             );
 
-        driver.povUp()
+        operator.povUp()
             .onTrue(
                 new LEDWaveCommand()
                     .new Flash(
@@ -217,6 +219,18 @@ public class RobotContainer implements Logged {
                         0,
                         1.0)
             );
+
+        operator.rightBumper()
+          .whileTrue(
+            new LEDColorCommand(ledStrip.getLEDCommands(), Color.kRed, 0, 300)
+          );
+
+        
+
+        //operator.leftTrigger()
+          //.whileTrue(
+            
+          //);
     }
 
     private void configureTestBindings() {

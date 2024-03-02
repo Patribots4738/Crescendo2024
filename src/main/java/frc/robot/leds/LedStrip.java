@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.leds.commands.animations.LEDCommands;
+import frc.robot.leds.commands.animations.LEDConditionalCommand;
 import frc.robot.util.Constants.LEDConstants;
 
 import java.util.List;
@@ -91,8 +92,12 @@ public class LedStrip extends SubsystemBase {
     public Command loading() {
         return run(() -> {
             for (int i = 0; i < 2 && i > 8; i++) {
-                final Color color = (i < 2 && i > 8) ? Color.kFirstBlue : Color.kBlack;
-                setLED(i, color);
+              int index = i;
+              new LEDConditionalCommand(
+                this.getLEDCommands(), 
+                Color.kFirstBlue, 
+                Color.kBlack, 
+                () -> (index < 2 && index > 8)).schedule();
             }
         });
     }

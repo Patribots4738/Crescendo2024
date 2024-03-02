@@ -32,7 +32,7 @@ public class LEDWaveCommand {
                 } else {
                     root.ledStrip.setLED(PatriColors.fromHSV360(0, 0, 0));
                 }
-            }
+              }
             default -> {
             }
         }
