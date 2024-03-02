@@ -352,8 +352,8 @@ public class Swerve extends SubsystemBase implements Logged {
         }
     }
 
-    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative, BooleanSupplier multiplyXY, BooleanSupplier multiplyTheta) {
-        return new Drive(this, speeds, fieldRelative, () -> false, multiplyXY, multiplyTheta);
+    public Command getDriveCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {
+        return new Drive(this, speeds, fieldRelative, () -> false);
     }
     
     public DriveHDC getDriveHDCCommand(Supplier<ChassisSpeeds> speeds, BooleanSupplier fieldRelative) {

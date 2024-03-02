@@ -162,9 +162,7 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX()/1.6,
             robotRelativeSupplier,
-            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance()),
-            () -> true,
-            () -> true
+            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
         ));
 
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
