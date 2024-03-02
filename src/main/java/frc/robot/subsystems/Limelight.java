@@ -39,20 +39,23 @@ public class Limelight extends SubsystemBase implements Logged{
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
-    
+    private int pipelineIndex = 0;
+
     @Log
     public boolean isConnected = false;
 
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
-    public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName) {
+    public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName, int pipelineIndex) {
         // Uses network tables to check status of limelight
         this.limelightName = limelightName;
+        this.pipelineIndex = pipelineIndex;
         timingTestEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName, "TIMING_TEST_ENTRY");
         this.robotPoseSupplier = robotPoseSupplier;
         this.poseEstimator = poseEstimator;
         loadAprilTagFieldLayout();
+        setPipelineIndex(pipelineIndex);
     }
 
     @Override
@@ -121,6 +124,10 @@ public class Limelight extends SubsystemBase implements Logged{
         return LimelightHelpers.getLatestResults(limelightName).targetingResults;
     }
 
+    public void setPipelineIndex(int index) {
+        LimelightHelpers.setPipelineIndex(limelightName, index);
+    }
+
     private LimelightTarget_Fiducial[] getTags() {
         LimelightTarget_Fiducial[] fiducials = LimelightHelpers.getLatestResults(limelightName).targetingResults.targets_Fiducials;
         
@@ -160,7 +167,7 @@ public class Limelight extends SubsystemBase implements Logged{
         return (
             results.valid && (!(results.botpose[0] == 0 && results.botpose[1] == 0))
             && (LimelightHelpers.getTA("limelight") >= 0.3 
-                || results.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
+                || results.targets_Detector.length > 1 && LimelightHelpers.getTA("limelight") > 0.4))
             && getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25;
     }
 
