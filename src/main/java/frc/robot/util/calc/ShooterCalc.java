@@ -34,7 +34,7 @@ public class ShooterCalc implements Logged {
     double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
 
     @Log
-    double distance = 0;
+    public double distance = 0;
 
     /**
      * Calculates the shooter speeds required to reach the speaker position.
