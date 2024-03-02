@@ -106,8 +106,8 @@ public class Swerve extends SubsystemBase implements Logged {
             // standard deviations
             // X, Y, theta
             VecBuilder.fill(
-                Units.feetToMeters(2.5), 
-                Units.feetToMeters(2.5), 
+                Units.feetToMeters(3), 
+                Units.feetToMeters(3), 
                 Units.degreesToRadians(20)
             )
     // Vision measurement
