@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.890547398116074,
-        "y": 5.561729376538261
+        "x": 2.8877895157805993,
+        "y": 5.465203494796687
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.585543742516057,
-        "y": 5.394680503646721
+        "x": 1.5827858601805822,
+        "y": 5.298154621905147
       },
       "isLocked": false,
       "linkedName": "W2"
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "PrepareShooter",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.4,
       "command": {
         "type": "parallel",
         "data": {
@@ -51,14 +51,14 @@
   ],
   "globalConstraints": {
     "maxVelocity": 6.08,
-    "maxAcceleration": 7.378,
-    "maxAngularVelocity": 45.0,
-    "maxAngularAcceleration": 60.0
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 1137.21,
+    "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
     "rotation": -152.53613820423004,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Wings",

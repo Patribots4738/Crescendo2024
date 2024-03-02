@@ -15,10 +15,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
@@ -89,24 +88,24 @@ public class Limelight extends SubsystemBase implements Logged{
     
         if (result.valid) {
             double xyStds;
-            double degStds;
+            double radStds;
             // multiple targets detected
             if (result.targets_Fiducials.length >= 2) {
                 // TODO: TUNE
-                xyStds = 0.5;
-                degStds = 3;
+                xyStds = 0.8;
+                radStds = 1.2;
             }
             // 1 target with large area and close to estimated pose
             else if (poseDifference < 0.5 && getBestTargetArea(result) > 0.8) {
                 // TODO: TUNE
-                xyStds = 1.0;
-                degStds = 6;
+                xyStds = 1.6;
+                radStds = 4;
             }
             // 1 target farther away and estimated pose is close
             else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.1) {
                 // TODO: TUNE
-                xyStds = 2.0;
-                degStds = 12;
+                xyStds = 2.5;
+                radStds = 6;
             }
             // conditions don't match to add a vision measurement
             else {
@@ -114,9 +113,9 @@ public class Limelight extends SubsystemBase implements Logged{
             }
     
             poseEstimator.setVisionMeasurementStdDevs(
-                VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
+                VecBuilder.fill(xyStds, xyStds, radStds));
             poseEstimator.addVisionMeasurement(estimatedRobotPose,
-                Robot.currentTimestamp - getLatencyDiffSeconds(result));
+                Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
         }
     }
 

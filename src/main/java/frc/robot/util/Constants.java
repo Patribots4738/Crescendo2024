@@ -387,6 +387,7 @@ public final class Constants {
             "S C1-5 S",
             "S W1 A C1-5 S",
             "S W3-1 S",
+            "S W3-1 S Proxy",
             "S W3-1 S C1-3 S"
         };
     }
@@ -461,7 +462,7 @@ public final class Constants {
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
-        public static final int VORTEX_CURRENT_LIMIT = 80; // amps
+        public static final int VORTEX_CURRENT_LIMIT = 50; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
     }
 

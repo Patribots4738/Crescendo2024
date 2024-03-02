@@ -57,6 +57,11 @@ public class PieceControl {
                 .andThen(noteToShoot(poseSupplier, speedSupplier));
     }
 
+    public Command shootPreload() {
+        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+                .andThen(intakeAuto());
+    }
+
     // TODO: Possibly split this into two commands where one sends to shooter
     // without waiting
     public Command noteToShoot(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
