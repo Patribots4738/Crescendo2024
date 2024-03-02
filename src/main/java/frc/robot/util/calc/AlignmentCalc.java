@@ -11,6 +11,7 @@ import frc.robot.Robot;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 
 public class AlignmentCalc {
@@ -73,11 +74,7 @@ public class AlignmentCalc {
      */
     public ChassisSpeeds getChainRotationalSpeeds(double driverX, double driverY) {
         Pose2d closestChain = PoseCalculations.getClosestChain(swerve.getPose());
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(closestChain.getRotation())
-        );
+        return getRotationalSpeeds(driverX, driverY, closestChain.getRotation());
     }
 
     /**
@@ -101,11 +98,7 @@ public class AlignmentCalc {
      */
     public ChassisSpeeds getSourceRotationalSpeeds(double driverX, double driverY) {
         Pose2d source = FieldConstants.GET_SOURCE_POSITION();
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(source.getRotation())
-        );
+        return getRotationalSpeeds(driverX, driverY, source.getRotation());
     }
 
     /**
@@ -128,10 +121,8 @@ public class AlignmentCalc {
      * @return the rotational speeds to align the robot to the speaker
      */
     public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity())));
+        return 
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
     /**
@@ -140,13 +131,13 @@ public class AlignmentCalc {
      * @param driverX      the driver's x input
      * @param driverY      the driver's y input
      * @param desiredAngle the desired angle
-     * @return the rotational speeds to align the robot to the speaker
+     * @return the rotational speeds to align the robot
      */
     public ChassisSpeeds getRotationalSpeeds(double driverX, double driverY, Rotation2d desiredAngle) {
         return new ChassisSpeeds(
             driverY * (Robot.isRedAlliance() ? -1 : 1),
             driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(desiredAngle));
+            getAlignmentSpeeds(desiredAngle) / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND);
     }
 
     /**
