@@ -130,10 +130,10 @@ public class Neo extends SafeSpark implements Logged {
 
         if (targetPosition != position){
             setHasControl(false);
-            targetPosition = position;
         } else {
             setHasControl(true);
         }
+        targetPosition = position;
 
         controlType = ControlLoopType.POSITION;
     }
@@ -183,10 +183,10 @@ public class Neo extends SafeSpark implements Logged {
         
         if (targetPercent != percent){
             setHasControl(false);
-            targetPercent = percent;
         } else {
             setHasControl(true);
         }
+        targetPercent = percent;
         
         controlType = ControlLoopType.PERCENT;
     }
@@ -237,10 +237,10 @@ public class Neo extends SafeSpark implements Logged {
 
         if (targetVelocity != velocity){
             setHasControl(false);
-            targetVelocity = velocity;
         } else {
             setHasControl(true);
         }
+        targetVelocity = velocity;
 
         controlType = ControlLoopType.VELOCITY;
     }
@@ -498,7 +498,7 @@ public class Neo extends SafeSpark implements Logged {
             && this.getOutputCurrent() > currentThreshold;
     }
 
-    public void setPossiblyControlled() {
+    public void resetTimer() {
         lastDesiredChangeTimestamp = Robot.currentTimestamp;
     }
 
