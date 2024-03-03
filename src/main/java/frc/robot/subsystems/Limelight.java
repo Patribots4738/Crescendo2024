@@ -38,10 +38,13 @@ public class Limelight extends SubsystemBase implements Logged{
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
-    private int pipelineIndex = 0;
+    private int pipelineIndex;
 
     @Log
     public boolean isConnected = false;
+    
+    @Log
+    private Pose2d estimatedPose2d = new Pose2d();
 
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
@@ -86,7 +89,7 @@ public class Limelight extends SubsystemBase implements Logged{
         double poseDifference = poseEstimator.getEstimatedPosition().getTranslation()
             .getDistance(estimatedRobotPose.getTranslation());
     
-        if (result.valid) {
+        if (hasTarget(result)) {
             double xyStds;
             double radStds;
             // multiple targets detected
@@ -102,7 +105,7 @@ public class Limelight extends SubsystemBase implements Logged{
                 radStds = 4;
             }
             // 1 target farther away and estimated pose is close
-            else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.1) {
+            else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.15) {
                 // TODO: TUNE
                 xyStds = 2.5;
                 radStds = 6;
@@ -111,7 +114,9 @@ public class Limelight extends SubsystemBase implements Logged{
             else {
                 return;
             }
-    
+
+            this.estimatedPose2d = estimatedRobotPose;
+
             poseEstimator.setVisionMeasurementStdDevs(
                 VecBuilder.fill(xyStds, xyStds, radStds));
             poseEstimator.addVisionMeasurement(estimatedRobotPose,
@@ -254,14 +259,17 @@ public class Limelight extends SubsystemBase implements Logged{
         return angleCheck && distanceCheck && isFacing;
     }
 
-    public boolean hasTarget(Results results) {
-        if(results == null) return false;
-        if(!results.valid) return false;
-        if(results.botpose[0] == 0 && results.botpose[1] == 0) return false;
-        if((LimelightHelpers.getTA("limelight") >= 0.3 
-            || results.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4)) 
+    public boolean hasTarget(Results result) {
+        if (result == null || !result.valid || (result.botpose[0] == 0 && result.botpose[1] == 0)) {
             return false;
-        if(getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25) return false;
+        }
+
+        if ((LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15))
+        {
+            return false;
+        }
+
         return true;
     }
 
