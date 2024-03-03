@@ -303,6 +303,8 @@ public final class Constants {
         public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
         public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
 
+        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(1);
+
         /*
          * XY:
          *  P: 5.2
@@ -478,8 +480,6 @@ public final class Constants {
         public static final double DRIVER_DEADBAND = 0.15;
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
-
-        public static final double ALIGNMENT_DEADBAND = Units.inchesToMeters(1);
 
         // See https://www.desmos.com/calculator/e07raajzh5
         // And

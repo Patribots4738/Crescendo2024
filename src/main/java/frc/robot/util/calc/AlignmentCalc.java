@@ -3,6 +3,8 @@ package frc.robot.util.calc;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,6 +22,32 @@ public class AlignmentCalc {
 
     public AlignmentCalc(Swerve swerve) {
         this.swerve = swerve;
+    }
+
+    public ChassisSpeeds normalizeChassisSpeeds(ChassisSpeeds controllerSpeeds, ChassisSpeeds autoSpeeds) {
+        return new ChassisSpeeds(
+             MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vxMetersPerSecond, autoSpeeds.vxMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
+            -MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vyMetersPerSecond, autoSpeeds.vyMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
+             autoSpeeds.omegaRadiansPerSecond / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND
+        );
+    }
+
+    /**
+     * Normalize and add two speeds together.
+     * 
+     * @param controllerInput the controller input [0 , 1]
+     * @param autoInput       the auto input [0 ,
+     *                        DriveConstants.MAX_SPEED_METERS_PER_SECOND]
+     * 
+     * @return the normalized, combined speed
+     */
+    public double normalizeTwoSpeeds(double controllerInput, double autoInput) {
+        autoInput /= DriveConstants.MAX_SPEED_METERS_PER_SECOND;
+
+        return MathUtil.clamp(
+            controllerInput + autoInput,
+            -1,
+            1);
     }
 
     /**
@@ -177,6 +205,44 @@ public class AlignmentCalc {
                 0,
                 desiredPose.getRotation()
             );
+    }
+
+    public Supplier<ChassisSpeeds> getTrapAlignmentSpeedsSupplier() {
+        return () -> getTrapAlignmentSpeeds();
+    }
+
+    public ChassisSpeeds getTrapControllerSpeeds(double driverX, double driverY) {
+
+        // Get the current chain that we are aligning to and the current robot pose
+        Pose2d closestChain = PoseCalculations.getClosestChain(swerve.getPose());
+
+        // Make the pose always relative to the blue alliance
+        // Closest chain is the actual chain position
+        // when we use our comparitors below, we use things from
+        // the origin of the field's persepctive
+        if (Robot.isRedAlliance()) {
+            closestChain = GeometryUtil.flipFieldPose(closestChain);
+        }
+
+        // If we are on the left chain, then use the positive driver X axis
+        // If we are on the right chain, then use the negative driver X axis
+        // If we are on the back chain, then use the positive driver Y axis
+        double x = (closestChain.getTranslation().getX() == FieldConstants.CHAIN_POSITIONS.get(1).getX()) 
+            ? -driverY
+            : closestChain.getTranslation().getY() > FieldConstants.FIELD_HEIGHT_METERS/2.0
+                ? driverX * (Robot.isRedAlliance() ? -1 : 1) 
+                : -driverX * (Robot.isRedAlliance() ? -1 : 1);
+
+        return ChassisSpeeds.fromFieldRelativeSpeeds(
+            -x * swerve.getPose().getRotation().getCos(),
+            -x * swerve.getPose().getRotation().getSin(),
+            0,
+            swerve.getPose().getRotation()
+        );
+    }
+
+    public Supplier<ChassisSpeeds> getTrapControllerSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getTrapControllerSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
     /**
