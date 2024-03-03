@@ -293,7 +293,7 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 6.08;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 4.5;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
@@ -387,7 +387,7 @@ public final class Constants {
             "S C1-5 S",
             "S W1 A C1-5 S",
             "S W3-1 S",
-            "S W3-1 S Proxy",
+            "S W3-1 S C2 S Proxy",
             "S W3-1 S C1-3 S"
         };
     }
@@ -476,7 +476,7 @@ public final class Constants {
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
 
-        public static final double ALIGNMENT_DEADBAND = 0.2;
+        public static final double ALIGNMENT_DEADBAND = Units.inchesToMeters(1);
 
         // See https://www.desmos.com/calculator/e07raajzh5
         // And
