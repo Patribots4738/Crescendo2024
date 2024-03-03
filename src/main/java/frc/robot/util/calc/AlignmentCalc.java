@@ -3,6 +3,8 @@ package frc.robot.util.calc;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,6 +13,7 @@ import frc.robot.Robot;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 
 public class AlignmentCalc {
@@ -19,6 +22,41 @@ public class AlignmentCalc {
 
     public AlignmentCalc(Swerve swerve) {
         this.swerve = swerve;
+    }
+
+    /**
+     * Normalize and add two speeds together.
+     * 
+     * @param controllerSpeeds the controller speeds [-1 , 1]
+     * @param autoSpeeds       the auto alignment speeds [-DriveConstants.MAX_SPEED_METERS_PER_SECOND, 
+     *                                                     DriveConstants.MAX_SPEED_METERS_PER_SECOND]
+     * 
+     * @return the normalized ChassisSpeeds with the alignment deadband applied
+     */
+    public ChassisSpeeds normalizeChassisSpeeds(ChassisSpeeds controllerSpeeds, ChassisSpeeds autoSpeeds) {
+        return new ChassisSpeeds(
+             MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vxMetersPerSecond, autoSpeeds.vxMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
+            -MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vyMetersPerSecond, autoSpeeds.vyMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
+             autoSpeeds.omegaRadiansPerSecond / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND
+        );
+    }
+
+    /**
+     * Normalize and add two speeds together.
+     * 
+     * @param controllerInput the controller input [0 , 1]
+     * @param autoInput       the auto input [0 ,
+     *                        DriveConstants.MAX_SPEED_METERS_PER_SECOND]
+     * 
+     * @return the normalized, combined speed
+     */
+    public double normalizeTwoSpeeds(double controllerInput, double autoInput) {
+        autoInput /= DriveConstants.MAX_SPEED_METERS_PER_SECOND;
+
+        return MathUtil.clamp(
+            controllerInput + autoInput,
+            -1,
+            1);
     }
 
     /**
@@ -56,9 +94,9 @@ public class AlignmentCalc {
     }
 
     /**
-     * Supplier for the Command to align the robot to the amp.
+     * Supplier for the amp alignment chassis speeds
      * 
-     * @return the command to align the robot to the amp
+     * @return the supplier for amp alignment chassis speeds
      */
     public Supplier<ChassisSpeeds> getAmpAlignmentSpeedsSupplier() {
         return () -> getAmpAlignmentSpeeds();
@@ -73,19 +111,15 @@ public class AlignmentCalc {
      */
     public ChassisSpeeds getChainRotationalSpeeds(double driverX, double driverY) {
         Pose2d closestChain = PoseCalculations.getClosestChain(swerve.getPose());
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(closestChain.getRotation())
-        );
+        return getRotationalSpeeds(driverX, driverY, closestChain.getRotation());
     }
 
     /**
-     * Supplier for the Command to align the robot rotationally to the chain.
+     * Supplier for the rotational speeds to align the robot rotationally to the chain.
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
-     * @return        the command to align the robot to the chain
+     * @return        the supplier for the rotational speeds to align the robot to the chain
      */
     public Supplier<ChassisSpeeds> getChainRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
         return () -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
@@ -97,23 +131,19 @@ public class AlignmentCalc {
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
-     * @return the rotational speeds to align the robot to the source
+     * @return        the rotational speeds to align the robot to the source
      */
     public ChassisSpeeds getSourceRotationalSpeeds(double driverX, double driverY) {
         Pose2d source = FieldConstants.GET_SOURCE_POSITION();
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(source.getRotation())
-        );
+        return getRotationalSpeeds(driverX, driverY, source.getRotation());
     }
 
     /**
-     * Supplier for the Command to align the robot rotationally to the source of the field.
+     * Supplier for the speeds to align the robot rotationally to the source.
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
-     * @return        the command to align the robot to the source
+     * @return        the supplier for the rotational speeds to align the robot to the source
      */
     public Supplier<ChassisSpeeds> getSourceRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
         return () -> getSourceRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
@@ -125,13 +155,11 @@ public class AlignmentCalc {
      * @param driverX     the driver's x input
      * @param driverY     the driver's y input
      * @param shooterCmds the shooter commands
-     * @return the rotational speeds to align the robot to the speaker
+     * @return            the rotational speeds to align the robot to the speaker
      */
     public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
-        return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
-            driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity())));
+        return 
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
     /**
@@ -140,22 +168,22 @@ public class AlignmentCalc {
      * @param driverX      the driver's x input
      * @param driverY      the driver's y input
      * @param desiredAngle the desired angle
-     * @return the rotational speeds to align the robot to the speaker
+     * @return             the rotational speeds to rotationally align the robot
      */
     public ChassisSpeeds getRotationalSpeeds(double driverX, double driverY, Rotation2d desiredAngle) {
         return new ChassisSpeeds(
             driverY * (Robot.isRedAlliance() ? -1 : 1),
             driverX * (Robot.isRedAlliance() ? -1 : 1),
-            getAlignmentSpeeds(desiredAngle));
+            getAlignmentSpeeds(desiredAngle) / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND);
     }
 
     /**
-     * Supplier for the Command to align the robot rotationally to the speaker.
+     * Supplier for the speeds to align the robot rotationally to the speaker.
      * 
-     * @param driverX   the driver's x input
-     * @param driverY   the driver's y input
+     * @param driverX     the driver's x input
+     * @param driverY     the driver's y input
      * @param shooterCmds the shooter commands
-     * @return          the command to align the robot to the speaker
+     * @return            the suppoer for the speeds to align the robot to the speaker
      */
     public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
@@ -186,6 +214,44 @@ public class AlignmentCalc {
                 0,
                 desiredPose.getRotation()
             );
+    }
+
+    public Supplier<ChassisSpeeds> getTrapAlignmentSpeedsSupplier() {
+        return () -> getTrapAlignmentSpeeds();
+    }
+
+    public ChassisSpeeds getTrapControllerSpeeds(double driverX, double driverY) {
+
+        // Get the current chain that we are aligning to and the current robot pose
+        Pose2d closestChain = PoseCalculations.getClosestChain(swerve.getPose());
+
+        // Make the pose always relative to the blue alliance
+        // Closest chain is the actual chain position
+        // when we use our comparitors below, we use things from
+        // the origin of the field's persepctive
+        if (Robot.isRedAlliance()) {
+            closestChain = GeometryUtil.flipFieldPose(closestChain);
+        }
+
+        // If we are on the left chain, then use the positive driver X axis
+        // If we are on the right chain, then use the negative driver X axis
+        // If we are on the back chain, then use the positive driver Y axis
+        double x = (closestChain.getTranslation().getX() == FieldConstants.CHAIN_POSITIONS.get(1).getX()) 
+            ? -driverY
+            : closestChain.getTranslation().getY() > FieldConstants.FIELD_HEIGHT_METERS/2.0
+                ? driverX * (Robot.isRedAlliance() ? -1 : 1) 
+                : -driverX * (Robot.isRedAlliance() ? -1 : 1);
+
+        return ChassisSpeeds.fromFieldRelativeSpeeds(
+            -x * swerve.getPose().getRotation().getCos(),
+            -x * swerve.getPose().getRotation().getSin(),
+            0,
+            swerve.getPose().getRotation()
+        );
+    }
+
+    public Supplier<ChassisSpeeds> getTrapControllerSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getTrapControllerSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
     /**

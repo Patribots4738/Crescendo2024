@@ -85,11 +85,11 @@ Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins
     - **Calc** [`robot/util/calc`](src/main/java/frc/robot/util/calc) contains the calculations required for pivot alinment & shooter speeds when shooting while driving.
    
 ## Controls 🎛️🎮
-[![Driver](https://github.com/Patribots4738/Crescendo2024/assets/148731136/461b6ea1-2418-44b1-bdd4-82bec2677c85)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
+[![Driver](https://github.com/Patribots4738/Crescendo2024/assets/65139378/d2d0000f-54cb-42d2-9b8a-7e635ca79c18)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
 
-[![Operator](https://github.com/Patribots4738/Crescendo2024/assets/148731136/c11e9e46-8121-4bff-97c3-2bb4c24f7ac7)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
+[![Operator](https://github.com/Patribots4738/Crescendo2024/assets/65139378/5040695f-deac-4ac9-9ad3-ca7cbfa4748b)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
 
 ## Components & Tools 🔨🔎🚨 
-[![Hardware](https://github.com/Patribots4738/Crescendo2024/assets/148731136/9ab7df35-7143-441b-a1f6-f31ea8a77bd8)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)
+[![Hardware](https://github.com/Patribots4738/Crescendo2024/assets/65139378/f9de2a2e-e401-4d6b-b57a-10bbf2dfd340)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)
   
 [![Software](https://github.com/Patribots4738/Crescendo2024/assets/148731136/058e53cd-83ff-4463-ba4f-3b58a56a3ead)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)

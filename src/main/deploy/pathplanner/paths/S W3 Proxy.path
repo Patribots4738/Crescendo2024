@@ -32,29 +32,6 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prepare and Shoot When Ready",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooter"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Intake",
       "waypointRelativePos": 0.5,
       "command": {

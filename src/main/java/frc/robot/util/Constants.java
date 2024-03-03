@@ -217,7 +217,6 @@ public final class Constants {
         public static final int ELEVATOR_CAN_ID = 14;
         public static final int TRAP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = 0.03;
-        public static final double GUILLOTINE_DEADBAND = 0.04;
         public static final double OUTTAKE_SECONDS = 3;
         public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
 
@@ -245,6 +244,8 @@ public final class Constants {
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
         public static final double UNSTUCK_POS = 0.175;
+
+        public static double PREP_PIECE_SECONDS = 0.3;
 
         public static final double STUCK_TIME_SECONDS = 0.25;
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
@@ -292,13 +293,16 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 6.08;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 4.5;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI/4.0;
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI/3.0;
+        // Below is gotten from choreo
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
 
         public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
         public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
+
+        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(1);
 
         /*
          * XY:
@@ -320,7 +324,7 @@ public final class Constants {
                 0,
                 AutoConstants.XY_CORRECTION_D);
 
-        public static final double ROTATION_CORRECTION_P = .3;
+        public static final double ROTATION_CORRECTION_P = 3.725;
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -356,7 +360,7 @@ public final class Constants {
                 AutoConstants.XY_CORRECTION_D),
             new PIDConstants(
                     AutoConstants.ROTATION_CORRECTION_P,
-                    1,
+                    AutoConstants.ROTATION_CORRECTION_I,
                     AutoConstants.ROTATION_CORRECTION_D,
                     Units.degreesToRadians(45)),
             MAX_SPEED_METERS_PER_SECOND,
@@ -385,6 +389,7 @@ public final class Constants {
             "S C1-5 S",
             "S W1 A C1-5 S",
             "S W3-1 S",
+            "S W3-1 S C2 S Proxy",
             "S W3-1 S C1-3 S"
         };
     }
@@ -408,9 +413,11 @@ public final class Constants {
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
         public static final double WHEEL_DIAMETER_METERS = 0.0762;
-        public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
+        public static final double WHEEL_TO_MOTOR_ROTATIONS = 3.5625;
+        public static final double   WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
         // teeth on the bevel pinion
+        // spur gear changes based on the gearing (L1-L3 etc)
         public static final double SPUR_GEAR_TEETH = 19;
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
@@ -459,7 +466,7 @@ public final class Constants {
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
-        public static final int VORTEX_CURRENT_LIMIT = 80; // amps
+        public static final int VORTEX_CURRENT_LIMIT = 50; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
     }
 
@@ -472,8 +479,6 @@ public final class Constants {
         public static final double DRIVER_DEADBAND = 0.15;
         public static final double OPERATOR_DEADBAND = 0.15;
         public static final double PID_TUNER_DEADBAND = 0.15;
-
-        public static final double ALIGNMENT_DEADBAND = 0.2;
 
         // See https://www.desmos.com/calculator/e07raajzh5
         // And
@@ -929,6 +934,9 @@ public final class Constants {
 
             put("ampPosition", 0.37);
             put("atan++", 0.0);
+
+            put("placeOuttake", 3.0);
+            put("prepPiece", 0.3);
         }};
     }
 }

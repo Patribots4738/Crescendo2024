@@ -6,8 +6,6 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.util.GeometryUtil;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,9 +15,7 @@ import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.calc.AlignmentCalc;
-import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.custom.ActiveConditionalCommand;
 
 public class AlignmentCmds {
@@ -37,22 +33,31 @@ public class AlignmentCmds {
         this.alignmentCalc = new AlignmentCalc(swerve);
     }
 
+    /**
+     * Command to align the robot rotationally to the source of the field.
+     * 
+     * @param autoSpeeds       Auto alignment speeds from [-DriveConsants.MAX_SPEED_METERS_PER_SECOND
+     *                                                DriveConstants.MAX_SPEED_METERS_PER_SECOND]
+     * @param controllerSpeeds Controller speeds from [-1, 1]
+     * 
+     * @return                 the command to drive the normalized and added autoSpeeds and controllerSpeeds together
+     */
     public Command getAutoAlignmentCommand(Supplier<ChassisSpeeds> autoSpeeds, Supplier<ChassisSpeeds> controllerSpeeds) {
         return 
-            swerve.getDriveCommand(() -> {
-                ChassisSpeeds controllerSpeedsGet = controllerSpeeds.get();
-                ChassisSpeeds autoSpeedsGet = autoSpeeds.get();
-                return new ChassisSpeeds(
-                        MathUtil.applyDeadband(
-                            (controllerSpeedsGet.vxMetersPerSecond + autoSpeedsGet.vxMetersPerSecond), 
-                            OIConstants.ALIGNMENT_DEADBAND),
-                        MathUtil.applyDeadband(
-                            -(controllerSpeedsGet.vyMetersPerSecond + autoSpeedsGet.vyMetersPerSecond), 
-                            OIConstants.ALIGNMENT_DEADBAND),
-                        controllerSpeedsGet.omegaRadiansPerSecond + autoSpeedsGet.omegaRadiansPerSecond);
-            }, () -> false);
+            swerve.getDriveCommand(() -> 
+                alignmentCalc.normalizeChassisSpeeds(
+                    controllerSpeeds.get(),
+                    autoSpeeds.get()
+                ),
+                () -> false);
     }
 
+    /**
+     * Command to align the robot to the amp
+     * 
+     * @param driverX the supplier for the driver controller's x axis
+     * @return        the command to auto align to the amp
+     */
     public Command ampAlignmentCommand(DoubleSupplier driverX) {
         return 
             getAutoAlignmentCommand(
@@ -67,6 +72,15 @@ public class AlignmentCmds {
             );
     }
 
+    /**
+     * Command to align the robot rotationally to the nearest chain of the stage.
+     * 
+     * @param driverX               the supplier for the driver's x input
+     * @param driverY               the supplier for the driver's y input
+     * @param robotRelativeSupplier the supplier for whether the speeds should be robot relative or not
+     * 
+     * @return                      the command to align the robot to the nearest chain on the stage
+     */
     public Command chainRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return 
             swerve.getDriveCommand(
@@ -80,6 +94,7 @@ public class AlignmentCmds {
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
+     * 
      * @return        the command to align the robot to the source
      */
     public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
@@ -110,39 +125,9 @@ public class AlignmentCmds {
     public Command trapAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
         return 
             getAutoAlignmentCommand(
-                alignmentCalc::getTrapAlignmentSpeeds, 
-                () -> getTrapAlignmentSpeeds(driverX, driverY)
+                alignmentCalc.getTrapAlignmentSpeedsSupplier(), 
+                alignmentCalc.getTrapControllerSpeedsSupplier(driverX, driverY)
             );
-    }
-
-    public ChassisSpeeds getTrapAlignmentSpeeds(DoubleSupplier driverX, DoubleSupplier driverY) {
-
-        // Get the current chain that we are aligning to and the current robot pose
-        Pose2d closestChain = PoseCalculations.getClosestChain(swerve.getPose());
-
-        // Make the pose always relative to the blue alliance
-        // Closest chain is the actual chain position
-        // when we use our comparitors below, we use things from
-        // the origin of the field's persepctive
-        if (Robot.isRedAlliance()) {
-            closestChain = GeometryUtil.flipFieldPose(closestChain);
-        }
-
-        // If we are on the left chain, then use the positive driver X axis
-        // If we are on the right chain, then use the negative driver X axis
-        // If we are on the back chain, then use the positive driver Y axis
-        double x = (closestChain.getTranslation().getX() == FieldConstants.CHAIN_POSITIONS.get(1).getX()) 
-            ? -driverY.getAsDouble() 
-            : closestChain.getTranslation().getY() > FieldConstants.FIELD_HEIGHT_METERS/2.0
-                ? driverX.getAsDouble() * (Robot.isRedAlliance() ? -1 : 1) 
-                : -driverX.getAsDouble() * (Robot.isRedAlliance() ? -1 : 1);
-
-        return ChassisSpeeds.fromFieldRelativeSpeeds(
-            -x * swerve.getPose().getRotation().getCos(),
-            -x * swerve.getPose().getRotation().getSin(),
-            0,
-            swerve.getPose().getRotation()
-        );
     }
 
     /**
@@ -190,5 +175,4 @@ public class AlignmentCmds {
             )
         );
     }
-
 }

@@ -75,6 +75,12 @@ public class MAXSwerveModule implements Logged{
         return new SwerveModulePosition(
                 drivingSpark.getPosition(),
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
+    }   
+
+
+    // gets the rotations of the wheel converted to radians
+    public double getDrivePositionRadians() {
+        return (drivingSpark.getPosition() / (ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR * ModuleConstants.WHEEL_TO_MOTOR_ROTATIONS)) * 2 * Math.PI;
     }
 
     /**
@@ -149,7 +155,7 @@ public class MAXSwerveModule implements Logged{
         drivingSpark.setPID(ModuleConstants.DRIVING_PID);
         turningSpark.setPID(ModuleConstants.TURNING_PID);
 
-        drivingSpark.setSmartCurrentLimit(ModuleConstants.VORTEX_CURRENT_LIMIT);
+        drivingSpark.setSmartCurrentLimit(ModuleConstants.NEO_CURRENT_LIMIT);
         turningSpark.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
         setBrakeMode();
     }
