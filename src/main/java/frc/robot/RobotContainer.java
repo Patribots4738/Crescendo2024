@@ -186,7 +186,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-        new Trigger(() -> Robot.currentTimestamp - gamemodeStart >= 134.8 && Robot.gameMode != Robot.GameMode.DISABLED)
+        new Trigger(() -> Robot.currentTimestamp - gamemodeStart >= 134.8 && Robot.gameMode != GameMode.DISABLED)
         .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
             .alongWith(pieceControl.coastIntakeAndIndexer()));
         
