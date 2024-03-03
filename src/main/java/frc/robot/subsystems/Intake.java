@@ -78,6 +78,10 @@ public class Intake extends SubsystemBase implements Logged {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 
+    public Command setCoastMode() {
+        return runOnce(() -> intakeMotor.setCoastMode());
+    }
+
     public boolean getPossession() {
         return notePossession;
     }

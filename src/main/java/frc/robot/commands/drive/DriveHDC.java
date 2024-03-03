@@ -14,7 +14,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 
-public class DriveHDC  extends Command {
+public class DriveHDC extends Command {
 
     private final Swerve swerve;
 

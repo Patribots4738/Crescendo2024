@@ -37,6 +37,10 @@ public class PieceControl implements Logged {
     @Log
     private boolean readyToMoveNote = true;
 
+    // State representing if we are ready to place with trapper
+    @Log
+    private boolean readyToPlace = false;
+
     public PieceControl(
             Intake intake,
             Indexer indexer,
@@ -56,10 +60,23 @@ public class PieceControl implements Logged {
                 shooterCmds.stopShooter()).ignoringDisable(true);
     }
 
+    public Command coastIntakeAndIndexer() {
+        return Commands.sequence(
+            intake.setCoastMode(),
+            indexer.setCoastMode(),
+            trapper.setCoastMode()
+        );
+    }
+
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
                 .andThen(noteToShoot(poseSupplier, speedSupplier));
+    }
+
+    public Command shootPreload() {
+        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+                .andThen(intakeAuto());
     }
 
     // TODO: Possibly split this into two commands where one sends to shooter
@@ -160,7 +177,7 @@ public class PieceControl implements Logged {
 
     public Command indexCommand() {
         return elevator.toIndexCommand()
-                .alongWith(intake.stopCommand(), trapper.stopCommand());
+                .alongWith(intake.stopCommand());
     }
 
     public Command intakeAuto() {
@@ -175,13 +192,12 @@ public class PieceControl implements Logged {
         // This is becuase placeTrap requires pivot, but shootWhenReady does not
         // If they are both required, then we would cancel any command that requires pivot
         // such as prepareSWDCommand
-        return Commands.defer(() -> Commands.either(
-            shootWhenReady(poseSupplier, speedSupplier),
-            placeTrap(),
-            this::getShooterMode
-        ), this.getShooterMode()
-            ? shootWhenReady(poseSupplier, speedSupplier).getRequirements() 
-            : placeTrap().getRequirements());
+        return 
+            new SelectiveConditionalCommand(
+                shootWhenReady(poseSupplier, speedSupplier),
+                placeWhenReady(),
+                this::getShooterMode
+            );
     }
 
     private Command setDislodging(boolean dislodging) {
@@ -193,58 +209,100 @@ public class PieceControl implements Logged {
     // Same as normally setting elevator position but adds unstuck logic
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
-            elevator.setPositionCommand(position, true),
+            setReadyToPlaceCommand(false),
+            elevator.setPositionCommand(position, true)
             // Run until we are no longer in our unstucking state only if elevator actually gets stuck
-            getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
+            // getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
 
-    // Same as above
     public Command elevatorToTop() {
-        return setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS);
+        return setElevatorPosition(() -> TrapConstants.ELEVATOR_TOP_LIMIT);
     }
 
-    public Command elevatorToAmp() {
-        return setElevatorPosition(() -> TrapConstants.AMP_PLACE_POS);
+    private void setReadyToPlace(boolean readyToPlace) {
+        this.readyToPlace = readyToPlace;
     }
 
+    private Command setReadyToPlaceCommand(boolean readyToPlace) {
+        return Commands.runOnce(() -> setReadyToPlace(readyToPlace));
+    }
+
+    public Command elevatorToBottom() {
+        return setElevatorPosition(() -> TrapConstants.ELEVATOR_BOTTOM_LIMIT)
+            .andThen(setPlaceWhenReadyCommand(false));
+    }
+
+    public Command prepPiece() {
+        return Commands.sequence(
+            trapper.intake(),
+            NT.getWaitCommand("prepPiece"),
+            trapper.stopCommand()
+        );
+    }
+
+    // TODO: possible repurpose for getting unstuck from any position where we have unforeseen problems
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(
                 // Toggle this state to currently unstucking if we haven't already
                 setDislodging(true),
                 elevator.setPositionCommand(TrapConstants.UNSTUCK_POS),
-                trapper.outtakeSlow(),
-                Commands.waitSeconds(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
-                trapper.stopCommand(),
+                trapper.outtakeSlow(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 elevator.setPositionCommand(desiredPose, true),
                 // Toggle unstucking state to off if the elevator isn't actually stuck anymore
                 setDislodging(false).onlyIf(() -> !elevator.getStuck())
             );
     }
 
-    public Command placeTrap() {
-        return Commands.sequence(
-                Commands.defer(
-                    () -> setElevatorPosition(NT.getSupplier("ampPosition")),
-                    Set.of(elevator)
-                ).alongWith(shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 60))), 
-                trapper.intake(),
-                Commands.waitSeconds(0.3),
-                trapper.stopCommand(),
-                Commands.waitSeconds(1),
-                trapper.outtake(),
-                Commands.waitSeconds(TrapConstants.OUTTAKE_SECONDS),
-                trapper.stopCommand(),
-                shooterCmds.setTripletCommand(SpeedAngleTriplet.of(0, 0, 0)));
+    // TODO: remove defer when amp position is finalized
+    public Command elevatorToPlacement(boolean amp) {
+        return 
+            Commands.defer(
+                () -> 
+                    Commands.sequence(
+                        Commands.either(
+                            setElevatorPosition(NT.getSupplier("ampPosition")), 
+                            setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
+                            () -> amp),
+                        prepPiece(),
+                        setReadyToPlaceCommand(true),
+                        placeWhenReady().onlyIf(this::shouldPlaceWhenReady)
+                    ),
+                Set.of(elevator, trapper)
+            );
+    }
+
+    public Command placeWhenReady() {
+        return 
+            new SelectiveConditionalCommand(
+                Commands.sequence(
+                    Commands.sequence(
+                        trapper.outtake(),
+                        NT.getWaitCommand("placeOuttake"),
+                        trapper.stopCommand(),
+                        elevatorToBottom()
+                    )),
+                setPlaceWhenReadyCommand(true),
+                () -> readyToPlace);
+    }
+
+    @Log
+    private boolean placeWhenReady = false;
+
+    public boolean shouldPlaceWhenReady() {
+        return placeWhenReady;
+    }
+
+    public Command setPlaceWhenReadyCommand(boolean placeWhenReady) {
+        return Commands.runOnce(() -> this.placeWhenReady = placeWhenReady);
     }
 
     public Command sourceShooterIntake() {
         return Commands.sequence(
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 45.0)),
             indexer.toElevator(),
-            trapper.outtake(),
-            Commands.waitSeconds(3),
+            trapper.outtake(3.0),
             indexCommand()
         ); 
     }

@@ -110,6 +110,10 @@ public class PathPlannerStorage implements Logged {
         autoChooser.onChange(consumer);
     }
 
+    public PatriSendableChooser<Command> getAutoChooser() {
+        return this.autoChooser;
+    }
+
     public Command updatePathViewerCommand() {
         return Commands.either(
             Commands.runOnce(() -> {

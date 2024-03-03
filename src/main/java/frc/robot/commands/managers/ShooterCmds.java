@@ -10,8 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Robot;
-import frc.robot.Robot.GameMode;
 import frc.robot.commands.logging.NoteTrajectory;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
@@ -142,4 +140,5 @@ public class ShooterCmds {
 	public Command stowPivot() {
 	    return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
+    
 }

@@ -3,60 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7412377646703784,
-        "y": 4.3334957369796125
+        "x": 8.288642422749572,
+        "y": 5.773167022257897
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5226377597212084,
-        "y": 4.36205056060728
+        "x": 7.30499772309735,
+        "y": 6.329339959911723
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "C2"
     },
     {
       "anchor": {
-        "x": 2.630387164469738,
-        "y": 4.19657762047887
+        "x": 5.045175804637324,
+        "y": 6.376864182299793
       },
       "prevControl": {
-        "x": 2.1201789324071374,
-        "y": 3.911596445813273
+        "x": 6.404089493509335,
+        "y": 6.66947878128679
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "W3"
+      "linkedName": "L"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prepare and Shoot When Ready",
+      "name": "StopIntake & PrepareShooter",
       "waypointRelativePos": 0,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooter"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Intake",
-      "waypointRelativePos": 0.5,
       "command": {
         "type": "parallel",
         "data": {
@@ -64,7 +41,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "StopIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 0.65,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
               }
             }
           ]
@@ -80,13 +74,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 154.2169,
+    "rotation": -176.87039607585024,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Preloads",
+  "folder": "Center Line",
   "previewStartingState": {
-    "rotation": 122.79953127261922,
+    "rotation": 179.83225523650648,
     "velocity": 0
   },
   "useDefaultConstraints": true
