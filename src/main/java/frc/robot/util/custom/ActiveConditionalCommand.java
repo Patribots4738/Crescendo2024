@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.util.function.BooleanSupplier;
 
 public class ActiveConditionalCommand extends Command {
+    
     private final Command onTrueCommand;
     private final Command onFalseCommand;
     private final BooleanSupplier condition;
