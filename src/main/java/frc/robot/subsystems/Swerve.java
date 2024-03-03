@@ -34,12 +34,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.ChasePose;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
+import frc.robot.util.Constants.OIConstants;
+import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -48,6 +52,9 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public static double twistScalar = 4;
     private Rotation2d gyroRotation2d = new Rotation2d();
+
+    @Log
+    private boolean isAlignedToAmp = false;
 
     private double speedMultiplier = 1;
     private final MAXSwerveModule frontLeft = new MAXSwerveModule(
@@ -128,6 +135,7 @@ public class Swerve extends SubsystemBase implements Logged {
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
+        this.isAlignedToAmp = isAlignedToAmp();
     }
 
     public void logPositions() {
@@ -404,4 +412,8 @@ public class Swerve extends SubsystemBase implements Logged {
         return atPose(desiredHDCPose);
     }
 
+    public boolean isAlignedToAmp() {
+        double robotX = this.getPose().getX();
+        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), OIConstants.ALIGNMENT_DEADBAND);
+    }
 }
