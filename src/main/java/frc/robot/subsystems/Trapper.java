@@ -6,9 +6,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.rev.Neo;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Trapper extends SubsystemBase {
+public class Trapper extends SubsystemBase implements Logged {
     private final Neo trapper;
+
+    @Log
     private double desiredSpeed = 0;
 
     public Trapper() {
@@ -43,6 +47,14 @@ public class Trapper extends SubsystemBase {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_OUTTAKE_SLOW));
     }
 
+    public Command outtakeSlow(double seconds) {
+        return 
+            Commands.sequence(
+                intakeSlow(),
+                Commands.waitSeconds(seconds),
+                stopCommand());
+    }
+
     public Command intakeSlow() {
         return runOnce(() -> setSpeed(0.1));
     }
@@ -55,11 +67,31 @@ public class Trapper extends SubsystemBase {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_INTAKE_PERCENT));
     }
 
+    public Command intake(double seconds) {
+        return Commands.sequence(
+            intake(),
+            Commands.waitSeconds(seconds),
+            stopCommand()  
+        );
+    }
+
+    public Command outtake(double seconds) {
+        return Commands.sequence(
+            outtake(),
+            Commands.waitSeconds(seconds),
+            stopCommand()  
+        );
+    }
+
     public Command toggleSpeed() {
         return Commands.either(
             outtake(), 
             stopCommand(), 
             () -> desiredSpeed == 0);
+    }
+
+    public Command setCoastMode() {
+        return runOnce(() -> trapper.setCoastMode());
     }
 
     public boolean hasPiece() {

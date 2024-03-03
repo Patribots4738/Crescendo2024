@@ -15,10 +15,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
@@ -39,20 +38,26 @@ public class Limelight extends SubsystemBase implements Logged{
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
-    
+    private int pipelineIndex;
+
     @Log
     public boolean isConnected = false;
+    
+    @Log
+    private Pose2d estimatedPose2d = new Pose2d();
 
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
-    public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName) {
+    public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName, int pipelineIndex) {
         // Uses network tables to check status of limelight
         this.limelightName = limelightName;
+        this.pipelineIndex = pipelineIndex;
         timingTestEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName, "TIMING_TEST_ENTRY");
         this.robotPoseSupplier = robotPoseSupplier;
         this.poseEstimator = poseEstimator;
         loadAprilTagFieldLayout();
+        setPipelineIndex(pipelineIndex);
     }
 
     @Override
@@ -84,41 +89,47 @@ public class Limelight extends SubsystemBase implements Logged{
         double poseDifference = poseEstimator.getEstimatedPosition().getTranslation()
             .getDistance(estimatedRobotPose.getTranslation());
     
-        if (result.valid) {
+        if (hasTarget(result)) {
             double xyStds;
-            double degStds;
+            double radStds;
             // multiple targets detected
             if (result.targets_Fiducials.length >= 2) {
                 // TODO: TUNE
-                xyStds = 0.5;
-                degStds = 3;
+                xyStds = 0.8;
+                radStds = 1.2;
             }
             // 1 target with large area and close to estimated pose
             else if (poseDifference < 0.5 && getBestTargetArea(result) > 0.8) {
                 // TODO: TUNE
-                xyStds = 1.0;
-                degStds = 6;
+                xyStds = 1.6;
+                radStds = 4;
             }
             // 1 target farther away and estimated pose is close
-            else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.1) {
+            else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.15) {
                 // TODO: TUNE
-                xyStds = 2.0;
-                degStds = 12;
+                xyStds = 2.5;
+                radStds = 6;
             }
             // conditions don't match to add a vision measurement
             else {
                 return;
             }
-    
+
+            this.estimatedPose2d = estimatedRobotPose;
+
             poseEstimator.setVisionMeasurementStdDevs(
-                VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
+                VecBuilder.fill(xyStds, xyStds, radStds));
             poseEstimator.addVisionMeasurement(estimatedRobotPose,
-                Robot.currentTimestamp - getLatencyDiffSeconds(result));
+                Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
         }
     }
 
     public Results getResults() {
         return LimelightHelpers.getLatestResults(limelightName).targetingResults;
+    }
+
+    public void setPipelineIndex(int index) {
+        LimelightHelpers.setPipelineIndex(limelightName, index);
     }
 
     private LimelightTarget_Fiducial[] getTags() {
@@ -248,14 +259,17 @@ public class Limelight extends SubsystemBase implements Logged{
         return angleCheck && distanceCheck && isFacing;
     }
 
-    public boolean hasTarget(Results results) {
-        if(results == null) return false;
-        if(!results.valid) return false;
-        if(results.botpose[0] == 0 && results.botpose[1] == 0) return false;
-        if((LimelightHelpers.getTA("limelight") >= 0.3 
-            || results.targets_Fiducials.length > 1 && LimelightHelpers.getTA("limelight") > 0.4)) 
+    public boolean hasTarget(Results result) {
+        if (result == null || !result.valid || (result.botpose[0] == 0 && result.botpose[1] == 0)) {
             return false;
-        if(getRobotPoseTargetSpace().getTranslation().getNorm() < 3.25) return false;
+        }
+
+        if ((LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15))
+        {
+            return false;
+        }
+      
         return true;
     }
 
