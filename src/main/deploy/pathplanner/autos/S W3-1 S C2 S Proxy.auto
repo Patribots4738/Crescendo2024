@@ -48,6 +48,18 @@
                       "data": {
                         "pathName": "W2 W1 Proxy"
                       }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "W1 C2"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C2 L Proxy"
+                      }
                     }
                   ]
                 }
