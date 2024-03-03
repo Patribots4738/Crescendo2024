@@ -129,7 +129,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
-        // limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
+        limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
 
@@ -196,11 +196,14 @@ public class RobotContainer implements Logged {
     private void configureTimedEvents() {
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
-            .alongWith(pieceControl.coastIntakeAndIndexer()));
+            .andThen(pieceControl.coastIntakeAndIndexer()));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
+
+        new Trigger(intake::getPossession)
+            .onTrue(limelight3.blinkLeds(() -> 1));
     }
 
     private void configureTestBindings() {
@@ -505,7 +508,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(intake, "Robot/Subsystems/intake");
         Monologue.logObj(climb, "Robot/Subsystems/climb");
         Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-        // Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+        Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");

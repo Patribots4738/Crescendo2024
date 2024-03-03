@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.apriltag.AprilTag;
@@ -17,6 +18,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -292,5 +295,14 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public Pose2d getRobotPoseTargetSpace() {
         return LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
+    }
+
+    public Command blinkLeds(DoubleSupplier duration) {
+        return Commands.sequence(
+            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceOn(limelightName)),
+            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceBlink(limelightName)),
+            Commands.waitSeconds(duration.getAsDouble()),
+            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceOff(limelightName))
+        );
     }
 }
