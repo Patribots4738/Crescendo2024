@@ -400,13 +400,13 @@ public final class Constants {
         // This changes the drive speed of the module (a pinion gear with more teeth
         // will result in a robot that drives faster).
         // Extra high speed settings from REV make this number high thern L3
-        public static final int DRIVING_MOTOR_PINION_TEETH = 16;
+        public static final double DRIVING_MOTOR_PINION_TEETH = 16.0;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
         // the steering motor in the MAXSwerve Module.
         // Update 2-29-24: I don't know how this needed to turn false but it is now false... -aleg
-        public static final boolean TURNING_ENCODER_INVERTED = false;
+        public static final boolean TURNING_ENCODER_INVERTED = true;
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
@@ -416,7 +416,7 @@ public final class Constants {
         // teeth on the bevel pinion
         // spur gear changes based on the gearing (L1-L3 etc)
         public static final double SPUR_GEAR_TEETH = 19;
-        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15);
+        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15.0);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
                 * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION;
