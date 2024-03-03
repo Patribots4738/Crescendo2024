@@ -33,7 +33,6 @@ import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.LedStrip;
-import frc.robot.leds.LedStrip.PatriColors;
 import frc.robot.leds.commands.LPI;
 import frc.robot.leds.commands.animations.LEDColorCommand;
 import frc.robot.leds.commands.animations.LEDFollowerCommand;
@@ -175,63 +174,51 @@ public class RobotContainer implements Logged {
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
         
-        //configureButtonBindings();
+        configureButtonBindings();
         configureLoggingPaths();
     }
 
-    //private void configureButtonBindings() {
-        //configureDriverBindings(driver);
-        //configureOperatorBindings(operator);
-        //configureTestBindings();
+    private void configureButtonBindings() {
+        // configureDriverBindings(driver);
+        // configureOperatorBindings(operator);
+        // configureTestBindings();
 
-        //new Trigger(Robot::isRedAlliance)
-        //    .onTrue(pathPlannerStorage.updatePathViewerCommand())
-        //    .onFalse(pathPlannerStorage.updatePathViewerCommand());
-        
-        //new Trigger(() -> elevator.getDesiredPosition() != 0)
-        //    .whileTrue(
-        //        new LEDFollowerCommand(
-        //            ledStrip.getLEDCommands(), 
-        //            elevator::getPosition, 
-        //            TrapConstants.ELEVATOR_TOP_LIMIT, 
-        //            Color.kBlue)
-        //    );
+        new Trigger(Robot::isRedAlliance)
+                .onTrue(pathPlannerStorage.updatePathViewerCommand())
+                .onFalse(pathPlannerStorage.updatePathViewerCommand());
 
-        //new Trigger(() -> elevator.getDesiredPosition() == 0)
-        //    .whileTrue(
-        //        new LEDFollowerCommand(
-        //            ledStrip.getLEDCommands(), 
-        //            elevator::getPosition, 
-        //            TrapConstants.ELEVATOR_TOP_LIMIT, 
-        //            Color.kRed)
-        //    );
+        new Trigger(() -> elevator.getDesiredPosition() != 0)
+                .whileTrue(
+                        new LEDFollowerCommand(
+                                ledStrip.getLEDCommands(),
+                                elevator::getPosition,
+                                TrapConstants.ELEVATOR_TOP_LIMIT,
+                                Color.kBlue));
 
-        //operator.povUp()
-        //    .onTrue(
-        //        new LEDWaveCommand()
-        //            .new Flash(
-        //                ledStrip.getLEDCommands(),  
-        //                255, 
-        //                ledStrip.getBuffer().getLength(),    
-        //                127.5, 
-        //                0.9,    
-        //                Math.PI*2, 
-        //                0,
-        //                1.0)
-        //    );
+        new Trigger(() -> elevator.getDesiredPosition() == 0)
+                .whileTrue(
+                        new LEDFollowerCommand(
+                                ledStrip.getLEDCommands(),
+                                elevator::getPosition,
+                                TrapConstants.ELEVATOR_TOP_LIMIT,
+                                Color.kRed));
 
-        //operator.rightBumper()
-        //  .whileTrue(
-        //    new LEDColorCommand(ledStrip.getLEDCommands(), Color.kRed, 0, 300)
-        //  );
+        operator.povUp()
+                .onTrue(
+                        new LEDWaveCommand().new Flash(
+                                ledStrip.getLEDCommands(),
+                                255,
+                                ledStrip.getBuffer().getLength(),
+                                127.5,
+                                0.9,
+                                Math.PI * 2,
+                                0,
+                                1.0));
 
-        
-
-        //operator.leftTrigger()
-          //.whileTrue(
-            
-          //);
-    //}
+        operator.rightBumper()
+                .whileTrue(
+                        new LEDColorCommand(ledStrip.getLEDCommands(), Color.kRed, 0, 300));
+    }
 
     private void configureTestBindings() {
         // Warning: these buttons are not on the default loop!

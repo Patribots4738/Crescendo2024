@@ -20,13 +20,11 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.leds.LedStrip;
 import frc.robot.leds.commands.animations.LEDWaveCommand;
-import frc.robot.leds.commands.animations.LEDWaveCommand.Hue;
 import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.custom.PatriBoxController;
 import monologue.Logged;
 
-import java.math.BigInteger;
 import java.util.function.Consumer;
 import monologue.Annotations.Log;
 
@@ -56,7 +54,7 @@ public class LPI extends Command implements Logged{
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("HHIHIHIHddddddddddddddddddddddddddddddddddddddddddfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        System.out.println("IMPORTANT PRINT: HHffffff");
         xboxController.setRumble(() -> 0);
     }
 

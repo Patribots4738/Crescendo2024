@@ -25,7 +25,6 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 import frc.robot.util.custom.PatrIDConstants;
@@ -643,6 +642,7 @@ public final class Constants {
 
     public static final class FieldConstants {
 
+        // TODO: do not forget to change this to be well not true 
         public static boolean IS_SIMULATION = true;
         public static final int CENTER_NOTE_COUNT = 5;
 
