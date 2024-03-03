@@ -75,7 +75,7 @@ public class MAXSwerveModule implements Logged{
         return new SwerveModulePosition(
                 drivingSpark.getPosition(),
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
-    }
+    }   
 
     /**
      * Sets the desired state for the module.
