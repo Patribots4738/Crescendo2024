@@ -93,9 +93,9 @@ public class LPI extends Command implements Logged{
 
             cardinalMagnitude = new Pose2d(desiredTranslation, cardinalDirection);
 
-            int degrresToThreeSixty = (int) (((cardinalDirection.getDegrees() % 360) + 360) % 360);
+            int degreesToThreeSixty = (int) (((cardinalDirection.getDegrees() % 360) + 360) % 360);
 
-            int arrowIndex = degrresToThreeSixty/45;
+            int arrowIndex = degreesToThreeSixty/45;
             
             //sets the LED to corresponding arrow
             // ledStrip.setLED(
