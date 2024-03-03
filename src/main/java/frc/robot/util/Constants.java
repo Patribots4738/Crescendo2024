@@ -414,6 +414,7 @@ public final class Constants {
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
         // teeth on the bevel pinion
+        // spur gear changes based on the gearing (L1-L3 etc)
         public static final double SPUR_GEAR_TEETH = 19;
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
