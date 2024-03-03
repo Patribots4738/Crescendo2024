@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import java.util.stream.DoubleStream;
+import java.util.Arrays;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -197,6 +199,10 @@ public class Swerve extends SubsystemBase implements Logged {
         return poseEstimator.getEstimatedPosition();
     }
 
+    public Rotation2d getGyroRotation2d() {
+        return this.gyroRotation2d;
+    }
+
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }
@@ -341,6 +347,10 @@ public class Swerve extends SubsystemBase implements Logged {
     public double getSpeedMultiplier() {
         return this.speedMultiplier;
     }
+
+    public double[] getWheelRadiusCharacterizationPosition() {
+        return Arrays.stream(swerveModules).mapToDouble(module -> module.getDrivePositionRadians()).toArray();
+      }
 
     /**
      * Sets the brake mode for the drive motors.

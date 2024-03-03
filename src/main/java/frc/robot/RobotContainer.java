@@ -26,6 +26,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.drive.DriveHDC;
+import frc.robot.commands.drive.WheelRadiusCharacterization;
 import frc.robot.commands.logging.NT;
 import frc.robot.commands.logging.NTPIDTuner;
 import frc.robot.commands.managers.CalibrationControl;
@@ -114,6 +115,7 @@ public class RobotContainer implements Logged {
     @Log
     public static SwerveModuleState[] swerveDesiredStates;
     
+    Command wheelRadiusChar;
     public RobotContainer() {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -155,6 +157,7 @@ public class RobotContainer implements Logged {
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
+        wheelRadiusChar = new WheelRadiusCharacterization(swerve);
         robotRelativeSupplier = () -> !driver.getYButton();
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -171,7 +174,7 @@ public class RobotContainer implements Logged {
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
-        
+        pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization", wheelRadiusChar);
         configureButtonBindings();
         configureLoggingPaths();
     }
@@ -463,6 +466,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("WheelRadiusCharacterization", wheelRadiusChar);
         registerPathToPathCommands();
     }
 
