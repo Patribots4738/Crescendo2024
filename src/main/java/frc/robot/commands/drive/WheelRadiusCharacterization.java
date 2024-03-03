@@ -88,6 +88,6 @@ public class WheelRadiusCharacterization extends Command implements Logged{
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Robot.currentTimestamp - robotTimestamp >= 10;
+    return Robot.currentTimestamp - robotTimestamp >= 20;
   }
 }
