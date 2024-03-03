@@ -261,7 +261,7 @@ public class RobotContainer implements Logged {
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
-
+      
         controller.leftBumper()
             .onTrue(pieceControl.intakeToTrap())
             .onFalse(pieceControl.stopIntakeAndIndexer());
@@ -273,16 +273,16 @@ public class RobotContainer implements Logged {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(pieceControl.elevatorToTop());
+            .onTrue(pieceControl.elevatorToPlacement(false));
 
         controller.povLeft()
-            .onTrue(pieceControl.elevatorToAmp());
+            .onTrue(pieceControl.elevatorToPlacement(true));
 
         controller.povRight()
             .onTrue(trapper.toggleSpeed());
         
         controller.povDown()
-            .onTrue(elevator.toBottomCommand());
+            .onTrue(pieceControl.elevatorToBottom());
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeToTrap())
@@ -293,14 +293,7 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
-            .onTrue(
-                shooter.setSpeedCommand(3000)
-                    .alongWith(pivot.setAngleCommand(30))
-                .andThen(Commands.waitUntil(shooterCalc.readyToShootSupplier()))
-                .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
-                .andThen(shooter.stopCommand()
-                    .alongWith(pivot.setAngleCommand(0)))
-            );
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)); 
 
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true));
@@ -463,7 +456,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootPreload());
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
-        NamedCommands.registerCommand("PlaceAmp", pieceControl.placeTrap());
+        NamedCommands.registerCommand("PlaceAmp", pieceControl.placeWhenReady());
         NamedCommands.registerCommand("PrepareShooterL", shooterCmds.prepareFireCommand(() -> FieldConstants.L_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterM", shooterCmds.prepareFireCommand(() -> FieldConstants.M_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));
@@ -498,6 +491,9 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
+        Monologue.logObj(trapper, "Robot/Subsystems/trapper");
+        Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
+
         
         Monologue.logObj(pathPlannerStorage, "Robot");
     }
