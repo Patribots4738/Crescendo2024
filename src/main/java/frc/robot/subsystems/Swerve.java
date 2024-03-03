@@ -41,6 +41,8 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
+import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
@@ -133,7 +135,7 @@ public class Swerve extends SubsystemBase implements Logged {
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
-        this.isAlignedToAmp();
+        this.isAlignedToAmp = isAlignedToAmp();
     }
 
     public void logPositions() {
@@ -412,7 +414,6 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public boolean isAlignedToAmp() {
         double robotX = this.getPose().getX();
-        robotX = MathUtil.applyDeadband(robotX, 0.3);
-        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), 0.3);
+        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), OIConstants.ALIGNMENT_DEADBAND);
     }
 }
