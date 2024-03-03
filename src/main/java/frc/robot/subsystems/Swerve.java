@@ -257,8 +257,24 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(desiredStates);
     }
 
+
     public Command getSetWheelsX() {
         return run(this::setWheelsX);
+    }   
+
+    public void setWheelsO() {
+        SwerveModuleState[] desiredStates = new SwerveModuleState[] {
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45))
+        };
+
+        setModuleStates(desiredStates);
+    }
+
+    public Command setWheelsOCommand() {
+        return runOnce(this::setWheelsO);
     }
 
     /**

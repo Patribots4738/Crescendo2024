@@ -174,7 +174,8 @@ public class RobotContainer implements Logged {
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
-        pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization", wheelRadiusChar);
+        pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
+            swerve.setWheelsOCommand().andThen(wheelRadiusChar));
         configureButtonBindings();
         configureLoggingPaths();
     }

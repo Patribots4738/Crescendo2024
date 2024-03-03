@@ -64,8 +64,9 @@ public class WheelRadiusCharacterization extends Command implements Logged{
     for (int i = 0; i < 4; i++) {
         averageWheelPosition += Math.abs(wheelPositions[i] - startWheelPositions[i]);
     }
-    System.out.println(averageWheelPosition);
+    
     averageWheelPosition /= 4.0;
+    System.out.println(averageWheelPosition);
     double driveRadius = Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0;
     currentEffectiveWheelRadius = (accumGyroYawRads * driveRadius) / averageWheelPosition;
   }
@@ -84,6 +85,6 @@ public class WheelRadiusCharacterization extends Command implements Logged{
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Robot.currentTimestamp - robotTimestamp >= 20;
+    return accumGyroYawRads > Math.PI * 2;
   }
 }
