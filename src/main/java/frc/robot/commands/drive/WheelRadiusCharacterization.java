@@ -8,8 +8,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.subsystems.Swerve;
@@ -32,7 +30,6 @@ public class WheelRadiusCharacterization extends Command implements Logged{
 
   private Swerve swerve; 
 
-  private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(1.0);
   private double robotTimestamp;
   private final DoubleSupplier gyroYawRadsSupplier =
   () -> swerve.getPose().getRotation().getRadians();
@@ -54,7 +51,6 @@ public class WheelRadiusCharacterization extends Command implements Logged{
 
     startWheelPositions = swerve.getWheelRadiusCharacterizationPosition();
 
-    omegaLimiter.reset(0);
   }
 
 

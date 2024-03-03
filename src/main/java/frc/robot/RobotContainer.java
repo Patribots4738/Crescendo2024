@@ -466,7 +466,6 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("WheelRadiusCharacterization", wheelRadiusChar);
         registerPathToPathCommands();
     }
 

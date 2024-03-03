@@ -79,7 +79,6 @@ public class MAXSwerveModule implements Logged{
 
 
     // gets the rotations of the wheel converted to radians
-    // TODO: change 3.5 into a real number from thad
     public double getDrivePositionRadians() {
         return (drivingSpark.getPosition() / (ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR * ModuleConstants.WHEEL_TO_MOTOR_ROTATIONS)) * 2 * Math.PI;
     }
