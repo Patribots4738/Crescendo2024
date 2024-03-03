@@ -25,6 +25,8 @@ import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.custom.PatriBoxController;
 import monologue.Logged;
+
+import java.math.BigInteger;
 import java.util.function.Consumer;
 import monologue.Annotations.Log;
 
@@ -54,6 +56,7 @@ public class LPI extends Command implements Logged{
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        System.out.println("HHIHIHIHddddddddddddddddddddddddddddddddddddddddddfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         xboxController.setRumble(() -> 0);
     }
 
@@ -96,32 +99,33 @@ public class LPI extends Command implements Logged{
 
             cardinalMagnitude = new Pose2d(desiredTranslation, cardinalDirection);
 
-            int degrresToThreeSixty = (int) (((cardinalDirection.getDegrees() % 360) + 360) % 360);
+            int degreesToThreeSixty = (int) (((cardinalDirection.getDegrees() % 360) + 360) % 360);
 
-            int arrowIndex = degrresToThreeSixty/45;
+            int arrowIndex = degreesToThreeSixty/45;
             
             //sets the LED to corresponding arrow
-            // ledStrip.setLED(
-            //     LEDConstants.ARROW_MAP.get((arrowIndex)).getFirst(), 
-            //     LEDConstants.ARROW_MAP.get((arrowIndex)).getSecond(), 
-            //     getColorFromDistance(closestDistance)
-            // );
+            ledStrip.setLED(
+                LEDConstants.ARROW_MAP.get((arrowIndex)).getFirst(), 
+                LEDConstants.ARROW_MAP.get((arrowIndex)).getSecond(), 
+                getColorFromDistance(closestDistance)
+            );
         } else if (MathUtil.applyDeadband(requiredRotation.getDegrees(), LEDConstants.LPI_ROTATIONAL_DEADBAND) != 0) {
-            // ledStrip.setLED(
-            //     activeRotationalLED,
-            //     activeRotationalLED + 2, 
-            //     Color.kGreen);
+            ledStrip.setLED(
+              activeRotationalLED,
+              activeRotationalLED + 2, 
+              Color.kGreen);
 
-            activeRotationalLED = requiredRotation.getDegrees() > 0 ? activeRotationalLED + 1 : activeRotationalLED - 1;
+            activeRotationalLED = requiredRotation.getDegrees() > 0 ? activeRotationalLED + 1 : activeRotationalLED + 1;
             activeRotationalLED %= LEDConstants.LED_COUNT - 2;
         } else {
             // Flash the LEDs based on the current timestamp
-            xboxController.getHID().setRumble(RumbleType.kRightRumble, 1);
-            // ledStrip.setLED(
-            //     ((int) (Robot.currentTimestamp * 10) % 2 == 0) 
-            //         ? Color.kGreen 
-            //         : Color.kGold
-            // );
+          
+            xboxController.getHID().setRumble(RumbleType.kRightRumble, 1000000000);
+            ledStrip.setLED(
+              ((int) (Robot.currentTimestamp * 10) % 2 == 0) 
+                ? Color.kGreen 
+                : Color.kGold
+            );
         }
     }
 
@@ -133,21 +137,29 @@ public class LPI extends Command implements Logged{
      * 
      * @param distance the distance used to determine the LED color
      */
+    int currentzone = 0;
     private Color getColorFromDistance(double distance) {
+        if (previouszone != currentzone) {
+            ledStrip.setLED(Color.kBlack);
+        }
+
         if (distance > LEDConstants.OUTER_ZONE) {
+            currentzone = 1;
             return Color.kRed;
-        } else if (distance > LEDConstants.INNER_ZONE) {
+        } else if (distance > LEDConstants.INNER_ZONE && distance < LEDConstants.OUTER_ZONE) {
+            currentzone = 2;
             return Color.kOrange;
         } else {
-            xboxController.getHID().setRumble(RumbleType.kLeftRumble, 1);
-            return Color.kGreen; 
+            xboxController.getHID().setRumble(RumbleType.kLeftRumble, 1000000000);
+            currentzone = 3;
+            return Color.kGreen;
         }
-    }
+    } 
+    int previouszone = currentzone;   
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        cancel();
         new LEDWaveCommand().new Hue(
             ledStrip.getLEDCommands(),
             50, 

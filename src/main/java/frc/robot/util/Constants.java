@@ -489,9 +489,9 @@ public final class Constants {
 
         public static final Integer patternMap = null;
 
-        public static final double OUTER_ZONE = 2.262;
-        public static final double INNER_ZONE = 1.131;
-        public static final double RIN_STAR_BIN = 0.1;
+        public static final double OUTER_ZONE = 3;
+        public static final double INNER_ZONE = 1.5;
+        public static final double RIN_STAR_BIN = 0.5;
 
         public static final int LPI_ROTATIONAL_DEADBAND = 1;
 
@@ -643,7 +643,7 @@ public final class Constants {
 
     public static final class FieldConstants {
 
-        public static boolean IS_SIMULATION = Robot.isSimulation();
+        public static boolean IS_SIMULATION = true;
         public static final int CENTER_NOTE_COUNT = 5;
 
         public static final Pose2d BLUE_ORIGIN = new Pose2d(0, 0, new Rotation2d());
