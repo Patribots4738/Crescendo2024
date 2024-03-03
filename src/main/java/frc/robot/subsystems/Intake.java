@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.Constants.IntakeConstants;
@@ -75,6 +76,10 @@ public class Intake extends SubsystemBase implements Logged {
 
     public Command stopCommand() {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
+    }
+
+    public Command setCoastMode() {
+        return runOnce(() -> intakeMotor.setCoastMode());
     }
 
     public boolean getPossession() {

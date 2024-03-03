@@ -57,6 +57,14 @@ public class PieceControl implements Logged{
                 shooterCmds.stopShooter()).ignoringDisable(true);
     }
 
+    public Command coastIntakeAndIndexer() {
+        return Commands.sequence(
+            intake.setCoastMode(),
+            indexer.setCoastMode(),
+            trapper.setCoastMode()
+        );
+    }
+
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())

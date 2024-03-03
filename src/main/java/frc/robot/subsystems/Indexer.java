@@ -57,6 +57,10 @@ public class Indexer extends SubsystemBase {
         return setPercentCommand(IntakeConstants.STOP_PERCENT);
     }
 
+    public Command setCoastMode() {
+        return runOnce(() -> indexer.setCoastMode());
+    }
+
     public boolean hasPiece() {
         return false;
     }
