@@ -413,6 +413,6 @@ public class Swerve extends SubsystemBase implements Logged {
     public boolean isAlignedToAmp() {
         double robotX = this.getPose().getX();
         robotX = MathUtil.applyDeadband(robotX, 0.3);
-        return robotX == FieldConstants.GET_AMP_POSITION().getX();
+        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), 0.3);
     }
 }
