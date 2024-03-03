@@ -207,7 +207,10 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public Command setRumble(DoubleSupplier rumble) {
-        return Commands.runOnce(() -> this.getHID().setRumble(RumbleType.kBothRumble, rumble.getAsDouble()));
+        return Commands.runOnce(() -> this.getHID().setRumble(RumbleType.kBothRumble, rumble.getAsDouble())).ignoringDisable(true);
     }
 
+    public void setRumble(double rumble) {
+        this.getHID().setRumble(RumbleType.kBothRumble, rumble);
+    }
 }

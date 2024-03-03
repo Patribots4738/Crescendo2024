@@ -496,7 +496,7 @@ public final class Constants {
 
         public static final double OUTER_ZONE = 2.262;
         public static final double INNER_ZONE = 1.131;
-        public static final double RIN_STAR_BIN = 0.1;
+        public static final double RIN_STAR_BIN = 0.;
 
         public static final int LPI_ROTATIONAL_DEADBAND = 1;
 

@@ -41,6 +41,7 @@ import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -195,13 +196,29 @@ public class RobotContainer implements Logged {
     
     private void configureTimedEvents() {
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
-        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
+        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity).asProxy()
             .alongWith(pieceControl.coastIntakeAndIndexer()));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
+        
+        new Trigger(swerve::isAlignedToAmp)
+            .onTrue(driver.setRumble(() -> 1.0));
+        
+        new Trigger(shooterCalc.readyToShootSupplier())
+            .onTrue(operator.setRumble(() -> 1.0));
+        
+        new Trigger(intake::getPossession)
+            .onTrue(driver.setRumble(() -> 1.0));
+  
+        new Trigger(() -> swerve.isAlignedToAmp() && intake.getPossession())
+            .onTrue(operator.setRumble(() -> 1.0));
+
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.gameMode == GameMode.TELEOP)
+            .onTrue(driver.setRumble(() -> Math.cos(2*Math.PI*Robot.currentTimestamp)/3 + 2/3));
     }
+    
 
     private void configureTestBindings() {
         // Warning: these buttons are not on the default loop!
