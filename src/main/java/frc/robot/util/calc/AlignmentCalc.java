@@ -24,6 +24,15 @@ public class AlignmentCalc {
         this.swerve = swerve;
     }
 
+    /**
+     * Normalize and add two speeds together.
+     * 
+     * @param controllerSpeeds the controller speeds [-1 , 1]
+     * @param autoSpeeds       the auto alignment speeds [-DriveConstants.MAX_SPEED_METERS_PER_SECOND, 
+     *                                                     DriveConstants.MAX_SPEED_METERS_PER_SECOND]
+     * 
+     * @return the normalized ChassisSpeeds with the alignment deadband applied
+     */
     public ChassisSpeeds normalizeChassisSpeeds(ChassisSpeeds controllerSpeeds, ChassisSpeeds autoSpeeds) {
         return new ChassisSpeeds(
              MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vxMetersPerSecond, autoSpeeds.vxMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
@@ -85,9 +94,9 @@ public class AlignmentCalc {
     }
 
     /**
-     * Supplier for the Command to align the robot to the amp.
+     * Supplier for the amp alignment chassis speeds
      * 
-     * @return the command to align the robot to the amp
+     * @return the supplier for amp alignment chassis speeds
      */
     public Supplier<ChassisSpeeds> getAmpAlignmentSpeedsSupplier() {
         return () -> getAmpAlignmentSpeeds();
@@ -106,11 +115,11 @@ public class AlignmentCalc {
     }
 
     /**
-     * Supplier for the Command to align the robot rotationally to the chain.
+     * Supplier for the rotational speeds to align the robot rotationally to the chain.
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
-     * @return        the command to align the robot to the chain
+     * @return        the supplier for the rotational speeds to align the robot to the chain
      */
     public Supplier<ChassisSpeeds> getChainRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
         return () -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
@@ -122,7 +131,7 @@ public class AlignmentCalc {
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
-     * @return the rotational speeds to align the robot to the source
+     * @return        the rotational speeds to align the robot to the source
      */
     public ChassisSpeeds getSourceRotationalSpeeds(double driverX, double driverY) {
         Pose2d source = FieldConstants.GET_SOURCE_POSITION();
@@ -130,11 +139,11 @@ public class AlignmentCalc {
     }
 
     /**
-     * Supplier for the Command to align the robot rotationally to the source of the field.
+     * Supplier for the speeds to align the robot rotationally to the source.
      * 
      * @param driverX the driver's x input
      * @param driverY the driver's y input
-     * @return        the command to align the robot to the source
+     * @return        the supplier for the rotational speeds to align the robot to the source
      */
     public Supplier<ChassisSpeeds> getSourceRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
         return () -> getSourceRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
@@ -146,7 +155,7 @@ public class AlignmentCalc {
      * @param driverX     the driver's x input
      * @param driverY     the driver's y input
      * @param shooterCmds the shooter commands
-     * @return the rotational speeds to align the robot to the speaker
+     * @return            the rotational speeds to align the robot to the speaker
      */
     public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return 
@@ -159,7 +168,7 @@ public class AlignmentCalc {
      * @param driverX      the driver's x input
      * @param driverY      the driver's y input
      * @param desiredAngle the desired angle
-     * @return the rotational speeds to align the robot
+     * @return             the rotational speeds to rotationally align the robot
      */
     public ChassisSpeeds getRotationalSpeeds(double driverX, double driverY, Rotation2d desiredAngle) {
         return new ChassisSpeeds(
@@ -169,12 +178,12 @@ public class AlignmentCalc {
     }
 
     /**
-     * Supplier for the Command to align the robot rotationally to the speaker.
+     * Supplier for the speeds to align the robot rotationally to the speaker.
      * 
-     * @param driverX   the driver's x input
-     * @param driverY   the driver's y input
+     * @param driverX     the driver's x input
+     * @param driverY     the driver's y input
      * @param shooterCmds the shooter commands
-     * @return          the command to align the robot to the speaker
+     * @return            the suppoer for the speeds to align the robot to the speaker
      */
     public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
