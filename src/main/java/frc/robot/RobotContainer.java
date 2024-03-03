@@ -117,7 +117,7 @@ public class RobotContainer implements Logged {
     @Log
     public static SwerveModuleState[] swerveDesiredStates;
     @Log
-    public static double gamemodeStart = 0;
+    public static double gameModeStart = 0;
     
     Command wheelRadiusChar;
     public RobotContainer() {
@@ -193,7 +193,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-        new Trigger(() -> Robot.currentTimestamp - gamemodeStart >= 134.8 && Robot.gameMode != GameMode.DISABLED)
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
             .alongWith(pieceControl.coastIntakeAndIndexer()));
         
@@ -408,7 +408,7 @@ public class RobotContainer implements Logged {
         } else if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
-        gamemodeStart = Robot.currentTimestamp;
+        gameModeStart = Robot.currentTimestamp;
         pathPlannerStorage.updatePathViewerCommand().schedule();
         this.freshCode = false;
     }
