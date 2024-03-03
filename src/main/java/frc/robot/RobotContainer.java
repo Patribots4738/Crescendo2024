@@ -13,9 +13,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -86,7 +88,7 @@ public class RobotContainer implements Logged {
     public static HDCTuner HDCTuner;
 
     private final LedStrip ledStrip;
-    private Indexer triggerWheel;
+    private Indexer indexer;
     private Trapper trapper;
     private ShooterCmds shooterCmds;
 
@@ -114,6 +116,8 @@ public class RobotContainer implements Logged {
     public static SwerveModuleState[] swerveMeasuredStates;
     @Log
     public static SwerveModuleState[] swerveDesiredStates;
+    @Log
+    public static double gameModeStart = 0;
     
     Command wheelRadiusChar;
     public RobotContainer() {
@@ -127,7 +131,7 @@ public class RobotContainer implements Logged {
         limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
         // limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
         ledStrip = new LedStrip(swerve::getPose);
-        triggerWheel = new Indexer();
+        indexer = new Indexer();
 
         shooter = new Shooter();
         elevator = new Elevator();
@@ -150,7 +154,7 @@ public class RobotContainer implements Logged {
 
         pieceControl = new PieceControl(
             intake,
-            triggerWheel,
+            indexer,
             elevator,
             trapper,
             shooterCmds);
@@ -178,13 +182,22 @@ public class RobotContainer implements Logged {
             swerve.setWheelsOCommand().andThen(wheelRadiusChar));
         configureButtonBindings();
         configureLoggingPaths();
+        
+        
     }
-
+    
     private void configureButtonBindings() {
         configureDriverBindings(driver);
         configureOperatorBindings(operator);
         configureTestBindings();
-
+        configureTimedEvents();
+    }
+    
+    private void configureTimedEvents() {
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
+        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
+            .alongWith(pieceControl.coastIntakeAndIndexer()));
+        
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
@@ -396,6 +409,7 @@ public class RobotContainer implements Logged {
         } else if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
+        gameModeStart = Robot.currentTimestamp;
         pathPlannerStorage.updatePathViewerCommand().schedule();
         this.freshCode = false;
     }
@@ -536,3 +550,4 @@ public class RobotContainer implements Logged {
         }
     }
 }
+ 

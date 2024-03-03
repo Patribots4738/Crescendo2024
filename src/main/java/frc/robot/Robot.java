@@ -16,7 +16,6 @@ import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.NeoPhysicsSim;
-import monologue.Annotations.Log;
 import monologue.Monologue;
 
 /**
@@ -69,11 +68,12 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        Monologue.updateAll();
-        CommandScheduler.getInstance().run();
-
+        // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
+        
+        Monologue.updateAll();
+        CommandScheduler.getInstance().run();
     }
 
     @Override
@@ -94,6 +94,7 @@ public class Robot extends TimedRobot {
     public void disabledExit() {
         // Shut off NetworkTables broadcasting for most logging calls
         // if we are at competition
+        RobotContainer.gameModeStart = currentTimestamp;
         Monologue.setFileOnly(DriverStation.isFMSAttached());
     }
 
@@ -124,6 +125,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousExit() {
         // Stop our autonomous command if it is still running.
+        System.out.printf(
+            "*** Auto finished in %.2f secs ***%n", Robot.currentTimestamp - RobotContainer.gameModeStart);
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }

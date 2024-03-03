@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import java.util.stream.DoubleStream;
 import java.util.Arrays;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -33,16 +32,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.ChasePose;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.ModuleConstants;
 import frc.robot.util.Constants.OIConstants;
-import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -445,6 +441,6 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public boolean isAlignedToAmp() {
         double robotX = this.getPose().getX();
-        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), OIConstants.ALIGNMENT_DEADBAND);
+        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), AutoConstants.AUTO_ALIGNMENT_DEADBAND);
     }
 }
