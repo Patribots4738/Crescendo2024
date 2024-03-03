@@ -77,6 +77,10 @@ public class MAXSwerveModule implements Logged{
                 new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
     }
 
+    public double getDrivePositionRadians() {
+        return new Rotation2d((drivingSpark.getPosition() / ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR)).getRadians();
+    }
+
     /**
      * Sets the desired state for the module.
      *
