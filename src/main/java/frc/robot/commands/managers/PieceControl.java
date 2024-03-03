@@ -63,6 +63,11 @@ public class PieceControl implements Logged{
                 .andThen(noteToShoot(poseSupplier, speedSupplier));
     }
 
+    public Command shootPreload() {
+        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+                .andThen(intakeAuto());
+    }
+
     // TODO: Possibly split this into two commands where one sends to shooter
     // without waiting
     public Command noteToShoot(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
@@ -142,6 +147,14 @@ public class PieceControl implements Logged{
         );
     }
 
+    public Command panicEjectNote() {
+        return trapper.intake().andThen(indexer.toElevator());
+    }
+
+    public Command stopPanicEject() {
+        return trapper.stopCommand().andThen(indexer.stopCommand());
+    }
+
     public Command dropPieceCommand() {
         return Commands.sequence(
             elevator.toDropCommand(),
@@ -160,7 +173,7 @@ public class PieceControl implements Logged{
         return Commands.sequence(
                 intake.inCommand(),
                 trapper.intake(),
-                indexer.stopCommand());
+                indexer.toShooter());
     }
 
     public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {

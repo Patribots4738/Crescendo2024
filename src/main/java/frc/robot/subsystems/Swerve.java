@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,12 +31,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.ChasePose;
 import frc.robot.commands.drive.Drive;
 import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
+import frc.robot.util.Constants.OIConstants;
+import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -44,6 +49,9 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public static double twistScalar = 4;
     private Rotation2d gyroRotation2d = new Rotation2d();
+
+    @Log
+    private boolean isAlignedToAmp = false;
 
     private double speedMultiplier = 1;
     private final MAXSwerveModule frontLeft = new MAXSwerveModule(
@@ -89,14 +97,22 @@ public class Swerve extends SubsystemBase implements Logged {
             // This is because we assume that the IMU is very accurate.
             // You can visualize these graphs working together here:
             // https://www.desmos.com/calculator/a0kszyrwfe
-            VecBuilder.fill(0.1, 0.1, 0.05),
             // State measurement
             // standard deviations
             // X, Y, theta
-            VecBuilder.fill(0.8, 0.8, 2.5)
-    // Vision measurement
-    // standard deviations
-    // X, Y, theta
+            VecBuilder.fill(
+                Units.feetToMeters(0.3), 
+                Units.feetToMeters(0.3), 
+                Units.degreesToRadians(3)
+            ),
+            // Vision measurement
+            // standard deviations
+            // X, Y, theta
+            VecBuilder.fill(
+                Units.feetToMeters(2.5), 
+                Units.feetToMeters(2.5), 
+                Units.degreesToRadians(20)
+            )
     );
 
     /**
@@ -124,6 +140,7 @@ public class Swerve extends SubsystemBase implements Logged {
         // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
         // gyro.getYaw().getValueAsDouble());
         logPositions();
+        this.isAlignedToAmp = isAlignedToAmp();
     }
 
     public void logPositions() {
@@ -400,4 +417,8 @@ public class Swerve extends SubsystemBase implements Logged {
         return atPose(desiredHDCPose);
     }
 
+    public boolean isAlignedToAmp() {
+        double robotX = this.getPose().getX();
+        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), OIConstants.ALIGNMENT_DEADBAND);
+    }
 }

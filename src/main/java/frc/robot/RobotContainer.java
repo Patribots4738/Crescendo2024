@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
 import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.Drive;
+import frc.robot.commands.drive.DriveHDC;
 import frc.robot.commands.logging.NT;
 import frc.robot.commands.logging.NTPIDTuner;
 import frc.robot.commands.managers.CalibrationControl;
@@ -121,8 +122,8 @@ public class RobotContainer implements Logged {
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight");
-        limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight2");
+        limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
+        // limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
         ledStrip = new LedStrip(swerve::getPose);
         triggerWheel = new Indexer();
 
@@ -161,7 +162,8 @@ public class RobotContainer implements Logged {
             driver::getLeftX,
             () -> -driver.getRightX()/1.6,
             robotRelativeSupplier,
-            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())));
+            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
+        ));
 
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();
@@ -259,14 +261,13 @@ public class RobotContainer implements Logged {
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
-
- 
+      
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeToTrap())
+            .onTrue(pieceControl.intakeToTrap())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
-            .whileTrue(pieceControl.ejectNote())
+            .onTrue(pieceControl.ejectNote())
             .onFalse(pieceControl.stopEjecting());
     }
 
@@ -300,6 +301,9 @@ public class RobotContainer implements Logged {
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
 
+        controller.a()
+            .onTrue(pieceControl.panicEjectNote())
+            .onFalse(pieceControl.stopPanicEject());
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
@@ -449,7 +453,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootPreload());
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
         NamedCommands.registerCommand("PlaceAmp", pieceControl.placeWhenReady());
@@ -483,7 +487,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(intake, "Robot/Subsystems/intake");
         Monologue.logObj(climb, "Robot/Subsystems/climb");
         Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-        Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+        // Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
