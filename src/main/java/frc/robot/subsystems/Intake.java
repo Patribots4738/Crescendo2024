@@ -1,11 +1,14 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.ControlType;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.rev.Neo;
+import frc.robot.util.rev.Neo.ControlLoopType;
 import frc.robot.util.rev.SafeSpark.TelemetryPreference;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -24,7 +27,7 @@ public class Intake extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        intakeMotor.updateHasControl(IntakeConstants.INTAKE_PERCENT, 0.3, 8000, 21);
+        intakeMotor.updateHasControl(ControlLoopType.PERCENT, IntakeConstants.INTAKE_PERCENT, 0.3, 8000, 21);
     }
 
     public void setPercent(double desiredPercent) {

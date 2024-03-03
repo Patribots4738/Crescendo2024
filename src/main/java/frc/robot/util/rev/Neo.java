@@ -128,11 +128,8 @@ public class Neo extends SafeSpark implements Logged {
             setPIDReference(position, ControlType.kPosition, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
         }
 
-        if (targetPosition != position){
-            setHasControl(false);
-        } else {
-            setHasControl(true);
-        }
+        if (targetPosition != position)
+            updateHasControl(ControlLoopType.POSITION, position, 0.3, 8000, 21);
         targetPosition = position;
 
         controlType = ControlLoopType.POSITION;
@@ -181,11 +178,8 @@ public class Neo extends SafeSpark implements Logged {
             setPIDReference(percent, ControlType.kDutyCycle, slot, arbitraryFeedForward, ArbFFUnits.kPercentOut);
         }
         
-        if (targetPercent != percent){
-            setHasControl(false);
-        } else {
-            setHasControl(true);
-        }
+        if (targetPercent != percent)
+            updateHasControl(ControlLoopType.PERCENT, percent, 0.3, 8000, 21);
         targetPercent = percent;
         
         controlType = ControlLoopType.PERCENT;
@@ -235,11 +229,8 @@ public class Neo extends SafeSpark implements Logged {
             setPIDReference(velocity, ControlType.kVelocity, slot, arbitraryFeedForward, ArbFFUnits.kVoltage);
         }
 
-        if (targetVelocity != velocity){
-            setHasControl(false);
-        } else {
-            setHasControl(true);
-        }
+        if (targetVelocity != velocity)
+            updateHasControl(ControlLoopType.VELOCITY, velocity, 0.3, 8000, 21);
         targetVelocity = velocity;
 
         controlType = ControlLoopType.VELOCITY;
@@ -487,12 +478,14 @@ public class Neo extends SafeSpark implements Logged {
         return hasControl;
     }
 
-    public void setHasControl(boolean hasControl) {
-        this.hasControl = hasControl;
-    }
-
-    public boolean updateHasControl(double requiredDesiredSpeed, double dt, double velocityThreshold, double currentThreshold) {
-        return getTargetPercent() == requiredDesiredSpeed 
+    public boolean updateHasControl(ControlLoopType type, double requiredDesiredSpeed, double dt, double velocityThreshold, double currentThreshold) {
+        double target = 
+            type == ControlLoopType.POSITION 
+                ? getTargetPosition() 
+            : ControlLoopType.VELOCITY == type 
+                ? getTargetVelocity() 
+            : getTargetPercent();
+        return target == requiredDesiredSpeed 
             && Robot.currentTimestamp - lastDesiredChangeTimestamp > dt
             && this.getVelocity() < velocityThreshold
             && this.getOutputCurrent() > currentThreshold;
