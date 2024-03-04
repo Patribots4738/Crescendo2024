@@ -16,17 +16,17 @@ import java.util.List;
 
 public class LedStrip extends SubsystemBase {
 
-	private AddressableLED led;
+    private AddressableLED led;
     public AddressableLEDBuffer ledBuffer;
 
     private BooleanSupplier isRedAlliance = Robot::isRedAlliance;
-    
+
     private LEDCommands ledFunctionCommand = new LEDCommands(this);
 
     public LedStrip() {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
         ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
-    
+
         led.setLength(ledBuffer.getLength());
 
         led.setData(ledBuffer);
@@ -38,13 +38,17 @@ public class LedStrip extends SubsystemBase {
     public AddressableLEDBuffer getBuffer() {
         return ledBuffer;
     }
-    
+
     @Override
     public void periodic() {
         led.setData(ledBuffer);
     }
 
     public void setLED(int startIndex, int endIndex, Color color) {
+        if (startIndex == -1 || endIndex == -1) {
+            setLED(color);
+            return;
+        }
         for (int i = startIndex; i < endIndex; i++) {
             ledBuffer.setLED(i, color);
         }
@@ -54,7 +58,7 @@ public class LedStrip extends SubsystemBase {
         if (index == -1) {
             setLED(color);
         } else {
-            setLED(index, index+1, color);
+            setLED(index, index + 1, color);
         }
     }
 
@@ -75,13 +79,14 @@ public class LedStrip extends SubsystemBase {
     public LEDCommands getLEDCommands() {
         return ledFunctionCommand;
     }
-    
-    //TODO: remove circus and loading when the commands have been made
+
+    // TODO: remove circus and loading when the commands have been made
     double circusOffset = 1;
+
     public Command circus() {
         return run(() -> {
             for (int i = 0; i < ledBuffer.getLength(); i++) {
-                final Color color = (((int) ((i/5.0) + circusOffset) % 2 == 0) ? Color.kRed : Color.kWhite);
+                final Color color = (((int) ((i / 5.0) + circusOffset) % 2 == 0) ? Color.kRed : Color.kWhite);
                 setLED(i, color);
             }
             circusOffset += .05;
@@ -91,12 +96,12 @@ public class LedStrip extends SubsystemBase {
     public Command loading() {
         return run(() -> {
             for (int i = 0; i < 2 && i > 8; i++) {
-              int index = i;
-              new LEDConditionalCommand(
-                this.getLEDCommands(), 
-                Color.kFirstBlue, 
-                Color.kBlack, 
-                () -> (index < 2 && index > 8)).schedule();
+                int index = i;
+                new LEDConditionalCommand(
+                        this.getLEDCommands(),
+                        Color.kFirstBlue,
+                        Color.kBlack,
+                        () -> (index < 2 && index > 8)).schedule();
             }
         });
     }
@@ -123,41 +128,7 @@ public class LedStrip extends SubsystemBase {
          * @return The color
          */
         public static Color fromHSV360(int h, int s, int v) {
-            // Loosely based on
-            // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
-            // The hue range is split into 60 degree regions where in each region there
-            // is one rgb component at a low value (m), one at a high value (v) and one
-            // that changes (X) from low to high (X+m) or high to low (v-X)
-
-            // Difference between highest and lowest value of any rgb component
-            final int chroma = (s * v) / 255;
-
-            // Because hue is 0-360 rather than 0-180 use 60 not 30
-            final int region = (h / 60) % 6;
-
-            // Remainder converted from 0-30 to 0-255
-            final int remainder = (int) Math.round((h % 30) * (255 / 30.0));
-
-            // Value of the lowest rgb component
-            final int m = v - chroma;
-
-            // Goes from 0 to chroma as hue increases
-            final int X = (chroma * remainder) >> 8;
-
-            switch (region) {
-                case 0:
-                    return new Color(v, X + m, m);
-                case 1:
-                    return new Color(v - X, v, m);
-                case 2:
-                    return new Color(m, v, X + m);
-                case 3:
-                    return new Color(m, v - X, v);
-                case 4:
-                    return new Color(X + m, m, v);
-                default:
-                    return new Color(v, m, v - X);
-            }
+            return Color.fromHSV(h/2, s, v);
         }
     }
 }

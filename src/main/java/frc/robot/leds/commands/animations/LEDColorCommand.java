@@ -4,10 +4,8 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public class LEDColorCommand extends LEDCommands {
     private Color color;
-    private int index = -1;
-    // TODO: wtf is this, please clean this up
-    private int index1 = 0;
-    private int index2 = 10;
+    private int index1 = -1;
+    private int index2 = -1;
     private LEDCommands root;
 
     public LEDColorCommand(LEDCommands root, Color color) {
@@ -16,15 +14,16 @@ public class LEDColorCommand extends LEDCommands {
         this.color = color;
     }
 
-    public LEDColorCommand(LEDCommands root, Color color, int i) {
+    public LEDColorCommand(LEDCommands root, Color color, int index) {
         this(root, color);
-        this.index = i;
+        this.index1 = index;
+        this.index2 = index + 1;
     }
 
-    public LEDColorCommand(LEDCommands root, Color color, int i, int j) {
+    public LEDColorCommand(LEDCommands root, Color color, int index1, int index2) {
         this(root, color);
-        this.index1 = i;
-        this.index2 = j;
+        this.index1 = index1;
+        this.index2 = index2;
     }
 
     @Override
