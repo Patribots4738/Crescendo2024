@@ -303,7 +303,7 @@ public final class Constants {
         public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
         public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
 
-        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(1);
+        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
         /*
          * XY:

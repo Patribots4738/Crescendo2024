@@ -196,7 +196,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.currentTimestamp - gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
             .andThen(pieceControl.coastIntakeAndIndexer()));
         
@@ -205,21 +205,31 @@ public class RobotContainer implements Logged {
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
         new Trigger(swerve::isAlignedToAmp)
-            .onTrue(driver.setRumble(() -> 1.0));
+            .onTrue(driver.setRumble(() -> 0.3))
+            .onFalse(driver.setRumble(() -> 0));
         
         new Trigger(shooterCalc.readyToShootSupplier())
-            .onTrue(operator.setRumble(() -> 1.0));
+            .onTrue(driver.setRumble(() -> 0.3))
+            .onFalse(driver.setRumble(() -> 0));
         
+        // Make the controllers pulse just like the LEDs do
         new Trigger(intake::getPossession)
-            .onTrue(driver.setRumble(() -> 1.0));
-  
-        new Trigger(() -> swerve.isAlignedToAmp() && intake.getPossession())
-            .onTrue(operator.setRumble(() -> 1.0));
+            .onTrue(
+                Commands.race(
+                    Commands.run(() -> {
+                        driver.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
+                        operator.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
+                    }),
+                    Commands.waitSeconds(1)
+                ).andThen(driver.setRumble(() -> 0).alongWith(operator.setRumble(() -> 0)))
+                // TODO: Figure out why this doesn't work
+                .alongWith(limelight3.blinkLeds(() -> 1))
+            );
 
         // Have the controllers pulse when the match is about to end to signal the drivers
         // Pulses get more extreme as the clock approaches 0
         // Starts when there are five seconds left in the match
-        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.gameMode == GameMode.TELEOP)
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.currentTimestamp - gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
             .whileTrue(
                 Commands.run(
                     () -> driver.setRumble( 
@@ -228,9 +238,6 @@ public class RobotContainer implements Logged {
                         ((135 - Robot.currentTimestamp - gameModeStart)*2.0)))
                     )
                 );
-
-        new Trigger(intake::getPossession)
-            .onTrue(limelight3.blinkLeds(() -> 1));
     }
     
 
@@ -290,10 +297,18 @@ public class RobotContainer implements Logged {
                     climb::getHooksUp)));
                     
         controller.x()
-            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
+            .toggleOnTrue(
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true)
+                .finallyDo(() -> 
+                    shooter.stopCommand().schedule()
+                ));
 
         controller.b()
-            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
+            .toggleOnTrue(
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false)
+                .finallyDo(() -> 
+                    shooter.stopCommand().schedule()
+                ));
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -305,7 +320,8 @@ public class RobotContainer implements Logged {
                     new ActiveConditionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::onOppositeSide)));
+                        alignmentCmds.alignmentCalc::onOppositeSide))
+                );
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
