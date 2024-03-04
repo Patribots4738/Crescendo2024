@@ -88,30 +88,20 @@ public class Limelight extends SubsystemBase implements Logged{
             return;
         }
 
-        // distance from current pose to vision estimated pose
-        double poseDifference = poseEstimator.getEstimatedPosition().getTranslation()
-            .getDistance(estimatedRobotPose.getTranslation());
-    
         if (hasTarget(result)) {
             double xyStds;
             double radStds;
             // multiple targets detected
-            if (result.targets_Fiducials.length >= 2) {
+            if (result.targets_Fiducials.length > 1) {
                 // TODO: TUNE
                 xyStds = 0.8;
                 radStds = 1.2;
             }
             // 1 target with large area and close to estimated pose
-            else if (poseDifference < 0.5 && getBestTargetArea(result) > 0.8) {
+            else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
                 xyStds = 1.6;
                 radStds = 4;
-            }
-            // 1 target farther away and estimated pose is close
-            else if (poseDifference < 0.3 && getBestTargetArea(result) > 0.15) {
-                // TODO: TUNE
-                xyStds = 2.5;
-                radStds = 6;
             }
             // conditions don't match to add a vision measurement
             else {
@@ -190,16 +180,6 @@ public class Limelight extends SubsystemBase implements Logged{
         return (result.latency_pipeline/1000.0) - (result.latency_capture/1000.0); 
     }
 
-    public double getBestTargetArea(Results result) {
-        double bestArea = 0;
-        for (LimelightTarget_Fiducial target : result.targets_Fiducials) {
-            if (target.ta > bestArea) {
-                bestArea = target.ta;
-            }
-        }
-        return bestArea;
-    }
-
     // The below code is for simulation only
     // This has nothing to do with the actual limelight
 
@@ -261,6 +241,9 @@ public class Limelight extends SubsystemBase implements Logged{
         
         return angleCheck && distanceCheck && isFacing;
     }
+
+    @Log
+    int tagsViable = 0;
 
     public boolean hasTarget(Results result) {
         if (result == null || !result.valid || (result.botpose[0] == 0 && result.botpose[1] == 0)) {

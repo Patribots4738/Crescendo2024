@@ -31,7 +31,7 @@ public class WheelRadiusCharacterization extends Command implements Logged{
 
   private double robotTimestamp;
   private final DoubleSupplier gyroYawRadsSupplier =
-  () -> swerve.getPose().getRotation().getRadians();
+  () -> swerve.getGyroRotation2d().getRadians();
   // wheel radius (meters) =
   //   gyro delta (radians) * drive base radius (meters) / wheel position delta (radians)		
   public WheelRadiusCharacterization(Swerve swerve) {

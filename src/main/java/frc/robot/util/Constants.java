@@ -413,9 +413,9 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = 0.0762;
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4684508138321497*2.0);
         public static final double WHEEL_TO_MOTOR_ROTATIONS = 3.5625;
-        public static final double   WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
+        public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
         // teeth on the bevel pinion
         // spur gear changes based on the gearing (L1-L3 etc)

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.288642422749572,
-        "y": 5.773167022257897
+        "x": 8.293238893308695,
+        "y": 5.77776349281702
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.327980075892963,
-        "y": 5.952429374063675
+        "x": 7.332576546452087,
+        "y": 5.957025844622798
       },
       "isLocked": false,
       "linkedName": "C2"
@@ -56,7 +56,7 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 0.65,
+      "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
         "data": {
