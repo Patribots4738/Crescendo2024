@@ -303,7 +303,7 @@ public final class Constants {
         public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
         public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
 
-        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(1);
+        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
         /*
          * XY:
@@ -492,11 +492,9 @@ public final class Constants {
         public static final int PWM_PORT = 9;
         public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
 
-        public static final Integer patternMap = null;
-
         public static final double OUTER_ZONE = 2.262;
         public static final double INNER_ZONE = 1.131;
-        public static final double RIN_STAR_BIN = 0.1;
+        public static final double RIN_STAR_BIN = Units.inchesToMeters(2.54);
 
         public static final int LPI_ROTATIONAL_DEADBAND = 1;
 
