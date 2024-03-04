@@ -216,8 +216,18 @@ public class RobotContainer implements Logged {
         new Trigger(() -> swerve.isAlignedToAmp() && intake.getPossession())
             .onTrue(operator.setRumble(() -> 1.0));
 
+        // Have the controllers pulse when the match is about to end to signal the drivers
+        // Pulses get more extreme as the clock approaches 0
+        // Starts when there are five seconds left in the match
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.gameMode == GameMode.TELEOP)
-            .onTrue(driver.setRumble(() -> Math.cos(2*Math.PI*Robot.currentTimestamp)/3 + 2/3));
+            .whileTrue(
+                Commands.run(
+                    () -> driver.setRumble( 
+                        (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - gameModeStart) + Math.PI)
+                        /
+                        ((135 - Robot.currentTimestamp - gameModeStart)*2.0)))
+                    )
+                );
 
         new Trigger(intake::getPossession)
             .onTrue(limelight3.blinkLeds(() -> 1));
@@ -422,6 +432,9 @@ public class RobotContainer implements Logged {
             .until(() -> Robot.gameMode != GameMode.DISABLED)
             .ignoringDisable(true)
             .schedule();
+
+        driver.setRumble(0);
+        operator.setRumble(0);
     }
 
     public void onEnabled() {
