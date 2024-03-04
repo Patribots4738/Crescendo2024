@@ -187,6 +187,8 @@ public class Swerve extends SubsystemBase implements Logged {
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
                 new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
 
+        RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
+
     }
 
     /**

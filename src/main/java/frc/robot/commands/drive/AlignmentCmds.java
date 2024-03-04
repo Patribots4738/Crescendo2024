@@ -143,7 +143,8 @@ public class AlignmentCmds {
             new ActiveConditionalCommand(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
-                    .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)),
+                    .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                        .finallyDo(shooterCmds.stopShooter()::initialize)),
                 climb::getHooksUp);
     }
 

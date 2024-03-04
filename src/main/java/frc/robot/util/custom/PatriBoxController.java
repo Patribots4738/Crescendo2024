@@ -43,8 +43,16 @@ public class PatriBoxController extends CommandXboxController {
         return super.getHID().getLeftTriggerAxis();
     }
 
+    public boolean getLeftTrigger() {
+        return super.getHID().getLeftTriggerAxis() > 0.25;
+    }
+
     public double getRightTriggerAxis() {
         return super.getHID().getRightTriggerAxis();
+    }
+
+    public boolean getRightTrigger() {
+        return super.getHID().getRightTriggerAxis() > 0.25;
     }
 
     public boolean getStartButton() {

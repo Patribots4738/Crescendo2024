@@ -153,7 +153,7 @@ public final class Constants {
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
 
-        public static final double SHOOTER_DEFAULT_RPM = 3000;
+        public static final double DEFAULT_RPM = 2500;
         
         public static final double SHOOTER_PASS_SECONDS = 2;
 
@@ -818,7 +818,7 @@ public final class Constants {
         }};
 
         // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-        public static final double AUTO_SHOOTER_DISTANCE_THRESHOLD = 6.5;
+        public static final double AUTOMATIC_SHOOTER_DISTANCE_RADIUS = 8.5;
 
         public static List<Pose2d> GET_SHOOTING_POSITIONS() {
             int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;
@@ -907,6 +907,8 @@ public final class Constants {
             put("noteToTrap1", 0.2);
             put("noteToTrap2", 0.5);
             put("noteToTrap3", 0.0);
+
+            put("dropPiece1", 0.5);
 
             put("ampPosition", 0.37);
             put("atan++", 0.0);

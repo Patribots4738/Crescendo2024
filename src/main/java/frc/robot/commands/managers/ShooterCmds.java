@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.util.GeometryUtil;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -72,6 +73,14 @@ public class ShooterCmds {
         shooter.setSpeed(triplet.getSpeeds());
     }
 
+    public void setSpeeds(Pair<Double, Double> speeds) {
+        shooter.setSpeed(speeds);
+    }
+
+    public void setSpeeds(double speed) {
+        setSpeeds(Pair.of(speed, speed));
+    }
+
     public Command setTripletCommand(SpeedAngleTriplet triplet) {
         return Commands.run(() -> {
             desiredTriplet = triplet;
@@ -132,9 +141,9 @@ public class ShooterCmds {
                         calculationTriplet.getAngle(),
                         false
                     )
-                ).asProxy().schedule();
+                ).schedule();
             }
-        ).asProxy();
+        );
     }
 
     public Command stopShooter() {

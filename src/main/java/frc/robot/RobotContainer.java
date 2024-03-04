@@ -13,11 +13,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
 import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.Drive;
-import frc.robot.commands.drive.DriveHDC;
 import frc.robot.commands.drive.WheelRadiusCharacterization;
 import frc.robot.commands.logging.NT;
 import frc.robot.commands.logging.NTPIDTuner;
@@ -110,6 +107,8 @@ public class RobotContainer implements Logged {
     public static Field2d field2d = new Field2d();
     @Log
     public static Pose2d robotPose2d = new Pose2d();
+    @Log
+    public static double distanceToSpeakerMeters = 0;
     @Log
     public static Pose3d robotPose3d = new Pose3d();
     @Log
@@ -201,8 +200,8 @@ public class RobotContainer implements Logged {
     
     private void configureTimedEvents() {
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
-        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
-            .alongWith(pieceControl.coastIntakeAndIndexer()));
+        .onTrue(pieceControl.coastIntakeAndIndexer()
+            .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
@@ -286,7 +285,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors());
       
         controller.leftBumper()
-            .onTrue(pieceControl.intakeToTrap())
+            .onTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -308,7 +307,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.elevatorToBottom());
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeToTrap())
+            .whileTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -350,7 +349,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeToTrap())
+            .whileTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
