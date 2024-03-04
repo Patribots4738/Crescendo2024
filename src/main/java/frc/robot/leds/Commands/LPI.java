@@ -33,7 +33,7 @@ public class LPI extends Command implements Logged{
     private int activeRotationalLED = 0;
     private PatriBoxController xboxController;
 
-    public Pose2d closestPose;
+    private Pose2d closestPose;
     Pose2d currentRobotPosition;
     Translation2d currentRobotTranslation;
     private final Consumer<Pose2d> poseConsumer;
