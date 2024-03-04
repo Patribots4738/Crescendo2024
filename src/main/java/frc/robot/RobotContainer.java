@@ -93,6 +93,7 @@ public class RobotContainer implements Logged {
     private Trapper trapper;
     private ShooterCmds shooterCmds;
 
+    @IgnoreLogged
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
     private final BooleanSupplier robotRelativeSupplier;
@@ -130,7 +131,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
-        // limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
+        limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
 
@@ -196,8 +197,8 @@ public class RobotContainer implements Logged {
     
     private void configureTimedEvents() {
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
-        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity).asProxy()
-            .alongWith(pieceControl.coastIntakeAndIndexer()));
+        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
+            .andThen(pieceControl.coastIntakeAndIndexer()));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
@@ -217,6 +218,9 @@ public class RobotContainer implements Logged {
 
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.gameMode == GameMode.TELEOP)
             .onTrue(driver.setRumble(() -> Math.cos(2*Math.PI*Robot.currentTimestamp)/3 + 2/3));
+
+        new Trigger(intake::getPossession)
+            .onTrue(limelight3.blinkLeds(() -> 1));
     }
     
 
@@ -297,7 +301,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors());
       
         controller.leftBumper()
-            .onTrue(pieceControl.intakeToTrap())
+            .onTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -319,7 +323,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.elevatorToBottom());
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeToTrap())
+            .whileTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -334,7 +338,7 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
-
+            
         controller.a()
             .onTrue(pieceControl.panicEjectNote())
             .onFalse(pieceControl.stopPanicEject());
@@ -361,7 +365,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeToTrap())
+            .whileTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
@@ -484,6 +488,7 @@ public class RobotContainer implements Logged {
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
+        NamedCommands.registerCommand("ToIndexer", pieceControl.noteToIndexer());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
@@ -516,13 +521,14 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
         Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
         Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
+        Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
 
         Monologue.logObj(swerve, "Robot/Swerve");
 
         Monologue.logObj(intake, "Robot/Subsystems/intake");
         Monologue.logObj(climb, "Robot/Subsystems/climb");
         Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-        // Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+        Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");

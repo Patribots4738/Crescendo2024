@@ -1,6 +1,7 @@
 package frc.robot.commands.managers;
 
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,7 +18,7 @@ import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
-public class PieceControl implements Logged{
+public class PieceControl implements Logged {
 
     private Intake intake;
     private Indexer indexer;
@@ -33,6 +34,8 @@ public class PieceControl implements Logged{
     // State representing if we are trying to unstuck the elevator
     @Log
     private boolean elevatorDislodging = false;
+    @Log
+    private boolean readyToMoveNote = true;
 
     // State representing if we are ready to place with trapper
     @Log
@@ -93,7 +96,7 @@ public class PieceControl implements Logged{
                 stopIntakeAndIndexer());
     }
 
-    public Command intakeToTrap() {
+    public Command intakeNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from trapper into indexer and then into 
@@ -104,24 +107,35 @@ public class PieceControl implements Logged{
             indexer.toShooterSlow(),
             Commands.waitUntil(intake::getPossession),
             NT.getWaitCommand("intakeToTrap1"), // 0.5
-            Commands.either(
-                noteToTrap().andThen(noteToIndexer()), 
-                noteToTrap(), 
-                this::getShooterMode)
+            // Use the trap to index it the first time around
+            noteToTrap(),
+            // Then send it to its desired location
+            moveNote()
         );
-    }
+    }  
 
     public Command noteToIndexer() {
         return Commands.sequence(
+            intake.inCommand(),
             trapper.intake(),
             indexer.toShooterSlow(),
-            NT.getWaitCommand("noteToIndexer1"), // 0.6
+            Commands.waitSeconds(.35),// 0.6
             indexer.stopCommand(),
             indexer.toElevatorSlow(),
             NT.getWaitCommand("noteToIndexer2"), // 0.07
             stopIntakeAndIndexer()
         );
     }
+
+    public Command toIndexerAuto() {
+        return Commands.sequence(
+            trapper.intake(),
+            intake.inCommand()
+            
+        );
+    }
+
+    
 
     public Command noteToTrap() {
         return Commands.sequence(
@@ -232,7 +246,7 @@ public class PieceControl implements Logged{
 
     public Command prepPiece() {
         return Commands.sequence(
-            trapper.intake(),
+            trapper.intakeSlow(),
             NT.getWaitCommand("prepPiece"),
             trapper.stopCommand()
         );
@@ -323,21 +337,52 @@ public class PieceControl implements Logged{
         this.shooterMode = shooterMode;
     }
 
+    public Command setReadyToMoveNote(boolean readyToMove) {
+        return Commands.runOnce(() -> {
+            this.readyToMoveNote = readyToMove;
+        });
+    }
 
+    public boolean readyToMoveNote() {
+        return readyToMoveNote;
+    }
+
+    public Command moveNote() {
+        return Commands.sequence(
+                setReadyToMoveNote(false),
+                Commands.either(
+                    noteToIndexer(),
+                    noteToTrap(),
+                    this::getShooterMode),
+                setReadyToMoveNote(true));
+    }
+
+    public Command moveNoteIfReady() {
+        return Commands.either(
+                moveNote(),
+                Commands.none(),
+                // TODO: Make intake.getPossesion more of a (note in robot) bool
+                () -> intake.getPossession() && readyToMoveNote);
+    }
+
+    // Think of this parameter as the desired state of shooterMode.
+    // We don't want to set the state until we are done with the command that moves the note
+    // since we arent ready to do another command that moves the note until we are done with the first one
     public Command setShooterModeCommand(boolean shooterMode) {
         return Commands.either(
-            Commands.runOnce(() -> setShooterMode(shooterMode))
-                .andThen(
-                    Commands.either(
-                        Commands.either(
-                            noteToIndexer(),
-                            noteToTrap(),
-                            () -> shooterMode), 
-                        Commands.none(), 
-                        intake::getPossession
-                    )
-                ),
-            Commands.none(),
-            () -> this.shooterMode != shooterMode);
+                    Commands.sequence(
+                        Commands.runOnce(() -> setShooterMode(shooterMode)),
+                        new SelectiveConditionalCommand(
+                            Commands.sequence(
+                                moveNoteIfReady(),
+                                new SelectiveConditionalCommand(
+                                    moveNoteIfReady(),
+                                    Commands.none(), 
+                                    () -> getShooterMode() != shooterMode)),
+                            Commands.none(),
+                            this::readyToMoveNote)
+                    ),
+                Commands.none(),
+                () -> getShooterMode() != shooterMode);
     }
 }

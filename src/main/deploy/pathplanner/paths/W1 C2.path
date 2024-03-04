@@ -8,32 +8,54 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.330545964563375,
-        "y": 7.0601787788122055
+        "x": 4.423010682527525,
+        "y": 7.5565975991974375
       },
       "isLocked": false,
       "linkedName": "W1"
     },
     {
       "anchor": {
-        "x": 8.288642422749572,
-        "y": 5.773167022257897
+        "x": 6.725842432647911,
+        "y": 6.076534079159984
       },
       "prevControl": {
-        "x": 7.525628309935232,
-        "y": 5.616887023247731
+        "x": 6.287967220566021,
+        "y": 6.75734344481007
+      },
+      "nextControl": {
+        "x": 7.334762739557085,
+        "y": 5.129783414953031
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.293238893308695,
+        "y": 5.77776349281702
+      },
+      "prevControl": {
+        "x": 7.153314194646308,
+        "y": 5.5755187882156285
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "C2"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -148.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "StopIntake",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.45,
       "command": {
         "type": "parallel",
         "data": {
@@ -49,8 +71,8 @@
       }
     },
     {
-      "name": "Intake",
-      "waypointRelativePos": 0.65,
+      "name": "ToIndexer",
+      "waypointRelativePos": 1.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -58,7 +80,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             }
           ]
@@ -74,7 +96,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.00075632974276,
+    "rotation": -144.3673494187136,
     "rotateFast": false
   },
   "reversed": false,
