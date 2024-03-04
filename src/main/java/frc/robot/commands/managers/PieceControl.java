@@ -1,7 +1,6 @@
 package frc.robot.commands.managers;
 
 import java.util.Set;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
