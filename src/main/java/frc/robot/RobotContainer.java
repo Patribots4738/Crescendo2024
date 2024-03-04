@@ -187,9 +187,9 @@ public class RobotContainer implements Logged {
     }
     
     private void configureButtonBindings() {
-        // configureDriverBindings(driver);
-        // configureOperatorBindings(operator);
-        // configureTestBindings();
+        configureDriverBindings(driver);
+        configureOperatorBindings(operator);
+        configureTestBindings();
         configureTimedEvents();
     }
     
@@ -430,7 +430,7 @@ public class RobotContainer implements Logged {
 
         // TODO: Extract this into a command file
         Commands.run(this::updateNTGains)
-            .until(() -> Robot.gameMode != GameMode.TELEOP)
+            .until(() -> Robot.gameMode != GameMode.DISABLED)
             .ignoringDisable(true)
             .schedule();
     }
