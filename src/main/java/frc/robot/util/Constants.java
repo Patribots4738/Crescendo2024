@@ -492,11 +492,9 @@ public final class Constants {
         public static final int PWM_PORT = 9;
         public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
 
-        public static final Integer patternMap = null;
-
         public static final double OUTER_ZONE = 2.262;
         public static final double INNER_ZONE = 1.131;
-        public static final double RIN_STAR_BIN = 0.;
+        public static final double RIN_STAR_BIN = Units.inchesToMeters(2.54);
 
         public static final int LPI_ROTATIONAL_DEADBAND = 1;
 
