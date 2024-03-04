@@ -44,11 +44,13 @@ public class LEDWaveCommand {
         private final double height;
         private final double waveSpeed;
         private final double waveRange;
+        private final int index1;
+        private final int index2;
         private LEDCommands root;
         private Command waveHueFunction;
 
         private void waveHueFunction() {
-            for (int i = 0; i < ledStrip.getBuffer().getLength(); i++) {
+            for (int i = index1; i < index2; i++) {
                 evaluateWave(
                     root,
                     scale,
@@ -64,10 +66,14 @@ public class LEDWaveCommand {
         }
 
         public Hue(LEDCommands root, double scale, double spacing, double height, double waveSpeed, double waveRange) {
-            this(root, scale, spacing, height, waveSpeed, waveRange, Set.of());
+            this(root, scale, spacing, height, waveSpeed, waveRange, -1, -1);
         }
 
-        public Hue(LEDCommands root, double scale, double spacing, double height, double waveSpeed, double waveRange,
+        private Hue(LEDCommands root, double scale, double spacing, double height, double waveSpeed,double waveRange, int index1, int index2) {
+            this(root, scale, spacing, height, waveSpeed, waveRange, index1, index2, Set.of());
+        }
+
+        public Hue(LEDCommands root, double scale, double spacing, double height, double waveSpeed, double waveRange, int index1, int index2,
                 Set<Subsystem> requirements) {
             super(root.ledStrip, requirements);
             this.scale = scale;
@@ -75,6 +81,13 @@ public class LEDWaveCommand {
             this.height = height;
             this.waveSpeed = waveSpeed;
             this.waveRange = waveRange;
+            if (index1 == -1 && index2 == -1) {
+                this.index1 = 0;
+                this.index2 = ledStrip.getBuffer().getLength();
+            } else {
+                this.index1 = index1;
+                this.index2 = index2;
+            }
             this.waveHueFunction = Commands.run(() -> waveHueFunction(), requirements.toArray(new Subsystem[0]))
                 .ignoringDisable(true);
         }
@@ -94,11 +107,13 @@ public class LEDWaveCommand {
         private final double spacing;
         private final double height;
         private final int hueVal;
+        private final int index1;
+        private final int index2;
         private LEDCommands root;
         private final Command waveValueFunction;
 
         private void waveValueFunction() {
-            for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
+            for (int i = index1; i < index2; i++) {
                 evaluateWave(
                     root,
                     scale,
@@ -115,11 +130,15 @@ public class LEDWaveCommand {
 
         public Value(LEDCommands root, double scale, double spacing, double height, double waveValueIncrement, double waveRange,
                 int hueVal) {
-            this(root, scale, spacing, height, waveValueIncrement, waveRange, hueVal, Set.of());
+            this(root, scale, spacing, height, waveValueIncrement, waveRange, hueVal, -1, -1);
+        }
+
+        public Value(LEDCommands root, double scale, double spacing, double height, double waveValueIncrement, double waveRange, int hueVal, int index1, int index2) {
+            this(root, scale, spacing, height, waveValueIncrement, waveRange, hueVal, index1, index2, Set.of());
         }
 
         public Value(LEDCommands root, double scale, double spacing, double height, double waveValueIncrement, double waveRange,
-                int hueVal, Set<Subsystem> requirements) {
+                int hueVal, int index1, int index2, Set<Subsystem> requirements) {
             super(root.ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
@@ -127,6 +146,13 @@ public class LEDWaveCommand {
             this.waveValueIncrement = waveValueIncrement;
             this.waveRange = waveRange;
             this.hueVal = hueVal;
+            if (index1 == -1 && index2 == -1) {
+                this.index1 = 0;
+                this.index2 = ledStrip.getBuffer().getLength();
+            } else {
+                this.index1 = index1;
+                this.index2 = index2;
+            }
             // we wrap this in a commands.run so that we can run it without worrying about the end condition
             // as we want this to run indefinitely until the top level command is ended
             this.waveValueFunction = 
@@ -149,11 +175,13 @@ public class LEDWaveCommand {
         private final double spacing;
         private final double height;
         private final int hueVal;
+        private final int index1;
+        private final int index2;
         private LEDCommands root;
         private final Command waveSaturationFunction;
 
         private void waveSaturationFunction() {
-            for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
+            for (int i = index1; i < index2; i++) {
                 evaluateWave(
                     root,
                     scale,
@@ -170,11 +198,15 @@ public class LEDWaveCommand {
 
         public Saturation(LEDCommands root, double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
                 int hueVal) {
-            this(root, scale, spacing, height, waveSaturationIncrement, waveRange, hueVal, Set.of());
+            this(root, scale, spacing, height, waveSaturationIncrement, waveRange, hueVal, -1, -1);
+        }
+
+        public Saturation(LEDCommands root, double scale, double spacing, double height, double waveSaturationIncrement, double waveRange, int hueVal, int index1, int index2) {
+            this(root, scale, spacing, height, waveSaturationIncrement, waveRange, hueVal, index1, index2, Set.of());
         }
 
         public Saturation(LEDCommands root, double scale, double spacing, double height, double waveSaturationIncrement, double waveRange,
-                int hueVal, Set<Subsystem> requirements) {
+                int hueVal,int index1, int index2, Set<Subsystem> requirements) {
             super(root.ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
@@ -183,6 +215,13 @@ public class LEDWaveCommand {
             this.waveSaturationIncrement = waveSaturationIncrement;
             this.waveRange = waveRange;
             this.hueVal = hueVal;
+            if (index1 == -1 && index2 == -1) {
+                this.index1 = 0;
+                this.index2 = ledStrip.getBuffer().getLength();
+            } else {
+                this.index1 = index1;
+                this.index2 = index2;
+            }
             this.waveSaturationFunction = Commands
                 .run(() -> waveSaturationFunction(), requirements.toArray(new Subsystem[0])).ignoringDisable(true);
         }
@@ -204,14 +243,21 @@ public class LEDWaveCommand {
         private final int hueVal;
         private final double duration;
         private double startTime;
+        private final int index1;
+        private final int index2;
 
         public Flash(LEDCommands root, double scale, double spacing, double height, double timeIncrement, double waveRange,
                 int hueVal, double duration) {
-            this(root, scale, spacing, height, timeIncrement, waveRange, hueVal, duration, Set.of());
+            this(root, scale, spacing, height, timeIncrement, waveRange, hueVal, duration, -1, -1);
         }
 
         public Flash(LEDCommands root, double scale, double spacing, double height, double timeIncrement, double waveRange,
-                int hueVal, double duration, Set<Subsystem> requirements) {
+                int hueVal, double duration, int index1, int index2) {
+            this(root, scale, spacing, height, timeIncrement, waveRange, hueVal, duration, index1, index2, Set.of());
+        }
+
+        public Flash(LEDCommands root, double scale, double spacing, double height, double timeIncrement, double waveRange,
+                int hueVal, double duration, int index1, int index2, Set<Subsystem> requirements) {
             super(root.ledStrip, requirements);
             this.scale = scale;
             this.spacing = spacing;
@@ -221,6 +267,13 @@ public class LEDWaveCommand {
             this.hueVal = hueVal;
             this.root = root;
             this.duration = duration;
+            if (index1 == -1 && index2 == -1) {
+                this.index1 = 0;
+                this.index2 = ledStrip.getBuffer().getLength();
+            } else {
+                this.index1 = index1;
+                this.index2 = index2;
+            }
         }
 
         @Override
@@ -231,7 +284,7 @@ public class LEDWaveCommand {
         // Called every time the scheduler runs while the command is scheduled.
         @Override
         public void execute() {
-            for (int i = 0; i < root.ledStrip.getBuffer().getLength(); i++) {
+            for (int i = index1; i < index2; i++) {
                 evaluateWave(
                     root,
                     scale,
