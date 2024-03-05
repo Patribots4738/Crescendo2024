@@ -110,10 +110,7 @@ public class Shooter extends SubsystemBase implements Logged{
      */
     public Command stopCommand() {
         return Commands.either(
-            runOnce(() -> {
-                motorLeft.setTargetPercent(0);
-                motorRight.setTargetPercent(0);
-            }),
+            setSpeedCommand(0),
             runOnce(() -> {
                 motorLeft.set(0);
                 motorRight.set(0);

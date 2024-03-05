@@ -394,6 +394,9 @@ public class PieceControl implements Logged {
             Commands.runOnce(() -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
             shooterCmds.getShooter()),
             shooterCmds.stopShooter().onlyIf(() -> Robot.gameMode != GameMode.TEST),
-            () -> shooterMode && hasPiece && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS && Robot.gameMode != GameMode.TEST);
+            () -> shooterMode 
+                && hasPiece 
+                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS 
+                && Robot.gameMode != GameMode.TEST);
     }
 }
