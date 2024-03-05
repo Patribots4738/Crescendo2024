@@ -12,7 +12,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import java.util.Arrays;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -25,6 +27,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
@@ -185,6 +188,8 @@ public class Swerve extends SubsystemBase implements Logged {
                                 Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
                 new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
+
+        RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
 
     }
 

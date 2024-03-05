@@ -153,6 +153,8 @@ public final class Constants {
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
 
+        public static final double DEFAULT_RPM = 2500;
+        
         public static final double SHOOTER_PASS_SECONDS = 2;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
@@ -174,9 +176,9 @@ public final class Constants {
                 // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
                 // put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
                 // put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
-                put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
-                put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
-                put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
+                // put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
+                // put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
+                // put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
 
                 // V2
                 put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
@@ -191,12 +193,10 @@ public final class Constants {
                 put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
                 // 2/28/24 - this was the day after bands were added
                 put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
-
-                // Random untested schenanagains
-                put(18, SpeedAngleTriplet.of(3928.0, 3928.0, 28.6));
-                put(19, SpeedAngleTriplet.of(4200.0, 4200.0, 28.3));
-                put(20, SpeedAngleTriplet.of(4200.0, 4200.0, 27.9));
-
+                put(16, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
+                put(17, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
+                put(18, SpeedAngleTriplet.of(3986.0, 3990.0, 26.1));
+                put(19, SpeedAngleTriplet.of(4201.0, 4205.0, 25.0));
             }
         };
 
@@ -852,6 +852,8 @@ public final class Constants {
             put(W3_RED, "W3_RED");
         }};
 
+      public static final Translation2d PODIUM_POSE = new Translation2d(2.9, 3.4);
+
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
             Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
@@ -868,6 +870,9 @@ public final class Constants {
             add(GeometryUtil.flipFieldPose(M_POSE2D));
             add(GeometryUtil.flipFieldPose(W3_POSE2D));
         }};
+
+        // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
+        public static final double AUTOMATIC_SHOOTER_DISTANCE_RADIUS = 8.5;
 
         public static List<Pose2d> GET_SHOOTING_POSITIONS() {
             int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;
@@ -955,6 +960,8 @@ public final class Constants {
             put("noteToTrap1", 0.2);
             put("noteToTrap2", 0.5);
             put("noteToTrap3", 0.0);
+
+            put("dropPiece1", 0.5);
 
             put("ampPosition", 0.37);
             put("atan++", 0.0);

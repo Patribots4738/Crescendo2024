@@ -113,6 +113,8 @@ public class RobotContainer implements Logged {
     @Log
     public static Pose2d robotPose2d = new Pose2d();
     @Log
+    public static double distanceToSpeakerMeters = 0;
+    @Log
     public static Pose3d robotPose3d = new Pose3d();
     @Log
     public static SwerveModuleState[] swerveMeasuredStates;
@@ -178,6 +180,13 @@ public class RobotContainer implements Logged {
             () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
         ));
 
+        shooter.setDefaultCommand(
+            pieceControl.getAutomaticShooterSpeeds(
+                swerve::getPose,
+                swerve::getRobotRelativeVelocity
+            )
+        );
+        
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();
         prepareNamedCommands();
@@ -213,9 +222,10 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.currentTimestamp - gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
-        .onTrue(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)
-            .andThen(pieceControl.coastIntakeAndIndexer()));
+      
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
+        .onTrue(pieceControl.coastIntakeAndIndexer()
+            .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
@@ -325,20 +335,15 @@ public class RobotContainer implements Logged {
                     
         controller.x()
             .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true)
-                .finallyDo(() -> 
-                    shooter.stopCommand().schedule()
-                ));
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
 
         controller.b()
             .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false)
-                .finallyDo(() -> 
-                    shooter.stopCommand().schedule()
-                ));
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
         
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)
+                .andThen(driver.setRumble(() -> 0.5, 0.3)));
 
         controller.rightStick()
             .toggleOnTrue(

@@ -144,17 +144,14 @@ public class AlignmentCmds {
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                        .finallyDo(() -> 
-                            shooterCmds.stopShooter().schedule()
-                        )
-                    ),
+                        .finallyDo(shooterCmds.stopShooter()::initialize)),
                 climb::getHooksUp);
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
         return Commands.either(
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.L_POSE),
             prepareFireAndRotateCommand(driverX, driverY, FieldConstants.M_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_POSE),
             // No way I just found my first XOR use case :D
             () -> Robot.isRedAlliance() ^ xButtonPressed
         );
