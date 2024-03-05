@@ -109,6 +109,7 @@ public class LimelightMapping extends SubsystemBase implements Logged {
             }
             modifiedTagPoses[fiducialID-1] = targetPose;
             poses.put(fiducialID, targetPose);
+            limelightConversion.addFiducial(fiducialID, targetPose);
         }
     }
 
@@ -119,6 +120,16 @@ public class LimelightMapping extends SubsystemBase implements Logged {
     }
 
     public Pose3d targetPoseFieldSpace(Pose3d targetPose, Pose3d actualRobotPose) {
+        targetPose = new Pose3d(
+            targetPose.getZ(), 
+            -targetPose.getX(), 
+            -targetPose.getY(), 
+            new Rotation3d(
+                targetPose.getRotation().getX(), 
+                targetPose.getRotation().getY(), 
+                Math.PI+targetPose.getRotation().getZ()
+            )
+        );
         Pose2d rotatedPose = targetPose.toPose2d().rotateBy(actualRobotPose.getRotation().toRotation2d());
         Pose3d position = 
             new Pose3d(

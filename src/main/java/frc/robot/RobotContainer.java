@@ -583,9 +583,12 @@ public class RobotContainer implements Logged {
 
         Monologue.logObj(intake, "Robot/Subsystems/intake");
         Monologue.logObj(climb, "Robot/Subsystems/climb");
-        Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-        Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
-        Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
+        if (CameraConstants.FIELD_CALIBRATION_MODE) {
+            Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
+        } else {
+            Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+            Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
+        }
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
