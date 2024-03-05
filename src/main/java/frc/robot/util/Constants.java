@@ -796,20 +796,20 @@ public final class Constants {
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
-        public static final List<Pose2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
-            Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d());
-            Pose2d W2_BLUE = new Pose2d(2.90, 5.55, new Rotation2d());
-            Pose2d W3_BLUE = new Pose2d(2.90, 4.10, new Rotation2d());
+        public static final List<Translation2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
+            Translation2d W1_BLUE = new Translation2d(2.90, 7.0);
+            Translation2d W2_BLUE = new Translation2d(2.90, 5.55);
+            Translation2d W3_BLUE = new Translation2d(2.90-0.1, 4.10);
 
-            Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d());
-            Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
-            Pose2d C3 = new Pose2d(8.29, 4.10, new Rotation2d());
-            Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
-            Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d());
+            Translation2d C1 = new Translation2d(8.29, 7.45);
+            Translation2d C2 = new Translation2d(8.29, 5.78);
+            Translation2d C3 = new Translation2d(8.29, 4.10);
+            Translation2d C4 = new Translation2d(8.29, 2.44);
+            Translation2d C5 = new Translation2d(8.29, 0.77);
 
-            Pose2d W1_RED = GeometryUtil.flipFieldPose(W1_BLUE);
-            Pose2d W2_RED = GeometryUtil.flipFieldPose(W2_BLUE);
-            Pose2d W3_RED = GeometryUtil.flipFieldPose(W3_BLUE);
+            Translation2d W1_RED = GeometryUtil.flipFieldPosition(W1_BLUE);
+            Translation2d W2_RED = GeometryUtil.flipFieldPosition(W2_BLUE);
+            Translation2d W3_RED = GeometryUtil.flipFieldPosition(W3_BLUE);
             
             add(W1_BLUE);
             add(W2_BLUE);
@@ -822,6 +822,34 @@ public final class Constants {
             add(W1_RED);
             add(W2_RED);
             add(W3_RED);
+        }};
+
+        public static final HashMap<Translation2d, String> CALIBRATION_POSE_MAP = new HashMap<Translation2d, String>() {{
+            Translation2d W1_BLUE = new Translation2d(2.90, 7.0);
+            Translation2d W2_BLUE = new Translation2d(2.90, 5.55);
+            Translation2d W3_BLUE = new Translation2d(2.90, 4.10);
+
+            Translation2d C1 = new Translation2d(8.29, 7.45);
+            Translation2d C2 = new Translation2d(8.29, 5.78);
+            Translation2d C3 = new Translation2d(8.29, 4.10);
+            Translation2d C4 = new Translation2d(8.29, 2.44);
+            Translation2d C5 = new Translation2d(8.29, 0.77);
+
+            Translation2d W1_RED = GeometryUtil.flipFieldPosition(W1_BLUE);
+            Translation2d W2_RED = GeometryUtil.flipFieldPosition(W2_BLUE);
+            Translation2d W3_RED = GeometryUtil.flipFieldPosition(W3_BLUE);
+
+            put(W1_BLUE, "W1_BLUE");
+            put(W2_BLUE, "W2_BLUE");
+            put(W3_BLUE, "W3_BLUE");
+            put(C1, "C1");
+            put(C2, "C2");
+            put(C3, "C3");
+            put(C4, "C4");
+            put(C5, "C5");
+            put(W1_RED, "W1_RED");
+            put(W2_RED, "W2_RED");
+            put(W3_RED, "W3_RED");
         }};
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
@@ -856,11 +884,10 @@ public final class Constants {
             }
             return notePoses;
         }
-
-        
     }
 
     public static final class CameraConstants {
+        public static final boolean FIELD_CALIBRATION_MODE = false;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
         private static final double CAM_HEIGHT = Units.inchesToMeters(16);
