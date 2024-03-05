@@ -144,10 +144,7 @@ public class AlignmentCmds {
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                        .finallyDo(() -> 
-                            shooterCmds.stopShooter().schedule()
-                        )
-                    ),
+                        .finallyDo(shooterCmds.stopShooter()::initialize)),
                 climb::getHooksUp);
     }
 

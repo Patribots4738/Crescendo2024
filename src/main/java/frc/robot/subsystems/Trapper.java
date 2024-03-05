@@ -79,7 +79,7 @@ public class Trapper extends SubsystemBase implements Logged {
         return Commands.sequence(
             outtake(),
             Commands.waitSeconds(seconds),
-            stopCommand()  
+            stopCommand()
         );
     }
 
