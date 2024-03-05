@@ -796,6 +796,8 @@ public final class Constants {
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
+        public static final Translation2d PODIUM_POSE = new Translation2d(2.9, 3.4);
+
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
             Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
