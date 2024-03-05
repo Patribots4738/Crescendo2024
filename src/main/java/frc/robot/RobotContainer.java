@@ -36,12 +36,14 @@ import frc.robot.leds.Commands.LPI;
 import frc.robot.leds.Strips.LedStrip;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.auto.PathPlannerStorage;
+import frc.robot.util.calc.LimelightMapping;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
@@ -66,6 +68,8 @@ public class RobotContainer implements Logged {
     private Limelight limelight3;
     @IgnoreLogged
     private Limelight limelight2;
+    @IgnoreLogged
+    private LimelightMapping limelightMapper;
     @IgnoreLogged
     private final Climb climb;
     @IgnoreLogged
@@ -119,7 +123,6 @@ public class RobotContainer implements Logged {
     @Log
     public static double gameModeStart = 0;
     
-    Command wheelRadiusChar;
     public RobotContainer() {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -128,8 +131,14 @@ public class RobotContainer implements Logged {
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
-        limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
-        limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
+        if (CameraConstants.FIELD_CALIBRATION_MODE) {
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 0);
+            limelightMapper = new LimelightMapping("limelight-three", swerve::getGyroRotation2d);
+        } else {
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 0);
+        }
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
 
@@ -161,7 +170,6 @@ public class RobotContainer implements Logged {
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
-        wheelRadiusChar = new WheelRadiusCharacterization(swerve);
         robotRelativeSupplier = () -> !driver.getYButton();
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -186,18 +194,31 @@ public class RobotContainer implements Logged {
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
-            swerve.setWheelsOCommand().andThen(wheelRadiusChar));
+            swerve.setWheelsOCommand().andThen(new WheelRadiusCharacterization(swerve)));
         configureButtonBindings();
         configureLoggingPaths();
-        
-        
+
     }
     
     private void configureButtonBindings() {
+
+        if (CameraConstants.FIELD_CALIBRATION_MODE) {
+            configureFieldCalibrationBindings(driver);
+            return;
+        }
+
         configureDriverBindings(driver);
         configureOperatorBindings(operator);
-        configureTestBindings();
         configureTimedEvents();
+        configureTestBindings();
+    }
+
+    private void configureTestBindings() {
+        // Warning: these buttons are not on the default loop!
+        // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
+        // for more information 
+        // configureHDCBindings(driver);
+        configureCalibrationBindings(operator);
     }
     
     private void configureTimedEvents() {
@@ -246,16 +267,26 @@ public class RobotContainer implements Logged {
                 );
     }
     
+    private void configureFieldCalibrationBindings(PatriBoxController controller) {
+        driver.povLeft()
+            .onTrue(
+                limelightMapper.incrementCalibrationPose(false)
+                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+            );
 
-    private void configureTestBindings() {
-        // Warning: these buttons are not on the default loop!
-        // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
-        // for more information 
-        // configureHDCBindings(driver);
-        configureCalibrationBindings(operator);
+        driver.povRight()
+            .onTrue(
+                limelightMapper.incrementCalibrationPose(true)
+                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+            );
 
+        driver.a()
+            .onTrue(limelightMapper.takeSnapshotCommand());
+
+        driver.leftBumper().and(driver.rightBumper())
+            .onTrue(limelightMapper.printJSONCommand());
     }
-    
+ 
     private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
@@ -557,14 +588,17 @@ public class RobotContainer implements Logged {
 
         Monologue.logObj(intake, "Robot/Subsystems/intake");
         Monologue.logObj(climb, "Robot/Subsystems/climb");
-        Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-        Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+        if (CameraConstants.FIELD_CALIBRATION_MODE) {
+            Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
+        } else {
+            Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+            Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
+        }
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
         Monologue.logObj(trapper, "Robot/Subsystems/trapper");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
-
         
         Monologue.logObj(pathPlannerStorage, "Robot");
     }
