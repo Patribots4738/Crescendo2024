@@ -102,7 +102,8 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateTriplet(Translation2d robotPose) {
         // Get our position relative to the desired field element
         // Use the distance as our key for interpolation
-        double distanceFeet = Units.metersToFeet(RobotContainer.distanceToSpeakerMeters);
+        double distanceFeet = Units.metersToFeet(robotPose.getDistance(FieldConstants.GET_SPEAKER_TRANSLATION()));
+
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
 

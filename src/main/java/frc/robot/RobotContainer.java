@@ -304,17 +304,11 @@ public class RobotContainer implements Logged {
                     
         controller.x()
             .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true)
-                .finallyDo(() -> 
-                    shooter.stopCommand().schedule()
-                ));
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
 
         controller.b()
             .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false)
-                .finallyDo(() -> 
-                    shooter.stopCommand().schedule()
-                ));
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
