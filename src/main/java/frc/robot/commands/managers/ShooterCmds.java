@@ -119,7 +119,7 @@ public class ShooterCmds {
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
         return Commands.runOnce(
             () -> {
-                SpeedAngleTriplet calculationTriplet = new SpeedAngleTriplet(shooter.getTargetSpeeds(), pivot.getTargetAngle());
+                SpeedAngleTriplet calculationTriplet = new SpeedAngleTriplet(shooter.getDesiredSpeeds(), pivot.getTargetAngle());
                 SpeedAngleTriplet realTriplet = new SpeedAngleTriplet(shooter.getSpeed(), pivot.getAngle());
                 
                 Pose2d currentPose = pose.get();

@@ -89,6 +89,7 @@ public class RobotContainer implements Logged {
     private Trapper trapper;
     private ShooterCmds shooterCmds;
 
+    @IgnoreLogged
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
     private final BooleanSupplier robotRelativeSupplier;
@@ -128,7 +129,7 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
-        // limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
+        limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
 
@@ -184,7 +185,8 @@ public class RobotContainer implements Logged {
         // choreoPathStorage = new ChoreoStorage(driver.y());
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
-        pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization", wheelRadiusChar);
+        pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
+            swerve.setWheelsOCommand().andThen(wheelRadiusChar));
         configureButtonBindings();
         configureLoggingPaths();
         
@@ -199,6 +201,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
+      
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.coastIntakeAndIndexer()
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)));
@@ -206,7 +209,43 @@ public class RobotContainer implements Logged {
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
+        
+        new Trigger(swerve::isAlignedToAmp)
+            .onTrue(driver.setRumble(() -> 0.3))
+            .onFalse(driver.setRumble(() -> 0));
+        
+        new Trigger(shooterCalc.readyToShootSupplier())
+            .onTrue(driver.setRumble(() -> 0.3))
+            .onFalse(driver.setRumble(() -> 0));
+        
+        // Make the controllers pulse just like the LEDs do
+        new Trigger(intake::getPossession)
+            .onTrue(
+                Commands.race(
+                    Commands.run(() -> {
+                        driver.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
+                        operator.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
+                    }),
+                    Commands.waitSeconds(1)
+                ).andThen(driver.setRumble(() -> 0).alongWith(operator.setRumble(() -> 0)))
+                // TODO: Figure out why this doesn't work
+                .alongWith(limelight3.blinkLeds(() -> 1))
+            );
+
+        // Have the controllers pulse when the match is about to end to signal the drivers
+        // Pulses get more extreme as the clock approaches 0
+        // Starts when there are five seconds left in the match
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.currentTimestamp - gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
+            .whileTrue(
+                Commands.run(
+                    () -> driver.setRumble( 
+                        (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - gameModeStart) + Math.PI)
+                        /
+                        ((135 - Robot.currentTimestamp - gameModeStart)*2.0)))
+                    )
+                );
     }
+    
 
     private void configureTestBindings() {
         // Warning: these buttons are not on the default loop!
@@ -264,10 +303,18 @@ public class RobotContainer implements Logged {
                     climb::getHooksUp)));
                     
         controller.x()
-            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
+            .toggleOnTrue(
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true)
+                .finallyDo(() -> 
+                    shooter.stopCommand().schedule()
+                ));
 
         controller.b()
-            .toggleOnTrue(alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
+            .toggleOnTrue(
+                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false)
+                .finallyDo(() -> 
+                    shooter.stopCommand().schedule()
+                ));
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
@@ -279,7 +326,8 @@ public class RobotContainer implements Logged {
                     new ActiveConditionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::onOppositeSide)));
+                        alignmentCmds.alignmentCalc::onOppositeSide))
+                );
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
@@ -322,7 +370,7 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.setShooterModeCommand(false));
-
+            
         controller.a()
             .onTrue(pieceControl.panicEjectNote())
             .onFalse(pieceControl.stopPanicEject());
@@ -406,6 +454,9 @@ public class RobotContainer implements Logged {
             .until(() -> Robot.gameMode != GameMode.DISABLED)
             .ignoringDisable(true)
             .schedule();
+
+        driver.setRumble(0);
+        operator.setRumble(0);
     }
 
     public void onEnabled() {
@@ -472,6 +523,7 @@ public class RobotContainer implements Logged {
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
+        NamedCommands.registerCommand("ToIndexer", pieceControl.noteToIndexer());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
@@ -504,13 +556,14 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
         Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
         Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
+        Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
 
         Monologue.logObj(swerve, "Robot/Swerve");
 
         Monologue.logObj(intake, "Robot/Subsystems/intake");
         Monologue.logObj(climb, "Robot/Subsystems/climb");
         Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-        // Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
+        Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");

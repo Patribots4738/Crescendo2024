@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -41,6 +42,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
@@ -258,8 +260,24 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(desiredStates);
     }
 
+
     public Command getSetWheelsX() {
         return run(this::setWheelsX);
+    }   
+
+    public void setWheelsO() {
+        SwerveModuleState[] desiredStates = new SwerveModuleState[] {
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45))
+        };
+
+        setModuleStates(desiredStates);
+    }
+
+    public Command setWheelsOCommand() {
+        return runOnce(this::setWheelsO);
     }
 
     /**
@@ -429,7 +447,13 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public boolean isAlignedToAmp() {
-        double robotX = this.getPose().getX();
-        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), AutoConstants.AUTO_ALIGNMENT_DEADBAND);
+        Translation2d touchingAmpPose = new Translation2d(
+            FieldConstants.GET_AMP_POSITION().getX(),
+            FieldConstants.GET_AMP_POSITION().getY() 
+                - DriveConstants.ROBOT_LENGTH_METERS / 2.0
+                - DriveConstants.BUMPER_LENGTH_METERS
+        );
+        double robotX = this.getPose().getTranslation().getDistance(touchingAmpPose);
+        return MathUtil.isNear(0, robotX, AutoConstants.AUTO_ALIGNMENT_DEADBAND);
     }
 }

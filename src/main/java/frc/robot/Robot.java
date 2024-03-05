@@ -72,7 +72,6 @@ public class Robot extends TimedRobot {
         // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-        
         Monologue.updateAll();
         CommandScheduler.getInstance().run();
     }

@@ -11,7 +11,6 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.AutoConstants;
 
 public class ChasePose extends Command {
-
     private Swerve swerve;
     private static Pose2d desiredPose = new Pose2d();
 
