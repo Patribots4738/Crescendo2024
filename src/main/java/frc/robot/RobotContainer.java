@@ -311,7 +311,8 @@ public class RobotContainer implements Logged {
                 alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
         
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity));
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)
+                .andThen(driver.setRumble(() -> 0.5, 0.3)));
 
         controller.rightStick()
             .toggleOnTrue(
