@@ -20,8 +20,8 @@
         "y": 4.099779112962734
       },
       "prevControl": {
-        "x": 7.429102428193659,
-        "y": 4.173595267683257
+        "x": 7.327980075892963,
+        "y": 4.081665856500806
       },
       "nextControl": null,
       "isLocked": false,
@@ -51,14 +51,14 @@
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 2.5,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
     "rotation": 157.55724663470568,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Stage",
