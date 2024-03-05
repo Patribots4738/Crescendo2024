@@ -796,6 +796,34 @@ public final class Constants {
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
+        public static final List<Pose2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
+            Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d());
+            Pose2d W2_BLUE = new Pose2d(2.90, 5.55, new Rotation2d());
+            Pose2d W3_BLUE = new Pose2d(2.90, 4.10, new Rotation2d());
+
+            Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d());
+            Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
+            Pose2d C3 = new Pose2d(8.29, 4.10, new Rotation2d());
+            Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
+            Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d());
+
+            Pose2d W1_RED = GeometryUtil.flipFieldPose(W1_BLUE);
+            Pose2d W2_RED = GeometryUtil.flipFieldPose(W2_BLUE);
+            Pose2d W3_RED = GeometryUtil.flipFieldPose(W3_BLUE);
+            
+            add(W1_BLUE);
+            add(W2_BLUE);
+            add(W3_BLUE);
+            add(C1);
+            add(C2);
+            add(C3);
+            add(C4);
+            add(C5);
+            add(W1_RED);
+            add(W2_RED);
+            add(W3_RED);
+        }};
+
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
             Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
