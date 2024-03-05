@@ -60,10 +60,8 @@ public class ShooterCalc implements Logged {
 
         return 
             SpeedAngleTriplet.of(
-                Pair.of(
-                    4200,
-                    4200
-                ),
+                currentTriplet.getLeftSpeed(),
+                currentTriplet.getRightSpeed(),
                 newAngle.getDegrees()
             );
     }
