@@ -3,12 +3,13 @@ package frc.robot.commands.managers;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import java.util.function.BooleanSupplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.Robot.GameMode;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
@@ -17,7 +18,6 @@ import frc.robot.subsystems.Trapper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
-import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -46,7 +46,7 @@ public class PieceControl implements Logged {
     private boolean readyToPlace = false;
 
     @Log
-    private boolean hasPiece = true;
+    private boolean hasPiece = false;
 
     public PieceControl(
             Intake intake,
@@ -393,7 +393,7 @@ public class PieceControl implements Logged {
         return Commands.either(
             Commands.runOnce(() -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
             shooterCmds.getShooter()),
-            shooterCmds.stopShooter(),
-            () -> shooterMode && hasPiece && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS);
+            shooterCmds.stopShooter().onlyIf(() -> Robot.gameMode != GameMode.TEST),
+            () -> shooterMode && hasPiece && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS && Robot.gameMode != GameMode.TEST);
     }
 }
