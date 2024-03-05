@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
@@ -32,9 +33,6 @@ public class ShooterCalc implements Logged {
     
     @Log
     double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
-
-    @Log
-    double distance = 0;
 
     /**
      * Calculates the shooter speeds required to reach the speaker position.
@@ -94,7 +92,11 @@ public class ShooterCalc implements Logged {
 	 *         if the pivot is at its target rotation and false otherwise
 	 */
 	public BooleanSupplier readyToShootSupplier() {
-        return () -> pivot.getAtDesiredAngle() && shooter.getAtDesiredRPM() && shooter.getAverageTargetSpeed() > 0;
+        return () -> 
+            pivot.getAtDesiredAngle() 
+            && shooter.getAtDesiredRPM() 
+            && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM 
+            && shooter.getAverageTargetSpeed() > 0;
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
@@ -102,13 +104,10 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateTriplet(Translation2d robotPose) {
         // Get our position relative to the desired field element
         // Use the distance as our key for interpolation
-        double distanceFeet = Units.metersToFeet(robotPose.getDistance(FieldConstants.GET_SPEAKER_TRANSLATION()));
-
-        this.distance = distanceFeet;
-
+        double distanceFeet = Units.metersToFeet(RobotContainer.distanceToSpeakerMeters);
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
-    
+
     @Log
     Rotation2d currentAngleToSpeaker;
     @Log
