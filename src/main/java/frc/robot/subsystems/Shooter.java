@@ -5,6 +5,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Logged;
@@ -51,7 +52,7 @@ public class Shooter extends SubsystemBase implements Logged{
     public void periodic() {
         currentLeftSpeed = motorLeft.getVelocity();
         currentRightSpeed = motorRight.getVelocity();
-
+        
         atDesiredRPM = 
             MathUtil.isNear(
                 currentLeftSpeed, targetLeftSpeed,
@@ -107,15 +108,24 @@ public class Shooter extends SubsystemBase implements Logged{
      * @return The method is returning a Command object.
      */
     public Command stopCommand() {
-        return runOnce(() -> motorLeft.set(0))
-            .andThen(runOnce(() -> motorRight.set(0)));
+        return Commands.either(
+            setSpeedCommand(0),
+            runOnce(() -> {
+                motorLeft.set(0);
+                motorRight.set(0);
+            }),
+            () -> FieldConstants.IS_SIMULATION);
     }
     
     public boolean getAtDesiredRPM() {
         return atDesiredRPM;
     }
 
-    public Pair<Double, Double> getTargetSpeeds() {
+    public Pair<Double, Double> getDesiredSpeeds() {
         return new Pair<Double, Double>(targetLeftSpeed, targetRightSpeed);
+    }
+
+    public double getAverageTargetSpeed() {
+        return (targetLeftSpeed + targetRightSpeed) / 2.0;
     }
 }

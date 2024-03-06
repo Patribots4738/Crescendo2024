@@ -61,6 +61,10 @@ public class Indexer extends SubsystemBase {
         return runOnce(() -> indexer.setCoastMode());
     }
 
+    public Command setBrakeMode() {
+        return runOnce(() -> indexer.setBrakeMode());
+    }
+
     public boolean hasPiece() {
         return false;
     }

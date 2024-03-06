@@ -35,7 +35,7 @@ public class LPI extends Command implements Logged {
     private int activeRotationalLED = 0;
     private PatriBoxController xboxController;
 
-    Pose2d closestPose;
+    private Pose2d closestPose;
     Pose2d currentRobotPosition;
     Translation2d currentRobotTranslation;
     private final Consumer<Pose2d> poseConsumer;
@@ -154,6 +154,7 @@ public class LPI extends Command implements Logged {
             currentzone = 3;
             return Color.kGreen;
         }
+
     }
 
     int previouszone = currentzone;

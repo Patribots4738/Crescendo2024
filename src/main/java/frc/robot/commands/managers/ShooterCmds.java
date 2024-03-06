@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.util.GeometryUtil;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -30,6 +31,10 @@ public class ShooterCmds {
         this.pivot = pivot;
         this.shooter = shooter;
         this.shooterCalc = shooterCalc;
+    }
+
+    public Shooter getShooter() {
+        return shooter;
     }
     
     /**
@@ -66,6 +71,14 @@ public class ShooterCmds {
         desiredTriplet = triplet;
         pivot.setAngle(triplet.getAngle());
         shooter.setSpeed(triplet.getSpeeds());
+    }
+
+    public void setSpeeds(Pair<Double, Double> speeds) {
+        shooter.setSpeed(speeds);
+    }
+
+    public void setSpeeds(double speed) {
+        setSpeeds(Pair.of(speed, speed));
     }
 
     public Command setTripletCommand(SpeedAngleTriplet triplet) {
@@ -106,7 +119,7 @@ public class ShooterCmds {
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
         return Commands.runOnce(
             () -> {
-                SpeedAngleTriplet calculationTriplet = new SpeedAngleTriplet(shooter.getTargetSpeeds(), pivot.getTargetAngle());
+                SpeedAngleTriplet calculationTriplet = new SpeedAngleTriplet(shooter.getDesiredSpeeds(), pivot.getTargetAngle());
                 SpeedAngleTriplet realTriplet = new SpeedAngleTriplet(shooter.getSpeed(), pivot.getAngle());
                 
                 Pose2d currentPose = pose.get();
@@ -128,9 +141,9 @@ public class ShooterCmds {
                         calculationTriplet.getAngle(),
                         false
                     )
-                ).asProxy().schedule();
+                ).schedule();
             }
-        ).asProxy();
+        );
     }
 
     public Command stopShooter() {
@@ -138,7 +151,7 @@ public class ShooterCmds {
     }
 
 	public Command stowPivot() {
-	    return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
+        return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
     
 }

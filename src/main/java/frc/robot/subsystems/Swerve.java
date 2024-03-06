@@ -12,18 +12,22 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import java.util.Arrays;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
@@ -38,6 +42,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
@@ -93,7 +98,7 @@ public class Swerve extends SubsystemBase implements Logged {
             // Notice that the theta on the vision is very large,
             // and the state measurement is very small.
             // This is because we assume that the IMU is very accurate.
-            // You can visualize these graphs working together here:
+            // You can visualize these graphs // working together here:
             // https://www.desmos.com/calculator/a0kszyrwfe
             // State measurement
             // standard deviations
@@ -184,6 +189,8 @@ public class Swerve extends SubsystemBase implements Logged {
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
                 new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
 
+        RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
+
     }
 
     /**
@@ -253,8 +260,24 @@ public class Swerve extends SubsystemBase implements Logged {
         setModuleStates(desiredStates);
     }
 
+
     public Command getSetWheelsX() {
         return run(this::setWheelsX);
+    }   
+
+    public void setWheelsO() {
+        SwerveModuleState[] desiredStates = new SwerveModuleState[] {
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45))
+        };
+
+        setModuleStates(desiredStates);
+    }
+
+    public Command setWheelsOCommand() {
+        return runOnce(this::setWheelsO);
     }
 
     /**
@@ -289,7 +312,11 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public Command resetOdometryCommand(Supplier<Pose2d> pose) {
-        return runOnce(() -> resetOdometry(pose.get()));
+        return runOnce(() -> resetOdometry(pose.get())).ignoringDisable(true);
+    }
+
+    public Command resetPositionCommand(Supplier<Translation2d> pose) {
+        return runOnce(() -> resetOdometry(new Pose2d(pose.get(), getGyroRotation2d()))).ignoringDisable(true);
     }
 
     public SwerveModuleState[] getModuleStates() {
@@ -424,7 +451,13 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public boolean isAlignedToAmp() {
-        double robotX = this.getPose().getX();
-        return MathUtil.isNear(robotX, FieldConstants.GET_AMP_POSITION().getX(), AutoConstants.AUTO_ALIGNMENT_DEADBAND);
+        Translation2d touchingAmpPose = new Translation2d(
+            FieldConstants.GET_AMP_POSITION().getX(),
+            FieldConstants.GET_AMP_POSITION().getY() 
+                - DriveConstants.ROBOT_LENGTH_METERS / 2.0
+                - DriveConstants.BUMPER_LENGTH_METERS
+        );
+        double robotX = this.getPose().getTranslation().getDistance(touchingAmpPose);
+        return MathUtil.isNear(0, robotX, AutoConstants.AUTO_ALIGNMENT_DEADBAND);
     }
 }

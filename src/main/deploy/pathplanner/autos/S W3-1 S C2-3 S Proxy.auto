@@ -60,6 +60,18 @@
                       "data": {
                         "pathName": "C2 L Proxy"
                       }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L C3"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C3 M Proxy"
+                      }
                     }
                   ]
                 }

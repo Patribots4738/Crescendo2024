@@ -220,7 +220,11 @@ public class SafeSpark extends CANSparkBase {
         return applyParameter(
                 () -> {
                     throwIfClosed();
-                    return REVLibError.fromInt(CANSparkMaxJNI.c_SparkMax_SetInverted(sparkMaxHandle, inverted));
+                    if (useAbsoluteEncoder) {
+                        return getAbsoluteEncoder().setInverted(inverted);
+                    } else {    
+                        return REVLibError.fromInt(CANSparkMaxJNI.c_SparkMax_SetInverted(sparkMaxHandle, inverted));
+                    }
                 },
                 () -> super.getInverted() == inverted,
                 "Set inverted failure!");

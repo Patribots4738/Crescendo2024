@@ -79,7 +79,7 @@ public class Trapper extends SubsystemBase implements Logged {
         return Commands.sequence(
             outtake(),
             Commands.waitSeconds(seconds),
-            stopCommand()  
+            stopCommand()
         );
     }
 
@@ -92,6 +92,10 @@ public class Trapper extends SubsystemBase implements Logged {
 
     public Command setCoastMode() {
         return runOnce(() -> trapper.setCoastMode());
+    }
+
+    public Command setBrakeMode() {
+        return runOnce(() -> trapper.setBrakeMode());
     }
 
     public boolean hasPiece() {
