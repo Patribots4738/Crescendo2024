@@ -27,6 +27,10 @@ public class Neo extends SafeSpark implements Logged {
 
     private double lastDesiredChangeTimestamp = 0;
 
+    private double defaultDt = 0.2;
+    private double defaultVelocityThreshold = 6000;
+    private double defaultCurrentThreshold = 17;
+
     @Log
     private boolean hasControl = false;
 
@@ -129,7 +133,7 @@ public class Neo extends SafeSpark implements Logged {
         }
 
         if (targetPosition != position)
-            updateHasControl(ControlLoopType.POSITION, position, 0.3, 8000, 21);
+            updateHasControl(ControlLoopType.POSITION, position, defaultDt, defaultVelocityThreshold, defaultCurrentThreshold);
         targetPosition = position;
 
         controlType = ControlLoopType.POSITION;
@@ -179,7 +183,7 @@ public class Neo extends SafeSpark implements Logged {
         }
         
         if (targetPercent != percent)
-            updateHasControl(ControlLoopType.PERCENT, percent, 0.3, 8000, 21);
+            updateHasControl(ControlLoopType.PERCENT, percent, 0.3, defaultVelocityThreshold, defaultCurrentThreshold);
         targetPercent = percent;
         
         controlType = ControlLoopType.PERCENT;
@@ -230,7 +234,7 @@ public class Neo extends SafeSpark implements Logged {
         }
 
         if (targetVelocity != velocity)
-            updateHasControl(ControlLoopType.VELOCITY, velocity, 0.3, 8000, 21);
+            updateHasControl(ControlLoopType.VELOCITY, velocity, defaultDt, defaultVelocityThreshold, defaultCurrentThreshold);
         targetVelocity = velocity;
 
         controlType = ControlLoopType.VELOCITY;

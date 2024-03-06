@@ -18,7 +18,9 @@ public class Intake extends SubsystemBase implements Logged {
 
     @Log
     private double desiredSpeed = 0;
-    
+    @Log
+    private boolean hasControl = false;
+
     public Intake() {
         intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID, false);
         intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
@@ -27,6 +29,7 @@ public class Intake extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
+        hasControl = intakeMotor.getHasControl();
         intakeMotor.updateHasControl(ControlLoopType.PERCENT, IntakeConstants.INTAKE_PERCENT, 0.3, 8000, 21);
     }
 
