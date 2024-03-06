@@ -1,6 +1,7 @@
 package frc.robot.commands.managers;
 
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -8,8 +9,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
+import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
@@ -18,6 +19,7 @@ import frc.robot.subsystems.Trapper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -75,6 +77,14 @@ public class PieceControl implements Logged {
         );
     }
 
+     public Command brakeIntakeAndIndexer() {
+        return Commands.sequence(
+            intake.setBrakeMode(),
+            indexer.setBrakeMode(),
+            trapper.setBrakeMode()
+        );
+    }
+
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
@@ -127,8 +137,8 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             trapper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitSeconds(.35),// 0.6
-            indexer.stopCommand(),
+            NT.getWaitCommand("noteToIndexer1"), // 0.7
+            trapper.stopCommand(),
             indexer.toElevatorSlow(),
             NT.getWaitCommand("noteToIndexer2"), // 0.07
             stopIntakeAndIndexer()
@@ -165,8 +175,7 @@ public class PieceControl implements Logged {
         return Commands.sequence(
             intake.outCommand(),
             indexer.toElevator(),
-            dropPieceCommand(),
-            stopAllMotors()
+            trapper.outtake()
         );
     }
 
@@ -185,15 +194,6 @@ public class PieceControl implements Logged {
         return trapper.stopCommand().andThen(indexer.stopCommand());
     }
 
-    public Command dropPieceCommand() {
-        return Commands.sequence(
-            elevator.toDropCommand(),
-            trapper.outtake(),
-            NT.getWaitCommand("dropPiece1"), // 0.5
-            elevator.toBottomCommand()
-        );
-    }
-
     public Command intakeAuto() {
         return Commands.sequence(
                 intake.inCommand(),
@@ -210,7 +210,7 @@ public class PieceControl implements Logged {
             new SelectiveConditionalCommand(
                 shootWhenReady(poseSupplier, speedSupplier),
                 placeWhenReady(),
-                this::getShooterMode
+                () -> elevator.getDesiredPosition() == 0
             ).andThen(setHasPiece(false));
     }
 
@@ -312,16 +312,17 @@ public class PieceControl implements Logged {
         return Commands.runOnce(() -> this.placeWhenReady = placeWhenReady);
     }
 
-    public Command sourceShooterIntake() {
+    public Command sourceShooterIntake(BooleanSupplier holdingButton) {
         return Commands.sequence(
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 45.0)),
             indexer.toElevator(),
-            trapper.outtake(3.0),
+            trapper.outtake()
+        ).onlyWhile(holdingButton)
+        .andThen(
             Commands.either(
                 stopAllMotors(),
                 noteToTrap(),
-                this::getShooterMode)
-        ); 
+                this::getShooterMode));
     }
 
     public Command stopIntakeAndIndexer() {
@@ -372,25 +373,18 @@ public class PieceControl implements Logged {
     // We don't want to set the state until we are done with the command that moves the note
     // since we arent ready to do another command that moves the note until we are done with the first one
     public Command setShooterModeCommand(boolean shooterMode) {
-        return Commands.either(
-            Commands.runOnce(() -> setShooterMode(shooterMode))
+        return Commands.runOnce(() -> setShooterMode(shooterMode))
                 .andThen(
                     Commands.either(
-                        Commands.either(
-                            noteToIndexer(),
-                            noteToTrap(),
-                            () -> shooterMode), 
-                        Commands.none(), 
-                        intake::getPossession
-                    )
-                ),
-            Commands.none(),
-            () -> this.shooterMode != shooterMode);
+                        noteToIndexer(),
+                        noteToTrap(),
+                        () -> shooterMode)
+                );
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
     public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speedSupplier) {
-        return Commands.either(
+        return new ActiveConditionalCommand(
             Commands.runOnce(() -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
             shooterCmds.getShooter()),
             shooterCmds.stopShooter().onlyIf(() -> Robot.gameMode != GameMode.TEST),

@@ -852,7 +852,10 @@ public final class Constants {
             put(W3_RED, "W3_RED");
         }};
 
-      public static final Translation2d PODIUM_POSE = new Translation2d(2.9, 3.4);
+        // 12.4ft from the speaker
+        public static final Translation2d PENINSULA_POSE = new Translation2d(3.697, 4.773);
+        // 9.76ft from the speaker
+        public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
@@ -953,7 +956,7 @@ public final class Constants {
             put("intakeToTrap1", 0.5);
             put("intakeToTrap2", 0.0);
 
-            put("noteToIndexer1", 0.6);
+            put("noteToIndexer1", 0.2);
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 

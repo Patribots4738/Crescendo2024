@@ -93,8 +93,7 @@ public class ShooterCalc implements Logged {
         return () -> 
             pivot.getAtDesiredAngle() 
             && shooter.getAtDesiredRPM() 
-            && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM 
-            && shooter.getAverageTargetSpeed() > 0;
+            && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
@@ -145,7 +144,7 @@ public class ShooterCalc implements Logged {
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
         Rotation2d desiredRotation2d = Rotation2d.fromRadians(MathUtil.angleModulus(
             currentAngleToSpeaker.getRadians() + velocityArcTan + Math.PI
-        )).plus(Rotation2d.fromDegrees(6));
+        )).plus(Rotation2d.fromDegrees(0));
 
         // Update the robot's pose with the desired rotation
         desiredSWDPose = new Pose2d(robotPose.getTranslation(), desiredRotation2d);

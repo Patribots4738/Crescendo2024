@@ -138,7 +138,7 @@ public class Elevator extends SubsystemBase implements Logged {
 	}
 
     public boolean atPosition(double position) {
-        return MathUtil.isNear(position, position, TrapConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(position, this.position, TrapConstants.ELEVATOR_DEADBAND);
     }
 
     public void setAmpMode(boolean amp) {

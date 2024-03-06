@@ -149,9 +149,11 @@ public class AlignmentCmds {
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
+        // The true condition represents the pose closer to C1
+        // Which is to the left of the driver
         return Commands.either(
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.M_POSE),
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.ORBIT_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PENINSULA_POSE),
             // No way I just found my first XOR use case :D
             () -> Robot.isRedAlliance() ^ xButtonPressed
         );
