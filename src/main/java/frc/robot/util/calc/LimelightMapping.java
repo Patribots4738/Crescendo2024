@@ -16,6 +16,7 @@ import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
@@ -113,6 +114,11 @@ public class LimelightMapping extends SubsystemBase implements Logged {
         }
     }
 
+    public void ManuallyAddPose(int fiducialID, Pose3d targetPose) {
+        limelightConversion.addFiducial(fiducialID, targetPose);
+        poses.put(fiducialID, targetPose);
+    }
+
     public Command takeSnapshotCommand() {
         return Commands.runOnce(this::takeSnapshot)
             .andThen(Commands.print("Snapshot taken"))
@@ -152,8 +158,15 @@ public class LimelightMapping extends SubsystemBase implements Logged {
         for (int i = 0; i < poseArray.length; i++) {
             poseArray[i] = poses.get(i);
         }
+        JSONObject[] jsonData = limelightConversion.tagMap.get("fiducials");
+        ArrayList<JSONObject> newJsonData = new ArrayList<>();
+        // remove any null values so then its easier to auto import to limelight visualizer
+        for (int i = 0; i < jsonData.length; i++) {
+            if(jsonData[i] == null) continue;
+            newJsonData.add(jsonData[i]);
+        }
         System.out.println("\n\n\n{");
-        System.out.println(JSONObject.toString("fiducials", limelightConversion.tagMap.get("fiducials")));
+        System.out.println(JSONObject.toString("fiducials", newJsonData.toArray(new JSONObject[0])));
         System.out.println("}\n\n\n");
     }
 
