@@ -27,43 +27,43 @@ public class Scale3d {
         this(scale.x, scale.y, scale.z);
     }
 
-    public Scale3d of (double x, double y, double z) {
+    public Scale3d of(double x, double y, double z) {
         return new Scale3d(x, y, z);
     }
 
-    public Scale3d of (double x, double y) {
+    public Scale3d of(double x, double y) {
         return new Scale3d(x, y);
     }
 
-    public Scale3d of (double x) {
+    public Scale3d of(double x) {
         return new Scale3d(x);
     }
 
-    public Scale3d of () {
+    public Scale3d of() {
         return new Scale3d();
     }
 
-    public Scale3d of (Scale3d scale) {
+    public Scale3d of(Scale3d scale) {
         return new Scale3d(scale);
     }
 
-    public Scale3d add (Scale3d scale) {
+    public Scale3d add(Scale3d scale) {
         return new Scale3d(x + scale.x, y + scale.y, z + scale.z);
     }
 
-    public Scale3d subtract (Scale3d scale) {
+    public Scale3d subtract(Scale3d scale) {
         return new Scale3d(x - scale.x, y - scale.y, z - scale.z);
     }
 
-    public Scale3d multiply (Scale3d scale) {
+    public Scale3d multiply(Scale3d scale) {
         return new Scale3d(x * scale.x, y * scale.y, z * scale.z);
     }
 
-    public Scale3d divide (Scale3d scale) {
+    public Scale3d divide(Scale3d scale) {
         return new Scale3d(x / scale.x, y / scale.y, z / scale.z);
     }
 
-    public Scale3d negate () {
+    public Scale3d negate() {
         return new Scale3d(-x, -y, -z);
     }
 }
