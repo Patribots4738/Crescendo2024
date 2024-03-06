@@ -285,7 +285,7 @@ public class Limelight extends SubsystemBase implements Logged{
             Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceBlink(limelightName)),
             Commands.waitSeconds(duration.getAsDouble()),
             Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceOff(limelightName))
-        );
+        ).ignoringDisable(true);
     }
 
     public void enableLEDS() {

@@ -176,7 +176,7 @@ public class PieceControl implements Logged {
             intake.outCommand(),
             indexer.toElevator(),
             trapper.outtake()
-        ).finallyDo(() -> stopAllMotors().initialize());
+        );
     }
 
     public Command stopEjecting() {
