@@ -953,7 +953,7 @@ public final class Constants {
             put("intakeToTrap1", 0.5);
             put("intakeToTrap2", 0.0);
 
-            put("noteToIndexer1", 0.6);
+            put("noteToIndexer1", 0.2);
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 

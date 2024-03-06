@@ -94,6 +94,10 @@ public class Trapper extends SubsystemBase implements Logged {
         return runOnce(() -> trapper.setCoastMode());
     }
 
+    public Command setBrakeMode() {
+        return runOnce(() -> trapper.setBrakeMode());
+    }
+
     public boolean hasPiece() {
         return false;
     }
