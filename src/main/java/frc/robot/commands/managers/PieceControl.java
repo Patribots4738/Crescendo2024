@@ -153,8 +153,6 @@ public class PieceControl implements Logged {
         );
     }
 
-    
-
     public Command noteToTrap() {
         return Commands.sequence(
             trapper.outtake(),
