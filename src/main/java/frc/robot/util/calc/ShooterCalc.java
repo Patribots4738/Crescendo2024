@@ -93,7 +93,8 @@ public class ShooterCalc implements Logged {
         return () -> 
             pivot.getAtDesiredAngle() 
             && shooter.getAtDesiredRPM() 
-            && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
+            && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM
+            && shooter.getAverageTargetSpeed() != 0;
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
