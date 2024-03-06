@@ -210,7 +210,7 @@ public class PieceControl implements Logged {
             new SelectiveConditionalCommand(
                 shootWhenReady(poseSupplier, speedSupplier),
                 placeWhenReady(),
-                this::getShooterMode
+                () -> elevator.getDesiredPosition() == 0
             ).andThen(setHasPiece(false));
     }
 
