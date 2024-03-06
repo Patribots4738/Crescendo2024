@@ -35,7 +35,7 @@ ___
   - Field-centric swerve drive
   - Modular autonomous routines
   - Under bumper intake
-  - LEDs to communicate various 
+  - LEDs to communicate various actions
 
 ## Autonomous 🤖
   ### LED Position Indicator (LPI)
