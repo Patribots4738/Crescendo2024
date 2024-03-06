@@ -34,19 +34,19 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3 Proxy"
+                        "pathName": "S W3"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W3 W2 Proxy"
+                        "pathName": "W3 W2"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W2 W1 Proxy"
+                        "pathName": "W2 W1"
                       }
                     },
                     {
@@ -58,7 +58,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "C2 L Proxy"
+                        "pathName": "C2 L"
                       }
                     },
                     {
@@ -70,7 +70,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "C3 M Proxy"
+                        "pathName": "C3 M"
                       }
                     }
                   ]

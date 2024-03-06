@@ -42,7 +42,7 @@
       }
     },
     {
-      "name": "Intake",
+      "name": "ToIndexer",
       "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
@@ -51,7 +51,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             }
           ]

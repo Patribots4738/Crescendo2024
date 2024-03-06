@@ -48,7 +48,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "End",
+      "name": "ToIndexer",
       "waypointRelativePos": 1.75,
       "command": {
         "type": "parallel",
@@ -57,7 +57,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             }
           ]
