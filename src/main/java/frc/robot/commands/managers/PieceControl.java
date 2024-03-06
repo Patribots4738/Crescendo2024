@@ -173,7 +173,8 @@ public class PieceControl implements Logged {
         return Commands.sequence(
             intake.outCommand(),
             indexer.toElevator(),
-            trapper.outtake()
+            trapper.outtake(),
+            setHasPiece(false)
         );
     }
 
