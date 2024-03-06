@@ -83,7 +83,7 @@ public class Elevator extends SubsystemBase implements Logged {
         if (desiredPos != pos) {
             desiredPos = pos;
             elevator.setTargetPosition(pos);
-    
+
             RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
                 0, 0, pos,
                 new Rotation3d()

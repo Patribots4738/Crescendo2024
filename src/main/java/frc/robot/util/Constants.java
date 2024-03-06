@@ -25,7 +25,6 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 import frc.robot.util.custom.PatrIDConstants;
@@ -490,11 +489,11 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int PWM_PORT = 9;
-        public static final int LED_COUNT = new AddressableLEDBuffer(PWM_PORT).getLength();
+        public static final int LED_COUNT = 300;
 
-        public static final double OUTER_ZONE = 2.262;
-        public static final double INNER_ZONE = 1.131;
-        public static final double RIN_STAR_BIN = Units.inchesToMeters(2.54);
+        public static final double OUTER_ZONE = 3;
+        public static final double INNER_ZONE = 1.5;
+        public static final double RIN_STAR_BIN = 0.5;
 
         public static final int LPI_ROTATIONAL_DEADBAND = 1;
 
@@ -503,6 +502,35 @@ public final class Constants {
                 10
         );
 
+
+        public static final HashMap<LED_SECTIONS, Pair<Integer,Integer>> LED_SECTION_MAP = new HashMap<>(){{
+            put(LED_SECTIONS.ELEVATOR1, LED_SECTIONS.ELEVATOR1.getIndexRange());
+            put(LED_SECTIONS.ELEVATOR2, LED_SECTIONS.ELEVATOR2.getIndexRange());
+            put(LED_SECTIONS.PIVOT, LED_SECTIONS.PIVOT.getIndexRange());
+            put(LED_SECTIONS.CLIMB1, LED_SECTIONS.CLIMB1.getIndexRange());
+            put(LED_SECTIONS.CLIMB2, LED_SECTIONS.CLIMB2.getIndexRange());
+            put(LED_SECTIONS.BUMPERS, LED_SECTIONS.BUMPERS.getIndexRange());
+        }};
+
+        public enum LED_SECTIONS {
+            ELEVATOR1(Pair.of(0, 50)),
+            ELEVATOR2(Pair.of(51, 100)),
+            PIVOT(Pair.of(101, 150)),
+            CLIMB1(Pair.of(151, 200)),
+            CLIMB2(Pair.of(201, 250)),
+            BUMPERS(Pair.of(251, 300));
+    
+            private Pair<Integer, Integer> indexRange;
+    
+            LED_SECTIONS(Pair<Integer, Integer> indexRange) {
+                this.indexRange = indexRange;
+            }
+    
+            public Pair<Integer, Integer> getIndexRange() {
+                return indexRange;
+            }
+        }
+        
         public static final int NORTH = 0;
         public static final int NORTHEAST = 1;
         public static final int EAST = 2;
@@ -617,7 +645,8 @@ public final class Constants {
 
     public static final class FieldConstants {
 
-        public static boolean IS_SIMULATION = Robot.isSimulation();
+        // TODO: do not forget to change this to be well not true 
+        public static boolean IS_SIMULATION = true;
         public static final int CENTER_NOTE_COUNT = 5;
 
         public static final Pose2d BLUE_ORIGIN = new Pose2d(0, 0, new Rotation2d());

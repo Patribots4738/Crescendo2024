@@ -19,6 +19,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -33,8 +34,11 @@ import frc.robot.commands.managers.CalibrationControl;
 import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.leds.Commands.LPI;
-import frc.robot.leds.Strips.LedStrip;
+import frc.robot.leds.LedStrip;
+import frc.robot.leds.commands.LPI;
+import frc.robot.leds.commands.animations.LEDColorCommand;
+import frc.robot.leds.commands.animations.LEDFollowerCommand;
+import frc.robot.leds.commands.animations.LEDWaveCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
@@ -42,12 +46,13 @@ import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
-import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.LimelightMapping;
 import frc.robot.util.calc.ShooterCalc;
-import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
+import frc.robot.util.custom.PatriBoxController;
+import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -89,7 +94,7 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     public static HDCTuner HDCTuner;
 
-    private final LedStrip ledStrip;
+    private final LedStrip ledStrip = new LedStrip();
     private Indexer indexer;
     private Trapper trapper;
     private ShooterCmds shooterCmds;
@@ -148,7 +153,6 @@ public class RobotContainer implements Logged {
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
-        ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
 
         shooter = new Shooter();
@@ -156,7 +160,7 @@ public class RobotContainer implements Logged {
         trapper = new Trapper();
         
         pivot = new Pivot();
-
+        
         HDCTuner = new HDCTuner(
             AutoConstants.HDC.getXController(),
             AutoConstants.HDC.getThetaController());
@@ -221,18 +225,28 @@ public class RobotContainer implements Logged {
         configureOperatorBindings(operator);
         configureTimedEvents();
         configureTestBindings();
-    }
-
-    private void configureTestBindings() {
-        // Warning: these buttons are not on the default loop!
-        // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
-        // for more information 
-        // configureHDCBindings(driver);
-        configureCalibrationBindings(operator);
+        configureTimedEvents();
     }
     
     private void configureTimedEvents() {
-      
+        new Trigger(() -> elevator.getDesiredPosition() != 0)
+                .whileTrue(
+                    new LEDFollowerCommand(
+                        ledStrip.getLEDCommands(),
+                        elevator::getPosition,
+                        TrapConstants.ELEVATOR_TOP_LIMIT,
+                        Color.kBlue));
+
+        new Trigger(() -> elevator.getDesiredPosition() == 0)
+                .whileTrue(
+                    new LEDFollowerCommand(
+                        ledStrip.getLEDCommands(),
+                        elevator::getPosition,
+                        TrapConstants.ELEVATOR_TOP_LIMIT,
+                        Color.kRed));
+
+        // TODO: configure button bindings for LEDs
+
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.coastIntakeAndIndexer()
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
@@ -278,6 +292,14 @@ public class RobotContainer implements Logged {
                         ((135 - Robot.currentTimestamp - gameModeStart)*2.0)))
                     )
                 );
+    }
+
+    private void configureTestBindings() {
+        // Warning: these buttons are not on the default loop!
+        // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
+        // for more information 
+        // configureHDCBindings(driver);
+        configureCalibrationBindings(operator);
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {
