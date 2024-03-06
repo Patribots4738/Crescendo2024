@@ -49,7 +49,7 @@ public final class Constants {
 
         public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.377;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3.5;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -134,7 +134,7 @@ public final class Constants {
             0.25
         );
 
-        public static final int SHOOTER_CURRENT_LIMIT = 80;
+        public static final int SHOOTER_CURRENT_LIMIT = 40;
         public static final int PIVOT_CURRENT_LIMIT = 15;
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
@@ -294,7 +294,7 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4.5;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 4.377;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
