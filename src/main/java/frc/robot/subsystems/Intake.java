@@ -82,6 +82,10 @@ public class Intake extends SubsystemBase implements Logged {
         return runOnce(() -> intakeMotor.setCoastMode());
     }
 
+    public Command setBrakeMode() {
+        return runOnce(() -> intakeMotor.setBrakeMode());
+    }
+
     public boolean getPossession() {
         return notePossession;
     }

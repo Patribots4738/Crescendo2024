@@ -138,6 +138,8 @@ public class RobotContainer implements Logged {
         } else {
             limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
             limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 0);
+            limelight2.disableLEDS();
+            limelight3.disableLEDS();
         }
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
@@ -225,7 +227,9 @@ public class RobotContainer implements Logged {
       
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.coastIntakeAndIndexer()
-            .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity)));
+            .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .andThen(Commands.waitSeconds(5))
+            .andThen(pieceControl.brakeIntakeAndIndexer()));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
@@ -250,7 +254,8 @@ public class RobotContainer implements Logged {
                     Commands.waitSeconds(1)
                 ).andThen(driver.setRumble(() -> 0).alongWith(operator.setRumble(() -> 0)))
                 // TODO: Figure out why this doesn't work
-                .alongWith(limelight3.blinkLeds(() -> 1))
+                .alongWith(limelight3.blinkLeds(() -> 3))
+                .alongWith(limelight2.blinkLeds(() -> 3))
             );
 
         // Have the controllers pulse when the match is about to end to signal the drivers
@@ -400,6 +405,9 @@ public class RobotContainer implements Logged {
         controller.a()
             .onTrue(pieceControl.panicEjectNote())
             .onFalse(pieceControl.stopPanicEject());
+
+        controller.start().or(controller.back())
+            .whileTrue(pieceControl.sourceShooterIntake(controller.start().or(controller.back())));
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
