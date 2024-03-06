@@ -254,8 +254,8 @@ public class RobotContainer implements Logged {
                     Commands.waitSeconds(1)
                 ).andThen(driver.setRumble(() -> 0).alongWith(operator.setRumble(() -> 0)))
                 // TODO: Figure out why this doesn't work
-                .alongWith(limelight3.blinkLeds(() -> 3))
-                .alongWith(limelight2.blinkLeds(() -> 3))
+                .alongWith(limelight3.blinkLeds(() -> 1))
+                .alongWith(limelight2.blinkLeds(() -> 1))
             );
 
         // Have the controllers pulse when the match is about to end to signal the drivers
@@ -333,7 +333,7 @@ public class RobotContainer implements Logged {
         controller.a().whileTrue(
             Commands.sequence(
                 swerve.resetHDCCommand(),
-                new ActiveConditionalCommand(
+                Commands.either(
                     alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                     alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
                     climb::getHooksUp)));
