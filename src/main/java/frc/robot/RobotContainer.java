@@ -153,7 +153,6 @@ public class RobotContainer implements Logged {
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
-        ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
 
         shooter = new Shooter();
@@ -246,21 +245,7 @@ public class RobotContainer implements Logged {
                         TrapConstants.ELEVATOR_TOP_LIMIT,
                         Color.kRed));
 
-        // operator.povUp()
-        //         .onTrue(
-        //             new LEDWaveCommand().new Flash(
-        //                 ledStrip.getLEDCommands(),
-        //                 255,
-        //                 ledStrip.getBuffer().getLength(),
-        //                 127.5,
-        //                 0.9,
-        //                 Math.PI * 2,
-        //                 0,
-        //                 1.0));
-
-        // operator.rightBumper()
-        //         .whileTrue(
-        //             new LEDColorCommand(ledStrip.getLEDCommands(), Color.kRed, 0, 300));
+        // TODO: configure button bindings for LEDs
 
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.coastIntakeAndIndexer()
