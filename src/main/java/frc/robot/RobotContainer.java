@@ -244,12 +244,16 @@ public class RobotContainer implements Logged {
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
         new Trigger(swerve::isAlignedToAmp)
-            .onTrue(driver.setRumble(() -> 0.3))
-            .onFalse(driver.setRumble(() -> 0));
+            .onTrue(driver.setRumble(() -> 0.5)
+                .alongWith(operator.setRumble(() -> 0.5)))
+            .onFalse(driver.setRumble(() -> 0)
+                .alongWith(operator.setRumble(() -> 0)));
         
         new Trigger(shooterCalc.readyToShootSupplier())
-            .onTrue(driver.setRumble(() -> 0.3))
-            .onFalse(driver.setRumble(() -> 0));
+            .onTrue(driver.setRumble(() -> 0.5)
+                .alongWith(operator.setRumble(() -> 0.5)))
+            .onFalse(driver.setRumble(() -> 0)
+                .alongWith(operator.setRumble(() -> 0)));
         
         // Make the controllers pulse just like the LEDs do
         new Trigger(intake::getPossession)
@@ -272,12 +276,19 @@ public class RobotContainer implements Logged {
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.currentTimestamp - gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
             .whileTrue(
                 Commands.run(
-                    () -> driver.setRumble( 
-                        (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - gameModeStart) + Math.PI)
-                        /
-                        ((135 - Robot.currentTimestamp - gameModeStart)*2.0)))
-                    )
-                );
+                    () -> {
+                        double rumbleSpeed =
+                            (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - gameModeStart) + Math.PI)
+                            /
+                            ((135 - Robot.currentTimestamp - gameModeStart)*2.0)); 
+                        driver.setRumble(rumbleSpeed);
+                        operator.setRumble(rumbleSpeed);
+                    }
+                )
+            ).onFalse(
+                driver.setRumble(() -> 0)
+                .alongWith(operator.setRumble(() -> 0))
+            );
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {
@@ -356,7 +367,8 @@ public class RobotContainer implements Logged {
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)
-                .andThen(driver.setRumble(() -> 0.5, 0.3)));
+                .alongWith(driver.setRumble(() -> 0.5, 0.3))
+                .alongWith(operator.setRumble(() -> 0.5, 0.3)));
 
         controller.rightStick()
             .toggleOnTrue(
@@ -416,6 +428,9 @@ public class RobotContainer implements Logged {
 
         controller.start().or(controller.back())
             .whileTrue(pieceControl.sourceShooterIntake(controller.start().or(controller.back())));
+
+        controller.rightStick().and(controller.leftStick())
+            .onTrue(elevator.resetEncoder());
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) {
