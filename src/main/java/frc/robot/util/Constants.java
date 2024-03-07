@@ -28,6 +28,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
@@ -166,7 +167,7 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                // put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
+                put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
                 // put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
                 // put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
                 // put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
@@ -182,21 +183,34 @@ public final class Constants {
 
                 // V2
                 put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
-                put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
-                put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
-                put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
-                put(10, SpeedAngleTriplet.of(2884.0, 2894.0, 37.1));
-                put(11, SpeedAngleTriplet.of(2924.0, 2930.0, 33.3));
-                put(12, SpeedAngleTriplet.of(2924.0, 2930.0, 32.3));
-                // V3 (note inside of indexer)
-                put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
-                put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
-                // 2/28/24 - this was the day after bands were added
-                put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
+                // put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
+                // put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
+                // put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
+                // put(10, SpeedAngleTriplet.of(2884.0, 2894.0, 37.1));
+                // put(11, SpeedAngleTriplet.of(2924.0, 2930.0, 33.3));
+                // put(12, SpeedAngleTriplet.of(2924.0, 2930.0, 32.3));
+                // // V3 (note inside of indexer)
+                // put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
+                // put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
+                // // 2/28/24 - this was the day after bands were added
+                // put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
+
                 put(16, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
                 put(17, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
                 put(18, SpeedAngleTriplet.of(3986.0, 3990.0, 26.1));
                 put(19, SpeedAngleTriplet.of(4201.0, 4205.0, 25.0));
+
+                put(7, SpeedAngleTriplet.of(2840.0, 2850.0, 44.6));
+                put(8, SpeedAngleTriplet.of(2810.0, 2820.0, 39.5));
+                put(9, SpeedAngleTriplet.of(2886.0, 2886.0, 37.4));
+                put(10, SpeedAngleTriplet.of(2888.0, 2897.0, 35.6));
+                // Driverstation has some words for you:
+                //   樀愀瘀愀㨀㐀㄀㈀⤀㨀 䰀漀漀瀀 琀椀洀攀 漀昀 　⸀　㈀猀 漀瘀攀爀爀甀渀 ＀෾਀＀￾￾￾￾￾⃾ ＀෾਀＀
+                put(11, SpeedAngleTriplet.of(2943.0, 2930.0, 33.3));
+                put(12, SpeedAngleTriplet.of(2943.0, 2935.0, 32.2));
+                put(13, SpeedAngleTriplet.of(3319.0, 3042.0, 30.3));
+                put(14, SpeedAngleTriplet.of(3587.0, 3310.0, 29.1));
+                put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 27.3));
             }
         };
 
