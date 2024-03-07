@@ -65,11 +65,11 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public double getPosition() {
-        return elevator.getPosition();
+        return position;
     }
 
     public double getDesiredPosition() {
-        return elevator.getTargetPosition();
+        return desiredPos;
     }
 
     public void setPosition(double pos) {
@@ -132,8 +132,8 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public boolean atDesiredPosition() {
-		return MathUtil.isNear(desiredPos, position, TrapConstants.ELEVATOR_DEADBAND);
-	}
+	return MathUtil.isNear(desiredPos, position, TrapConstants.ELEVATOR_DEADBAND);
+    }
 
     public boolean atPosition(double position) {
         return MathUtil.isNear(position, this.position, TrapConstants.ELEVATOR_DEADBAND);
