@@ -268,22 +268,16 @@ public class PieceControl implements Logged {
             );
     }
 
-    // TODO: remove defer when amp position is finalized
-    public Command elevatorToPlacement(boolean amp) {
+    public Command elevatorToPlacement(boolean povLeftPosition) {
         return 
-            Commands.defer(
-                () -> 
-                    Commands.sequence(
-                        Commands.either(
-                            setElevatorPosition(NT.getSupplier("ampPosition")), 
-                            setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
-                            () -> amp),
-                        prepPiece(),
-                        setReadyToPlaceCommand(true),
-                        placeWhenReady().onlyIf(this::shouldPlaceWhenReady)
-                    ),
-                Set.of(elevator, trapper)
-            );
+            Commands.sequence(
+                Commands.either(
+                    setElevatorPosition(() -> TrapConstants.NOTE_FIX_POS), 
+                    setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
+                    () -> povLeftPosition),
+                prepPiece(),
+                setReadyToPlaceCommand(true),
+                placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }
 
     public Command placeWhenReady() {
@@ -312,7 +306,7 @@ public class PieceControl implements Logged {
 
     public Command sourceShooterIntake(BooleanSupplier holdingButton) {
         return Commands.sequence(
-            shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 45.0)),
+            shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 60.0)),
             indexer.toElevator(),
             trapper.outtake()
         ).onlyWhile(holdingButton)
