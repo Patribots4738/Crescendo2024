@@ -80,19 +80,26 @@ public class Limelight extends SubsystemBase implements Logged{
         Results result = getResults();
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
 
+        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;      
+
         // invalid data check
         if (estimatedRobotPose.getX() == 0.0
             || Double.isNaN(estimatedRobotPose.getX()) 
             || Double.isNaN(estimatedRobotPose.getY()) 
-            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())) {
-            return;
-        }
+            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())
+            || targets.length == 0
+            || Double.valueOf(targets[0].tx).equals(null)
+            || Double.valueOf(targets[0].ty).equals(null)
+            || !Double.isFinite(targets[0].tx)
+            || !Double.isFinite(targets[0].ty))
+                return;
+             
 
         if (hasTarget(result)) {
             double xyStds;
             double radStds;
             // multiple targets detected
-            if (result.targets_Fiducials.length > 1) {
+            if (targets.length > 1) {
                 // TODO: TUNE
                 xyStds = 0.8;
                 radStds = 1.2;
