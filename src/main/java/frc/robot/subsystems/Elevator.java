@@ -25,7 +25,7 @@ public class Elevator extends SubsystemBase implements Logged {
     private double position = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
 
     @Log
-    private boolean atDesiredPos = false, stuckOnGuillotine = false, ampMode = true;
+    private boolean atDesiredPos = false, stuckOnGuillotine = false;
 
     /** Creates a new Elevator. */
     public Elevator() {
@@ -77,8 +77,6 @@ public class Elevator extends SubsystemBase implements Logged {
             pos,
             TrapConstants.ELEVATOR_BOTTOM_LIMIT,
             TrapConstants.ELEVATOR_TOP_LIMIT);
-        
-        setAmpMode(pos == TrapConstants.AMP_PLACE_POS);
 
         if (desiredPos != pos) {
             desiredPos = pos;
@@ -121,8 +119,8 @@ public class Elevator extends SubsystemBase implements Logged {
         return setPositionCommand(TrapConstants.TRAP_PLACE_POS, true);
     }
 
-    public Command toAmpCommand() {
-        return setPositionCommand(TrapConstants.AMP_PLACE_POS, true);
+    public Command toNoteFixCommand() {
+        return setPositionCommand(TrapConstants.NOTE_FIX_POS, true);
     }
 
     public Command toIndexCommand() {
@@ -141,14 +139,6 @@ public class Elevator extends SubsystemBase implements Logged {
         return MathUtil.isNear(position, this.position, TrapConstants.ELEVATOR_DEADBAND);
     }
 
-    public void setAmpMode(boolean amp) {
-        this.ampMode = amp;
-    }   
-
-    public boolean getAmpMode() {
-        return this.ampMode;
-    }
-
     public boolean nearGuillotine() {
         return atPosition(TrapConstants.GUILLOTONE_POS);
     }
@@ -165,5 +155,9 @@ public class Elevator extends SubsystemBase implements Logged {
             && desiredPos > position
             && nearGuillotine()
             && elevator.getOutputCurrent() > 35.0;
+    }
+
+    public Command resetEncoder() {
+        return runOnce(elevator::resetEncoder);
     }
 }
