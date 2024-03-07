@@ -909,6 +909,22 @@ public final class Constants {
     }
 
     public static final class CameraConstants {
+        /**
+         * Things to do when we are in field calibration
+         * First off: Take snapshots at W2 (both alliances), and C3
+         * 
+         * Then, attempt to quickly make the fmap and verify the accuracy using a hotspot
+         * (look up "april tag map builder limelight") or visit https://tools.limelightvision.io/map-builder
+         * Then, go back and take another shot from either W1 or W3 to verify the accuracy
+         * 
+         * Finally, move the robot around and see if the vision helps us out...
+         * Power cycle the limelight to force megatag to stop giving us outdated readings
+         * 
+         * Make sure to bring:
+         *   Tape measure to verify the accuracy (Sub is 36 in out from field wall)
+         *   Square (to make sure the robot is perfectly in the center of the spike mark)
+         *   Phone for hotspot i suppose
+         */
         public static final boolean FIELD_CALIBRATION_MODE = false;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
