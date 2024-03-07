@@ -92,25 +92,8 @@
       }
     },
     {
-      "name": "PrepareSWD",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareSWD"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Shoot",
-      "waypointRelativePos": 0.45,
+      "waypointRelativePos": 0.35,
       "command": {
         "type": "parallel",
         "data": {
@@ -126,29 +109,18 @@
       }
     },
     {
-      "name": "PrepareShotL",
-      "waypointRelativePos": 1.4,
+      "name": "ShootW2&Intake",
+      "waypointRelativePos": 0.7,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooterL"
+                "name": "Intake"
               }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "ShootW2",
-      "waypointRelativePos": 0.8,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
+            },
             {
               "type": "named",
               "data": {

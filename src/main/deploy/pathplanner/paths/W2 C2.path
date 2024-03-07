@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284610415676218,
-        "y": 7.43617949033381
+        "x": 2.892385986339722,
+        "y": 5.538747023742648
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.6543294855906625,
-        "y": 7.083161131607817
+        "x": 5.89027734906092,
+        "y": 7.328898921318496
       },
       "isLocked": false,
-      "linkedName": "C1"
+      "linkedName": "W2"
     },
     {
       "anchor": {
-        "x": 5.045175804637324,
-        "y": 6.376864182299793
+        "x": 8.293238893308695,
+        "y": 5.77776349281702
       },
       "prevControl": {
-        "x": 5.810671183847568,
-        "y": 6.706027670167642
+        "x": 6.674745396870256,
+        "y": 5.7532408640831045
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "C2"
     }
   ],
   "rotationTargets": [],
@@ -37,20 +37,13 @@
       "command": {
         "type": "parallel",
         "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "StopIntake"
-              }
-            }
-          ]
+          "commands": []
         }
       }
     },
     {
-      "name": "Shoot",
-      "waypointRelativePos": 1.0,
+      "name": "ToIndexer",
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -58,7 +51,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot"
+                "name": "ToIndexer"
               }
             }
           ]
@@ -74,13 +67,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -177.32156198722237,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Center Line",
+  "folder": "Wings",
   "previewStartingState": {
-    "rotation": -179.2648316228425,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

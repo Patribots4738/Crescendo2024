@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake & PrepareShooter",
+      "name": "StopIntake",
       "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
@@ -42,12 +42,6 @@
               "type": "named",
               "data": {
                 "name": "StopIntake"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooter"
               }
             }
           ]

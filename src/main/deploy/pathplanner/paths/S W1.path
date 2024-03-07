@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2690658005429514,
-        "y": 6.986635249866245
+        "x": 2.1825139573185,
+        "y": 6.851182627494981
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 6.9912317204253664
       },
       "prevControl": {
-        "x": 1.8928975934588572,
-        "y": 6.959248091856636
+        "x": 2.2254285576028527,
+        "y": 6.679524226357571
       },
       "nextControl": null,
       "isLocked": false,
@@ -55,7 +55,7 @@
       }
     },
     {
-      "name": "ToIndexer",
+      "name": "Intake",
       "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
@@ -64,7 +64,7 @@
             {
               "type": "named",
               "data": {
-                "name": "ToIndexer"
+                "name": "Intake"
               }
             }
           ]

@@ -3,37 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284610415676218,
-        "y": 7.43617949033381
+        "x": 1.3793978662827602,
+        "y": 5.631181847982673
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.6543294855906625,
-        "y": 7.083161131607817
+        "x": 1.8146745263093393,
+        "y": 5.612789876434728
       },
       "isLocked": false,
-      "linkedName": "C1"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.045175804637324,
-        "y": 6.376864182299793
+        "x": 2.892385986339722,
+        "y": 5.538747023742648
       },
       "prevControl": {
-        "x": 5.810671183847568,
-        "y": 6.706027670167642
+        "x": 2.4583935305746274,
+        "y": 5.545352647416459
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "W2"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake",
-      "waypointRelativePos": 0.0,
+      "name": "Intake",
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,24 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "StopIntake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 1.0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot"
+                "name": "Intake"
               }
             }
           ]
@@ -74,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -177.32156198722237,
+    "rotation": 179.31337875990656,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Center Line",
+  "folder": "Preloads",
   "previewStartingState": {
-    "rotation": -179.2648316228425,
+    "rotation": -179.1656544244532,
     "velocity": 0
   },
   "useDefaultConstraints": true

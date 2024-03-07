@@ -71,23 +71,6 @@
       }
     },
     {
-      "name": "PrepareSWD",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareSWD"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Shoot",
       "waypointRelativePos": 0.45,
       "command": {
@@ -98,23 +81,6 @@
               "type": "named",
               "data": {
                 "name": "Shoot"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "PrepareShotL",
-      "waypointRelativePos": 1.2,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooterL"
               }
             }
           ]

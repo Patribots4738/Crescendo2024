@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9975302503796497,
-        "y": 4.868811439750539
+        "x": 2.9978913627211985,
+        "y": 5.410478189377432
       },
       "isLocked": false,
       "linkedName": "M"
     },
     {
       "anchor": {
-        "x": 2.630387164469738,
-        "y": 4.19657762047887
+        "x": 2.6055293029785465,
+        "y": 4.135301495213813
       },
       "prevControl": {
-        "x": 0.8323826951865259,
-        "y": 4.4844499914837
+        "x": 1.373267209099281,
+        "y": 4.932286929066075
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake & PrepareShooter",
-      "waypointRelativePos": 0.0,
+      "name": "Intake",
+      "waypointRelativePos": 0.85,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,30 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "StopIntake"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooter"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 0.9,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToIndexer"
+                "name": "Intake"
               }
             }
           ]

@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "PrepareShooter",
+      "name": "Intake",
       "waypointRelativePos": 0.4,
       "command": {
         "type": "parallel",
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooter"
+                "name": "Intake"
               }
             }
           ]
@@ -61,7 +61,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Preloads",
+  "folder": "Wings",
   "previewStartingState": {
     "rotation": 179.34683901291848,
     "velocity": 0
