@@ -290,12 +290,11 @@ public class PieceControl implements Logged {
         return 
             new SelectiveConditionalCommand(
                 Commands.sequence(
-                    Commands.sequence(
-                        trapper.outtake(),
-                        NT.getWaitCommand("placeOuttake"),
-                        trapper.stopCommand(),
-                        elevatorToBottom()
-                    )),
+                    trapper.outtake(),
+                    NT.getWaitCommand("placeOuttake"),
+                    trapper.stopCommand(),
+                    elevatorToBottom()
+                ),
                 setPlaceWhenReadyCommand(true),
                 () -> readyToPlace);
     }
