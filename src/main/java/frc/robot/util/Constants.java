@@ -50,7 +50,7 @@ public final class Constants {
 
         public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3.5;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3.75;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -254,7 +254,7 @@ public final class Constants {
         public static final double TRAPPER_OUTTAKE_SLOW = -0.3;
         public static final double TRAPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
-        public static final double AMP_PLACE_POS = 0.37;
+        public static final double NOTE_FIX_POS = 0.14;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
@@ -427,7 +427,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4684508138321497*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4640288387922347*2.0);
         public static final double WHEEL_TO_MOTOR_ROTATIONS = 3.5625;
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
