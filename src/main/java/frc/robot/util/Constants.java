@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
+
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -926,7 +928,7 @@ public final class Constants {
          *   Square (to make sure the robot is perfectly in the center of the spike mark)
          *   Phone for hotspot i suppose
          */
-        public static final boolean FIELD_CALIBRATION_MODE = false;
+        public static boolean FIELD_CALIBRATION_MODE = true;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
         private static final double CAM_HEIGHT = Units.inchesToMeters(16);

@@ -33,9 +33,9 @@ import frc.robot.commands.managers.CalibrationControl;
 import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.leds.Commands.LPI;
-import frc.robot.leds.Strips.LedStrip;
 import frc.robot.subsystems.*;
+import frc.robot.leds.Strips.LedStrip;
+import frc.robot.leds.commands.LPI;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -123,6 +123,9 @@ public class RobotContainer implements Logged {
     public static SwerveModuleState[] swerveDesiredStates;
     @Log
     public static double gameModeStart = 0;
+
+    @Log
+    public static boolean calibrationMode = CameraConstants.FIELD_CALIBRATION_MODE;
     
     public RobotContainer() {
         
@@ -208,6 +211,7 @@ public class RobotContainer implements Logged {
         configureButtonBindings();
         configureLoggingPaths();
 
+        CameraConstants.FIELD_CALIBRATION_MODE = false;
     }
     
     private void configureButtonBindings() {
@@ -228,11 +232,12 @@ public class RobotContainer implements Logged {
         // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
         // for more information 
         // configureHDCBindings(driver);
+
         configureCalibrationBindings(operator);
     }
     
     private void configureTimedEvents() {
-      
+        
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.coastIntakeAndIndexer()
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
@@ -292,25 +297,39 @@ public class RobotContainer implements Logged {
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {
+        
+        driver.b()
+            .and(driver.y())
+            .and(driver.povUp())
+            .onTrue(
+                Commands.runOnce(() -> CameraConstants.FIELD_CALIBRATION_MODE = true)
+            );
+
+        driver.x().onTrue(
+            Commands.runOnce(() -> CameraConstants.FIELD_CALIBRATION_MODE = false)
+        );
+
         driver.povLeft()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(false)
                 .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+                .onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true)
             );
 
         driver.povRight()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(true)
                 .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+                .onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true)
             );
 
         driver.a()
-            .onTrue(limelightMapper.takeSnapshotCommand());
+            .onTrue(limelightMapper.takeSnapshotCommand().onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true));
 
         driver.leftBumper().and(driver.rightBumper())
-            .onTrue(limelightMapper.printJSONCommand());
+            .onTrue(limelightMapper.printJSONCommand().onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true));
     }
- 
+
     private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
@@ -382,7 +401,7 @@ public class RobotContainer implements Logged {
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
-      
+            
         controller.leftBumper()
             .onTrue(pieceControl.intakeNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
@@ -667,5 +686,8 @@ public class RobotContainer implements Logged {
             highNotePose3ds[i] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
     }
+
+    public void updateCalibrationMode() {
+        calibrationMode = CameraConstants.FIELD_CALIBRATION_MODE;
+    }
 }
- 
