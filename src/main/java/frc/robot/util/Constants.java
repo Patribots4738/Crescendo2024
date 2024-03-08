@@ -814,12 +814,14 @@ public final class Constants {
 
         public static final List<Pose2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
             Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d(Math.PI));
-            Pose2d W2_BLUE = new Pose2d(2.90, 5.55, new Rotation2d(Math.PI));
+            // This pose is exactly 6 ft from the edge of the robot to the center of the edge of the subwoofer
+            Pose2d W2_BLUE = new Pose2d(1.8288, 5.55, new Rotation2d(Math.PI));
             Pose2d W3_BLUE = new Pose2d(2.90-0.1, 4.10, new Rotation2d(Math.PI));
 
             Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d(Math.PI));
             Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
-            Pose2d C3 = new Pose2d(8.29, 4.10, new Rotation2d(Math.PI));
+            // This pose is exactly 8 ft from the edge of the robot to the center of the edge of the center stage tag
+            Pose2d C3 = new Pose2d(8.19, 4.10, new Rotation2d(Math.PI));
             Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
             Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d(Math.PI));
 
@@ -842,12 +844,14 @@ public final class Constants {
 
         public static final HashMap<Pose2d, String> CALIBRATION_POSE_MAP = new HashMap<Pose2d, String>() {{
             Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d(Math.PI));
-            Pose2d W2_BLUE = new Pose2d(2.90, 5.55, new Rotation2d(Math.PI));
+            // This pose is exactly 6 ft from the edge of the robot to the center of the edge of the subwoofer
+            Pose2d W2_BLUE = new Pose2d(1.8288, 5.55, new Rotation2d(Math.PI));
             Pose2d W3_BLUE = new Pose2d(2.90-0.1, 4.10, new Rotation2d(Math.PI));
 
             Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d(Math.PI));
             Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
-            Pose2d C3 = new Pose2d(8.29, 4.10, new Rotation2d(Math.PI));
+            // This pose is exactly 8 ft from the edge of the robot to the center of the edge of the center stage tag
+            Pose2d C3 = new Pose2d(8.19, 4.10, new Rotation2d(Math.PI));
             Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
             Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d(Math.PI));
 
