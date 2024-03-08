@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4031274310765443,
-        "y": 2.9862633191742836
+        "x": 1.8811624633327657,
+        "y": 2.6199882186998416
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.511078009317217,
-        "y": 3.396142598276637
+        "x": 4.363256565258932,
+        "y": 3.3875988020733043
       },
       "prevControl": {
-        "x": 2.8660365081744184,
-        "y": 1.9754249381987647
+        "x": 2.9214298694659195,
+        "y": 2.542572167176301
       },
       "nextControl": {
-        "x": 6.314546837367568,
-        "y": 4.953683858865578
+        "x": 6.872929490539833,
+        "y": 4.8584693809925135
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 2.436296745792339
       },
       "prevControl": {
-        "x": 6.426619411970311,
-        "y": 3.900151314015027
+        "x": 6.992437725077018,
+        "y": 2.904969393365438
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,42 +48,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "End",
-      "waypointRelativePos": 1.75,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "PrepareSWD",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareSWD"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Shoot",
-      "waypointRelativePos": 0.45,
+      "waypointRelativePos": 0.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -99,8 +65,8 @@
       }
     },
     {
-      "name": "PrepareShotL",
-      "waypointRelativePos": 1.2,
+      "name": "ToIndexer",
+      "waypointRelativePos": 1.8,
       "command": {
         "type": "parallel",
         "data": {
@@ -108,7 +74,7 @@
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooterL"
+                "name": "ToIndexer"
               }
             }
           ]
@@ -124,7 +90,7 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 125.21759296819283,
+    "rotation": 151.4660629058016,
     "rotateFast": false
   },
   "reversed": false,

@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4031274310765443,
-        "y": 2.9862633191742836
+        "x": 2.386774224836244,
+        "y": 2.8268293938603555
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.576764134983334,
-        "y": 1.5341195874973776
+        "x": 5.190621265900987,
+        "y": 1.7650446947030507
       },
       "prevControl": {
-        "x": 3.5532352481451897,
-        "y": 2.371441885499374
+        "x": 3.571341733048224,
+        "y": 2.1709797842060845
       },
       "nextControl": {
-        "x": 6.255992654638661,
-        "y": 1.2530595103986197
+        "x": 6.859140078862465,
+        "y": 1.3467658738229003
       },
       "isLocked": false,
       "linkedName": null
@@ -54,42 +54,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "End",
-      "waypointRelativePos": 1.75,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "PrepareSWD",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareSWD"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 0.45,
+      "name": "Shoot just in case we didnt before",
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -105,8 +71,8 @@
       }
     },
     {
-      "name": "PrepareShotL",
-      "waypointRelativePos": 1.2,
+      "name": "ToIndexer",
+      "waypointRelativePos": 1.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -114,7 +80,7 @@
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooterL"
+                "name": "ToIndexer"
               }
             }
           ]

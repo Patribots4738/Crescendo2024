@@ -404,7 +404,9 @@ public final class Constants {
             // "S W1 A C1-5 S",
             // "S W3-1 S",
             "S W3-1 S C2-3 S Proxy",
-            "S W3-1 S C1-3 S Proxy"
+            "S W3-1 S C1-3 S Proxy",
+            "S C5-3 S Proxy",
+            "S C4-2 S Proxy"
             // "S W3-1 S C1-3 S"
         };
     }

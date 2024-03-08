@@ -131,7 +131,19 @@ public class PieceControl implements Logged {
             // Then send it to its desired location
             moveNote()
         );
-    }  
+    }
+
+    public Command toIndexerAuto() {
+        return Commands.sequence(
+            intake.inCommand(),
+            trapper.intake(),
+            indexer.stopCommand(),
+            Commands.waitUntil(intake::getPossession),
+            setHasPiece(true),
+            NT.getWaitCommand("intakeToTrap1"), // 0.5,
+            stopIntakeAndIndexer()
+        );
+    }
 
     public Command noteToIndexer() {
         return Commands.sequence(
@@ -143,14 +155,6 @@ public class PieceControl implements Logged {
             indexer.toElevatorSlow(),
             NT.getWaitCommand("noteToIndexer2"), // 0.07
             stopIntakeAndIndexer()
-        );
-    }
-
-    public Command toIndexerAuto() {
-        return Commands.sequence(
-            trapper.intake(),
-            intake.inCommand()
-            
         );
     }
 

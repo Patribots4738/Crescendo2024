@@ -20,8 +20,8 @@
         "y": 4.099779112962734
       },
       "prevControl": {
-        "x": 7.711495725744656,
-        "y": 4.281425126587596
+        "x": 7.778434190686971,
+        "y": 4.430997618994118
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0.55,
+      "name": "ToIndexer",
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             }
           ]
