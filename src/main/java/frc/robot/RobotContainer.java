@@ -295,14 +295,28 @@ public class RobotContainer implements Logged {
         driver.povLeft()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(false)
-                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+                .andThen(swerve.resetOdometryCommand(limelightMapper::getCurrentCalibrationPose))
             );
 
         driver.povRight()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(true)
-                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+                .andThen(swerve.resetOdometryCommand(limelightMapper::getCurrentCalibrationPose))
             );
+
+        driver.povUp()
+            .onTrue(
+                swerve.resetOdometryCommand(
+                    () -> new Pose2d(
+                        swerve.getPose().getTranslation(), 
+                        swerve.getPose().getRotation().plus(Rotation2d.fromDegrees(90)))));
+
+        driver.povDown()
+            .onTrue(
+                swerve.resetOdometryCommand(
+                    () -> new Pose2d(
+                        swerve.getPose().getTranslation(), 
+                        swerve.getPose().getRotation().minus(Rotation2d.fromDegrees(90)))));
 
         driver.a()
             .onTrue(limelightMapper.takeSnapshotCommand());
@@ -506,6 +520,8 @@ public class RobotContainer implements Logged {
         pathPlannerStorage.updatePathViewerCommand().schedule();
         fixPathPlannerCommands();
 
+        limelight3.disableLEDS();
+
         // TODO: Extract this into a command file
         Commands.run(this::updateNTGains)
             .until(() -> Robot.gameMode != GameMode.DISABLED)
@@ -580,7 +596,7 @@ public class RobotContainer implements Logged {
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
-        NamedCommands.registerCommand("ToIndexer", pieceControl.noteToIndexer());
+        NamedCommands.registerCommand("ToIndexer", pieceControl.intakeNote());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));

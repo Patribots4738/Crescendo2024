@@ -27,7 +27,7 @@ public class LimelightMapping extends SubsystemBase implements Logged {
     private HashMap<Integer, Pose3d> poses;
     private String limelightName;
 
-    private Translation2d currentCalibrationPose;
+    private Pose2d currentCalibrationPose;
     private Supplier<Rotation2d> rotationSupplier;
 
     @Log
@@ -83,12 +83,12 @@ public class LimelightMapping extends SubsystemBase implements Logged {
         }).ignoringDisable(true);
     }
 
-    public Translation2d getCurrentCalibrationPose() {
+    public Pose2d getCurrentCalibrationPose() {
         return currentCalibrationPose;
     }
 
     public void takeSnapshot() {
-        Pose2d actualRobotPose = new Pose2d(currentCalibrationPose, rotationSupplier.get());
+        Pose2d actualRobotPose = currentCalibrationPose;
         LimelightTarget_Fiducial[] recordedPoses = LimelightHelpers.getLatestResults(limelightName).targetingResults.targets_Fiducials;
         for (int i = 0; i < recordedPoses.length; i++) {
             int fiducialID = (int) recordedPoses[i].fiducialID;

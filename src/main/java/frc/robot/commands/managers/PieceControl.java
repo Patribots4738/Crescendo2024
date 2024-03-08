@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
@@ -35,7 +36,7 @@ public class PieceControl implements Logged {
     private ShooterCmds shooterCmds;
 
     @Log
-    private boolean shooterMode = true;
+    private boolean shooterMode = false;
 
     // State representing if we are trying to unstuck the elevator
     @Log
@@ -207,10 +208,11 @@ public class PieceControl implements Logged {
         // such as prepareSWDCommand
         return 
             new SelectiveConditionalCommand(
-                shootWhenReady(poseSupplier, speedSupplier),
-                placeWhenReady(),
+                Commands.race(shootWhenReady(poseSupplier, speedSupplier).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() != 0)),
+                Commands.race(placeWhenReady().andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() == 0)),
                 () -> elevator.getDesiredPosition() == 0
-            ).andThen(setHasPiece(false));
+            )
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
     private Command setDislodging(boolean dislodging) {
@@ -223,7 +225,7 @@ public class PieceControl implements Logged {
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
             setReadyToPlaceCommand(false),
-            elevator.setPositionCommand(position, true)
+            elevator.setPositionCommand(position, false)
             // Run until we are no longer in our unstucking state only if elevator actually gets stuck
             // getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
@@ -271,6 +273,7 @@ public class PieceControl implements Logged {
     public Command elevatorToPlacement(boolean povLeftPosition) {
         return 
             Commands.sequence(
+                stopIntakeAndIndexer(),
                 Commands.either(
                     setElevatorPosition(() -> TrapConstants.NOTE_FIX_POS), 
                     setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
@@ -281,7 +284,7 @@ public class PieceControl implements Logged {
     }
 
     public Command placeWhenReady() {
-        return 
+        return
             new SelectiveConditionalCommand(
                 Commands.sequence(
                     trapper.outtake(),
