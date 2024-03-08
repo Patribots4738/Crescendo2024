@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
+import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 
@@ -31,13 +32,13 @@ public class SafeSpark extends CANSparkBase {
     protected RelativeEncoder relativeEncoder;
     protected SparkAbsoluteEncoder absoluteEncoder;
 
-    private final int MAX_ATTEMPTS = NeoMotorConstants.SAFE_SPARK_MODE ? 20 : 2;
+    private final int MAX_ATTEMPTS = (NeoMotorConstants.SAFE_SPARK_MODE && !CameraConstants.FIELD_CALIBRATION_MODE) ? 20 : 2;
     private final int SPARK_MAX_MEASUREMENT_PERIOD = 16;
     private final int SPARK_FLEX_MEASUREMENT_PERIOD = 32;
     private final int SPARK_MAX_AVERAGE_DEPTH = 2;
     private final int SPARK_FLEX_AVERAGE_DEPTH = 8;
-    private final double BURN_FLASH_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.5 : 0;
-    private final double APPLY_PARAMETER_WAIT_TIME = NeoMotorConstants.SAFE_SPARK_MODE ? 0.05 : 0;
+    private final double BURN_FLASH_WAIT_TIME = (NeoMotorConstants.SAFE_SPARK_MODE && !CameraConstants.FIELD_CALIBRATION_MODE) ? 0.5 : 0.05;
+    private final double APPLY_PARAMETER_WAIT_TIME = (NeoMotorConstants.SAFE_SPARK_MODE && !CameraConstants.FIELD_CALIBRATION_MODE) ? 0.05 : 0;
 
     public SafeSpark(int canID, boolean useAbsoluteEncoder, MotorType motorType, boolean isSparkFlex) {
         super(canID, motorType, isSparkFlex ? SparkModel.SparkFlex : SparkModel.SparkMax);

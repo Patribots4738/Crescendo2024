@@ -41,8 +41,7 @@ public class Elevator extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        position = getPosition();
-        desiredPos = getDesiredPosition();
+        position = elevator.getPosition();
         atDesiredPos = atDesiredPosition();
 
         // A value of 0 on hitGuillotineTimestamp indicates that we are not hitting the guillotine

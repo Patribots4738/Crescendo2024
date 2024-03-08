@@ -38,15 +38,33 @@
                       }
                     },
                     {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.07
+                      }
+                    },
+                    {
                       "type": "path",
                       "data": {
                         "pathName": "W3 W2 Proxy"
                       }
                     },
                     {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.07
+                      }
+                    },
+                    {
                       "type": "path",
                       "data": {
                         "pathName": "W2 W1 Proxy"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.07
                       }
                     },
                     {

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Pivot;
@@ -179,6 +180,11 @@ public class ShooterCalc implements Logged {
         double velocityTangentToSpeaker = totalSpeed * Math.sin(angleDifference);
 
         double velocityNormalToSpeaker = totalSpeed * Math.cos(angleDifference);
+
+        if (Robot.isBlueAlliance()) {
+            velocityTangentToSpeaker *= -1;
+            velocityNormalToSpeaker *= -1;
+        }
         
         return new Translation2d(velocityTangentToSpeaker, velocityNormalToSpeaker);
     }

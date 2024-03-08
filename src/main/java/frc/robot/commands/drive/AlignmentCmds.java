@@ -153,7 +153,7 @@ public class AlignmentCmds {
         // Which is to the left of the driver
         return Commands.either(
             prepareFireAndRotateCommand(driverX, driverY, FieldConstants.ORBIT_POSE),
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PENINSULA_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_SHOT_SPOT),
             // No way I just found my first XOR use case :D
             () -> Robot.isRedAlliance() ^ xButtonPressed
         );
