@@ -1,6 +1,8 @@
 package frc.robot.util.calc;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,11 +10,13 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
+import frc.robot.util.calc.LimelightHelpers.Results;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
@@ -28,14 +32,16 @@ public class LimelightMapping extends SubsystemBase implements Logged {
     private String limelightName;
 
     private Pose2d currentCalibrationPose;
-    private Supplier<Rotation2d> rotationSupplier;
+    private SwerveDrivePoseEstimator poseEstimator;
+    Supplier<Pose2d> robotPoseSupplier;
 
     @Log
     private Pose3d[] modifiedTagPoses = new Pose3d[16];
 
-    public LimelightMapping(String limelightName, Supplier<Rotation2d> rotationSupplier) {
+    public LimelightMapping(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName) {
         currentCalibrationPose = FieldConstants.TAG_CALIBRATION_POSE.get(0);
-        this.rotationSupplier = rotationSupplier;
+        this.robotPoseSupplier = robotPoseSupplier;
+        this.poseEstimator = poseEstimator;
         this.limelightName = limelightName;
         poses = new HashMap<>();
         limelightConversion = new LimelightConversion();
@@ -172,6 +178,94 @@ public class LimelightMapping extends SubsystemBase implements Logged {
 
     public Command printJSONCommand() {
         return Commands.runOnce(this::printJSON).ignoringDisable(true);
+    }
+
+    public Command updatePoseEstimatorCommand() {
+        return Commands.run(
+            () -> {
+                this.updatePoseEstimator();
+            }
+        );
+    }
+
+    @Log
+    Pose2d estimatedPose2d = new Pose2d();
+
+    private void updatePoseEstimator() {
+        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 0) {
+            LimelightHelpers.setPipelineIndex(limelightName, 0);
+        }
+        Results result = getResults();
+        Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
+
+        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;      
+
+        // invalid data check
+        if (estimatedRobotPose.getX() == 0.0
+            || Double.isNaN(estimatedRobotPose.getX()) 
+            || Double.isNaN(estimatedRobotPose.getY()) 
+            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())
+            || targets.length == 0
+            || Double.valueOf(targets[0].tx).equals(null)
+            || Double.valueOf(targets[0].ty).equals(null)
+            || !Double.isFinite(targets[0].tx)
+            || !Double.isFinite(targets[0].ty))
+                return;
+             
+
+        if (hasTarget(result)) {
+            double xyStds;
+            double radStds;
+            // multiple targets detected
+            if (targets.length > 1) {
+                // TODO: TUNE
+                xyStds = 0.8;
+                radStds = 1.2;
+            }
+            // 1 target with large area and close to estimated pose
+            else if (LimelightHelpers.getTA(limelightName) > 0.175) {
+                // TODO: TUNE
+                xyStds = 1.6;
+                radStds = 4;
+            }
+            // conditions don't match to add a vision measurement
+            else {
+                return;
+            }
+
+            this.estimatedPose2d = estimatedRobotPose;
+
+            poseEstimator.setVisionMeasurementStdDevs(
+                VecBuilder.fill(xyStds, xyStds, radStds));
+            poseEstimator.addVisionMeasurement(estimatedRobotPose,
+                Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
+        }
+    }
+
+    public Results getResults() {
+        return LimelightHelpers.getLatestResults(limelightName).targetingResults;
+    }
+
+    public double getLatencyDiffSeconds() {
+        return (LimelightHelpers.getLatency_Pipeline(limelightName)/1000d) - (LimelightHelpers.getLatency_Capture(limelightName)/1000d); 
+    }
+
+    public double getLatencyDiffSeconds(Results result) {
+        return (result.latency_pipeline/1000.0) - (result.latency_capture/1000.0); 
+    }
+
+    public boolean hasTarget(Results result) {
+        if (result == null || !result.valid || (result.botpose[0] == 0 && result.botpose[1] == 0)) {
+            return false;
+        }
+
+        if ((LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15))
+        {
+            return false;
+        }
+      
+        return true;
     }
 
     private boolean isWithinTolerance(Pose3d existingPose, Pose3d targetPose) {
