@@ -93,7 +93,7 @@ public class Limelight extends SubsystemBase implements Logged{
             || !Double.isFinite(targets[0].tx)
             || !Double.isFinite(targets[0].ty))
                 return;
-             
+                
 
         if (hasTarget(result)) {
             double xyStds;

@@ -312,7 +312,7 @@ public class RobotContainer implements Logged {
         driver.povLeft()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(false)
-                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+                .andThen(swerve.resetOdometryCommand(limelightMapper::getCurrentCalibrationPose))
                 .onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true)
 
             );
@@ -320,7 +320,7 @@ public class RobotContainer implements Logged {
         driver.povRight()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(true)
-                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPose))
+                .andThen(swerve.resetOdometryCommand(limelightMapper::getCurrentCalibrationPose))
                 .onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true)
 
             );
@@ -330,14 +330,16 @@ public class RobotContainer implements Logged {
                 swerve.resetOdometryCommand(
                     () -> new Pose2d(
                         swerve.getPose().getTranslation(), 
-                        swerve.getPose().getRotation().plus(Rotation2d.fromDegrees(90)))));
+                        swerve.getPose().getRotation().plus(Rotation2d.fromDegrees(90)))).onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true));
 
         driver.povDown()
             .onTrue(
                 swerve.resetOdometryCommand(
                     () -> new Pose2d(
                         swerve.getPose().getTranslation(), 
-                        swerve.getPose().getRotation().minus(Rotation2d.fromDegrees(90)))));
+                        swerve.getPose().getRotation().minus(Rotation2d.fromDegrees(90)))).onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true));
+
+        
 
         driver.a()
             .onTrue(limelightMapper.takeSnapshotCommand().onlyIf(() -> CameraConstants.FIELD_CALIBRATION_MODE == true));

@@ -306,9 +306,9 @@ public class Swerve extends SubsystemBase implements Logged {
         }
 
         poseEstimator.resetPosition(
-                gyroRotation2d,
-                getModulePositions(),
-                pose);
+            gyroRotation2d,
+            getModulePositions(),
+            pose);
     }
 
     public Command resetOdometryCommand(Supplier<Pose2d> pose) {
@@ -373,7 +373,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public double[] getWheelRadiusCharacterizationPosition() {
         return Arrays.stream(swerveModules).mapToDouble(module -> module.getDrivePositionRadians()).toArray();
-      }
+    }
 
     /**
      * Sets the brake mode for the drive motors.
