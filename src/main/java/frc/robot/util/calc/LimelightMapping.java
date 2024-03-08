@@ -137,8 +137,8 @@ public class LimelightMapping extends SubsystemBase implements Logged {
             -targetPose.getX(), 
             -targetPose.getY(), 
             new Rotation3d(
-                targetPose.getRotation().getX(), 
-                targetPose.getRotation().getY(), 
+                0,
+                0, 
                 Math.PI+targetPose.getRotation().getZ()
             )
         );
