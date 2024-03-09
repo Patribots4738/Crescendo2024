@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -289,10 +290,18 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public Command blinkLeds(DoubleSupplier duration) {
         return Commands.sequence(
-            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceBlink(limelightName)),
+            runOnce(() -> LimelightHelpers.setLEDMode_ForceBlink(limelightName)),
             Commands.waitSeconds(duration.getAsDouble()),
-            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceOff(limelightName))
-        ).ignoringDisable(true);
+            runOnce(() -> LimelightHelpers.setLEDMode_ForceOff(limelightName))
+        ).ignoringDisable(true).asProxy();
+    }
+
+    public Command setLEDState(BooleanSupplier enabled) {
+        return Commands.either(
+                Commands.runOnce(this::enableLEDS), 
+                Commands.runOnce(this::disableLEDS), 
+                enabled
+            ).ignoringDisable(true).asProxy();
     }
 
     public void enableLEDS() {
