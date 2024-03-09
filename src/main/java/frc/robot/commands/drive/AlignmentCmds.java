@@ -140,7 +140,7 @@ public class AlignmentCmds {
      */
     public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
-            new ActiveConditionalCommand(
+            Commands.either(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
