@@ -212,11 +212,10 @@ public class PieceControl implements Logged {
         // such as prepareSWDCommand
         return 
             new SelectiveConditionalCommand(
-                Commands.race(shootWhenReady(poseSupplier, speedSupplier).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() != 0)),
-                Commands.race(placeWhenReady().andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() == 0)),
-                () -> elevator.getDesiredPosition() == 0
-            )
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+                Commands.race(shootWhenReady(poseSupplier, speedSupplier).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)),
+                Commands.race(placeWhenReady().andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
+                () -> elevator.getDesiredPosition() <= 0
+            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
 
     private Command setDislodging(boolean dislodging) {
