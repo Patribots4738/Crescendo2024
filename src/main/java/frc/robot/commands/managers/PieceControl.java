@@ -51,6 +51,9 @@ public class PieceControl implements Logged {
     @Log
     private boolean hasPiece = false;
 
+    @Log
+    private boolean automaticShooterIsScheduled = false;
+
     public PieceControl(
             Intake intake,
             Indexer indexer,
@@ -346,6 +349,14 @@ public class PieceControl implements Logged {
         return readyToMoveNote;
     }
 
+    public boolean automaticShooterIsScheduled() {
+        return automaticShooterIsScheduled;
+    }
+
+    public Command scheduleAutomaticShooter(boolean  automaticShooterIsScheduled) {
+        return Commands.runOnce(() -> this.automaticShooterIsScheduled = automaticShooterIsScheduled);
+    }
+
     public Command moveNote() {
         return Commands.sequence(
                 setReadyToMoveNote(false),
@@ -380,7 +391,7 @@ public class PieceControl implements Logged {
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
     public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speedSupplier) {
         return new ActiveConditionalCommand(
-            Commands.runOnce(() -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
+            Commands.runOnce(() -> scheduleAutomaticShooter(true), 
             shooterCmds.getShooter()),
             shooterCmds.stopShooter().onlyIf(() -> Robot.gameMode != GameMode.TEST),
             () -> shooterMode 
