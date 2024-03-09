@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.OIConstants;
 
 public class PatriBoxController extends CommandXboxController {
@@ -225,6 +227,9 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     public void setRumble(double rumble) {
-        this.getHID().setRumble(RumbleType.kBothRumble, rumble);
+        if (Robot.gameMode == GameMode.TELEOP)
+            this.getHID().setRumble(RumbleType.kBothRumble, rumble);
+        else if (Robot.gameMode == GameMode.DISABLED)
+            this.getHID().setRumble(RumbleType.kBothRumble, 0);
     }
 }
