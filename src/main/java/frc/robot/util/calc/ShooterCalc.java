@@ -90,11 +90,9 @@ public class ShooterCalc implements Logged {
 	 * @return The method is returning a BooleanSupplier that returns true
 	 *         if the pivot is at its target rotation and false otherwise
 	 */
+    @Log
 	public BooleanSupplier readyToShootSupplier() {
-        return () -> 
-            pivot.getAtDesiredAngle() 
-            && shooter.getAtDesiredRPM() 
-            && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
+        return () -> pivot.getAtDesiredAngle() && shooter.getAtDesiredRPM();
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
