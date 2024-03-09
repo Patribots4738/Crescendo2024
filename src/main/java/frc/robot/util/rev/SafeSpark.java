@@ -32,13 +32,13 @@ public class SafeSpark extends CANSparkBase {
     protected RelativeEncoder relativeEncoder;
     protected SparkAbsoluteEncoder absoluteEncoder;
 
-    private final int MAX_ATTEMPTS = (NeoMotorConstants.SAFE_SPARK_MODE && !CameraConstants.FIELD_CALIBRATION_MODE) ? 20 : 2;
+    private final int MAX_ATTEMPTS = (NeoMotorConstants.SAFE_SPARK_MODE) ? 20 : 2;
     private final int SPARK_MAX_MEASUREMENT_PERIOD = 16;
     private final int SPARK_FLEX_MEASUREMENT_PERIOD = 32;
     private final int SPARK_MAX_AVERAGE_DEPTH = 2;
     private final int SPARK_FLEX_AVERAGE_DEPTH = 8;
-    private final double BURN_FLASH_WAIT_TIME = (NeoMotorConstants.SAFE_SPARK_MODE && !CameraConstants.FIELD_CALIBRATION_MODE) ? 0.5 : 0.05;
-    private final double APPLY_PARAMETER_WAIT_TIME = (NeoMotorConstants.SAFE_SPARK_MODE && !CameraConstants.FIELD_CALIBRATION_MODE) ? 0.05 : 0;
+    private final double BURN_FLASH_WAIT_TIME = (NeoMotorConstants.SAFE_SPARK_MODE) ? 0.1 : 0.05;
+    private final double APPLY_PARAMETER_WAIT_TIME = (NeoMotorConstants.SAFE_SPARK_MODE) ? 0.05 : 0;
 
     public SafeSpark(int canID, boolean useAbsoluteEncoder, MotorType motorType, boolean isSparkFlex) {
         super(canID, motorType, isSparkFlex ? SparkModel.SparkFlex : SparkModel.SparkMax);
@@ -87,15 +87,6 @@ public class SafeSpark extends CANSparkBase {
             status = parameterSetter.get();
             if (parameterCheckSupplier.getAsBoolean() && status == REVLibError.kOk)
                 break;
-            // If there is an error with the sensor, try to reinitialize it
-            if (status == REVLibError.kHALError) {
-                System.out.println("Reconfiguring encoder for " + canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")\n\n\n");
-                if (useAbsoluteEncoder) {
-                    getAbsoluteEncoder();
-                } else {
-                    getEncoder();
-                }
-            }
             Timer.delay(APPLY_PARAMETER_WAIT_TIME);
         }
 
@@ -150,10 +141,9 @@ public class SafeSpark extends CANSparkBase {
             String message = "\nSensor fault detected on motor " +
                 canID + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ")" +
                 ". Power cycle the robot to fix.";
-            if (Robot.gameMode == GameMode.DISABLED) {
-                throw new IllegalStateException(message);
-            } else {
+            for (int i = 0; i < 5; i++) {
                 System.err.println(message);
+                Timer.delay(1);
             }
         }
     }
