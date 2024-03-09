@@ -50,7 +50,7 @@ public final class Constants {
 
         public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3.75;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.377;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -246,7 +246,7 @@ public final class Constants {
         public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
         // TODO: set these values
-        public static final double BOTTOM_POS = 0;
+        public static final double BOTTOM_POS = -.0254;
         public static final double INTAKE_TIME = 0;
         public static final double TRAPPER_OUTTAKE_PERCENT = -1;
         public static final double TRAPPER_INTAKE_PERCENT = 1;
@@ -265,7 +265,7 @@ public final class Constants {
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.49;
-        public static final double ELEVATOR_BOTTOM_LIMIT = 0;
+        public static final double ELEVATOR_BOTTOM_LIMIT = -0.0254;
 
         public static final double TRAPPER_LOWER_PERCENT_LIMIT = -1;
         public static final double TRAPPER_UPPER_PERCENT_LIMIT = 1;
@@ -406,7 +406,8 @@ public final class Constants {
             "S W3-1 S C2-3 S Proxy",
             "S W3-1 S C1-3 S Proxy",
             "S C5-3 S Proxy",
-            "S C4-2 S Proxy"
+            "S C4-2 S Proxy",
+            "S W1 S C1-3 S Proxy"
             // "S W3-1 S C1-3 S"
         };
     }
@@ -483,7 +484,7 @@ public final class Constants {
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
-        public static final int VORTEX_CURRENT_LIMIT = 50; // amps
+        public static final int VORTEX_CURRENT_LIMIT = 80; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
     }
 
@@ -543,7 +544,7 @@ public final class Constants {
     }
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = false;
+        public static final boolean SAFE_SPARK_MODE = true;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
