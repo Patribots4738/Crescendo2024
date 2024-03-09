@@ -146,9 +146,12 @@ public class Swerve extends SubsystemBase implements Logged {
         this.isAlignedToAmp = isAlignedToAmp();
     }
 
+    @Log
+    Pose2d currentPose = new Pose2d();
+
     public void logPositions() {
 
-        Pose2d currentPose = getPose();
+        currentPose = getPose();
 
         RobotContainer.swerveMeasuredStates = new SwerveModuleState[] {
                 frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
@@ -288,8 +291,7 @@ public class Swerve extends SubsystemBase implements Logged {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
             desiredStates, 
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
-                .getDouble(DriveConstants.MAX_SPEED_METERS_PER_SECOND)
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND
         );
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
@@ -359,12 +361,6 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public void setSpeedMultiplier(double speedMultiplier) {
         this.speedMultiplier = speedMultiplier;
-    }
-
-    public Command setAlignmentSpeed() {
-        return runOnce(() -> {
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
-        });
     }
 
     public double getSpeedMultiplier() {
