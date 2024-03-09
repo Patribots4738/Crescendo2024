@@ -357,21 +357,23 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
-            .onTrue(shooterCmds.stowPivot())
-            .toggleOnTrue(climb.povUpCommand(swerve::getPose));
+            .onTrue(climb.toTopCommand());
         
         controller.povDown()
-            .onTrue(shooterCmds.stowPivot()
-            .alongWith(climb.toBottomCommand())
-        );
+            .onTrue(climb.toBottomCommand());
         
-        controller.a().whileTrue(
-            Commands.sequence(
-                swerve.resetHDCCommand(),
-                Commands.either(
-                    alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
-                    alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
-                    climb::getHooksUp)));
+        controller.a()
+            .whileTrue(
+                Commands.sequence(
+                    swerve.resetHDCCommand(),
+                    Commands.either(
+                        alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
+                        alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
+                        climb::getHooksUp)
+                ).alongWith(
+                    limelight3.setLEDState(() -> true)
+                )
+            ).onFalse(limelight3.setLEDState(() -> false));
                     
         controller.x()
             .toggleOnTrue(
@@ -390,10 +392,13 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(
                 Commands.sequence(
                     swerve.resetHDCCommand(),
+                    limelight3.setLEDState(() -> true),
                     new ActiveConditionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::onOppositeSide))
+                        alignmentCmds.alignmentCalc::onOppositeSide),
+                    limelight3.setLEDState(() -> false)
+                    )
                 );
 
         controller.povLeft()
@@ -430,7 +435,8 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)); 
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)
+            .andThen(limelight3.setLEDState(() -> false))); 
 
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true));
