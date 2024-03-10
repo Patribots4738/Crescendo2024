@@ -28,7 +28,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "P Podium"
+                        "pathName": "P R"
                       }
                     },
                     {
@@ -58,19 +58,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "C4 M Proxy"
+                        "pathName": "C4 R"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "M C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M Proxy"
+                        "pathName": "R C5"
                       }
                     }
                   ]

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4728426619973807,
-      "y": 5.443753298854117
+      "x": 1.4146207015818286,
+      "y": 5.487419769165779
     },
-    "rotation": 142.0
+    "rotation": 179.22577983507193
   },
   "command": {
     "type": "sequential",
@@ -34,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3 Proxy"
+                        "pathName": "S W3 Proxy2"
                       }
                     },
                     {
