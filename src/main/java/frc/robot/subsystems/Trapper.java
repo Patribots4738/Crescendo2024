@@ -56,7 +56,7 @@ public class Trapper extends SubsystemBase implements Logged {
     }
 
     public Command intakeSlow() {
-        return runOnce(() -> setSpeed(0.1));
+        return runOnce(() -> setSpeed(0.2));
     }
 
     public Command stopCommand() {
