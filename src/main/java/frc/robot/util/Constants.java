@@ -50,7 +50,7 @@ public final class Constants {
 
         public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.377;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3.8;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -404,8 +404,9 @@ public final class Constants {
             // "S W1 A C1-5 S",
             // "S W3-1 S",
             "S W3-1 S C2-3 S Proxy",
+            "S W3-1 S C2-3 S Proxy2",
             "S W3-1 S C1-3 S Proxy",
-            "S C5-3 S Proxy",
+            "S C5-4 S Proxy",
             "S C4-2 S Proxy",
             "S W1 S C1-3 S Proxy"
             // "S W3-1 S C1-3 S"
@@ -430,7 +431,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4640288387922347*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4904427061105388*2.0);
         public static final double WHEEL_TO_MOTOR_ROTATIONS = 3.5625;
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
@@ -484,7 +485,7 @@ public final class Constants {
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
-        public static final int VORTEX_CURRENT_LIMIT = 80; // amps
+        public static final int VORTEX_CURRENT_LIMIT = 60; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
     }
 
