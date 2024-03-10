@@ -11,12 +11,13 @@ import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,6 +56,8 @@ import monologue.Logged;
 import monologue.Monologue;
 
 public class RobotContainer implements Logged {
+
+    private PowerDistribution pdh;
 
     private EventLoop testButtonBindingLoop = new EventLoop();
     
@@ -129,6 +132,9 @@ public class RobotContainer implements Logged {
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         
+        pdh = new PowerDistribution(30, ModuleType.kRev);
+        pdh.setSwitchableChannel(false); 
+
         intake = new Intake();
         climb = new Climb();
         swerve = new Swerve();
@@ -179,6 +185,7 @@ public class RobotContainer implements Logged {
         calibrationControl = new CalibrationControl(shooterCmds);
 
         robotRelativeSupplier = () -> !driver.getYButton();
+
         swerve.setDefaultCommand(new Drive(
             swerve,
             driver::getLeftY,
@@ -206,6 +213,7 @@ public class RobotContainer implements Logged {
         
         configureButtonBindings();
         configureLoggingPaths();
+        pdh.setSwitchableChannel(true);
 
     }
     
@@ -231,6 +239,10 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
+
+        new Trigger(() -> (shooter.getAverageSpeed() > 1000 && (swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance())))
+            .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
+            .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
       
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.coastIntakeAndIndexer()
@@ -373,7 +385,9 @@ public class RobotContainer implements Logged {
                 ).alongWith(
                     limelight3.setLEDState(() -> true)
                 )
-            ).onFalse(limelight3.setLEDState(() -> false));
+            ).onFalse(
+                limelight3.setLEDState(() -> false)
+            );
                     
         controller.x()
             .toggleOnTrue(
@@ -411,6 +425,9 @@ public class RobotContainer implements Logged {
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
             .onFalse(pieceControl.stopEjecting());
+
+        controller.povRight()
+            .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
     }
 
     private void configureOperatorBindings(PatriBoxController controller) {
@@ -690,6 +707,11 @@ public class RobotContainer implements Logged {
             notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
             highNotePose3ds[i] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[i-1], new Rotation3d());
         }
+    }
+
+    public void turnOffLamp() {
+        pdh.setSwitchableChannel(false);
+        limelight3.disableLEDS();
     }
 }
  

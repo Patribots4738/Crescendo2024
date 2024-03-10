@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
         // Shut off NetworkTables broadcasting for most logging calls
         // if we are at competition
         RobotContainer.gameModeStart = currentTimestamp;
-        Monologue.setFileOnly(DriverStation.isFMSAttached());
+        // Monologue.setFileOnly(DriverStation.isFMSAttached());
     }
 
     @Override   
@@ -145,6 +145,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
+        robotContainer.turnOffLamp();
     }
 
     @Override

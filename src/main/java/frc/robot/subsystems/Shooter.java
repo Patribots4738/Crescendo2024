@@ -103,6 +103,10 @@ public class Shooter extends SubsystemBase implements Logged{
         return new Pair<Double, Double>(motorLeft.getVelocity(), motorRight.getVelocity());
     }
 
+    public double getAverageSpeed() {
+        return (motorLeft.getVelocity() + motorRight.getVelocity()) / 2.0;
+    }
+
     /**
      * The function is a command that stops both motors
      * 
