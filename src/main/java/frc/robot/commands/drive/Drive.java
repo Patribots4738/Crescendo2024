@@ -64,7 +64,7 @@ public class Drive extends Command {
         // on the field's axis
         double y = -ySupplier.getAsDouble();
         double rotation = rotationSupplier.getAsDouble();
-        if (shouldMirror.getAsBoolean()) {
+        if (shouldMirror.getAsBoolean() || !fieldRelativeSupplier.getAsBoolean()) {
             x *= -1;
             y *= -1;
         }
