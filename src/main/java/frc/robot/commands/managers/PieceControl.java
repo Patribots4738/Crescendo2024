@@ -191,7 +191,7 @@ public class PieceControl implements Logged {
     }
 
     public Command panicEjectNote() {
-        return trapper.intake().andThen(indexer.toElevator());
+        return trapper.intake().alongWith(indexer.toElevator()).alongWith(intake.outCommand());
     }
 
     public Command stopPanicEject() {
@@ -213,7 +213,7 @@ public class PieceControl implements Logged {
         return 
             new SelectiveConditionalCommand(
                 Commands.race(shootWhenReady(poseSupplier, speedSupplier).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)),
-                Commands.race(placeWhenReady().andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
+                Commands.race(prepPiece().andThen(placeWhenReady()).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
                 () -> elevator.getDesiredPosition() <= 0
             ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
@@ -281,7 +281,6 @@ public class PieceControl implements Logged {
                     setElevatorPosition(() -> TrapConstants.NOTE_FIX_POS), 
                     setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
                     () -> povLeftPosition),
-                prepPiece(),
                 setReadyToPlaceCommand(true),
                 placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }
@@ -290,9 +289,7 @@ public class PieceControl implements Logged {
         return
             new SelectiveConditionalCommand(
                 Commands.sequence(
-                    trapper.outtake(),
-                    NT.getWaitCommand("placeOuttake"),
-                    trapper.stopCommand(),
+                    trapper.outtake(0.8),
                     elevatorToBottom()
                 ),
                 setPlaceWhenReadyCommand(true),
