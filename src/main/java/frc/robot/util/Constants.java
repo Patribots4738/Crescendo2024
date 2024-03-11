@@ -50,7 +50,7 @@ public final class Constants {
 
         public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 3.8;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.377;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -485,7 +485,7 @@ public final class Constants {
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
-        public static final int VORTEX_CURRENT_LIMIT = 60; // amps
+        public static final int VORTEX_CURRENT_LIMIT = 80; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
     }
 
@@ -545,7 +545,7 @@ public final class Constants {
     }
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = true;
+        public static final boolean SAFE_SPARK_MODE = false;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
