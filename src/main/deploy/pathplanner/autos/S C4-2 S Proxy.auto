@@ -50,6 +50,12 @@
                       }
                     },
                     {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
+                      }
+                    },
+                    {
                       "type": "path",
                       "data": {
                         "pathName": "M C3"
