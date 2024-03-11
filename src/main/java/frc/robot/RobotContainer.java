@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -170,6 +171,8 @@ public class RobotContainer implements Logged {
         new NTPIDTuner().schedule();
         new NT(NTConstants.WAIT_TIMES);
 
+        RobotController.setBrownoutVoltage(6.0);
+
         shooterCalc = new ShooterCalc(shooter, pivot);
         shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
 
@@ -213,7 +216,7 @@ public class RobotContainer implements Logged {
         
         configureButtonBindings();
         configureLoggingPaths();
-        pdh.setSwitchableChannel(true);
+        pdh.setSwitchableChannel(false/*true*/);
 
     }
     
@@ -241,10 +244,10 @@ public class RobotContainer implements Logged {
     private void configureTimedEvents() {
 
         new Trigger(() -> (shooter.getAverageSpeed() > 1000 && (swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance())))
-            .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
+            .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false/*true*/)))
             .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
       
-        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.8 && Robot.gameMode == GameMode.TELEOP)
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.2 && Robot.gameMode == GameMode.TELEOP)
         .onTrue(pieceControl.coastIntakeAndIndexer()
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
             .andThen(Commands.waitSeconds(5))
