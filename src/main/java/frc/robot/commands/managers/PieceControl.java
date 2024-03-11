@@ -140,7 +140,7 @@ public class PieceControl implements Logged {
             indexer.stopCommand(),
             Commands.waitUntil(intake::getPossession),
             setHasPiece(true),
-            NT.getWaitCommand("intakeToTrap1"), // 0.5,
+            Commands.waitSeconds(0.3),
             stopIntakeAndIndexer()
         );
     }
@@ -195,7 +195,7 @@ public class PieceControl implements Logged {
     }
 
     public Command stopPanicEject() {
-        return trapper.stopCommand().andThen(indexer.stopCommand());
+        return trapper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand())    ;
     }
 
     public Command intakeAuto() {
