@@ -79,11 +79,11 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public Command setCoastMode() {
-        return runOnce(() -> intakeMotor.setCoastMode());
+        return runOnce(() -> intakeMotor.setCoastMode()).ignoringDisable(true);
     }
 
     public Command setBrakeMode() {
-        return runOnce(() -> intakeMotor.setBrakeMode());
+        return runOnce(() -> intakeMotor.setBrakeMode()).ignoringDisable(true);
     }
 
     public boolean getPossession() {
