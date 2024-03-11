@@ -171,8 +171,6 @@ public class RobotContainer implements Logged {
         new NTPIDTuner().schedule();
         new NT(NTConstants.WAIT_TIMES);
 
-        RobotController.setBrownoutVoltage(6.0);
-
         shooterCalc = new ShooterCalc(shooter, pivot);
         shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
 
