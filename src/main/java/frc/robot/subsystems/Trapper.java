@@ -85,7 +85,7 @@ public class Trapper extends SubsystemBase implements Logged {
 
     public Command toggleSpeed() {
         return Commands.either(
-            outtake(), 
+            outtakeSlow(), 
             stopCommand(), 
             () -> desiredSpeed == 0);
     }
