@@ -48,9 +48,9 @@ public final class Constants {
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 
-        public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
+        public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = Units.degreesToRadians(1137.21); // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.377;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = ModuleConstants.CURRENT_GEARING.maxSpeedVortex;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -414,38 +414,58 @@ public final class Constants {
     }
 
     public static final class ModuleConstants {
-        // The MAXSwerve module can be configured with one of three pinion gears:
-        // L1 = 12T (slow, high torque)
-        // L2 = 13T (medium)
-        // L3 = 14T (fast, low torque)
-        // This changes the drive speed of the module (a pinion gear with more teeth
-        // will result in a robot that drives faster).
-        // Extra high speed settings from REV make this number high thern L3
-        public static final double DRIVING_MOTOR_PINION_TEETH = 16.0;
+
+        // https://www.revrobotics.com/rev-21-3005/
+        private enum SwerveGearing {
+            LOW         (12, 22, 4.12, 4.92),
+            MEDIUM      (13, 22, 4.46, 5.33),
+            HIGH        (14, 22, 4.8, 5.74),
+
+            EXTRA_HIGH_1(14, 21, 5.03, 6.01),
+            EXTRA_HIGH_2(14, 20, 5.28, 6.32),
+            EXTRA_HIGH_3(15, 20, 5.66, 6.77),
+            EXTRA_HIGH_4(16, 20, 6.04, 7.22),
+            EXTRA_HIGH_5(16, 19, 6.36, 7.60);
+
+            private final double 
+                pinionTeeth, 
+                spurTeeth, 
+                maxSpeedNeo,
+                maxSpeedVortex;
+
+            SwerveGearing(
+                int pinionTeeth, 
+                int spurTeeth, 
+                double maxSpeedNeo,
+                double maxSpeedVortex)
+            {
+                this.pinionTeeth = pinionTeeth;
+                this.spurTeeth = spurTeeth;
+                this.maxSpeedNeo = maxSpeedNeo;
+                this.maxSpeedVortex = maxSpeedVortex;
+            }
+        }
+
+        public static final SwerveGearing CURRENT_GEARING = SwerveGearing.HIGH;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
         // the steering motor in the MAXSwerve Module.
-        // Update 2-29-24: I don't know how this needed to turn false but it is now false... -aleg
         public static final boolean TURNING_ENCODER_INVERTED = true;
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4904427061105388*2.0);
-        public static final double WHEEL_TO_MOTOR_ROTATIONS = 3.5625;
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-        // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
-        // teeth on the bevel pinion
-        // spur gear changes based on the gearing (L1-L3 etc)
-        public static final double SPUR_GEAR_TEETH = 19;
-        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15.0);
+        // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
+        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
                 * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION;
 
-        public static final double DRIVING_ENCODER_POSITION_FACTOR = (WHEEL_DIAMETER_METERS * Math.PI)
+        public static final double DRIVING_ENCODER_POSITION_FACTOR = (WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION; // meters
-        public static final double DRIVING_ENCODER_VELOCITY_FACTOR = ((WHEEL_DIAMETER_METERS * Math.PI)
+        public static final double DRIVING_ENCODER_VELOCITY_FACTOR = (WHEEL_CIRCUMFERENCE_METERS
                 / DRIVING_MOTOR_REDUCTION) / 60.0; // meters per second
 
         public static final double TURNING_ENCODER_POSITION_FACTOR = (2 * Math.PI); // radians

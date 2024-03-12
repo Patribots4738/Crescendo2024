@@ -35,9 +35,9 @@ public class AlignmentCalc {
      */
     public ChassisSpeeds normalizeChassisSpeeds(ChassisSpeeds controllerSpeeds, ChassisSpeeds autoSpeeds) {
         return new ChassisSpeeds(
-             MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vxMetersPerSecond, autoSpeeds.vxMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
-            -MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vyMetersPerSecond, autoSpeeds.vyMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
-             autoSpeeds.omegaRadiansPerSecond / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND
+            MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vyMetersPerSecond, autoSpeeds.vyMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
+            MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vxMetersPerSecond, autoSpeeds.vxMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
+            autoSpeeds.omegaRadiansPerSecond / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND
         );
     }
 

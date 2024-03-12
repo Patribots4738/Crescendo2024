@@ -135,7 +135,7 @@ public class ShooterCmds {
                     true
                 ).alongWith(
                     new NoteTrajectory(
-                        currentPose,
+                        shooterCalc.desiredSWDPose,
                         currentSpeeds,
                         shooterCalc.rpmToVelocity(calculationTriplet.getSpeeds()),
                         calculationTriplet.getAngle(),

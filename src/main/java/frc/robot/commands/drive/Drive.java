@@ -18,6 +18,7 @@ public class Drive extends Command {
     private final DoubleSupplier rotationSupplier;
     private final BooleanSupplier fieldRelativeSupplier;
     private final BooleanSupplier shouldMirror;
+    private double driveMultiplier = 1;
 
     public Drive(
             Swerve swerve,
@@ -43,8 +44,8 @@ public class Drive extends Command {
 
         this.swerve = swerve;
 
-        this.xSupplier = () -> speeds.get().vxMetersPerSecond;
-        this.ySupplier = () -> speeds.get().vyMetersPerSecond;
+        this.xSupplier = () -> speeds.get().vyMetersPerSecond;
+        this.ySupplier = () -> speeds.get().vxMetersPerSecond;
         this.rotationSupplier = () -> speeds.get().omegaRadiansPerSecond;
 
         this.fieldRelativeSupplier = fieldRelativeSupplier;
@@ -73,9 +74,9 @@ public class Drive extends Command {
         }
         else {
             swerve.drive(
-                x * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
-                y * DriveConstants.MAX_SPEED_METERS_PER_SECOND * swerve.getSpeedMultiplier(),
-                rotation * DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * swerve.getSpeedMultiplier(),
+                x * DriveConstants.MAX_SPEED_METERS_PER_SECOND * driveMultiplier,
+                y * DriveConstants.MAX_SPEED_METERS_PER_SECOND * driveMultiplier,
+                rotation * DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND * driveMultiplier,
                 fieldRelativeSupplier.getAsBoolean());
         }
     }
@@ -83,6 +84,10 @@ public class Drive extends Command {
     @Override
     public void end(boolean interrupted) {
         swerve.drive(0, 0, 0, false);
+    }
+
+    public void toggleDriveMultiplier() {
+        driveMultiplier = (driveMultiplier == 1) ? 0.5 : 1;
     }
 
     @Override
