@@ -81,20 +81,7 @@ public class Limelight extends SubsystemBase implements Logged{
         Results result = getResults();
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
 
-        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;      
-
-        // invalid data check
-        if (estimatedRobotPose.getX() == 0.0
-            || Double.isNaN(estimatedRobotPose.getX()) 
-            || Double.isNaN(estimatedRobotPose.getY()) 
-            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())
-            || targets.length == 0
-            || Double.valueOf(targets[0].tx).equals(null)
-            || Double.valueOf(targets[0].ty).equals(null)
-            || !Double.isFinite(targets[0].tx)
-            || !Double.isFinite(targets[0].ty))
-                return;
-             
+        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
         if (hasTarget(result)) {
             double xyStds;
@@ -254,12 +241,22 @@ public class Limelight extends SubsystemBase implements Logged{
     int tagsViable = 0;
 
     public boolean hasTarget(Results result) {
-        if (result == null || !result.valid || (result.botpose[0] == 0 && result.botpose[1] == 0)) {
-            return false;
-        }
 
-        if ((LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
-            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15))
+        Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
+        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
+
+        if (result == null || !result.valid 
+            || (LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15)
+            || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
+            || Double.isNaN(estimatedRobotPose.getX()) 
+            || Double.isNaN(estimatedRobotPose.getY()) 
+            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())
+            || targets.length == 0
+            || Double.valueOf(targets[0].tx).equals(null)
+            || Double.valueOf(targets[0].ty).equals(null)
+            || !Double.isFinite(targets[0].tx)
+            || !Double.isFinite(targets[0].ty))
         {
             return false;
         }
