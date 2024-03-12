@@ -376,9 +376,9 @@ public class RobotContainer implements Logged {
             .onTrue(climb.toBottomCommand());
         
         controller.a()
+            .onTrue(swerve.resetHDCCommand())
             .whileTrue(
                 Commands.sequence(
-                    swerve.resetHDCCommand(),
                     Commands.either(
                         alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
                         alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
