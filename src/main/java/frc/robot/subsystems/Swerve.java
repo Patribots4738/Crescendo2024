@@ -104,16 +104,16 @@ public class Swerve extends SubsystemBase implements Logged {
             // standard deviations
             // X, Y, theta
             VecBuilder.fill(
-                Units.feetToMeters(0.3), // 6328 uses 0.003 m here
-                Units.feetToMeters(0.3), // 6328 uses 0.003 m here
-                Units.degreesToRadians(3) // 6328 uses 0.0002 rads here
+                0.003, // 6328 uses 0.003 m here
+                0.003, // 6328 uses 0.003 m here
+                0.0002 // 6328 uses 0.0002 rads here
             ),
             // Vision measurement
             // standard deviations
             // X, Y, theta
             VecBuilder.fill(
-                Units.feetToMeters(2.5), 
-                Units.feetToMeters(2.5), 
+                Units.feetToMeters(2.5),
+                Units.feetToMeters(2.5),
                 Units.degreesToRadians(20)
             )
     );
