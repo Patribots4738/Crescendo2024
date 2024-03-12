@@ -758,6 +758,12 @@ public final class Constants {
             add(bluePose);
             add(redPose);
         }};
+        public static final Pose2d PASS_POSITION_BLUE = new Pose2d(0.709, 6.620, Rotation2d.fromDegrees(0));
+        public static final Pose2d PASS_POSITION_RED = new Pose2d(15.884, 6.620, Rotation2d.fromDegrees(180));
+        public static final List<Pose2d> PASS_POSITIONS = new ArrayList<Pose2d>() {{
+            add(PASS_POSITION_BLUE);
+            add(PASS_POSITION_RED);
+        }};
 
         private static int getAllianceIndex(Alliance defaultAlliance) {
             return defaultAlliance == Alliance.Blue
@@ -767,6 +773,10 @@ public final class Constants {
 
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_PASS_POSITION() {
+            return PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_SOURCE_POSITION() {

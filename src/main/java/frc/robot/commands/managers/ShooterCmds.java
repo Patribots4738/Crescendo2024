@@ -116,6 +116,15 @@ public class ShooterCmds {
             }, pivot, shooter);
     }
 
+    public Command prepareSWDPassCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.run(
+            () -> {
+                desiredTriplet = shooterCalc.calculatePassTriplet(robotPose.get(), speeds.get());
+                pivot.setAngle(desiredTriplet.getAngle());
+                shooter.setSpeed(desiredTriplet.getSpeeds());
+            }, pivot, shooter);
+    }
+
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
         return Commands.runOnce(
             () -> {

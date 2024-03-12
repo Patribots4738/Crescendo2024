@@ -415,7 +415,16 @@ public class RobotContainer implements Logged {
                     limelight3.setLEDState(() -> false)
                     )
                 );
-
+        
+        controller.leftStick()
+            .toggleOnTrue(
+                Commands.sequence(
+                    swerve.resetHDCCommand(),
+                    limelight3.setLEDState(() -> true),
+                    alignmentCmds.passRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                    limelight3.setLEDState(() -> false)
+                    )
+                );
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
       

@@ -64,6 +64,23 @@ public class ShooterCalc implements Logged {
                 newAngle.getDegrees()
             );
     }
+    // This can def be done better I just don't wanna work on english homework <3
+    // Will kill itself at close range tbh
+    public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose, ChassisSpeeds speeds) {
+        Pose2d poseRelativeToTarget = robotPose.relativeTo(FieldConstants.GET_PASS_POSITION());
+        double distanceToTarget = poseRelativeToTarget.getTranslation().getNorm();  
+        // assuming time is constant and realistic because makes this easier and a constant high shot?
+        // idk man i'm tired
+        double time = 3.0;
+        double v0y = (time / 2) * 9.8;
+        double v0x = distanceToTarget/time;
+        double v0 = Math.hypot(v0x, v0y);
+        return new SpeedAngleTriplet(
+            velocityToRPM(v0),
+            velocityToRPM(v0),
+            MathUtil.clamp(Units.radiansToDegrees(Math.atan2(v0x, v0y)), 20.0, 60.0)
+        );
+    }
 
     /**
      * Calculates the pivot angle based on the robot's pose.
@@ -125,24 +142,26 @@ public class ShooterCalc implements Logged {
      * 
      * @return              The angle to the speaker in the form of a Rotation2d object.
      */
-    public Rotation2d calculateRobotAngleToSpeaker(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    public Rotation2d calculateRobotAngleToPose(Pose2d robotPose, ChassisSpeeds robotVelocity, Pose2d target) {
         Translation2d velocityVectorToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity);
         double velocityTangent = velocityVectorToSpeaker.getX();
         // TODO: Check if this velocity should be accounted for in the x component of atan2
         // TODO: I think this should be "newv0" from the SWD calculation for normal velocity
         double velocityNormal = velocityVectorToSpeaker.getY();
 
-        Pose2d poseRelativeToSpeaker = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
-        Rotation2d currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
+        Pose2d poseRelativeToTarget = robotPose.relativeTo(target);
+        Rotation2d currentAngleToTarget = new Rotation2d(poseRelativeToTarget.getX(), poseRelativeToTarget.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
+            target.equals(FieldConstants.GET_PASS_POSITION()) 
+                ? rpmToVelocity(calculatePassTriplet(robotPose, robotVelocity).getSpeeds()) 
+                : rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
             // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
         Rotation2d desiredRotation2d = Rotation2d.fromRadians(MathUtil.angleModulus(
-            currentAngleToSpeaker.getRadians() + velocityArcTan + Math.PI
+            currentAngleToTarget.getRadians() + velocityArcTan + Math.PI
         ));
 
         // Update the robot's pose with the desired rotation
@@ -152,8 +171,22 @@ public class ShooterCalc implements Logged {
         return desiredRotation2d;
     }
 
+    public Rotation2d calculateRobotAngleToPass(Pose2d robotPose) {
+        return calculateRobotAngleToPose(robotPose, new ChassisSpeeds(), FieldConstants.GET_PASS_POSITION());
+    }
+
+    public Rotation2d calculateRobotAngleToPass(Pose2d robotPose, ChassisSpeeds robotVelocity) {
+        return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_POSITION());
+    }
+
+
+
     public Rotation2d calculateRobotAngleToSpeaker(Pose2d pose) {
         return calculateRobotAngleToSpeaker(pose, new ChassisSpeeds());
+    }
+
+    public Rotation2d calculateRobotAngleToSpeaker(Pose2d pose, ChassisSpeeds robotVelocity) {
+        return calculateRobotAngleToPose(pose, robotVelocity, FieldConstants.GET_SPEAKER_POSITION());
     }
 
     public Rotation2d calculateRobotAngleToSpeaker(Translation2d translation) {
