@@ -268,8 +268,52 @@ public class LimelightHelpers {
         @JsonProperty("typ")
         public double ty_pixels;
 
+        @JsonProperty("calcY")
+        public double calcY;
+
+        @JsonProperty("calcX")
+        public double calcX;
+
         public LimelightTarget_Detector() {
         }
+
+        /**
+         * https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance
+         * Calculate the Y distance from the camera to the target (distance between the camera and the target)
+         * @param targetHeight the height of the target to the ground
+         * @param cameraHeight the height of the center of the lens to the ground
+         * @param cameraAngle the angle of the camera in degrees from vertical
+         */
+        public void calculateDistance(double cameraHeight, double cameraAngle) {
+            if (className == "note") {
+                double targetHeight = 0; // we always assume that the note is on the ground
+
+                double angleToNoteDeg = cameraAngle + ty;
+                double angleToNoteRad = Units.degreesToRadians(angleToNoteDeg);
+                this.calcY = (targetHeight - cameraHeight) / Math.tan(angleToNoteRad);
+            }
+        }
+
+        /**
+         * Calculate the X distance from the camera to the target (the side to side distance between the camera and the target)
+         * @param cameraAngle the angle of the camera in degrees from right (0)
+         */
+        public void calculateXDistance(double cameraAngle) {
+            if (className == "note") {
+                double angleToNoteDeg = cameraAngle + tx;
+                double angleToNoteRad = Units.degreesToRadians(angleToNoteDeg);
+                this.calcX = this.calcY * Math.tan(angleToNoteRad);
+            }
+        }
+
+        /**
+         * Get the calculated distance from the camera to the target
+         * @return the Pose2d of the target relative to the camera
+         */
+        public Pose2d getNotePose2d() {
+            return new Pose2d(this.calcX, this.calcY, new Rotation2d());
+        }
+
     }
 
     public static class Results {
@@ -306,13 +350,13 @@ public class LimelightHelpers {
 
         @JsonProperty("botpose_tagcount")
         public double botpose_tagcount;
-       
+
         @JsonProperty("botpose_span")
         public double botpose_span;
-       
+
         @JsonProperty("botpose_avgdist")
         public double botpose_avgdist;
-       
+
         @JsonProperty("botpose_avgarea")
         public double botpose_avgarea;
 
