@@ -8,6 +8,8 @@ import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.ColorMatch;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -26,7 +28,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.custom.PatrIDConstants;
@@ -413,6 +417,21 @@ public final class Constants {
         };
     }
 
+    public static final class ColorSensorConstants {
+
+        public static final I2C.Port I2C_PORT = I2C.Port.kOnboard;
+
+        public static final ColorMatch COLOR_MATCH = new ColorMatch() 
+        {{
+            // BLACK
+            addColorMatch(new Color(0.0, 0.0, 0.0));
+            // NEW COMP READY NOTE ORANGE
+            addColorMatch(new Color(0.957, 0.282, 0.086));
+            // WHITE
+            addColorMatch(new Color(1.0, 1.0, 1.0));
+        }};
+
+    }
     public static final class ModuleConstants {
 
         // https://www.revrobotics.com/rev-21-3005/
