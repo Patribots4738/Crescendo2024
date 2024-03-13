@@ -268,7 +268,7 @@ public class RobotContainer implements Logged {
                 .alongWith(operator.setRumble(() -> 0)));
         
         // Make the controllers pulse just like the LEDs do
-        new Trigger(intake::getPossession)
+        trapper.getPossessionTrigger()
             .onTrue(
                 Commands.race(
                     Commands.run(() -> {
@@ -471,9 +471,14 @@ public class RobotContainer implements Logged {
 
         controller.rightStick().and(controller.leftStick())
             .onTrue(elevator.resetEncoder());
+
+        controller.rightStick().toggleOnTrue(
+            elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY()))
+        );
+        
     }
     
-    private void configureCalibrationBindings(PatriBoxController controller) {
+    private void configureCalibrationBindings(PatriBoxController controller) { 
         controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors());
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
         controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));

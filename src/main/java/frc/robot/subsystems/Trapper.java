@@ -4,20 +4,30 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class Trapper extends SubsystemBase implements Logged {
-    private final Neo trapper;
+    private final Neo motor;
 
     @Log
     private double desiredSpeed = 0;
 
     public Trapper() {
-        trapper = new Neo(TrapConstants.TRAP_CAN_ID, false, TrapConstants.TRAP_INVERTION);
-        trapper.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
+        motor = new Neo(TrapConstants.TRAP_CAN_ID, false, TrapConstants.TRAP_INVERTION);
+        motor.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
+        motor.makePossessionTrigger(TrapConstants.TRAPPER_INTAKE_PERCENT, 10600, 4, 0.3);
+    }
+
+    @Log
+    boolean hasNote = false;
+    @Override
+    public void periodic() {
+        hasNote = getPossessionTrigger().getAsBoolean();
     }
 
     public Command intakeFromHandoff() {
@@ -35,7 +45,7 @@ public class Trapper extends SubsystemBase implements Logged {
         if (desiredSpeed != percent) {
             desiredSpeed = percent;
             
-            trapper.set(percent);
+            motor.set(percent);
         }
     }
 
@@ -91,15 +101,22 @@ public class Trapper extends SubsystemBase implements Logged {
     }
 
     public Command setCoastMode() {
-        return runOnce(() -> trapper.setCoastMode());
+        return runOnce(() -> motor.setCoastMode());
     }
 
     public Command setBrakeMode() {
-        return runOnce(() -> trapper.setBrakeMode());
+        return runOnce(() -> motor.setBrakeMode());
     }
 
     public boolean hasPiece() {
         return false;
     }
 
+    public Trigger getPossessionTrigger() {
+        return motor.getPossessionTrigger();
+    }
+
+    public boolean hasNote() {
+        return motor.hasNote();
+    }
 }

@@ -1011,7 +1011,7 @@ public final class Constants {
             put("noteToShoot2", 0.4);
             put("noteToShoot3", 0.0);
 
-            put("intakeToTrap1", 0.5);
+            put("intakeToTrap1", 0.2);
             put("intakeToTrap2", 0.0);
 
             put("noteToIndexer1", 0.2);
