@@ -126,15 +126,13 @@ public class PieceControl implements Logged {
         // shooter before stopping trapper and indexer
         return Commands.sequence(
             intake.inCommand(),
-            trapper.intake(),
+            trapper.intakeSlow(0.6),
             indexer.toShooterSlow(),
             Commands.waitUntil(colorSensor.hasNoteTrigger()),
             setHasPiece(true),
-            NT.getWaitCommand("intakeToTrap1"), // 0.5
+            NT.getWaitCommand("intakeToTrap1"), // 0.1
             // Use the trap to index it the first time around
-            noteToTrap(),
-            // Then send it to its desired location
-            moveNote()
+            noteToTrap()
         );
     }
 
@@ -145,7 +143,7 @@ public class PieceControl implements Logged {
             indexer.stopCommand(),
             Commands.waitUntil(colorSensor.hasNoteTrigger()),
             setHasPiece(true),
-            Commands.waitSeconds(0.3),
+            Commands.waitSeconds(0.15),
             stopIntakeAndIndexer()
         );
     }

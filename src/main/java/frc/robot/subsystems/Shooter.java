@@ -5,7 +5,6 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.rev.Neo;
@@ -14,8 +13,8 @@ import monologue.Annotations.Log;
 
 public class Shooter extends SubsystemBase implements Logged{
     /** Creates a new shooter. */
-    private final Neo motorLeft;
-    private final Neo motorRight;
+    private final Neo leftMotor;
+    private final Neo rightMotor;
 
     @Log
     private double targetLeftSpeed = 0;
@@ -32,27 +31,27 @@ public class Shooter extends SubsystemBase implements Logged{
 
     public Shooter() {
 
-        motorLeft = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID, true);
-        motorRight = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true, true);
+        leftMotor = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID, true);
+        rightMotor = new Neo(ShooterConstants.RIGHT_SHOOTER_CAN_ID, true, true);
 
         configMotors();
     }
 
     public void configMotors() {
-        motorLeft.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
-        motorRight.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
-        motorLeft.setPID(ShooterConstants.SHOOTER_PID);
+        leftMotor.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
+        rightMotor.setSmartCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT);
+        leftMotor.setPID(ShooterConstants.SHOOTER_PID);
 
-        motorRight.setPID(ShooterConstants.SHOOTER_PID);
+        rightMotor.setPID(ShooterConstants.SHOOTER_PID);
 
-        motorLeft.setCoastMode();
-        motorRight.setCoastMode();
+        leftMotor.setCoastMode();
+        rightMotor.setCoastMode();
     }
 
     @Override
     public void periodic() {
-        currentLeftSpeed = motorLeft.getVelocity();
-        currentRightSpeed = motorRight.getVelocity();
+        currentLeftSpeed = leftMotor.getVelocity();
+        currentRightSpeed = rightMotor.getVelocity();
         
         atDesiredRPM = 
             MathUtil.isNear(
@@ -70,15 +69,15 @@ public class Shooter extends SubsystemBase implements Logged{
      * @param speed A double representing the speed the motors should be set to
      */
     public void setSpeed(double speed) {
-        motorLeft.setTargetVelocity(speed);
-        motorRight.setTargetVelocity(speed);
+        leftMotor.setTargetVelocity(speed);
+        rightMotor.setTargetVelocity(speed);
         targetLeftSpeed = speed;
         targetRightSpeed = speed;
     }
 
     public void setSpeed(Pair<Double, Double> speeds) {
-        motorLeft.setTargetVelocity(speeds.getFirst());
-        motorRight.setTargetVelocity(speeds.getSecond());
+        leftMotor.setTargetVelocity(speeds.getFirst());
+        rightMotor.setTargetVelocity(speeds.getSecond());
         targetLeftSpeed = speeds.getFirst();
         targetRightSpeed = speeds.getSecond();
     }
@@ -100,11 +99,11 @@ public class Shooter extends SubsystemBase implements Logged{
     }
 
     public Pair<Double, Double> getSpeed() {
-        return new Pair<Double, Double>(motorLeft.getVelocity(), motorRight.getVelocity());
+        return new Pair<Double, Double>(leftMotor.getVelocity(), rightMotor.getVelocity());
     }
 
     public double getAverageSpeed() {
-        return (motorLeft.getVelocity() + motorRight.getVelocity()) / 2.0;
+        return (leftMotor.getVelocity() + rightMotor.getVelocity()) / 2.0;
     }
 
     /**
@@ -116,8 +115,8 @@ public class Shooter extends SubsystemBase implements Logged{
         return Commands.either(
             setSpeedCommand(0),
             runOnce(() -> {
-                motorLeft.set(0);
-                motorRight.set(0);
+                leftMotor.set(0);
+                rightMotor.set(0);
             }),
             () -> FieldConstants.IS_SIMULATION);
     }
