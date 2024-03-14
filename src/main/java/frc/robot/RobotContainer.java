@@ -97,9 +97,12 @@ public class RobotContainer implements Logged {
     public static HDCTuner HDCTuner;
 
     private final LedStrip ledStrip;
+    @IgnoreLogged
     private Indexer indexer;
+    @IgnoreLogged
     private Trapper trapper;
     private ShooterCmds shooterCmds;
+    @IgnoreLogged
     private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
 
     @IgnoreLogged
@@ -187,7 +190,8 @@ public class RobotContainer implements Logged {
             indexer,
             elevator,
             trapper,
-            shooterCmds);
+            shooterCmds,
+            colorSensor);
 
         calibrationControl = new CalibrationControl(shooterCmds);
 

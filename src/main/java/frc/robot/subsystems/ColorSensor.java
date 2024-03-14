@@ -1,13 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
-import com.revrobotics.ColorSensorV3.ColorSensorMeasurementRate;
-
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.Constants.ColorSensorConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -15,6 +13,8 @@ import monologue.Annotations.Log;
 public class ColorSensor extends SubsystemBase implements Logged {
     
     private ColorSensorV3 colorSensor;
+
+    private Trigger hasNoteTrigger;
 
     @Log
     private boolean hasOrange = false;
@@ -39,7 +39,23 @@ public class ColorSensor extends SubsystemBase implements Logged {
         this.match = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColor);
 
         colorString = detectedColor.toString();
-        matchString = match.toString();
+        if (this.match.color == ColorSensorConstants.NOTE_ORANGE) {
+            matchString = "Note";
+            hasOrange = true;
+        } else {
+            matchString = "Surely not a note";
+            hasOrange = false;
+        }
     }
 
+    public boolean hasNote() {
+        return this.hasOrange;
+    }
+
+    public Trigger hasNoteTrigger() {
+        if (hasNoteTrigger == null) {
+            hasNoteTrigger = new Trigger(this::hasNote);
+        }
+        return hasNoteTrigger;
+    }
 }

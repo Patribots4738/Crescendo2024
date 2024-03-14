@@ -13,6 +13,7 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
+import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -35,6 +36,8 @@ public class PieceControl implements Logged {
 
     private ShooterCmds shooterCmds;
 
+    private ColorSensor colorSensor;
+
     @Log
     private boolean shooterMode = false;
 
@@ -56,12 +59,14 @@ public class PieceControl implements Logged {
             Indexer indexer,
             Elevator elevator,
             Trapper trapper,
-            ShooterCmds shooterCmds) {
+            ShooterCmds shooterCmds,
+            ColorSensor colorSensor) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.trapper = trapper;
         this.shooterCmds = shooterCmds;
+        this.colorSensor = colorSensor;
     }
 
     public Command stopAllMotors() {
@@ -123,7 +128,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             trapper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(intake::getPossession),
+            Commands.waitUntil(colorSensor.hasNoteTrigger()),
             setHasPiece(true),
             NT.getWaitCommand("intakeToTrap1"), // 0.5
             // Use the trap to index it the first time around
@@ -138,7 +143,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             trapper.intake(),
             indexer.stopCommand(),
-            Commands.waitUntil(intake::getPossession),
+            Commands.waitUntil(colorSensor.hasNoteTrigger()),
             setHasPiece(true),
             Commands.waitSeconds(0.3),
             stopIntakeAndIndexer()
@@ -354,14 +359,6 @@ public class PieceControl implements Logged {
                     noteToTrap(),
                     this::getShooterMode),
                 setReadyToMoveNote(true));
-    }
-
-    public Command moveNoteIfReady() {
-        return Commands.either(
-                moveNote(),
-                Commands.none(),
-                // TODO: Make intake.getPossesion more of a (note in robot) bool
-                () -> intake.getPossession() && readyToMoveNote);
     }
 
     // Think of this parameter as the desired state of shooterMode.

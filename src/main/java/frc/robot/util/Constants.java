@@ -419,16 +419,15 @@ public final class Constants {
 
     public static final class ColorSensorConstants {
 
-        public static final I2C.Port I2C_PORT = I2C.Port.kOnboard;
-
+        public static final I2C.Port I2C_PORT = I2C.Port.kMXP;
+        public static final Color NOTE_ORANGE = new Color(0.957, 0.282, 0.086);
         public static final ColorMatch COLOR_MATCH = new ColorMatch() 
         {{
             // BLACK
-            addColorMatch(new Color(0.0, 0.0, 0.0));
+            addColorMatch(Color.kBlack);
             // NEW COMP READY NOTE ORANGE
-            addColorMatch(new Color(0.957, 0.282, 0.086));
-            // WHITE
-            addColorMatch(new Color(1.0, 1.0, 1.0));
+            addColorMatch(NOTE_ORANGE);
+            addColorMatch(Color.kWhite);
         }};
 
     }
