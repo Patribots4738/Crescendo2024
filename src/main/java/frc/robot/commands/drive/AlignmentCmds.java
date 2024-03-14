@@ -161,7 +161,7 @@ public class AlignmentCmds {
     public Command passRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
             passRotationalAlignment(driverX, driverY, shooterCmds)
-                .alongWith(shooterCmds.prepareSWDPassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
                     .finallyDo(shooterCmds.stopShooter()::initialize));
     }
     
