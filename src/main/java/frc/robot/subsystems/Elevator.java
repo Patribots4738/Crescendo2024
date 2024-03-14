@@ -157,7 +157,7 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command resetEncoder() {
-        return runOnce(motor::resetEncoder);
+        return runOnce(motor::resetEncoder).ignoringDisable(true);
     }
 
     public Command overrideCommand(DoubleSupplier doubleSupplier) {

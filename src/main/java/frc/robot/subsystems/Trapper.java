@@ -69,6 +69,10 @@ public class Trapper extends SubsystemBase implements Logged {
         return runOnce(() -> setSpeed(0.2));
     }
 
+    public Command intakeSlow(double speed) {
+        return runOnce(() -> setSpeed(speed));
+    }
+
     public Command stopCommand() {
         return runOnce(() -> setSpeed(TrapConstants.TRAPPER_STOP_PERCENT));
     }
@@ -101,11 +105,11 @@ public class Trapper extends SubsystemBase implements Logged {
     }
 
     public Command setCoastMode() {
-        return runOnce(() -> motor.setCoastMode());
+        return Commands.runOnce(() -> motor.setCoastMode()).ignoringDisable(true);
     }
 
     public Command setBrakeMode() {
-        return runOnce(() -> motor.setBrakeMode());
+        return Commands.runOnce(() -> motor.setBrakeMode()).ignoringDisable(true);
     }
 
     public boolean hasPiece() {

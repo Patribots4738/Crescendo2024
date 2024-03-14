@@ -121,7 +121,7 @@ public class PieceControl implements Logged {
         // shooter before stopping trapper and indexer
         return Commands.sequence(
             intake.inCommand(),
-            trapper.intake(),
+            trapper.intakeSlow(0.6),
             indexer.toShooterSlow(),
             Commands.waitUntil(trapper.getPossessionTrigger()),
             setHasPiece(true),
