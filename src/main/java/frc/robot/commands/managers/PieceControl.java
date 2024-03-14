@@ -47,10 +47,6 @@ public class PieceControl implements Logged {
     @Log
     private boolean readyToMoveNote = true;
 
-    // State representing if we are ready to place with trapper
-    @Log
-    private boolean readyToPlace = false;
-
     @Log
     private boolean hasPiece = false;
 
@@ -227,7 +223,6 @@ public class PieceControl implements Logged {
     // Same as normally setting elevator position but adds unstuck logic
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
-            setReadyToPlaceCommand(false),
             elevator.setPositionCommand(position, false)
             // Run until we are no longer in our unstucking state only if elevator actually gets stuck
             // getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
@@ -237,15 +232,6 @@ public class PieceControl implements Logged {
     public Command elevatorToTop() {
         return setElevatorPosition(() -> TrapConstants.ELEVATOR_TOP_LIMIT);
     }
-
-    private void setReadyToPlace(boolean readyToPlace) {
-        this.readyToPlace = readyToPlace;
-    }
-
-    private Command setReadyToPlaceCommand(boolean readyToPlace) {
-        return Commands.runOnce(() -> setReadyToPlace(readyToPlace));
-    }
-
     public Command elevatorToBottom() {
         return setElevatorPosition(() -> TrapConstants.ELEVATOR_BOTTOM_LIMIT)
             .andThen(setPlaceWhenReadyCommand(false));
@@ -281,7 +267,6 @@ public class PieceControl implements Logged {
                     setElevatorPosition(() -> TrapConstants.NOTE_FIX_POS), 
                     setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
                     () -> povLeftPosition),
-                setReadyToPlaceCommand(true),
                 placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }
 
@@ -289,11 +274,12 @@ public class PieceControl implements Logged {
         return
             new SelectiveConditionalCommand(
                 Commands.sequence(
+                    prepPiece(),
                     trapper.outtake(0.8),
                     elevatorToBottom()
                 ),
                 setPlaceWhenReadyCommand(true),
-                () -> readyToPlace);
+                elevator::atDesiredPosition);
     }
 
     @Log
