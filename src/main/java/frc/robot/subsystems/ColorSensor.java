@@ -51,11 +51,4 @@ public class ColorSensor extends SubsystemBase implements Logged {
     public boolean hasNote() {
         return this.hasOrange;
     }
-
-    public Trigger hasNoteTrigger() {
-        if (hasNoteTrigger == null) {
-            hasNoteTrigger = new Trigger(this::hasNote);
-        }
-        return hasNoteTrigger;
-    }
 }
