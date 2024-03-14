@@ -1,6 +1,5 @@
 package frc.robot.commands.managers;
 
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -8,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
@@ -45,7 +45,7 @@ public class PieceControl implements Logged {
     @Log
     private boolean elevatorDislodging = false;
     @Log
-    private boolean readyToMoveNote = true;
+    private boolean currentlyMovingNote = false;
 
     @Log
     private boolean hasPiece = false;
@@ -122,17 +122,6 @@ public class PieceControl implements Logged {
         // shooter before stopping trapper and indexer
         return Commands.sequence(
             intake.inCommand(),
-            trapper.intakeSlow(0.6),
-            indexer.toShooterSlow(),
-            Commands.waitUntil(colorSensor::hasNote),
-            setHasPiece(true),
-            stopIntakeAndIndexer()
-        );
-    }
-
-    public Command toIndexerAuto() {
-        return Commands.sequence(
-            intake.inCommand(),
             trapper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(colorSensor::hasNote),
@@ -146,10 +135,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             trapper.intake(),
             indexer.toShooterSlow(),
-            NT.getWaitCommand("noteToIndexer1"), // 0.7
-            trapper.stopCommand(),
-            indexer.toElevatorSlow(),
-            NT.getWaitCommand("noteToIndexer2"), // 0.07
+            Commands.waitUntil(colorSensor::hasNote),
             stopIntakeAndIndexer()
         );
     }
@@ -158,7 +144,7 @@ public class PieceControl implements Logged {
         return Commands.sequence(
             trapper.outtake(),
             indexer.toElevator(),
-            NT.getWaitCommand("noteToTrap1"), // 0.2
+            Commands.waitUntil(() -> !colorSensor.hasNote()),
             stopIntakeAndIndexer(),
             trapper.outtakeSlow(),
             NT.getWaitCommand("noteToTrap2"), // 0.5
@@ -191,7 +177,7 @@ public class PieceControl implements Logged {
     }
 
     public Command stopPanicEject() {
-        return trapper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand())    ;
+        return trapper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand());
     }
 
     public Command intakeAuto() {
@@ -324,22 +310,27 @@ public class PieceControl implements Logged {
         return Commands.runOnce(() -> this.hasPiece = hasPiece);
     }
   
-    public Command setReadyToMoveNote(boolean readyToMove) {
-        return Commands.runOnce(() -> this.readyToMoveNote = readyToMove);
+    public Command setCurrentlyMovingNote(boolean currentlyMovingNote) {
+        return Commands.runOnce(() -> this.currentlyMovingNote = currentlyMovingNote);
     }
 
-    public boolean readyToMoveNote() {
-        return readyToMoveNote;
-    }
+    @Log
+    private boolean desiredSide = false;
 
-    public Command moveNote() {
+    public Command moveNote(boolean desiredSide) {
         return Commands.sequence(
-                setReadyToMoveNote(false),
+                Commands.runOnce(() -> this.desiredSide = desiredSide),
+                setCurrentlyMovingNote(true),
                 Commands.either(
                     noteToIndexer(),
                     noteToTrap(),
-                    this::getShooterMode),
-                setReadyToMoveNote(true));
+                    () -> desiredSide))
+                .finallyDo(() -> {
+                    currentlyMovingNote = false;
+                    if (desiredSide != shooterMode) {
+                        moveNote(shooterMode).schedule();
+                    }
+                });
     }
 
     // Think of this parameter as the desired state of shooterMode.
@@ -348,10 +339,10 @@ public class PieceControl implements Logged {
     public Command setShooterModeCommand(boolean shooterMode) {
         return Commands.runOnce(() -> setShooterMode(shooterMode))
                 .andThen(
-                    Commands.either(
-                        noteToIndexer(),
-                        noteToTrap(),
-                        () -> shooterMode)
+                    new SelectiveConditionalCommand(
+                        new ScheduleCommand(moveNote(shooterMode)),
+                        Commands.none(),
+                        () -> !currentlyMovingNote)
                 );
     }
 

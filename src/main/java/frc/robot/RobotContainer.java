@@ -6,9 +6,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-import com.revrobotics.ColorSensorV3;
-import com.revrobotics.ColorSensorV3.ColorSensorMeasurementRate;
-
 import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,7 +17,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -282,7 +278,10 @@ public class RobotContainer implements Logged {
                 .alongWith(operator.setRumble(() -> 0)));
         
         // Make the controllers pulse just like the LEDs do
-        trapper.getPossessionTrigger()
+        // The reason we are checking bumpers
+        // is so this doesn't happen on pieceControl::moveNote
+        // TODO: make work with source intake
+        new Trigger(() -> colorSensor.hasNote() && (operator.getLeftBumper() || driver.getLeftBumper()))
             .onTrue(
                 Commands.race(
                     Commands.run(() -> {
@@ -642,7 +641,7 @@ public class RobotContainer implements Logged {
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
-        NamedCommands.registerCommand("ToIndexer", pieceControl.toIndexerAuto());
+        NamedCommands.registerCommand("ToIndexer", pieceControl.intakeNote());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
