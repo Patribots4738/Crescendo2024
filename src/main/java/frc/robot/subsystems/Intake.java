@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.IntakeConstants;
@@ -12,29 +14,18 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class Intake extends SubsystemBase implements Logged {
-    private final Neo intakeMotor;
+    private final Neo motor;
 
     @Log
     private double desiredSpeed = 0;
-    private double startedIntakingTimestamp = 0;
     @Log
-    private boolean notePossession = FieldConstants.IS_SIMULATION; 
+    private boolean notePossession = FieldConstants.IS_SIMULATION;
 
     public Intake() {
-        intakeMotor = new Neo(IntakeConstants.INTAKE_CAN_ID, false);
-        intakeMotor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
-        intakeMotor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
-    }
-
-    @Override
-    public void periodic() {
-        if (desiredSpeed == IntakeConstants.INTAKE_PERCENT
-            && Robot.currentTimestamp - startedIntakingTimestamp > 0.3
-            && intakeMotor.getVelocity() < 8000
-            && intakeMotor.getOutputCurrent() > 21)
-        {
-            notePossession = true;
-        }
+        motor = new Neo(IntakeConstants.INTAKE_CAN_ID, false);
+        motor.setSmartCurrentLimit(IntakeConstants.INTAKE_CURRENT_LIMIT_AMPS);
+        motor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+        motor.makePossessionTrigger(IntakeConstants.INTAKE_PERCENT, 8000, 21, 0.3);
     }
 
     public void setPercent(double desiredPercent) {
@@ -46,12 +37,8 @@ public class Intake extends SubsystemBase implements Logged {
         
         if (desiredSpeed != desiredPercent) {
             desiredSpeed = desiredPercent;
-            if (desiredSpeed == IntakeConstants.INTAKE_PERCENT) {
-                notePossession = false;
-                startedIntakingTimestamp = Robot.currentTimestamp;
-            }
             
-            intakeMotor.set(desiredSpeed);
+            motor.set(desiredSpeed);
         }
 
     }
@@ -79,22 +66,18 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public Command setCoastMode() {
-        return runOnce(() -> intakeMotor.setCoastMode()).ignoringDisable(true);
+        return runOnce(() -> motor.setCoastMode()).ignoringDisable(true);
     }
 
     public Command setBrakeMode() {
-        return runOnce(() -> intakeMotor.setBrakeMode()).ignoringDisable(true);
+        return runOnce(() -> motor.setBrakeMode()).ignoringDisable(true);
     }
 
-    public boolean getPossession() {
-        return notePossession;
+    public Trigger getPossessionTrigger() {
+        return motor.getPossessionTrigger();
     }
 
-    public void setPossession(boolean possession) {
-        this.notePossession = possession;
-    }
-
-    public Command revokePossesion() {
-        return runOnce(() -> setPossession(false));
+    public boolean hasNote() {
+        return motor.hasNote();
     }
 }

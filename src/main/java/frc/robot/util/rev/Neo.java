@@ -7,6 +7,11 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.custom.PatrIDConstants;
@@ -18,6 +23,11 @@ import frc.robot.util.custom.PatrIDConstants;
 public class Neo extends SafeSpark {
 
     private ControlLoopType controlType = ControlLoopType.PERCENT;
+
+    private Trigger possessionSupplier;
+    private double possessionTimestamp = 0;
+    private double possessionPercent = -2;
+    
     private double targetPosition = 0;
     private double targetVelocity = 0;
     private double targetPercent = 0;
@@ -223,6 +233,10 @@ public class Neo extends SafeSpark {
      * @param percent The percentage value to set the motor output to.
      */
     public void set(double percent) {
+        targetPercent = percent;
+        if (percent == possessionPercent) {
+            possessionTimestamp = Robot.currentTimestamp;
+        }
         super.set(percent);
         controlType = ControlLoopType.PERCENT;
     }
@@ -468,5 +482,44 @@ public class Neo extends SafeSpark {
         for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {
             neo.burnFlash();
         }
+    }
+
+    public Trigger makePossessionTrigger(double possessionPercent, double rpmThreshold, double currentThreshold, double settlingTime) {
+        this.possessionPercent = possessionPercent;
+        possessionSupplier = new Trigger(() ->
+            targetPercent == possessionPercent
+            && Robot.currentTimestamp - possessionTimestamp > settlingTime
+            && this.getVelocity() < rpmThreshold
+            && this.getOutputCurrent() > currentThreshold);
+
+        possessionSupplier.onTrue(Commands.runOnce(() -> RobotContainer.hasPiece = true));
+        
+        return possessionSupplier;
+    }
+
+    public Trigger getPossessionTrigger() {
+        if (possessionSupplier == null) {
+            DriverStation.reportError(
+                "PossessionSupplier for motor " 
+                + canID 
+                + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ") " 
+                + "has not yet been created.", 
+                true);
+            return new Trigger(() -> false);
+        }
+        return possessionSupplier;
+    }
+
+    public boolean hasNote() {
+        if (possessionSupplier == null) {
+            DriverStation.reportError(
+                "PossessionSupplier for motor " 
+                + canID 
+                + " (" + NeoMotorConstants.CAN_ID_MAP.get(canID) + ") " 
+                + "has not yet been created.", 
+                true);
+            return false;
+        }
+        return possessionSupplier.getAsBoolean();
     }
 }

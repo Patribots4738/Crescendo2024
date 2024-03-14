@@ -14,7 +14,7 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class Pivot extends SubsystemBase implements Logged {
-	private Neo pivot;
+	private Neo motor;
 
 	@Log
 	private double realAngle = 0, desiredAngle = 0;
@@ -23,7 +23,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	private boolean atDesiredAngle = false;
 
 	public Pivot() {
-		pivot = new Neo(
+		motor = new Neo(
             ShooterConstants.SHOOTER_PIVOT_CAN_ID,
             false,
             true, 
@@ -32,9 +32,9 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public void configMotor() {
-		pivot.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
-		pivot.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
-		pivot.setPID(ShooterConstants.PIVOT_PID);
+		motor.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
+		motor.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
+		motor.setPID(ShooterConstants.PIVOT_PID);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES,
 				ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
 
-        pivot.setTargetPosition(angle);
+        motor.setTargetPosition(angle);
         desiredAngle = angle;
 		
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
@@ -88,11 +88,11 @@ public class Pivot extends SubsystemBase implements Logged {
 	}
 
 	public double getAngle() {
-		return pivot.getPosition();
+		return motor.getPosition();
 	}
 
 	public double getTargetAngle() {
-		return pivot.getTargetPosition();
+		return motor.getTargetPosition();
 	}
 
 	/**
