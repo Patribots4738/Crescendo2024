@@ -336,11 +336,14 @@ public class PieceControl implements Logged {
     // Think of this parameter as the desired state of shooterMode.
     // We don't want to set the state until we are done with the command that moves the note
     // since we arent ready to do another command that moves the note until we are done with the first one
-    public Command setShooterModeCommand(boolean shooterMode) {
-        return Commands.runOnce(() -> setShooterMode(shooterMode))
+    public Command setShooterModeCommand(boolean newShooterMode) {
+        return Commands.runOnce(() -> setShooterMode(newShooterMode))
                 .andThen(
                     new SelectiveConditionalCommand(
-                        new ScheduleCommand(moveNote(shooterMode)),
+                        // Fork off from the current sequence
+                        // So that this button can continue to be spammed
+                        // without waking up the baby
+                        new ScheduleCommand(moveNote(newShooterMode)),
                         Commands.none(),
                         () -> !currentlyMovingNote)
                 );
