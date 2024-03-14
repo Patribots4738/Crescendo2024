@@ -436,7 +436,7 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDCCommand(),
                     limelight3.setLEDState(() -> true),
-                    alignmentCmds.passRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                     limelight3.setLEDState(() -> false)
                     )
                 );

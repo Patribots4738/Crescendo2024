@@ -157,13 +157,12 @@ public class AlignmentCmds {
                 climb::getHooksUp);
     }
 
-    public Command passRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
-            passRotationalAlignment(driverX, driverY, shooterCmds)
+            speakerRotationalAlignment(driverX, driverY, shooterCmds)
                 .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
                     .finallyDo(shooterCmds.stopShooter()::initialize));
     }
-    
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
         // The true condition represents the pose closer to C1
