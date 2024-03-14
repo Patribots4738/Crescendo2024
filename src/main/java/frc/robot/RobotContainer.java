@@ -6,6 +6,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.ColorSensorV3;
+import com.revrobotics.ColorSensorV3.ColorSensorMeasurementRate;
 
 import edu.wpi.first.math.MathUtil;
 
@@ -41,6 +43,7 @@ import frc.robot.leds.Strips.LedStrip;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
+import frc.robot.util.Constants.ColorSensorConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
@@ -95,9 +98,13 @@ public class RobotContainer implements Logged {
     public static HDCTuner HDCTuner;
 
     private final LedStrip ledStrip;
+    @IgnoreLogged
     private Indexer indexer;
+    @IgnoreLogged
     private Trapper trapper;
     private ShooterCmds shooterCmds;
+    @IgnoreLogged
+    private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
 
     @IgnoreLogged
     private PieceControl pieceControl;
@@ -157,6 +164,8 @@ public class RobotContainer implements Logged {
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
+
+
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
 
@@ -184,7 +193,8 @@ public class RobotContainer implements Logged {
             indexer,
             elevator,
             trapper,
-            shooterCmds);
+            shooterCmds,
+            colorSensor);
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
@@ -677,6 +687,7 @@ public class RobotContainer implements Logged {
             Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
             Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
         }
+        Monologue.logObj(colorSensor, "Robot/ColorSensors/colorSensor");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
