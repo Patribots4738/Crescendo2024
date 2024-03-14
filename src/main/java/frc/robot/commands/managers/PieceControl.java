@@ -121,15 +121,13 @@ public class PieceControl implements Logged {
         // shooter before stopping trapper and indexer
         return Commands.sequence(
             intake.inCommand(),
-            trapper.intake(),
+            trapper.intakeSlow(0.6),
             indexer.toShooterSlow(),
-            Commands.waitUntil(intake::getPossession),
+            Commands.waitUntil(trapper.getPossessionTrigger()),
             setHasPiece(true),
-            NT.getWaitCommand("intakeToTrap1"), // 0.5
+            NT.getWaitCommand("intakeToTrap1"), // 0.1
             // Use the trap to index it the first time around
-            noteToTrap(),
-            // Then send it to its desired location
-            moveNote()
+            noteToTrap()
         );
     }
 
@@ -138,9 +136,9 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             trapper.intake(),
             indexer.stopCommand(),
-            Commands.waitUntil(intake::getPossession),
+            Commands.waitUntil(trapper.getPossessionTrigger()),
             setHasPiece(true),
-            Commands.waitSeconds(0.3),
+            Commands.waitSeconds(0.15),
             stopIntakeAndIndexer()
         );
     }
@@ -354,14 +352,6 @@ public class PieceControl implements Logged {
                     noteToTrap(),
                     this::getShooterMode),
                 setReadyToMoveNote(true));
-    }
-
-    public Command moveNoteIfReady() {
-        return Commands.either(
-                moveNote(),
-                Commands.none(),
-                // TODO: Make intake.getPossesion more of a (note in robot) bool
-                () -> intake.getPossession() && readyToMoveNote);
     }
 
     // Think of this parameter as the desired state of shooterMode.

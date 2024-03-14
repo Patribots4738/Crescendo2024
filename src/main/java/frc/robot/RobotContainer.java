@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -127,6 +128,8 @@ public class RobotContainer implements Logged {
     public static SwerveModuleState[] swerveDesiredStates;
     @Log
     public static double gameModeStart = 0;
+    @Log
+    public static boolean hasPiece = true;
     
     public RobotContainer() {
         
@@ -245,8 +248,9 @@ public class RobotContainer implements Logged {
             .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false/*true*/)))
             .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
       
-        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.2 && Robot.gameMode == GameMode.TELEOP)
+        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.2 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached())
         .onTrue(pieceControl.coastIntakeAndIndexer()
+            .alongWith(climb.toBottomCommand())
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
             .andThen(Commands.waitSeconds(5))
             .andThen(pieceControl.brakeIntakeAndIndexer()));
@@ -268,7 +272,7 @@ public class RobotContainer implements Logged {
                 .alongWith(operator.setRumble(() -> 0)));
         
         // Make the controllers pulse just like the LEDs do
-        new Trigger(intake::getPossession)
+        trapper.getPossessionTrigger()
             .onTrue(
                 Commands.race(
                     Commands.run(() -> {
@@ -401,7 +405,8 @@ public class RobotContainer implements Logged {
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
-                .alongWith(operator.setRumble(() -> 0.5, 0.3)));
+                .alongWith(operator.setRumble(() -> 0.5, 0.3))
+            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
         controller.rightStick()
             .toggleOnTrue(
@@ -471,9 +476,14 @@ public class RobotContainer implements Logged {
 
         controller.rightStick().and(controller.leftStick())
             .onTrue(elevator.resetEncoder());
+
+        controller.rightStick().toggleOnTrue(
+            elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY()))
+        );
+        
     }
     
-    private void configureCalibrationBindings(PatriBoxController controller) {
+    private void configureCalibrationBindings(PatriBoxController controller) { 
         controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors());
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
         controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));

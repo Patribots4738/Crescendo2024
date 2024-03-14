@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -89,14 +90,14 @@ public class Limelight extends SubsystemBase implements Logged{
             // multiple targets detected
             if (targets.length > 1) {
                 // TODO: TUNE
-                xyStds = 0.8;
-                radStds = 1.2;
+                xyStds = 0.073;
+                radStds = Units.degreesToRadians(5);
             }
             // 1 target with large area and close to estimated pose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
-                xyStds = 1.6;
-                radStds = 4;
+                xyStds = 0.154;
+                radStds = Units.degreesToRadians(20);
             }
             // conditions don't match to add a vision measurement
             else {

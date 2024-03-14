@@ -419,7 +419,7 @@ public final class Constants {
         private enum SwerveGearing {
             LOW         (12, 22, 4.12, 4.92),
             MEDIUM      (13, 22, 4.46, 5.33),
-            HIGH        (14, 22, 4.8, 5.74),
+            HIGH        (14, 22, 4.8, 5.5/*5.74*/),
 
             EXTRA_HIGH_1(14, 21, 5.03, 6.01),
             EXTRA_HIGH_2(14, 20, 5.28, 6.32),
@@ -1011,7 +1011,7 @@ public final class Constants {
             put("noteToShoot2", 0.4);
             put("noteToShoot3", 0.0);
 
-            put("intakeToTrap1", 0.5);
+            put("intakeToTrap1", 0.2);
             put("intakeToTrap2", 0.0);
 
             put("noteToIndexer1", 0.2);
