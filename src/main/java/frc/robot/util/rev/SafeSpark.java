@@ -76,8 +76,6 @@ public class SafeSpark extends CANSparkBase {
     {
         if (FieldConstants.IS_SIMULATION)
             return parameterSetter.get();
-        if (parameterCheckSupplier.getAsBoolean())
-            return REVLibError.kOk;
 
         REVLibError status = REVLibError.kError;
         for (int i = 0; i < MAX_ATTEMPTS; i++) {
