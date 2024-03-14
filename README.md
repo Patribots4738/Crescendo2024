@@ -40,7 +40,7 @@ ___
 
 ## Simulation & Testing 🪄
 
-  It is crucial to both mantain our equipment & our robot. Therefore, we always run our code in a simulation using FRC Driver Station, WPILibs's Sim GUI, and Advantage Scope to check if we either have any breaking changes or if our robot has expected behavior. Once we know our code works, we merge the branch it was on into the main branch to use on the real robot. This is process is used with most of our code yet was especially crucial for code involving critical math (ie. auto alignment & shooting while driving).
+  It is crucial to both mantain our equipment & our robot. Therefore, we always run our code in a simulation using FRC Driver Station, WPILibs's Sim GUI, and Advantage Scope to check if we either have any breaking changes or if our robot has expected behavior. After our design team has constructed the CAD model of our robot in OnShape, we can export it's moving parts into Advantage Scope. We then use a Json in our robot code to link the parts togethor so that they can move similarly to how they would in real life. Once we know our code works, we merge the branch it was on into the main branch to use on the real robot. This is process is used with most of our code yet was especially crucial for code involving critical math (ie. auto alignment & shooting while driving).
 
 
 ## Autonomous 🤖
