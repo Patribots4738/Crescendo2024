@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.529202050853034,
-        "y": 6.49941351124302
+        "x": 7.5529696500460455,
+        "y": 5.631181847982673
       },
       "isLocked": false,
       "linkedName": "C2"
@@ -20,8 +20,8 @@
         "y": 7.43617949033381
       },
       "prevControl": {
-        "x": 6.789169016790071,
-        "y": 7.706925450903187
+        "x": 6.896989331413801,
+        "y": 7.758519890649863
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
+      "name": "ToIndexer",
       "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             }
           ]

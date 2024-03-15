@@ -54,25 +54,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Shoot just in case we didnt before",
-      "waypointRelativePos": 0.6,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "ToIndexer",
-      "waypointRelativePos": 1.7,
+      "waypointRelativePos": 1.75,
       "command": {
         "type": "parallel",
         "data": {
@@ -81,6 +64,23 @@
               "type": "named",
               "data": {
                 "name": "ToIndexer"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 0.45,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
               }
             }
           ]

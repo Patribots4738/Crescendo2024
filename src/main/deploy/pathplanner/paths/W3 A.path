@@ -3,38 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.8992806921784053,
-        "y": 6.899302309242916
+        "x": 2.6055293029785465,
+        "y": 4.135301495213813
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9334865679809745,
-        "y": 7.5198258347244575
+        "x": 1.8024132119428065,
+        "y": 3.969773751259882
       },
       "isLocked": false,
-      "linkedName": "W1"
+      "linkedName": "W3"
     },
     {
       "anchor": {
-        "x": 8.284610415676218,
-        "y": 7.43617949033381
+        "x": 1.8337621392595704,
+        "y": 7.619282085683008
       },
       "prevControl": {
-        "x": 7.0062271367543865,
-        "y": 7.469264658574111
+        "x": 1.7969781961586968,
+        "y": 6.356366705886348
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C1"
+      "linkedName": "A"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
@@ -43,13 +37,20 @@
       "command": {
         "type": "parallel",
         "data": {
-          "commands": []
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "StopIntake"
+              }
+            }
+          ]
         }
       }
     },
     {
-      "name": "ToIndexer",
-      "waypointRelativePos": 0.7,
+      "name": "Elevate",
+      "waypointRelativePos": 0.65,
       "command": {
         "type": "parallel",
         "data": {
@@ -57,7 +58,24 @@
             {
               "type": "named",
               "data": {
-                "name": "ToIndexer"
+                "name": "RaiseElevator"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PlaceAmp",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PlaceAmp"
               }
             }
           ]
@@ -67,19 +85,19 @@
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 1.0,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.91283827567477,
+    "rotation": -89.48842783346618,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Wings",
   "previewStartingState": {
-    "rotation": -156.60379853289518,
+    "rotation": 178.3251620094708,
     "velocity": 0
   },
   "useDefaultConstraints": true

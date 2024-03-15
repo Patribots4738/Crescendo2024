@@ -3,53 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.8992806921784053,
-        "y": 6.899302309242916
+        "x": 1.8337621392595704,
+        "y": 7.619282085683008
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9334865679809745,
-        "y": 7.5198258347244575
+        "x": 1.7043226970071437,
+        "y": 6.471081882119288
       },
       "isLocked": false,
-      "linkedName": "W1"
+      "linkedName": "A"
     },
     {
       "anchor": {
-        "x": 8.284610415676218,
-        "y": 7.43617949033381
+        "x": 2.892385986339722,
+        "y": 5.538747023742648
       },
       "prevControl": {
-        "x": 7.0062271367543865,
-        "y": 7.469264658574111
+        "x": 1.4223124665671127,
+        "y": 4.7974124710295385
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C1"
+      "linkedName": "W2"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": []
-        }
-      }
-    },
-    {
       "name": "ToIndexer",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.65,
       "command": {
         "type": "parallel",
         "data": {
@@ -73,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.91283827567477,
+    "rotation": -179.7550563255071,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Wings",
+  "folder": "Amp",
   "previewStartingState": {
-    "rotation": -156.60379853289518,
+    "rotation": -90.04297299971782,
     "velocity": 0
   },
   "useDefaultConstraints": true

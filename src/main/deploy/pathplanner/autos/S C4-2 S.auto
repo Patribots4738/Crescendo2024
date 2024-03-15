@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.1380663896079564,
-      "y": 4.3334957369796125
+      "x": 1.2698318789694694,
+      "y": 3.0612493923756046
     },
-    "rotation": 142.0
+    "rotation": 118.45372149994454
   },
   "command": {
     "type": "sequential",
@@ -26,6 +26,12 @@
                 "data": {
                   "commands": [
                     {
+                      "type": "path",
+                      "data": {
+                        "pathName": "P R"
+                      }
+                    },
+                    {
                       "type": "named",
                       "data": {
                         "name": "ShootWhenReady"
@@ -34,61 +40,43 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3 Proxy"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.07
+                        "pathName": "S C4"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W3 W2 Proxy"
+                        "pathName": "C4 M Proxy"
                       }
                     },
                     {
-                      "type": "wait",
+                      "type": "named",
                       "data": {
-                        "waitTime": 0.07
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W2 W1 Proxy"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.07
+                        "name": "ShootWhenReady"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W1 C2"
+                        "pathName": "M C3"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "C2 L Proxy"
+                        "pathName": "C3 M"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "L C3"
+                        "pathName": "M C2"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "C3 M Proxy"
+                        "pathName": "C2 L"
                       }
                     }
                   ]

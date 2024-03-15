@@ -49,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "ToIndexer",
-      "waypointRelativePos": 1.8,
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
