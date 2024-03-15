@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
-import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
@@ -312,7 +311,7 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 4.5;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 5;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
@@ -402,11 +401,11 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "S W3-1 S C2-3 S",
-            "S W3-1 S C2-3 S 2",
-            "S W3-1 S C1-3 S",
-            "S C5-4 S",
-            "S C4-2 S",
-            "S W1 S C1-3 S"
+            // "S W3-1 S C2-3 S 2",
+            // "S W3-1 S C1-3 S",
+            // "S C5-4 S",
+            // "S C4-2 S",
+            // "S W1 S C1-3 S"
         };
     }
 

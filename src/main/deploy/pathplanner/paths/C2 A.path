@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.293238893308695,
-        "y": 5.77776349281702
+        "x": 8.513869480146576,
+        "y": 5.754781140021407
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.899800847779888,
-        "y": 7.384549802459921
+        "x": 3.1204314346177693,
+        "y": 7.361567449664308
       },
       "isLocked": false,
       "linkedName": "C2"
@@ -31,23 +31,6 @@
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
-    {
-      "name": "StopIntake",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "StopIntake"
-              }
-            }
-          ]
-        }
-      }
-    },
     {
       "name": "Elevate",
       "waypointRelativePos": 0.55,
@@ -84,8 +67,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 3.5,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },

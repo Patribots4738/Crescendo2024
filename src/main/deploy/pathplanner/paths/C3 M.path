@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284863829514135,
-        "y": 4.099779112962734
+        "x": 8.48629065679184,
+        "y": 4.109244679855541
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.399402193047182,
-        "y": 4.272864524211365
+        "x": 6.600919850227918,
+        "y": 3.92106201270608
       },
       "isLocked": false,
       "linkedName": "C3"
@@ -20,8 +20,8 @@
         "y": 4.956144380373867
       },
       "prevControl": {
-        "x": 4.645608678072344,
-        "y": 4.739868935489274
+        "x": 4.859675385644165,
+        "y": 4.316085855016055
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,25 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "StopIntake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Shoot",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -67,8 +50,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 6.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
@@ -83,5 +66,5 @@
     "rotation": 180.0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

@@ -3,54 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284863829514135,
-        "y": 4.099779112962734
+        "x": 8.288642422749572,
+        "y": 2.436296745792339
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.475885011108571,
-        "y": 5.124792047647059
+        "x": 6.6890706681749315,
+        "y": 3.8012811523943313
       },
       "isLocked": false,
-      "linkedName": "C3"
+      "linkedName": "C4"
     },
     {
       "anchor": {
-        "x": 4.04,
-        "y": 6.338915940243228
+        "x": 4.027331175229726,
+        "y": 4.956144380373867
       },
       "prevControl": {
-        "x": 5.0599756885228055,
-        "y": 6.8229476540209415
+        "x": 4.4735718586778725,
+        "y": 4.182788208801502
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "M"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "StopIntake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Shoot",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.8,
       "command": {
         "type": "parallel",
         "data": {
@@ -67,14 +50,14 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 4.1,
+    "maxAcceleration": 3.4,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -173.36255043289074,
+    "rotation": 172.18236916823508,
     "rotateFast": false
   },
   "reversed": false,
@@ -83,5 +66,5 @@
     "rotation": 180.0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

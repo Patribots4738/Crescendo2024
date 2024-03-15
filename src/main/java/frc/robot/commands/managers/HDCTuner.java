@@ -33,6 +33,7 @@ public class HDCTuner extends SubsystemBase implements Logged {
     }
 
     public void log() {
+        updateValues();
         System.out.printf("XY P: %.4f | I: %.4f | D: %.4f | Theta P: %.4f | I: %.4f | D: %.4f%n", 
             XYController.getP(), XYController.getI(), XYController.getD(), 
             thetaController.getP(), thetaController.getI(), thetaController.getD());

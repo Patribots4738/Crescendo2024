@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.293238893308695,
-        "y": 5.77776349281702
+        "x": 8.513869480146576,
+        "y": 5.754781140021407
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.332576546452087,
-        "y": 5.957025844622798
+        "x": 7.28661184086086,
+        "y": 6.255796430965762
       },
       "isLocked": false,
       "linkedName": "C2"
     },
     {
       "anchor": {
-        "x": 4.04,
-        "y": 6.338915940243228
+        "x": 5.743336151610713,
+        "y": 6.3607970553007185
       },
       "prevControl": {
-        "x": 4.772972894517218,
-        "y": 6.441532145475638
+        "x": 6.470169804043686,
+        "y": 6.3473221649602385
+      },
+      "nextControl": {
+        "x": 4.96079773794486,
+        "y": 6.375304665502949
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.5129095118212637,
+        "y": 6.237410548729272
+      },
+      "prevControl": {
+        "x": 4.194690780691753,
+        "y": 6.411693390762668
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,25 +48,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "StopIntake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Shoot",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 1.5,
       "command": {
         "type": "parallel",
         "data": {
@@ -67,8 +66,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 6.3,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
@@ -83,5 +82,5 @@
     "rotation": 179.83225523650648,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

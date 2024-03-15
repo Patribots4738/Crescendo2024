@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.1380663896079564,
-      "y": 4.3334957369796125
+      "x": 1.3617612901519198,
+      "y": 4.771136440369186
     },
-    "rotation": 142.0
+    "rotation": 151.53108100340572
   },
   "command": {
     "type": "sequential",
@@ -50,9 +50,15 @@
                       }
                     },
                     {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
+                      }
+                    },
+                    {
                       "type": "path",
                       "data": {
-                        "pathName": "W1 C2"
+                        "pathName": "L C2"
                       }
                     },
                     {

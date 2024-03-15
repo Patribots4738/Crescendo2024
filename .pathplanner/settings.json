@@ -10,8 +10,8 @@
     "Wings"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 4.5,
-  "defaultMaxAccel": 1.0,
+  "defaultMaxVel": 5.0,
+  "defaultMaxAccel": 4.5,
   "defaultMaxAngVel": 1137.21,
   "defaultMaxAngAccel": 1492.9,
   "maxModuleSpeed": 7.6

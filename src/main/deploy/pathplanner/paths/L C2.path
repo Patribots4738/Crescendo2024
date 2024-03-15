@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.04,
-        "y": 6.338915940243228
+        "x": 3.5129095118212637,
+        "y": 6.237410548729272
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.990435673920994,
-        "y": 6.702803192840428
+        "x": 6.698263609293177,
+        "y": 6.793583486383099
       },
       "isLocked": false,
       "linkedName": "L"
     },
     {
       "anchor": {
-        "x": 8.293238893308695,
+        "x": 7.401523604838924,
         "y": 5.77776349281702
       },
       "prevControl": {
-        "x": 7.498815565007017,
-        "y": 6.0841948634251874
+        "x": 6.927049520570011,
+        "y": 5.784952494093823
+      },
+      "nextControl": {
+        "x": 7.70489066174101,
+        "y": 5.773167022257897
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.513869480146576,
+        "y": 5.754781140021407
+      },
+      "prevControl": {
+        "x": 8.095590659266424,
+        "y": 5.722605846107549
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +48,25 @@
   "constraintZones": [],
   "eventMarkers": [
     {
+      "name": "StopIntake",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "StopIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "ToIndexer",
-      "waypointRelativePos": 0.8,
+      "waypointRelativePos": 0.95,
       "command": {
         "type": "parallel",
         "data": {
@@ -50,21 +83,21 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 2.7,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 160.11483488614476,
+    "rotation": -178.97696981133205,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Stage",
   "previewStartingState": {
-    "rotation": -173.92664670661742,
+    "rotation": -178.36444750609965,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

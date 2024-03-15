@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
 import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.Drive;
+import frc.robot.commands.drive.DriveHDC;
 import frc.robot.commands.drive.WheelRadiusCharacterization;
 import frc.robot.commands.logging.NT;
 import frc.robot.commands.logging.NTPIDTuner;

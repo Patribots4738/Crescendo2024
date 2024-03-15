@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
@@ -90,13 +92,13 @@ public class Limelight extends SubsystemBase implements Logged{
             // multiple targets detected
             if (targets.length > 1) {
                 // TODO: TUNE
-                xyStds = 0.073;
+                xyStds = 0.1778;
                 radStds = Units.degreesToRadians(5);
             }
             // 1 target with large area and close to estimated pose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
-                xyStds = 0.154;
+                xyStds = 0.3556;
                 radStds = Units.degreesToRadians(15);
             }
             // conditions don't match to add a vision measurement
@@ -105,6 +107,8 @@ public class Limelight extends SubsystemBase implements Logged{
             }
 
             this.estimatedPose2d = estimatedRobotPose;
+
+            if (Robot.gameMode == GameMode.AUTONOMOUS) return;
 
             poseEstimator.setVisionMeasurementStdDevs(
                 VecBuilder.fill(xyStds, xyStds, radStds));
