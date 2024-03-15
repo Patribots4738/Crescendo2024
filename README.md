@@ -39,9 +39,10 @@ ___
   - Fully simulated motors
 
 ## Simulation & Testing 🪄
-
   It is crucial to both mantain our equipment & our robot. Therefore, we always run our code in a simulation using FRC Driver Station, WPILibs's Sim GUI, and Advantage Scope to check if we either have any breaking changes or if our robot has expected behavior. After our design team has constructed the CAD model of our robot in OnShape, we can export it's moving parts into Advantage Scope. We then use a Json in our robot code to link the parts togethor so that they can move similarly to how they would in real life. Once we know our code works, we merge the branch it was on into the main branch to use on the real robot. This is process is used with most of our code yet was especially crucial for code involving critical math (ie. auto alignment & shooting while driving).
 
+## Discretize Swerve 🛞
+  Our robot uses REV Neo swerve drive. Over time as the robot moves and turns, the motors meausered states do not match it's actual state, causing the robot to drift in the direction of its rotation and have a curved path. We wanted the trajectory to be straighter, so we collaborated with other teams to discretize the swerve's motion using 2nd order kinematics. You can learn more about the evolution about it here: [Swerve Drive Skew and Second Order Kinematics - Chief Delphi](<https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/33>) Our disretize swerve code was then implemented into WPILibs resources!
 
 ## Autonomous 🤖
   ### Path Generation & Modular Autonomous Paths 📈
@@ -60,6 +61,10 @@ ___
   
   ### Auto Alignment w/ April Tags
   Another feature for user-friendliness is our robot's ability to align to field objects such as the speaker, stage & amp. When aligned to the speaker, the driver can move the robot anywhere on the field whilst the shooter always faces the speaker. For the amp & stage, the robot becomes locked in a certain axis. This helps the driver with steering & alignment.
+
+<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/d47db1e3-67e7-4c6d-ab01-7f75e807eed5" height="400">
+![Screenshot 2024-03-14 165424](https://github.com/Patribots4738/Crescendo2024/assets/148731136/73e776c2-dc3e-4e8b-9221-655e205a701a)
+
 
 
 _____
