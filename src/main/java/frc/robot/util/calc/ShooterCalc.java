@@ -45,8 +45,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        // SpeedAngleTriplet currentTriplet = new SpeedAngleTriplet(calculateShooterSpeedsForApex(pose, calculatePivotAngle(pose)), calculatePivotAngle(pose).getDegrees());
-        SpeedAngleTriplet currentTriplet = calculateSpeakerTriplet(pose.getTranslation());
+        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
@@ -69,8 +68,18 @@ public class ShooterCalc implements Logged {
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForPassApex(robotPose, pivotAngle);
         return SpeedAngleTriplet.of(
             // Don't ask. It works. Is this how we finally beat the hawaiian kids?
-            shooterSpeeds.getFirst().doubleValue()/1.359,
-            shooterSpeeds.getSecond().doubleValue()/1.359,
+            shooterSpeeds.getFirst(),
+            shooterSpeeds.getSecond(),
+            pivotAngle.getDegrees());
+    }
+
+    public SpeedAngleTriplet calculateApexTriplet(Pose2d robotPose) {
+        Rotation2d pivotAngle = calculatePivotAngle(robotPose);
+        Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForSpeakerApex(robotPose, pivotAngle);
+        return SpeedAngleTriplet.of(
+            // Don't ask. It works. Is this how we finally beat the hawaiian kids?
+            shooterSpeeds.getFirst(),
+            shooterSpeeds.getSecond(),
             pivotAngle.getDegrees());
     }
 
