@@ -425,11 +425,19 @@ public class RobotContainer implements Logged {
                     new ActiveConditionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::onOppositeSide),
-                    limelight3.setLEDState(() -> false)
-                    )
+                        alignmentCmds.alignmentCalc::onOppositeSide)
+                    ).finallyDo(() -> limelight3.setLEDState(() -> false).schedule())
                 );
-
+        
+        controller.leftStick()
+            .toggleOnTrue(
+                Commands.sequence(
+                    swerve.resetHDCCommand(),
+                    limelight3.setLEDState(() -> true),
+                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier)
+                    ).finallyDo(() -> limelight3.setLEDState(() -> false).schedule())
+                );
+        
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
       

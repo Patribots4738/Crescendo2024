@@ -97,7 +97,7 @@ public class Limelight extends SubsystemBase implements Logged{
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
                 xyStds = 0.154;
-                radStds = Units.degreesToRadians(20);
+                radStds = Units.degreesToRadians(15);
             }
             // conditions don't match to add a vision measurement
             else {

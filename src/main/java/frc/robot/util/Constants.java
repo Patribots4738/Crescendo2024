@@ -226,8 +226,9 @@ public final class Constants {
         }};
 
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
-        public static final double GRAVITY = 9.8;
-        public static final double V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
+        public static final double GRAVITY = 9.81;
+        public static final double SPEAKER_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
+        public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.PASS_HEIGHT_METERS);
 
     }
 
@@ -678,6 +679,7 @@ public final class Constants {
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
+        public static final double PASS_HEIGHT_METERS = Units.feetToMeters(11.5);
 
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
@@ -768,6 +770,16 @@ public final class Constants {
             add(bluePose);
             add(redPose);
         }};
+        
+        public static final List<Pose2d> PASS_POSITIONS = new ArrayList<Pose2d>() {{
+
+            // I swear bulldogs and hawaiin kids just had to get in here somehow
+            Pose2d bluePose = new Pose2d(4.581, 4.359, Rotation2d.fromDegrees(0));
+            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
+
+            add(bluePose);
+            add(redPose);
+        }};
 
         private static int getAllianceIndex(Alliance defaultAlliance) {
             return defaultAlliance == Alliance.Blue
@@ -777,6 +789,10 @@ public final class Constants {
 
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_PASS_POSITION() {
+            return PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_SOURCE_POSITION() {

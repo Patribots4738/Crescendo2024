@@ -162,6 +162,11 @@ public class AlignmentCalc {
             getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
+    public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
+        return 
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+    }
+
     /**
      * Calculates the rotational speeds to align the robot to the speaker.
      * 
@@ -187,6 +192,10 @@ public class AlignmentCalc {
      */
     public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
+    }
+
+    public Supplier<ChassisSpeeds> getPassRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
+        return () -> getPassRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
     }
 
     /**
