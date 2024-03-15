@@ -8,13 +8,13 @@ import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.SafeSpark.TelemetryPreference;
 
 public class Indexer extends SubsystemBase {
-    private final Neo indexer;
+    private final Neo motor;
     private double desiredPercent = 0;
 
     public Indexer() {
-        indexer = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID, false);
-        indexer.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_CURRENT_LIMIT_AMPS);
-        indexer.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
+        motor = new Neo(IntakeConstants.TRIGGER_WHEEL_CAN_ID, false);
+        motor.setSmartCurrentLimit(IntakeConstants.TRIGGER_WHEEL_CURRENT_LIMIT_AMPS);
+        motor.setTelemetryPreference(TelemetryPreference.NO_ENCODER);
     }
 
     public double getDesiredPercent() {
@@ -29,7 +29,7 @@ public class Indexer extends SubsystemBase {
 
         if (percent != desiredPercent) {
             desiredPercent = percent;
-            indexer.set(desiredPercent);
+            motor.set(desiredPercent);
         }
     }
 
@@ -42,7 +42,7 @@ public class Indexer extends SubsystemBase {
     }
     
     public Command toShooterSlow() {
-        return setPercentCommand(IntakeConstants.SHOOTER_TRIGGER_WHEEL_PERCENT/2.0);
+        return setPercentCommand(IntakeConstants.SHOOTER_TRIGGER_WHEEL_PERCENT/7.0);
     }
 
     public Command toElevator() {
@@ -58,7 +58,11 @@ public class Indexer extends SubsystemBase {
     }
 
     public Command setCoastMode() {
-        return runOnce(() -> indexer.setCoastMode());
+        return runOnce(() -> motor.setCoastMode());
+    }
+
+    public Command setBrakeMode() {
+        return runOnce(() -> motor.setBrakeMode());
     }
 
     public boolean hasPiece() {

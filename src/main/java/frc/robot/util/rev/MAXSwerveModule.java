@@ -15,8 +15,8 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class MAXSwerveModule implements Logged{
-    private final Neo drivingSpark;
-    private final Neo turningSpark;
+    private final Neo driveMotor;
+    private final Neo turnMotor;
 
     private double chassisAngularOffset = 0;
 
@@ -30,18 +30,18 @@ public class MAXSwerveModule implements Logged{
      * Encoder.
      */
     public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
-        drivingSpark = new Neo(drivingCANId, true);
+        driveMotor = new Neo(drivingCANId, true);
         
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
         // the steering motor in the MAXSwerve Module.
 
-        turningSpark = new Neo(turningCANId, false, ModuleConstants.TURNING_ENCODER_INVERTED, true);
+        turnMotor = new Neo(turningCANId, false, ModuleConstants.TURNING_ENCODER_INVERTED, true);
         this.chassisAngularOffset = chassisAngularOffset;
 
         resetEncoders();
         configMotors();
-        desiredState.angle = new Rotation2d(turningSpark.getPosition());
+        desiredState.angle = new Rotation2d(turnMotor.getPosition());
     }
 
     /**
@@ -52,16 +52,16 @@ public class MAXSwerveModule implements Logged{
     public SwerveModuleState getState() {
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
-        return new SwerveModuleState(drivingSpark.getVelocity(),
-                new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
+        return new SwerveModuleState(driveMotor.getVelocity(),
+                new Rotation2d(turnMotor.getPosition() - chassisAngularOffset));
     }
 
     public SparkPIDController getDrivingPIDController() {
-        return drivingSpark.getPIDController();
+        return driveMotor.getPIDController();
     }
     
     public SparkPIDController getTurningPIDController() {
-        return turningSpark.getPIDController();
+        return turnMotor.getPIDController();
     }
 
     /**
@@ -73,14 +73,14 @@ public class MAXSwerveModule implements Logged{
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
         return new SwerveModulePosition(
-                drivingSpark.getPosition(),
-                new Rotation2d(turningSpark.getPosition() - chassisAngularOffset));
-    }   
-
+                driveMotor.getPosition(),
+                new Rotation2d(turnMotor.getPosition() - chassisAngularOffset));
+    }
 
     // gets the rotations of the wheel converted to radians
+    // We need to undo the position conversion factor
     public double getDrivePositionRadians() {
-        return (drivingSpark.getPosition() / (ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR * ModuleConstants.WHEEL_TO_MOTOR_ROTATIONS)) * 2 * Math.PI;
+        return (driveMotor.getPosition() / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS) * 2 * Math.PI;
     }
 
     /**
@@ -97,12 +97,12 @@ public class MAXSwerveModule implements Logged{
         // Optimize the reference state to avoid spinning further than 90 degrees.
         if (!FieldConstants.IS_SIMULATION) {
             correctedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
-                    new Rotation2d(turningSpark.getPosition()));
+                    new Rotation2d(turnMotor.getPosition()));
         }
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
-        drivingSpark.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
-        turningSpark.setTargetPosition(correctedDesiredState.angle.getRadians());
+        driveMotor.setTargetVelocity(correctedDesiredState.speedMetersPerSecond);
+        turnMotor.setTargetPosition(correctedDesiredState.angle.getRadians());
 
         this.desiredState = correctedDesiredState;
     }
@@ -111,52 +111,52 @@ public class MAXSwerveModule implements Logged{
      * Zeroes this driving motor's encoder.
      */
     public void resetEncoders() {
-        drivingSpark.resetEncoder();
+        driveMotor.resetEncoder();
     }
 
     /**
      * Set the full module to coast mode
      */
     public void setCoastMode() {
-        drivingSpark.setCoastMode();
-        turningSpark.setCoastMode();
+        driveMotor.setCoastMode();
+        turnMotor.setCoastMode();
     }
 
     /**
      * Set the full module to brake mode
      */
     public void setBrakeMode() {
-        drivingSpark.setBrakeMode();
-        turningSpark.setBrakeMode();
+        driveMotor.setBrakeMode();
+        turnMotor.setBrakeMode();
     }
 
     public void configMotors() {
         // Apply position and velocity conversion factors for the driving encoder. The
         // native units for position and velocity are rotations and RPM, respectively,
         // but we want meters and meters per second to use with WPILib's swerve APIs.
-        drivingSpark.setPositionConversionFactor(ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR);
-        drivingSpark.setVelocityConversionFactor(ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
+        driveMotor.setPositionConversionFactor(ModuleConstants.DRIVING_ENCODER_POSITION_FACTOR);
+        driveMotor.setVelocityConversionFactor(ModuleConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
 
         // Apply position and velocity conversion factors for the turning encoder. We
         // want these in radians and radians per second to use with WPILib's swerve
         // APIs.
-        turningSpark.setPositionConversionFactor(ModuleConstants.TURNING_ENCODER_POSITION_FACTOR);
-        turningSpark.setVelocityConversionFactor(ModuleConstants.TURNING_ENCODER_VELOCITY_FACTOR);
+        turnMotor.setPositionConversionFactor(ModuleConstants.TURNING_ENCODER_POSITION_FACTOR);
+        turnMotor.setVelocityConversionFactor(ModuleConstants.TURNING_ENCODER_VELOCITY_FACTOR);
 
         // Enable PID wrap around for the turning motor. This will allow the PID
         // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
         // to 10 degrees will go through 0 rather than the other direction which is a
         // longer route.
-        turningSpark.setPositionPIDWrappingEnabled(true);
-        turningSpark.setPositionPIDWrappingBounds(
+        turnMotor.setPositionPIDWrappingEnabled(true);
+        turnMotor.setPositionPIDWrappingBounds(
             ModuleConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT,
             ModuleConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
 
-        drivingSpark.setPID(ModuleConstants.DRIVING_PID);
-        turningSpark.setPID(ModuleConstants.TURNING_PID);
+        driveMotor.setPID(ModuleConstants.DRIVING_PID);
+        turnMotor.setPID(ModuleConstants.TURNING_PID);
 
-        drivingSpark.setSmartCurrentLimit(ModuleConstants.NEO_CURRENT_LIMIT);
-        turningSpark.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
+        driveMotor.setSmartCurrentLimit(ModuleConstants.NEO_CURRENT_LIMIT);
+        turnMotor.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
         setBrakeMode();
     }
 }

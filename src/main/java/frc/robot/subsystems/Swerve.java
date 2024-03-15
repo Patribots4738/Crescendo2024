@@ -12,9 +12,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import java.util.Arrays;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -27,9 +25,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -42,8 +38,6 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.ModuleConstants;
-import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -56,72 +50,52 @@ public class Swerve extends SubsystemBase implements Logged {
     @Log
     private boolean isAlignedToAmp = false;
 
-    private double speedMultiplier = 1;
-    private final MAXSwerveModule frontLeft = new MAXSwerveModule(
-            DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
-            DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
-            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
-
-    private final MAXSwerveModule frontRight = new MAXSwerveModule(
-            DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
-            DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
-            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
-
-    private final MAXSwerveModule rearLeft = new MAXSwerveModule(
-            DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
-            DriveConstants.REAR_LEFT_TURNING_CAN_ID,
-            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
-
-    private final MAXSwerveModule rearRight = new MAXSwerveModule(
-            DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
-            DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
-            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
+    private final MAXSwerveModule frontLeft, frontRight, rearLeft, rearRight;
 
     // The gyro sensor
-    private final Pigeon2 gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
+    private final Pigeon2 gyro;
 
-    private final MAXSwerveModule[] swerveModules = new MAXSwerveModule[] {
-            frontLeft,
-            frontRight,
-            rearLeft,
-            rearRight
-    };
+    private final MAXSwerveModule[] swerveModules;
 
-    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
-            DriveConstants.DRIVE_KINEMATICS,
-            gyro.getRotation2d(),
-            getModulePositions(),
-            new Pose2d(),
-            // Trust the information of the vision more
-            // Nat.N1()).fill(0.1, 0.1, 0.1) --> trust more
-            // Nat.N1()).fill(1.25, 1.25, 1.25) --> trust less
-            // Notice that the theta on the vision is very large,
-            // and the state measurement is very small.
-            // This is because we assume that the IMU is very accurate.
-            // You can visualize these graphs working together here:
-            // https://www.desmos.com/calculator/a0kszyrwfe
-            // State measurement
-            // standard deviations
-            // X, Y, theta
-            VecBuilder.fill(
-                Units.feetToMeters(0.3), 
-                Units.feetToMeters(0.3), 
-                Units.degreesToRadians(3)
-            ),
-            // Vision measurement
-            // standard deviations
-            // X, Y, theta
-            VecBuilder.fill(
-                Units.feetToMeters(2.5), 
-                Units.feetToMeters(2.5), 
-                Units.degreesToRadians(20)
-            )
-    );
+    private SwerveDrivePoseEstimator poseEstimator;
 
     /**
      * Creates a new DriveSu1stem.
      */
     public Swerve() {
+
+        frontLeft = new MAXSwerveModule(
+            DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
+            DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
+            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+
+        frontRight = new MAXSwerveModule(
+            DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
+            DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
+            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+
+        rearLeft = new MAXSwerveModule(
+            DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
+            DriveConstants.REAR_LEFT_TURNING_CAN_ID,
+            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
+
+        rearRight = new MAXSwerveModule(
+            DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
+            DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
+            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);     
+
+        swerveModules = new MAXSwerveModule[] {
+            frontLeft,
+            frontRight,
+            rearLeft,
+            rearRight
+        };
+            
+        gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
+        gyro.setYaw(0);
+        resetEncoders();
+        setBrakeMode();
+
         AutoBuilder.configureHolonomic(
                 this::getPose,
                 this::resetOdometry,
@@ -131,24 +105,49 @@ public class Swerve extends SubsystemBase implements Logged {
                 Robot::isRedAlliance,
                 this);
 
-        resetEncoders();
-        gyro.setYaw(0);
-        setBrakeMode();
+        poseEstimator = new SwerveDrivePoseEstimator(
+            DriveConstants.DRIVE_KINEMATICS,
+            gyro.getRotation2d(),
+            getModulePositions(),
+            new Pose2d(),
+            // State measurements
+            /*
+             * See https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#process-and-measurement-noise-covariance-matrices
+             * for how to select the standard deviations.
+             */
+            // standard deviations
+            // X, Y, theta
+            VecBuilder.fill(
+                0.003, // 6328 uses 0.003 m here
+                0.003, // 6328 uses 0.003 m here
+                0.0002 // 6328 uses 0.0002 rads here
+            ),
+            // Vision measurement
+            // standard deviations
+            // X, Y, theta
+            VecBuilder.fill(
+                Units.inchesToMeters(4),
+                Units.inchesToMeters(4),
+                Units.degreesToRadians(2)
+            )
+        );
     }
 
     @Override
     public void periodic() {
         gyroRotation2d = gyro.getRotation2d();
-        poseEstimator.updateWithTime(Robot.currentTimestamp, gyroRotation2d, getModulePositions());
-        // System.out.print("angle: " + gyro.getAngle()+ ", yaw: " +
-        // gyro.getYaw().getValueAsDouble());
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroRotation2d, getModulePositions());
+        
         logPositions();
         this.isAlignedToAmp = isAlignedToAmp();
     }
 
+    @Log
+    Pose2d currentPose = new Pose2d();
+
     public void logPositions() {
 
-        Pose2d currentPose = getPose();
+        currentPose = getPose();
 
         RobotContainer.swerveMeasuredStates = new SwerveModuleState[] {
                 frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
@@ -288,8 +287,7 @@ public class Swerve extends SubsystemBase implements Logged {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
             desiredStates, 
-            NetworkTableInstance.getDefault().getTable("Robot").getEntry("MAX")
-                .getDouble(DriveConstants.MAX_SPEED_METERS_PER_SECOND)
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND
         );
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
@@ -353,27 +351,9 @@ public class Swerve extends SubsystemBase implements Logged {
         }
     }
 
-    public Command toggleSpeed() {
-        return runOnce(() -> this.speedMultiplier = (this.speedMultiplier == 1) ? 0.35 : 1);
-    }
-
-    public void setSpeedMultiplier(double speedMultiplier) {
-        this.speedMultiplier = speedMultiplier;
-    }
-
-    public Command setAlignmentSpeed() {
-        return runOnce(() -> {
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND = FieldConstants.ALIGNMENT_SPEED;
-        });
-    }
-
-    public double getSpeedMultiplier() {
-        return this.speedMultiplier;
-    }
-
     public double[] getWheelRadiusCharacterizationPosition() {
         return Arrays.stream(swerveModules).mapToDouble(module -> module.getDrivePositionRadians()).toArray();
-      }
+    }
 
     /**
      * Sets the brake mode for the drive motors.

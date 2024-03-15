@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.281967377058862,
-        "y": 0.7612043754757987
+        "x": 8.3066452657728,
+        "y": 0.7714409755060643
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.540572455284961,
-        "y": 1.4174735914228842
+        "x": 7.565250343998899,
+        "y": 1.4277101914531498
       },
       "isLocked": false,
       "linkedName": "C5"
@@ -51,7 +51,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 4.5,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },

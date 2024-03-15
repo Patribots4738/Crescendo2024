@@ -16,7 +16,6 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.AlignmentCalc;
-import frc.robot.util.custom.ActiveConditionalCommand;
 
 public class AlignmentCmds {
     
@@ -140,7 +139,7 @@ public class AlignmentCmds {
      */
     public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
-            new ActiveConditionalCommand(
+            Commands.either(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
@@ -149,9 +148,11 @@ public class AlignmentCmds {
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
+        // The true condition represents the pose closer to C1
+        // Which is to the left of the driver
         return Commands.either(
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.M_POSE),
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.ORBIT_POSE),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_SHOT_SPOT),
             // No way I just found my first XOR use case :D
             () -> Robot.isRedAlliance() ^ xButtonPressed
         );

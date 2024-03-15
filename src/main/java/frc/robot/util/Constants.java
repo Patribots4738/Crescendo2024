@@ -8,6 +8,8 @@ import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.ColorMatch;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -26,8 +28,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
@@ -47,9 +52,9 @@ public final class Constants {
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 
-        public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = 4 * Math.PI; // radians per second
+        public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = Units.degreesToRadians(1137.21); // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.377;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = ModuleConstants.CURRENT_GEARING.maxSpeedVortex;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -127,15 +132,13 @@ public final class Constants {
         );
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
-            0.05,
+            0.07,
             0,
-            0.0083,
-            -0.25,
-            0.25
+            0.0083
         );
 
-        public static final int SHOOTER_CURRENT_LIMIT = 80;
-        public static final int PIVOT_CURRENT_LIMIT = 15;
+        public static final int SHOOTER_CURRENT_LIMIT = 40;
+        public static final int PIVOT_CURRENT_LIMIT = 20;
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
@@ -166,7 +169,8 @@ public final class Constants {
          */
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
-                // put(5, SpeedAngleTriplet.of(1930.0, 1930.0, 56.0));
+                put(4, SpeedAngleTriplet.of(1763.0, 2316.0, 56.1));
+                put(5, SpeedAngleTriplet.of(1763.0, 2316.0, 56.1));
                 // put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
                 // put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
                 // put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
@@ -182,21 +186,34 @@ public final class Constants {
 
                 // V2
                 put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
-                put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
-                put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
-                put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
-                put(10, SpeedAngleTriplet.of(2884.0, 2894.0, 37.1));
-                put(11, SpeedAngleTriplet.of(2924.0, 2930.0, 33.3));
-                put(12, SpeedAngleTriplet.of(2924.0, 2930.0, 32.3));
-                // V3 (note inside of indexer)
-                put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
-                put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
-                // 2/28/24 - this was the day after bands were added
-                put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
+                // put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
+                // put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
+                // put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
+                // put(10, SpeedAngleTriplet.of(2884.0, 2894.0, 37.1));
+                // put(11, SpeedAngleTriplet.of(2924.0, 2930.0, 33.3));
+                // put(12, SpeedAngleTriplet.of(2924.0, 2930.0, 32.3));
+                // // V3 (note inside of indexer)
+                // put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
+                // put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
+                // // 2/28/24 - this was the day after bands were added
+                // put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
+
                 put(16, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
                 put(17, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
                 put(18, SpeedAngleTriplet.of(3986.0, 3990.0, 26.1));
                 put(19, SpeedAngleTriplet.of(4201.0, 4205.0, 25.0));
+
+                put(7, SpeedAngleTriplet.of(2840.0, 2850.0, 44.6));
+                put(8, SpeedAngleTriplet.of(2810.0, 2820.0, 39.5));
+                put(9, SpeedAngleTriplet.of(2886.0, 2886.0, 37.4));
+                put(10, SpeedAngleTriplet.of(2888.0, 2897.0, 35.6));
+                // Driverstation has some words for you:
+                //   樀愀瘀愀㨀㐀㄀㈀⤀㨀 䰀漀漀瀀 琀椀洀攀 漀昀 　⸀　㈀猀 漀瘀攀爀爀甀渀 ＀෾਀＀￾￾￾￾￾⃾ ＀෾਀＀
+                put(11, SpeedAngleTriplet.of(2943.0, 2930.0, 33.3));
+                put(12, SpeedAngleTriplet.of(2943.0, 2935.0, 32.2));
+                put(13, SpeedAngleTriplet.of(3319.0, 3042.0, 30.3));
+                put(14, SpeedAngleTriplet.of(3587.0, 3310.0, 29.1));
+                put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 27.3));
             }
         };
 
@@ -233,14 +250,14 @@ public final class Constants {
         public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
         // TODO: set these values
-        public static final double BOTTOM_POS = 0;
+        public static final double BOTTOM_POS = -.0254;
         public static final double INTAKE_TIME = 0;
         public static final double TRAPPER_OUTTAKE_PERCENT = -1;
         public static final double TRAPPER_INTAKE_PERCENT = 1;
         public static final double TRAPPER_OUTTAKE_SLOW = -0.3;
         public static final double TRAPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
-        public static final double AMP_PLACE_POS = 0.37;
+        public static final double NOTE_FIX_POS = 0.14;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
@@ -252,7 +269,7 @@ public final class Constants {
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.49;
-        public static final double ELEVATOR_BOTTOM_LIMIT = 0;
+        public static final double ELEVATOR_BOTTOM_LIMIT = -0.0254;
 
         public static final double TRAPPER_LOWER_PERCENT_LIMIT = -1;
         public static final double TRAPPER_UPPER_PERCENT_LIMIT = 1;
@@ -295,7 +312,7 @@ public final class Constants {
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 4.5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 7.378;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
@@ -383,51 +400,82 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
-            // "A W1 A C1-4 S",
-            // "S W1 A C1-5 S",
-            // "S W2 S C1-3 S W3-1 S",
-            // "S W2 S C1-4 S",
-            // "S C1-5 S",
-            // "S W1 A C1-5 S",
-            // "S W3-1 S",
             "S W3-1 S C2-3 S",
-            // "S W3-1 S C1-3 S"
+            "S W3-1 S C2-3 S 2",
+            "S W3-1 S C1-3 S",
+            "S C5-4 S",
+            "S C4-2 S",
+            "S W1 S C1-3 S"
         };
     }
 
+    public static final class ColorSensorConstants {
+
+        public static final I2C.Port I2C_PORT = I2C.Port.kMXP;
+        public static final Color NOTE_ORANGE = new Color(0.957, 0.282, 0.086);
+        public static final ColorMatch COLOR_MATCH = new ColorMatch() 
+        {{
+            // BLACK
+            addColorMatch(Color.kBlack);
+            // NEW COMP READY NOTE ORANGE
+            addColorMatch(NOTE_ORANGE);
+            addColorMatch(Color.kWhite);
+        }};
+
+    }
     public static final class ModuleConstants {
-        // The MAXSwerve module can be configured with one of three pinion gears:
-        // L1 = 12T (slow, high torque)
-        // L2 = 13T (medium)
-        // L3 = 14T (fast, low torque)
-        // This changes the drive speed of the module (a pinion gear with more teeth
-        // will result in a robot that drives faster).
-        // Extra high speed settings from REV make this number high thern L3
-        public static final double DRIVING_MOTOR_PINION_TEETH = 16.0;
+
+        // https://www.revrobotics.com/rev-21-3005/
+        private enum SwerveGearing {
+            LOW         (12, 22, 4.12, 4.92),
+            MEDIUM      (13, 22, 4.46, 5.33),
+            HIGH        (14, 22, 4.8, 5.5/*5.74*/),
+
+            EXTRA_HIGH_1(14, 21, 5.03, 6.01),
+            EXTRA_HIGH_2(14, 20, 5.28, 6.32),
+            EXTRA_HIGH_3(15, 20, 5.66, 6.77),
+            EXTRA_HIGH_4(16, 20, 6.04, 7.22),
+            EXTRA_HIGH_5(16, 19, 6.36, 7.60);
+
+            private final double 
+                pinionTeeth, 
+                spurTeeth, 
+                maxSpeedNeo,
+                maxSpeedVortex;
+
+            SwerveGearing(
+                int pinionTeeth, 
+                int spurTeeth, 
+                double maxSpeedNeo,
+                double maxSpeedVortex)
+            {
+                this.pinionTeeth = pinionTeeth;
+                this.spurTeeth = spurTeeth;
+                this.maxSpeedNeo = maxSpeedNeo;
+                this.maxSpeedVortex = maxSpeedVortex;
+            }
+        }
+
+        public static final SwerveGearing CURRENT_GEARING = SwerveGearing.HIGH;
 
         // Invert the turning encoder, since the output shaft rotates in the opposite
         // direction of
         // the steering motor in the MAXSwerve Module.
-        // Update 2-29-24: I don't know how this needed to turn false but it is now false... -aleg
         public static final boolean TURNING_ENCODER_INVERTED = true;
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4684508138321497*2.0);
-        public static final double WHEEL_TO_MOTOR_ROTATIONS = 3.5625;
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.5019838755657253*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-        // 45 teeth on the wheel's bevel gear, 19-22 teeth on the first-stage spur gear, 15
-        // teeth on the bevel pinion
-        // spur gear changes based on the gearing (L1-L3 etc)
-        public static final double SPUR_GEAR_TEETH = 19;
-        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * SPUR_GEAR_TEETH) / (DRIVING_MOTOR_PINION_TEETH * 15.0);
+        // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
+        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
                 * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION;
 
-        public static final double DRIVING_ENCODER_POSITION_FACTOR = (WHEEL_DIAMETER_METERS * Math.PI)
+        public static final double DRIVING_ENCODER_POSITION_FACTOR = (WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION; // meters
-        public static final double DRIVING_ENCODER_VELOCITY_FACTOR = ((WHEEL_DIAMETER_METERS * Math.PI)
+        public static final double DRIVING_ENCODER_VELOCITY_FACTOR = (WHEEL_CIRCUMFERENCE_METERS
                 / DRIVING_MOTOR_REDUCTION) / 60.0; // meters per second
 
         public static final double TURNING_ENCODER_POSITION_FACTOR = (2 * Math.PI); // radians
@@ -467,7 +515,7 @@ public final class Constants {
         );
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
-        public static final int VORTEX_CURRENT_LIMIT = 50; // amps
+        public static final int VORTEX_CURRENT_LIMIT = 80; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
     }
 
@@ -531,7 +579,7 @@ public final class Constants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
-        public static final int MAX_PERIODIC_STATUS_TIME_MS = 10000;
+        public static final int MAX_PERIODIC_STATUS_TIME_MS = 32766;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 20;
 
         // This gets filled out as motors are created on the robot
@@ -796,20 +844,22 @@ public final class Constants {
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
-        public static final List<Translation2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
-            Translation2d W1_BLUE = new Translation2d(2.90, 7.0);
-            Translation2d W2_BLUE = new Translation2d(2.90, 5.55);
-            Translation2d W3_BLUE = new Translation2d(2.90-0.1, 4.10);
+        public static final List<Pose2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
+            Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d(Math.PI));
+            // This pose is exactly 6 ft from the edge of the robot to the center of the edge of the subwoofer
+            Pose2d W2_BLUE = new Pose2d(1.8288, 5.55, new Rotation2d(Math.PI));
+            Pose2d W3_BLUE = new Pose2d(2.90-0.1, 4.10, new Rotation2d(Math.PI));
 
-            Translation2d C1 = new Translation2d(8.29, 7.45);
-            Translation2d C2 = new Translation2d(8.29, 5.78);
-            Translation2d C3 = new Translation2d(8.29, 4.10);
-            Translation2d C4 = new Translation2d(8.29, 2.44);
-            Translation2d C5 = new Translation2d(8.29, 0.77);
+            Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d(Math.PI));
+            Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
+            // This pose is exactly 8 ft from the edge of the robot to the center of the edge of the center stage tag
+            Pose2d C3 = new Pose2d(8.19, 4.10, new Rotation2d(Math.PI));
+            Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
+            Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d(Math.PI));
 
-            Translation2d W1_RED = GeometryUtil.flipFieldPosition(W1_BLUE);
-            Translation2d W2_RED = GeometryUtil.flipFieldPosition(W2_BLUE);
-            Translation2d W3_RED = GeometryUtil.flipFieldPosition(W3_BLUE);
+            Pose2d W1_RED = GeometryUtil.flipFieldPose(W1_BLUE);
+            Pose2d W2_RED = GeometryUtil.flipFieldPose(W2_BLUE);
+            Pose2d W3_RED = GeometryUtil.flipFieldPose(W3_BLUE);
             
             add(W1_BLUE);
             add(W2_BLUE);
@@ -824,20 +874,22 @@ public final class Constants {
             add(W3_RED);
         }};
 
-        public static final HashMap<Translation2d, String> CALIBRATION_POSE_MAP = new HashMap<Translation2d, String>() {{
-            Translation2d W1_BLUE = new Translation2d(2.90, 7.0);
-            Translation2d W2_BLUE = new Translation2d(2.90, 5.55);
-            Translation2d W3_BLUE = new Translation2d(2.90, 4.10);
+        public static final HashMap<Pose2d, String> CALIBRATION_POSE_MAP = new HashMap<Pose2d, String>() {{
+            Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d(Math.PI));
+            // This pose is exactly 6 ft from the edge of the robot to the center of the edge of the subwoofer
+            Pose2d W2_BLUE = new Pose2d(1.8288, 5.55, new Rotation2d(Math.PI));
+            Pose2d W3_BLUE = new Pose2d(2.90-0.1, 4.10, new Rotation2d(Math.PI));
 
-            Translation2d C1 = new Translation2d(8.29, 7.45);
-            Translation2d C2 = new Translation2d(8.29, 5.78);
-            Translation2d C3 = new Translation2d(8.29, 4.10);
-            Translation2d C4 = new Translation2d(8.29, 2.44);
-            Translation2d C5 = new Translation2d(8.29, 0.77);
+            Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d(Math.PI));
+            Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
+            // This pose is exactly 8 ft from the edge of the robot to the center of the edge of the center stage tag
+            Pose2d C3 = new Pose2d(8.19, 4.10, new Rotation2d(Math.PI));
+            Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
+            Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d(Math.PI));
 
-            Translation2d W1_RED = GeometryUtil.flipFieldPosition(W1_BLUE);
-            Translation2d W2_RED = GeometryUtil.flipFieldPosition(W2_BLUE);
-            Translation2d W3_RED = GeometryUtil.flipFieldPosition(W3_BLUE);
+            Pose2d W1_RED = GeometryUtil.flipFieldPose(W1_BLUE);
+            Pose2d W2_RED = GeometryUtil.flipFieldPose(W2_BLUE);
+            Pose2d W3_RED = GeometryUtil.flipFieldPose(W3_BLUE);
 
             put(W1_BLUE, "W1_BLUE");
             put(W2_BLUE, "W2_BLUE");
@@ -852,7 +904,10 @@ public final class Constants {
             put(W3_RED, "W3_RED");
         }};
 
-      public static final Translation2d PODIUM_POSE = new Translation2d(2.9, 3.4);
+        // 12.4ft from the speaker
+        public static final Translation2d PODIUM_SHOT_SPOT = new Translation2d(2.55, 4.19);
+        // 9.76ft from the speaker
+        public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
@@ -892,6 +947,22 @@ public final class Constants {
     }
 
     public static final class CameraConstants {
+        /**
+         * Things to do when we are in field calibration
+         * First off: Take snapshots at W2 (both alliances), and C3
+         * 
+         * Then, attempt to quickly make the fmap and verify the accuracy using a hotspot
+         * (look up "april tag map builder limelight") or visit https://tools.limelightvision.io/map-builder
+         * Then, go back and take another shot from either W1 or W3 to verify the accuracy
+         * 
+         * Finally, move the robot around and see if the vision helps us out...
+         * Power cycle the limelight to force megatag to stop giving us outdated readings
+         * 
+         * Make sure to bring:
+         *   Tape measure to verify the accuracy (Sub is 36 in out from field wall)
+         *   Square (to make sure the robot is perfectly in the center of the spike mark)
+         *   Phone for hotspot i suppose
+         */
         public static final boolean FIELD_CALIBRATION_MODE = false;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
@@ -950,10 +1021,10 @@ public final class Constants {
             put("noteToShoot2", 0.4);
             put("noteToShoot3", 0.0);
 
-            put("intakeToTrap1", 0.5);
+            put("intakeToTrap1", 0.2);
             put("intakeToTrap2", 0.0);
 
-            put("noteToIndexer1", 0.6);
+            put("noteToIndexer1", 0.2);
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
@@ -966,7 +1037,7 @@ public final class Constants {
             put("ampPosition", 0.37);
             put("atan++", 0.0);
 
-            put("placeOuttake", 3.0);
+            put("placeOuttake", 0.8);
             put("prepPiece", 0.3);
         }};
     }

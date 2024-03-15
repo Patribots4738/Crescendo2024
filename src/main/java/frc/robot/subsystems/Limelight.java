@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -80,28 +82,22 @@ public class Limelight extends SubsystemBase implements Logged{
         Results result = getResults();
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
 
-        // invalid data check
-        if (estimatedRobotPose.getX() == 0.0
-            || Double.isNaN(estimatedRobotPose.getX()) 
-            || Double.isNaN(estimatedRobotPose.getY()) 
-            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())) {
-            return;
-        }
+        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
         if (hasTarget(result)) {
             double xyStds;
             double radStds;
             // multiple targets detected
-            if (result.targets_Fiducials.length > 1) {
+            if (targets.length > 1) {
                 // TODO: TUNE
-                xyStds = 0.8;
-                radStds = 1.2;
+                xyStds = 0.073;
+                radStds = Units.degreesToRadians(5);
             }
             // 1 target with large area and close to estimated pose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
-                xyStds = 1.6;
-                radStds = 4;
+                xyStds = 0.154;
+                radStds = Units.degreesToRadians(20);
             }
             // conditions don't match to add a vision measurement
             else {
@@ -246,12 +242,22 @@ public class Limelight extends SubsystemBase implements Logged{
     int tagsViable = 0;
 
     public boolean hasTarget(Results result) {
-        if (result == null || !result.valid || (result.botpose[0] == 0 && result.botpose[1] == 0)) {
-            return false;
-        }
 
-        if ((LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
-            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15))
+        Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
+        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
+
+        if (result == null || !result.valid 
+            || (LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15)
+            || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
+            || Double.isNaN(estimatedRobotPose.getX()) 
+            || Double.isNaN(estimatedRobotPose.getY()) 
+            || Double.isNaN(estimatedRobotPose.getRotation().getRadians())
+            || targets.length == 0
+            || Double.valueOf(targets[0].tx).equals(null)
+            || Double.valueOf(targets[0].ty).equals(null)
+            || !Double.isFinite(targets[0].tx)
+            || !Double.isFinite(targets[0].ty))
         {
             return false;
         }
@@ -282,10 +288,25 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public Command blinkLeds(DoubleSupplier duration) {
         return Commands.sequence(
-            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceOn(limelightName)),
-            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceBlink(limelightName)),
+            runOnce(() -> LimelightHelpers.setLEDMode_ForceBlink(limelightName)),
             Commands.waitSeconds(duration.getAsDouble()),
-            Commands.runOnce(() -> LimelightHelpers.setLEDMode_ForceOff(limelightName))
-        );
+            runOnce(() -> LimelightHelpers.setLEDMode_ForceOff(limelightName))
+        ).ignoringDisable(true).asProxy();
+    }
+
+    public Command setLEDState(BooleanSupplier enabled) {
+        return Commands.either(
+                Commands.runOnce(this::enableLEDS), 
+                Commands.runOnce(this::disableLEDS), 
+                enabled
+            ).ignoringDisable(true).asProxy();
+    }
+
+    public void enableLEDS() {
+        LimelightHelpers.setLEDMode_ForceOn(limelightName);
+    }
+
+    public void disableLEDS() {
+        LimelightHelpers.setLEDMode_ForceOff(limelightName);
     }
 }

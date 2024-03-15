@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.Pivot;
@@ -89,12 +90,9 @@ public class ShooterCalc implements Logged {
 	 * @return The method is returning a BooleanSupplier that returns true
 	 *         if the pivot is at its target rotation and false otherwise
 	 */
+    @Log
 	public BooleanSupplier readyToShootSupplier() {
-        return () -> 
-            pivot.getAtDesiredAngle() 
-            && shooter.getAtDesiredRPM() 
-            && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM 
-            && shooter.getAverageTargetSpeed() > 0;
+        return () -> pivot.getAtDesiredAngle() && shooter.getAtDesiredRPM();
     }
 
     // Gets a SpeedAngleTriplet by interpolating values from a map of already
@@ -108,9 +106,9 @@ public class ShooterCalc implements Logged {
     }
 
     @Log
-    Rotation2d currentAngleToSpeaker;
+    Rotation2d currentAngleToSpeaker = new Rotation2d();
     @Log
-    Pose2d desiredSWDPose;
+    public Pose2d desiredSWDPose = new Pose2d();
     @Log
     double desiredMPSForNote = 0;
     @Log
@@ -138,14 +136,14 @@ public class ShooterCalc implements Logged {
         Rotation2d currentAngleToSpeaker = new Rotation2d(poseRelativeToSpeaker.getX(), poseRelativeToSpeaker.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            // rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
-            rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
+            rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
+            // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
         Rotation2d desiredRotation2d = Rotation2d.fromRadians(MathUtil.angleModulus(
             currentAngleToSpeaker.getRadians() + velocityArcTan + Math.PI
-        )).plus(Rotation2d.fromDegrees(6));
+        ));
 
         // Update the robot's pose with the desired rotation
         desiredSWDPose = new Pose2d(robotPose.getTranslation(), desiredRotation2d);
@@ -180,6 +178,11 @@ public class ShooterCalc implements Logged {
         double velocityTangentToSpeaker = totalSpeed * Math.sin(angleDifference);
 
         double velocityNormalToSpeaker = totalSpeed * Math.cos(angleDifference);
+
+        if (Robot.isBlueAlliance()) {
+            velocityTangentToSpeaker *= -1;
+            velocityNormalToSpeaker *= -1;
+        }
         
         return new Translation2d(velocityTangentToSpeaker, velocityNormalToSpeaker);
     }
