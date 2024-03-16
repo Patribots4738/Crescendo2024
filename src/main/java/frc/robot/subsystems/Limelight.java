@@ -141,14 +141,14 @@ public class Limelight extends SubsystemBase implements Logged{
         visableTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
-    // TODO: test this logic in real life before running dynamic auto
     public Pose2d getNotePose2d() {
         if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
             LimelightHelpers.setPipelineIndex(limelightName, 1);
         }
         if (noteInVision()) {
-            Translation2d noteTranslation = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d().getTranslation();
-            Pose2d notePose = new Pose2d(noteTranslation, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
+            Results results = getResults();
+            Translation2d noteTranslationToBot = new Translation2d(results.targets_Detector[0].calcX, results.targets_Detector[0].calcY);
+            Pose2d notePose = new Pose2d(noteTranslationToBot, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
             return notePose.plus(new Transform2d(robotPoseSupplier.get().getTranslation(), new Rotation2d()));
         }
         return robotPoseSupplier.get();
@@ -156,7 +156,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public boolean noteInVision() {
         Results results = getResults();
-        return (hasTarget(results));
+        return results.valid && results.targets_Detector[0].calcX != 0 && results.targets_Detector[0].calcY != 0;
     }
 
     public Pose2d getPose2d() {
