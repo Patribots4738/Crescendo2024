@@ -1,10 +1,13 @@
 [![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
 
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
-![Robot Image](images/robot.gif)
-____
 
-<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/1c6c852f-4c20-4b9f-b6bc-79065b717ee7" width="800">
+![Robot Image](images/robot.gif)
+
+
+<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/1c6c852f-4c20-4b9f-b6bc-79065b717ee7" width="100%">
+
+____
 
 # _**The Patribots (FRC 4738)**_
 ### Visit our website at [patribots.org](https://www.patribots.org)!
@@ -31,44 +34,42 @@ Thanks for checking us out, & be sure to star this repository if you find anythi
 ___
 
 ## ✨ Highlights ✨
-  - April Tag interpretation & note detection using two Limelights
-  - Auto alignment to amp with auto shooting to the speaker while driving
-  - Trap placement
   - Field-centric swerve drive
-  - Modular autonomous routines using limelight
   - Under bumper intake
+  - April Tag interpretation & note detection using two Limelights
+  - Auto alignment to amp, speaker, chains/traps, and source
+  - Shooting into the speaker while driving
+  - Modular autonomous routines
   - LEDs to communicate various actions
   - Fully simulated motors
 
 ## Simulation & Testing 🪄
-  It is crucial to both mantain our equipment & our robot. Therefore, we always run our code in a simulation using FRC Driver Station, WPILibs's Sim GUI, and Advantage Scope to check if we either have any breaking changes or if our robot has expected behavior. After our design team has constructed the CAD model of our robot in OnShape, we can export it's moving parts into Advantage Scope. We then use a Json in our robot code to link the parts togethor so that they can move similarly to how they would in real life. Once we know our code works, we merge the branch it was on into the main branch to use on the real robot. This is process is used with most of our code yet was especially crucial for code involving critical math (ie. auto alignment & shooting while driving).
+  It is crucial to maintain both our robot & our code. Therefore, we always run our code in a simulation using `FRC Driver Station` / `WPILibs's Sim GUI` and `Advantage Scope` to catch breaking changes on our robot before they happen in real life. After our design team has constructed the CAD model of our robot in `Onshape`, we can export its moving parts into `Advantage Scope`. We then link the CAD and the code together to simulate a robot that moves similarly to a real one. Once our code passes this unit test (working in simulation), we can expect a much more specific result on the real robot. This process is used with most of our code and was essential for code involving critical math (i.e. auto alignment & shooting while driving).
 
 ## Discretize Swerve 🛞
-  Our robot uses REV Neo swerve drive. Over time as the robot moves and turns, the motors meausered states do not match it's actual state, causing the robot to drift in the direction of its rotation and have a curved path. We wanted the trajectory to be straighter, so we collaborated with other teams to discretize the swerve's motion using 2nd order kinematics. You can learn more about the evolution about it here: [Swerve Drive Skew and Second Order Kinematics - Chief Delphi](<https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/33>) Our disretize swerve code was then implemented into WPILibs resources!
+  Our robot uses `REV MAX Swerve`. It works great, but when turning while driving, a dt of 0.02s just isn't small enough to get precise movement that doesn't drift. To remedy this, we discretize our speeds over 0.02s to get a new trajectory that results in the robot being able to spin while driving without drifting left or right. This is critical to our autonomous, since we need our position to be as accurate as possible. You can learn more about the evolution about it here: [Swerve Drive Skew and Second Order Kinematics - Chief Delphi](<https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/33>). This code is now implemented into WPILib!
 
 ## Autonomous 🤖
+  <img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/d47db1e3-67e7-4c6d-ab01-7f75e807eed5" width="70%" />
+  
   ### Path Generation & Modular Autonomous Paths 📈
-  We use PathPlanner to construct a modular autonomous. In PathPlanner, we use waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, also allows us to make a modular autonomous path that can prevent us from going to a note position that has no note detected. This allows the robot to prioritize going to locations with notes. Additionaly, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of april tags allow us the generate a path from anywhere in the starting zone as long as our limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>) :>
+  We use `PathPlanner` to construct a modular autonomous. In `PathPlanner`, we use named waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, we are able to make quick decisions on whether or not we got the note, or if we should skip trying to get a note that isn't there. Additionally, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of April tags allow us to generate a path from anywhere in the starting zone as long as our Limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>) :>
 
   ### Note Detection 👀
-  Using Limelight & machine learning, we can detect notes from 13 feet away. Note detection is incorporated in our modular autonomous logic, allowing us to skip over a note location if no note is detected. Those opposing robots are fast!
+  Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing us to skip over a note location if no note is detected. Those opposing robots are fast!
 
 
 ## Teleoperated 🎮
+  <img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/73e776c2-dc3e-4e8b-9221-655e205a701a" width="40%" />
+  
   ### Shooting While Driving
-  Our robot is able to shoot notes into the speaker while moving sideways when relative to it. This feature grants us a shorter cycle time. If you are curious to learn more, check out the [Math](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW? viewport=-121,-188,2715,1378&page=page:page>) :D
+  Our robot is able to shoot notes into the speaker while moving! This feature grants us a shorter cycle time and is most evident in autonomous. If you are curious to learn more, check out the [Math](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW? viewport=-121,-188,2715,1378&page=page:page>) behind it!
   
   ### Field Centric Swerve Drive
-  To make the robot more user-friendly for the driver, our swerve drive is field centric using our Pigeon 2.0 gyroscope to get our orientation on the field.
+  To make the robot more user-friendly for the driver, our swerve drive is field-centric using our `Pigeon 2.0` gyroscope to get our orientation on the field.
   
   ### Auto Alignment w/ April Tags
   Another feature for user-friendliness is our robot's ability to align to field objects such as the speaker, stage & amp. When aligned to the speaker, the driver can move the robot anywhere on the field whilst the shooter always faces the speaker. For the amp & stage, the robot becomes locked in a certain axis. This helps the driver with steering & alignment.
-
-
-<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/73e776c2-dc3e-4e8b-9221-655e205a701a" height="400">
-<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/d47db1e3-67e7-4c6d-ab01-7f75e807eed5" height="400"> 
-
-
 
 _____
 
@@ -78,14 +79,14 @@ _____
 Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins>Java<ins/>.
  
   - **Subsystems** [`robot/subsystems`](src/main/java/frc/robot/subsystems) Folder containing class file for each subsystem on the robot.
-    - **Intake** [`robot/subsystems/intake`](src/main/java/frc/robot/subsystems/intake) An under-the-bumper intake which is run by a Neo 550
-    - **Swerve** [`robot/subsystems/swerve`](src/main/java/frc/robot/subsystems/swerve) Drivetrain with four swerve modules using 4 Neo Vortexs and 4 Neo 550s.
-    - **Shooter** [`robot/subsystems/shooter`](src/main/java/frc/robot/subsystems/shooter) A shooter that uses 2 Neo Vortexs & pivot which uses 1 Neo 550 with an absolute encoder.
-    - **Elevator** [`robot/subsystems/elevator`](src/main/java/frc/robot/subsystems/elevator) Elevator for amp & trap placement which uses 1 Neo v1.1.
-    - **Indexer** [`robot/subsystems/indexer`](src/main/java/frc/robot/subsystems/indexer) The Indexer between intake & shooter which uses a Neo 550.
-    - **Climb** [`robot/subsystems/climb`](src/main/java/frc/robot/subsystems/climb) Two independently driven climbs that conform to the curve of the unoccupied chain on stage to keep the robot level with the ground. Uses one Neo Vortex each.
-    - **LEDS** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/leds) Our WS2812B LED strip.
-    - **Limelight** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/limelight) Interaction between the Limelight 2/3 and the robot.
+    - **Intake** [`robot/subsystems/intake`](src/main/java/frc/robot/subsystems/intake) An under-the-bumper intake run by a `Neo 550`.
+    - **Swerve** [`robot/subsystems/swerve`](src/main/java/frc/robot/subsystems/swerve) Drivetrain with four swerve modules using 4 `Neo Vortexs` and 4 `Neo 550`s.
+    - **Shooter** [`robot/subsystems/shooter`](src/main/java/frc/robot/subsystems/shooter) A shooter that uses 2 Neo Vortexs & pivot which uses 1 `Neo 550` with an absolute encoder.
+    - **Elevator** [`robot/subsystems/elevator`](src/main/java/frc/robot/subsystems/elevator) Elevator for amp & trap placement which uses 1 `Neo v1.1`.
+    - **Indexer** [`robot/subsystems/indexer`](src/main/java/frc/robot/subsystems/indexer) The Indexer between intake & shooter which uses a `Neo 550`.
+    - **Climb** [`robot/subsystems/climb`](src/main/java/frc/robot/subsystems/climb) Two independently driven climbs that conform to the curve of the unoccupied chain on stage to keep the robot level with the ground. Uses one `Neo Vortex` each.
+    - **LEDS** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/leds) Our `WS2812B` LED strip.
+    - **Limelight** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/limelight) Interaction between the `Limelight` (2 and 3) and the robot.
       
 
    - **Commands** [`robot/commands`](src/main/java/frc/robot/commands) Fodler containing command files that control the robot.
