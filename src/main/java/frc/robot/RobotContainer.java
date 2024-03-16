@@ -206,12 +206,9 @@ public class RobotContainer implements Logged {
             () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
         ));
 
-        // shooter.setDefaultCommand(
-        //     pieceControl.getAutomaticShooterSpeeds(
-        //         swerve::getPose,
-        //         swerve::getRobotRelativeVelocity
-        //     )
-        // );
+        shooter.setDefaultCommand(
+            pieceControl.getAutomaticShooterSpeeds(swerve::getPose)
+        );
         
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
         initializeComponents();

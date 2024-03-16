@@ -350,16 +350,15 @@ public class PieceControl implements Logged {
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speedSupplier) {
+    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose) {
         return new ActiveConditionalCommand(
             Commands.runOnce(
                 () -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
                 shooterCmds.getShooter()
             ),
-            shooterCmds.stopShooter()
-                .onlyIf(() -> Robot.gameMode != GameMode.TEST),
+            shooterCmds.stopShooter(),
             () -> shooterMode && hasPiece
-                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS 
-                && Robot.gameMode != GameMode.TEST);
+                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
+            .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 }
