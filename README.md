@@ -57,6 +57,8 @@ ___
 
 ## Autonomous 🤖
   <img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/d47db1e3-67e7-4c6d-ab01-7f75e807eed5" width="70%" />
+  <img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/a2f07fb3-7936-4830-88a0-775047d76ef3" width="70%" />
+
   
   ### Path Generation & Modular Autonomous Paths 📈
   We use `PathPlanner` to construct a modular autonomous. In `PathPlanner`, we use named waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, we are able to make quick decisions on whether or not we got the note, or if we should skip trying to get a note that isn't there. Additionally, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of April tags allow us to generate a path from anywhere in the starting zone as long as our Limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>) :>
@@ -73,6 +75,13 @@ ___
   
   ### Auto Alignment w/ April Tags
   Another feature for user-friendliness is our robot's ability to align to field objects such as the speaker, stage & amp. When aligned to the speaker, the driver can move the robot anywhere on the field whilst the shooter always faces the speaker. For the amp & stage, the robot becomes locked in a certain axis. This helps the driver with steering & alignment.
+
+  ### Timed Event Triggers
+When certain time relative or sequential events occour, it triggers another command or event. Some examples include:
+- Doing a gradual rumble of the driver and operator controllers in endgame that gets more intense as the fields timer gets closer to ending.
+- Flashing `Limelight` LEDs and rumbling both controllers when our `Color sensor` detects that we have a note
+- Rumbling controllers when our shooter is up to speed or when aligned to amp.
+- Telling `PathPlanner` what side of the field we are running auto on based on our alliance.
 
 _____
 
