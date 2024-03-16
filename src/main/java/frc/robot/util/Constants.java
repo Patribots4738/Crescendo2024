@@ -859,22 +859,22 @@ public final class Constants {
         public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
-        public static final List<Pose2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
-            Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d(Math.PI));
+        public static final List<Translation2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
+            Translation2d W1_BLUE = new Translation2d(2.90, 7.0);
             // This pose is exactly 6 ft from the edge of the robot to the center of the edge of the subwoofer
-            Pose2d W2_BLUE = new Pose2d(1.8288, 5.55, new Rotation2d(Math.PI));
-            Pose2d W3_BLUE = new Pose2d(2.90-0.1, 4.10, new Rotation2d(Math.PI));
+            Translation2d W2_BLUE = new Translation2d(1.8288, 5.55);
+            Translation2d W3_BLUE = new Translation2d(2.90-0.1, 4.10);
 
-            Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d(Math.PI));
-            Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
+            Translation2d C1 = new Translation2d(8.29, 7.45);
+            Translation2d C2 = new Translation2d(8.29, 5.78);
             // This pose is exactly 8 ft from the edge of the robot to the center of the edge of the center stage tag
-            Pose2d C3 = new Pose2d(8.19, 4.10, new Rotation2d(Math.PI));
-            Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
-            Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d(Math.PI));
+            Translation2d C3 = new Translation2d(8.19, 4.10);
+            Translation2d C4 = new Translation2d(8.29, 2.44);
+            Translation2d C5 = new Translation2d(8.29, 0.77);
 
-            Pose2d W1_RED = GeometryUtil.flipFieldPose(W1_BLUE);
-            Pose2d W2_RED = GeometryUtil.flipFieldPose(W2_BLUE);
-            Pose2d W3_RED = GeometryUtil.flipFieldPose(W3_BLUE);
+            Translation2d W1_RED = GeometryUtil.flipFieldPosition(W1_BLUE);
+            Translation2d W2_RED = GeometryUtil.flipFieldPosition(W2_BLUE);
+            Translation2d W3_RED = GeometryUtil.flipFieldPosition(W3_BLUE);
             
             add(W1_BLUE);
             add(W2_BLUE);
@@ -889,22 +889,22 @@ public final class Constants {
             add(W3_RED);
         }};
 
-        public static final HashMap<Pose2d, String> CALIBRATION_POSE_MAP = new HashMap<Pose2d, String>() {{
-            Pose2d W1_BLUE = new Pose2d(2.90, 7.0, new Rotation2d(Math.PI));
+        public static final HashMap<Translation2d, String> CALIBRATION_POSE_MAP = new HashMap<Translation2d, String>() {{
+            Translation2d W1_BLUE = new Translation2d(2.90, 7.0);
             // This pose is exactly 6 ft from the edge of the robot to the center of the edge of the subwoofer
-            Pose2d W2_BLUE = new Pose2d(1.8288, 5.55, new Rotation2d(Math.PI));
-            Pose2d W3_BLUE = new Pose2d(2.90-0.1, 4.10, new Rotation2d(Math.PI));
+            Translation2d W2_BLUE = new Translation2d(1.8288, 5.55);
+            Translation2d W3_BLUE = new Translation2d(2.90-0.1, 4.10);
 
-            Pose2d C1 = new Pose2d(8.29, 7.45, new Rotation2d(Math.PI));
-            Pose2d C2 = new Pose2d(8.29, 5.78, new Rotation2d());
+            Translation2d C1 = new Translation2d(8.29, 7.45);
+            Translation2d C2 = new Translation2d(8.29, 5.78);
             // This pose is exactly 8 ft from the edge of the robot to the center of the edge of the center stage tag
-            Pose2d C3 = new Pose2d(8.19, 4.10, new Rotation2d(Math.PI));
-            Pose2d C4 = new Pose2d(8.29, 2.44, new Rotation2d());
-            Pose2d C5 = new Pose2d(8.29, 0.77, new Rotation2d(Math.PI));
+            Translation2d C3 = new Translation2d(8.19, 4.10);
+            Translation2d C4 = new Translation2d(8.29, 2.44);
+            Translation2d C5 = new Translation2d(8.29, 0.77);
 
-            Pose2d W1_RED = GeometryUtil.flipFieldPose(W1_BLUE);
-            Pose2d W2_RED = GeometryUtil.flipFieldPose(W2_BLUE);
-            Pose2d W3_RED = GeometryUtil.flipFieldPose(W3_BLUE);
+            Translation2d W1_RED = GeometryUtil.flipFieldPosition(W1_BLUE);
+            Translation2d W2_RED = GeometryUtil.flipFieldPosition(W2_BLUE);
+            Translation2d W3_RED = GeometryUtil.flipFieldPosition(W3_BLUE);
 
             put(W1_BLUE, "W1_BLUE");
             put(W2_BLUE, "W2_BLUE");
@@ -978,7 +978,7 @@ public final class Constants {
          *   Square (to make sure the robot is perfectly in the center of the spike mark)
          *   Phone for hotspot i suppose
          */
-        public static final boolean FIELD_CALIBRATION_MODE = false;
+        public static final boolean FIELD_CALIBRATION_MODE = true;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
         private static final double CAM_HEIGHT = Units.inchesToMeters(16);
