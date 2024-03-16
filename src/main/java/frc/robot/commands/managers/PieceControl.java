@@ -357,7 +357,7 @@ public class PieceControl implements Logged {
                 shooterCmds.getShooter()
             ),
             shooterCmds.stopShooter(),
-            () -> shooterMode && hasPiece
+            () -> colorSensor.hasNote()
                 && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
