@@ -440,7 +440,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors());
       
         controller.leftBumper()
-            .onTrue(pieceControl.intakeNote())
+            .onTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -465,7 +465,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.elevatorToBottom());
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeNote())
+            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -519,7 +519,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeNote())
+            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
@@ -647,7 +647,7 @@ public class RobotContainer implements Logged {
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
-        NamedCommands.registerCommand("ToIndexer", pieceControl.intakeNote());
+        NamedCommands.registerCommand("ToIndexer", pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
