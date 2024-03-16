@@ -135,7 +135,7 @@ public class PieceControl implements Logged {
             noteToShoot(poseSupplier, speedSupplier)
                 .andThen(
                     Commands.defer(
-                        () -> new ScheduleCommand(intakeNote(poseSupplier, speedSupplier)), 
+                        () -> intakeNote(poseSupplier, speedSupplier), 
                         intakeUntilNote().getRequirements()
                     )
                 ),
