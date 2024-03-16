@@ -4,6 +4,8 @@
 ![Robot Image](images/robot.gif)
 ____
 
+<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/1c6c852f-4c20-4b9f-b6bc-79065b717ee7" width="800">
+
 # _**The Patribots (FRC 4738)**_
 ### Visit our website at [patribots.org](https://www.patribots.org)!
 
@@ -62,8 +64,9 @@ ___
   ### Auto Alignment w/ April Tags
   Another feature for user-friendliness is our robot's ability to align to field objects such as the speaker, stage & amp. When aligned to the speaker, the driver can move the robot anywhere on the field whilst the shooter always faces the speaker. For the amp & stage, the robot becomes locked in a certain axis. This helps the driver with steering & alignment.
 
-<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/d47db1e3-67e7-4c6d-ab01-7f75e807eed5" height="400">
-![Screenshot 2024-03-14 165424](https://github.com/Patribots4738/Crescendo2024/assets/148731136/73e776c2-dc3e-4e8b-9221-655e205a701a)
+
+<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/73e776c2-dc3e-4e8b-9221-655e205a701a" height="400">
+<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/d47db1e3-67e7-4c6d-ab01-7f75e807eed5" height="400"> 
 
 
 
