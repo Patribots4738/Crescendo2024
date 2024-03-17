@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
+import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.DriveConstants;
 
@@ -69,7 +71,7 @@ public class Drive extends Command {
             x *= -1;
             y *= -1;
         }
-        if (x + y + rotation == 0) {
+        if (x + y + rotation == 0 && Robot.gameMode == GameMode.TELEOP) {
             swerve.setWheelsX();
         }
         else {

@@ -1,0 +1,104 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.901578927457967,
+        "y": 5.538747023742648
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.3579375214836105,
+        "y": 4.932286929066075
+      },
+      "isLocked": false,
+      "linkedName": "W2"
+    },
+    {
+      "anchor": {
+        "x": 1.8337621392595704,
+        "y": 7.619282085683008
+      },
+      "prevControl": {
+        "x": 1.8759810981445535,
+        "y": 6.446559253385371
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "A"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "StopIntake",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "StopIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Elevate",
+      "waypointRelativePos": 0.6,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "RaiseElevator"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PlaceAmp",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PlaceAmp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
+    "maxAngularVelocity": 1137.21,
+    "maxAngularAcceleration": 1492.9
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -89.5846406546284,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Wings",
+  "previewStartingState": {
+    "rotation": 179.66592436562317,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

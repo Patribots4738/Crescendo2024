@@ -1,0 +1,105 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.0476867681809234,
+      "y": 6.62594249192555
+    },
+    "rotation": -133.8576097768131
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "S W1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DisableLimelight"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "W1 W2"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "EnableLimelight"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "W2 C1"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C1 L"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L C2"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C2 L"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L C3"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C3 M"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

@@ -3,37 +3,75 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.6809483406200854,
-        "y": 5.4583087889580035
+        "x": 2.901578927457967,
+        "y": 5.538747023742648
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.3759446850200683,
-        "y": 5.291259916066464
+        "x": 2.248880108062568,
+        "y": 5.593904670452118
       },
       "isLocked": false,
       "linkedName": "W2"
     },
     {
       "anchor": {
-        "x": 2.8992806921784053,
-        "y": 6.899302309242916
+        "x": 2.16154716743924,
+        "y": 6.798179956942221
       },
       "prevControl": {
-        "x": 1.6862333987659808,
-        "y": 6.2025738429772215
+        "x": 1.7807776488656066,
+        "y": 6.6585644667985555
+      },
+      "nextControl": {
+        "x": 2.437335400986592,
+        "y": 6.899302309242916
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.892385986339722,
+        "y": 6.982038779307121
+      },
+      "prevControl": {
+        "x": 2.547650694405532,
+        "y": 6.913091720920284
+      },
+      "nextControl": {
+        "x": 3.3373232041458003,
+        "y": 7.071026222868336
+      },
+      "isLocked": false,
+      "linkedName": "W1"
+    },
+    {
+      "anchor": {
+        "x": 3.9173989210240463,
+        "y": 6.5775493701043395
+      },
+      "prevControl": {
+        "x": 3.545084805735121,
+        "y": 6.908495250361161
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "W1"
+      "linkedName": "L"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": -166.72935612359643,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "PrepareShooter",
-      "waypointRelativePos": 0.4,
+      "name": "Intake",
+      "waypointRelativePos": 0.8,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +79,13 @@
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooter"
+                "name": "Intake"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "EnableLimelight"
               }
             }
           ]
@@ -50,14 +94,14 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.8,
-    "maxAcceleration": 2.3,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -152.53613820423004,
+    "rotation": -172.68221039827986,
     "rotateFast": false
   },
   "reversed": false,

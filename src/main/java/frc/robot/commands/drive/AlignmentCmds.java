@@ -16,7 +16,6 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.AlignmentCalc;
-import frc.robot.util.custom.ActiveConditionalCommand;
 
 public class AlignmentCmds {
     
@@ -115,6 +114,16 @@ public class AlignmentCmds {
                 () -> true);
     }
 
+    public Command passRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
+        return 
+            swerve.getDriveCommand(
+                alignmentCalc.getPassRotationalSpeedsSupplier(
+                    driverX,
+                    driverY,
+                    shooterCmds),
+                () -> true);
+    }
+
     /**
      * Command to align the robot to the trap of the field.
      * multiplies the driverY by the cosine and sine to get the x and y components of the field relative speed
@@ -146,6 +155,13 @@ public class AlignmentCmds {
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
                         .finallyDo(shooterCmds.stopShooter()::initialize)),
                 climb::getHooksUp);
+    }
+
+    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+        return
+            speakerRotationalAlignment(driverX, driverY, shooterCmds)
+                .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                    .finallyDo(shooterCmds.stopShooter()::initialize));
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {

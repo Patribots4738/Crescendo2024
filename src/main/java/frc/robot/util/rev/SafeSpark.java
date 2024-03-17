@@ -17,9 +17,6 @@ import com.revrobotics.jni.CANSparkMaxJNI;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import frc.robot.Robot;
-import frc.robot.Robot.GameMode;
-import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 
@@ -79,8 +76,6 @@ public class SafeSpark extends CANSparkBase {
     {
         if (FieldConstants.IS_SIMULATION)
             return parameterSetter.get();
-        if (parameterCheckSupplier.getAsBoolean())
-            return REVLibError.kOk;
 
         REVLibError status = REVLibError.kError;
         for (int i = 0; i < MAX_ATTEMPTS; i++) {

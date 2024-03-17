@@ -36,7 +36,7 @@ public class AlignmentCalc {
     public ChassisSpeeds normalizeChassisSpeeds(ChassisSpeeds controllerSpeeds, ChassisSpeeds autoSpeeds) {
         return new ChassisSpeeds(
             MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vyMetersPerSecond, autoSpeeds.vyMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
-            MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vxMetersPerSecond, autoSpeeds.vxMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
+            -MathUtil.applyDeadband(normalizeTwoSpeeds(controllerSpeeds.vxMetersPerSecond, autoSpeeds.vxMetersPerSecond), AutoConstants.AUTO_ALIGNMENT_DEADBAND),
             autoSpeeds.omegaRadiansPerSecond / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND
         );
     }
@@ -162,6 +162,11 @@ public class AlignmentCalc {
             getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
+    public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
+        return 
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+    }
+
     /**
      * Calculates the rotational speeds to align the robot to the speaker.
      * 
@@ -172,8 +177,8 @@ public class AlignmentCalc {
      */
     public ChassisSpeeds getRotationalSpeeds(double driverX, double driverY, Rotation2d desiredAngle) {
         return new ChassisSpeeds(
-            driverY * (Robot.isRedAlliance() ? -1 : 1),
             driverX * (Robot.isRedAlliance() ? -1 : 1),
+            driverY * (Robot.isRedAlliance() ? -1 : 1),
             getAlignmentSpeeds(desiredAngle) / DriveConstants.MAX_ANGULAR_SPEED_RADS_PER_SECOND);
     }
 
@@ -187,6 +192,10 @@ public class AlignmentCalc {
      */
     public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
+    }
+
+    public Supplier<ChassisSpeeds> getPassRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
+        return () -> getPassRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
     }
 
     /**

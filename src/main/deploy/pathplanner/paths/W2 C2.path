@@ -3,43 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3636764862182205,
-        "y": 5.501975259269668
+        "x": 2.901578927457967,
+        "y": 5.538747023742648
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.844007659646525,
-        "y": 5.058032811101083
+        "x": 5.899470290179165,
+        "y": 7.328898921318496
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "W2"
     },
     {
       "anchor": {
-        "x": 2.5281156945292613,
-        "y": 4.3334957369796125
+        "x": 8.26566006995396,
+        "y": 5.77776349281702
       },
       "prevControl": {
-        "x": 2.084173246360677,
-        "y": 4.861533694698595
+        "x": 6.77640360879826,
+        "y": 5.938639962386308
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "W3"
+      "linkedName": "C2"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": 130.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0.5,
+      "name": "StopIntake",
+      "waypointRelativePos": 0.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": []
+        }
+      }
+    },
+    {
+      "name": "ToIndexer",
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -47,7 +51,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             }
           ]
@@ -56,18 +60,18 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.8,
-    "maxAcceleration": 2.3,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 154.2169,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Preloads",
+  "folder": "Wings",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0

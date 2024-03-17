@@ -1,18 +1,20 @@
 package frc.robot.commands.managers;
 
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
+import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -22,8 +24,8 @@ import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Logged;
 import monologue.Annotations.Log;
+import monologue.Logged;
 
 public class PieceControl implements Logged {
 
@@ -35,6 +37,8 @@ public class PieceControl implements Logged {
 
     private ShooterCmds shooterCmds;
 
+    private ColorSensor colorSensor;
+
     @Log
     private boolean shooterMode = false;
 
@@ -42,11 +46,7 @@ public class PieceControl implements Logged {
     @Log
     private boolean elevatorDislodging = false;
     @Log
-    private boolean readyToMoveNote = true;
-
-    // State representing if we are ready to place with trapper
-    @Log
-    private boolean readyToPlace = false;
+    private boolean currentlyMovingNote = false;
 
     @Log
     private boolean hasPiece = false;
@@ -56,12 +56,14 @@ public class PieceControl implements Logged {
             Indexer indexer,
             Elevator elevator,
             Trapper trapper,
-            ShooterCmds shooterCmds) {
+            ShooterCmds shooterCmds,
+            ColorSensor colorSensor) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.trapper = trapper;
         this.shooterCmds = shooterCmds;
+        this.colorSensor = colorSensor;
     }
 
     public Command stopAllMotors() {
@@ -114,7 +116,7 @@ public class PieceControl implements Logged {
                 stopIntakeAndIndexer());
     }
 
-    public Command intakeNote() {
+    public Command intakeUntilNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from trapper into indexer and then into 
@@ -123,26 +125,22 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             trapper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(intake::getPossession),
-            setHasPiece(true),
-            NT.getWaitCommand("intakeToTrap1"), // 0.5
-            // Use the trap to index it the first time around
-            noteToTrap(),
-            // Then send it to its desired location
-            moveNote()
+            Commands.waitUntil(colorSensor::hasNote),
+            stopIntakeAndIndexer()
         );
     }
 
-    public Command toIndexerAuto() {
-        return Commands.sequence(
-            intake.inCommand(),
-            trapper.intake(),
-            indexer.stopCommand(),
-            Commands.waitUntil(intake::getPossession),
-            setHasPiece(true),
-            Commands.waitSeconds(0.3),
-            stopIntakeAndIndexer()
-        );
+    public Command intakeNote(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        return Commands.either(
+            noteToShoot(poseSupplier, speedSupplier)
+                .andThen(
+                    Commands.defer(
+                        () -> intakeNote(poseSupplier, speedSupplier), 
+                        intakeUntilNote().getRequirements()
+                    )
+                ),
+            intakeUntilNote(), 
+            colorSensor::hasNote);
     }
 
     public Command noteToIndexer() {
@@ -150,10 +148,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             trapper.intake(),
             indexer.toShooterSlow(),
-            NT.getWaitCommand("noteToIndexer1"), // 0.7
-            trapper.stopCommand(),
-            indexer.toElevatorSlow(),
-            NT.getWaitCommand("noteToIndexer2"), // 0.07
+            Commands.waitUntil(colorSensor::hasNote),
             stopIntakeAndIndexer()
         );
     }
@@ -162,7 +157,7 @@ public class PieceControl implements Logged {
         return Commands.sequence(
             trapper.outtake(),
             indexer.toElevator(),
-            NT.getWaitCommand("noteToTrap1"), // 0.2
+            Commands.waitUntil(() -> !colorSensor.hasNote()),
             stopIntakeAndIndexer(),
             trapper.outtakeSlow(),
             NT.getWaitCommand("noteToTrap2"), // 0.5
@@ -195,7 +190,7 @@ public class PieceControl implements Logged {
     }
 
     public Command stopPanicEject() {
-        return trapper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand())    ;
+        return trapper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand());
     }
 
     public Command intakeAuto() {
@@ -227,7 +222,6 @@ public class PieceControl implements Logged {
     // Same as normally setting elevator position but adds unstuck logic
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
-            setReadyToPlaceCommand(false),
             elevator.setPositionCommand(position, false)
             // Run until we are no longer in our unstucking state only if elevator actually gets stuck
             // getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
@@ -237,15 +231,6 @@ public class PieceControl implements Logged {
     public Command elevatorToTop() {
         return setElevatorPosition(() -> TrapConstants.ELEVATOR_TOP_LIMIT);
     }
-
-    private void setReadyToPlace(boolean readyToPlace) {
-        this.readyToPlace = readyToPlace;
-    }
-
-    private Command setReadyToPlaceCommand(boolean readyToPlace) {
-        return Commands.runOnce(() -> setReadyToPlace(readyToPlace));
-    }
-
     public Command elevatorToBottom() {
         return setElevatorPosition(() -> TrapConstants.ELEVATOR_BOTTOM_LIMIT)
             .andThen(setPlaceWhenReadyCommand(false));
@@ -281,7 +266,6 @@ public class PieceControl implements Logged {
                     setElevatorPosition(() -> TrapConstants.NOTE_FIX_POS), 
                     setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
                     () -> povLeftPosition),
-                setReadyToPlaceCommand(true),
                 placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }
 
@@ -289,11 +273,12 @@ public class PieceControl implements Logged {
         return
             new SelectiveConditionalCommand(
                 Commands.sequence(
+                    prepPiece(),
                     trapper.outtake(0.8),
                     elevatorToBottom()
                 ),
                 setPlaceWhenReadyCommand(true),
-                () -> readyToPlace);
+                elevator::atDesiredPosition);
     }
 
     @Log
@@ -338,54 +323,55 @@ public class PieceControl implements Logged {
         return Commands.runOnce(() -> this.hasPiece = hasPiece);
     }
   
-    public Command setReadyToMoveNote(boolean readyToMove) {
-        return Commands.runOnce(() -> this.readyToMoveNote = readyToMove);
+    public Command setCurrentlyMovingNote(boolean currentlyMovingNote) {
+        return Commands.runOnce(() -> this.currentlyMovingNote = currentlyMovingNote);
     }
 
-    public boolean readyToMoveNote() {
-        return readyToMoveNote;
-    }
+    @Log
+    private boolean desiredSide = false;
 
-    public Command moveNote() {
+    public Command moveNote(boolean desiredSide) {
         return Commands.sequence(
-                setReadyToMoveNote(false),
+                Commands.runOnce(() -> this.desiredSide = desiredSide),
+                setCurrentlyMovingNote(true),
                 Commands.either(
                     noteToIndexer(),
                     noteToTrap(),
-                    this::getShooterMode),
-                setReadyToMoveNote(true));
-    }
-
-    public Command moveNoteIfReady() {
-        return Commands.either(
-                moveNote(),
-                Commands.none(),
-                // TODO: Make intake.getPossesion more of a (note in robot) bool
-                () -> intake.getPossession() && readyToMoveNote);
+                    () -> desiredSide))
+                .finallyDo(() -> {
+                    currentlyMovingNote = false;
+                    if (desiredSide != shooterMode) {
+                        moveNote(shooterMode).schedule();
+                    }
+                });
     }
 
     // Think of this parameter as the desired state of shooterMode.
     // We don't want to set the state until we are done with the command that moves the note
     // since we arent ready to do another command that moves the note until we are done with the first one
-    public Command setShooterModeCommand(boolean shooterMode) {
-        return Commands.runOnce(() -> setShooterMode(shooterMode))
+    public Command setShooterModeCommand(boolean newShooterMode) {
+        return Commands.runOnce(() -> setShooterMode(newShooterMode))
                 .andThen(
-                    Commands.either(
-                        noteToIndexer(),
-                        noteToTrap(),
-                        () -> shooterMode)
+                    new SelectiveConditionalCommand(
+                        // Fork off from the current sequence
+                        // So that this button can continue to be spammed
+                        // without waking up the baby
+                        new ScheduleCommand(moveNote(newShooterMode)),
+                        Commands.none(),
+                        () -> !currentlyMovingNote)
                 );
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speedSupplier) {
+    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose) {
         return new ActiveConditionalCommand(
-            Commands.runOnce(() -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
-            shooterCmds.getShooter()),
-            shooterCmds.stopShooter().onlyIf(() -> Robot.gameMode != GameMode.TEST),
-            () -> shooterMode 
-                && hasPiece 
-                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS 
-                && Robot.gameMode != GameMode.TEST);
+            Commands.runOnce(
+                () -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
+                shooterCmds.getShooter()
+            ),
+            shooterCmds.stopShooter(),
+            () -> colorSensor.hasNote()
+                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
+            .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.5281156945292613,
-        "y": 4.3334957369796125
+        "x": 2.749895399006924,
+        "y": 4.19657762047887
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7534004834707027,
-        "y": 4.559698794649549
+        "x": 1.9751801879483653,
+        "y": 4.422780678148806
       },
       "isLocked": false,
       "linkedName": "W3"
     },
     {
       "anchor": {
-        "x": 2.8992806921784053,
-        "y": 6.899302309242916
+        "x": 2.892385986339722,
+        "y": 6.982038779307121
       },
       "prevControl": {
-        "x": 1.4973571716460343,
-        "y": 6.674075251845913
+        "x": 1.4904624658073509,
+        "y": 6.756811721910118
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "StopIntake",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {
@@ -49,8 +49,8 @@
       }
     },
     {
-      "name": "PrepareShooter",
-      "waypointRelativePos": 0.45,
+      "name": "Intake",
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -58,24 +58,7 @@
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooter"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 0.75,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot"
+                "name": "Intake"
               }
             }
           ]
@@ -84,8 +67,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.8,
-    "maxAcceleration": 2.3,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },

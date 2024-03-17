@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         Robot.gameMode = GameMode.DISABLED;
         robotContainer.onDisabled();
+        RobotContainer.enableVision = true;
     }
     
     @Override

@@ -8,7 +8,7 @@ import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-
+import com.revrobotics.ColorMatch;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -27,7 +27,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
@@ -222,8 +224,9 @@ public final class Constants {
         }};
 
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
-        public static final double GRAVITY = 9.8;
-        public static final double V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
+        public static final double GRAVITY = 9.81;
+        public static final double SPEAKER_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
+        public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.PASS_HEIGHT_METERS);
 
     }
 
@@ -307,8 +310,8 @@ public final class Constants {
 
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3.8;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 2.5;
+        public static final double MAX_SPEED_METERS_PER_SECOND = 5;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
@@ -396,30 +399,38 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
-            // "A W1 A C1-4 S",
-            // "S W1 A C1-5 S",
-            // "S W2 S C1-3 S W3-1 S",
-            // "S W2 S C1-4 S",
-            // "S C1-5 S",
-            // "S W1 A C1-5 S",
-            // "S W3-1 S",
-            "S W3-1 S C2-3 S Proxy",
-            "S W3-1 S C2-3 S Proxy2",
-            "S W3-1 S C1-3 S Proxy",
-            "S C5-4 S Proxy",
-            "S C4-2 S Proxy",
-            "S W1 S C1-3 S Proxy"
-            // "S W3-1 S C1-3 S"
+            "S W3-1 S C2-3 S",
+            "S C1-5 S",
+            "S W1-2 S C1-3 S"
+            // "S W3-1 S C2-3 S 2",
+            // "S W3-1 S C1-3 S",
+            // "S C5-4 S",
+            // "S C4-2 S",
+            // "S W1 S C1-3 S"
         };
     }
 
+    public static final class ColorSensorConstants {
+
+        public static final I2C.Port I2C_PORT = I2C.Port.kMXP;
+        public static final Color NOTE_ORANGE = new Color(0.957, 0.282, 0.086);
+        public static final ColorMatch COLOR_MATCH = new ColorMatch() 
+        {{
+            // BLACK
+            addColorMatch(Color.kBlack);
+            // NEW COMP READY NOTE ORANGE
+            addColorMatch(NOTE_ORANGE);
+            addColorMatch(Color.kWhite);
+        }};
+
+    }
     public static final class ModuleConstants {
 
         // https://www.revrobotics.com/rev-21-3005/
         private enum SwerveGearing {
             LOW         (12, 22, 4.12, 4.92),
             MEDIUM      (13, 22, 4.46, 5.33),
-            HIGH        (14, 22, 4.8, 5.74),
+            HIGH        (14, 22, 4.8, 5.5/*5.74*/),
 
             EXTRA_HIGH_1(14, 21, 5.03, 6.01),
             EXTRA_HIGH_2(14, 20, 5.28, 6.32),
@@ -455,7 +466,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4904427061105388*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.497869699432264*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
@@ -569,7 +580,7 @@ public final class Constants {
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
-        public static final int MAX_PERIODIC_STATUS_TIME_MS = 10000;
+        public static final int MAX_PERIODIC_STATUS_TIME_MS = 32766;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 20;
 
         // This gets filled out as motors are created on the robot
@@ -668,6 +679,7 @@ public final class Constants {
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
+        public static final double PASS_HEIGHT_METERS = Units.feetToMeters(11.5);
 
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
@@ -758,6 +770,16 @@ public final class Constants {
             add(bluePose);
             add(redPose);
         }};
+        
+        public static final List<Pose2d> PASS_POSITIONS = new ArrayList<Pose2d>() {{
+
+            // I swear bulldogs and hawaiin kids just had to get in here somehow
+            Pose2d bluePose = new Pose2d(4.581, 4.359, Rotation2d.fromDegrees(0));
+            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
+
+            add(bluePose);
+            add(redPose);
+        }};
 
         private static int getAllianceIndex(Alliance defaultAlliance) {
             return defaultAlliance == Alliance.Blue
@@ -767,6 +789,10 @@ public final class Constants {
 
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_PASS_POSITION() {
+            return PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_SOURCE_POSITION() {
@@ -996,7 +1022,7 @@ public final class Constants {
             put("noteToShoot2", 0.4);
             put("noteToShoot3", 0.0);
 
-            put("intakeToTrap1", 0.5);
+            put("intakeToTrap1", 0.2);
             put("intakeToTrap2", 0.0);
 
             put("noteToIndexer1", 0.2);

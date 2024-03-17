@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.8992806921784053,
-        "y": 6.899302309242916
+        "x": 2.892385986339722,
+        "y": 6.982038779307121
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9334865679809745,
-        "y": 7.5198258347244575
+        "x": 6.220230671144434,
+        "y": 5.957025844622798
       },
       "isLocked": false,
       "linkedName": "W1"
     },
     {
       "anchor": {
-        "x": 8.284610415676218,
-        "y": 7.43617949033381
+        "x": 8.12316948262116,
+        "y": 7.3911246590690265
       },
       "prevControl": {
-        "x": 7.0062271367543865,
-        "y": 7.469264658574111
+        "x": 6.8447862036993286,
+        "y": 7.424209827309327
       },
       "nextControl": null,
       "isLocked": false,
@@ -49,7 +49,7 @@
     },
     {
       "name": "ToIndexer",
-      "waypointRelativePos": 0.6,
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "parallel",
         "data": {
@@ -66,8 +66,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.8,
-    "maxAcceleration": 2.3,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },

@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.04,
-        "y": 6.338915940243228
+        "x": 3.9173989210240463,
+        "y": 6.5775493701043395
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.990435673920994,
-        "y": 6.702803192840428
+        "x": 6.4408612579823155,
+        "y": 7.4600717174558655
       },
       "isLocked": false,
       "linkedName": "L"
     },
     {
       "anchor": {
-        "x": 8.293238893308695,
+        "x": 7.047595371786488,
         "y": 5.77776349281702
       },
       "prevControl": {
-        "x": 7.498815565007017,
-        "y": 6.0841948634251874
+        "x": 6.626048946393878,
+        "y": 5.801182738672167
+      },
+      "nextControl": {
+        "x": 7.295804781979105,
+        "y": 5.763974081139652
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.26566006995396,
+        "y": 5.77776349281702
+      },
+      "prevControl": {
+        "x": 7.544014192171723,
+        "y": 5.740991728344039
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,11 +45,23 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "SpeedyIntake",
+      "minWaypointRelativePos": 1.2,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    }
+  ],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0.8,
+      "name": "StopIntake",
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +69,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "StopIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ToIndexer",
+      "waypointRelativePos": 1.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ToIndexer"
               }
             }
           ]
@@ -50,21 +95,21 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.8,
-    "maxAcceleration": 2.3,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 2.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 160.11483488614476,
-    "rotateFast": false
+    "rotation": 180.0,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Stage",
   "previewStartingState": {
-    "rotation": -173.92664670661742,
+    "rotation": -165.35696772976468,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

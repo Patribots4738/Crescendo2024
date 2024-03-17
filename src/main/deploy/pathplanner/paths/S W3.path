@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7412377646703784,
-        "y": 4.3334957369796125
+        "x": 1.3617612901519198,
+        "y": 4.771136440369186
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5237868773609886,
-        "y": 4.679590068399995
+        "x": 1.9133377572466235,
+        "y": 4.582681147445162
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.5281156945292613,
-        "y": 4.3334957369796125
+        "x": 2.749895399006924,
+        "y": 4.19657762047887
       },
       "prevControl": {
-        "x": 1.8367299145945808,
-        "y": 4.919755655114147
+        "x": 2.2672659902990584,
+        "y": 4.440190560112364
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Prepare and Shoot When Ready",
+      "name": "Shoot&Intake",
       "waypointRelativePos": 0,
       "command": {
         "type": "sequential",
@@ -41,26 +41,9 @@
             {
               "type": "named",
               "data": {
-                "name": "PrepareShooter"
+                "name": "Shoot"
               }
             },
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Intake",
-      "waypointRelativePos": 0.5,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
             {
               "type": "named",
               "data": {
@@ -73,20 +56,20 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.8,
-    "maxAcceleration": 2.3,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
     "rotation": 154.2169,
-    "rotateFast": false
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Preloads",
   "previewStartingState": {
-    "rotation": 122.79953127261922,
+    "rotation": 151.2201936956028,
     "velocity": 0
   },
   "useDefaultConstraints": true

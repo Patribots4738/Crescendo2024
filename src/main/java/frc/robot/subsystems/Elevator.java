@@ -19,29 +19,29 @@ import monologue.Annotations.Log;
 
 public class Elevator extends SubsystemBase implements Logged {
     
-    private final Neo elevator;
+    private final Neo motor;
 
     @Log
-    private double position = 0, desiredPos = 0, hitGuillotineTimestamp = 0;
+    private double position = 0, desiredPos = 0, hitGuillotineTimestamp = 0, desiredOverridePos = 0;
 
     @Log
     private boolean atDesiredPos = false, stuckOnGuillotine = false;
 
     /** Creates a new Elevator. */
     public Elevator() {
-        elevator = new Neo(TrapConstants.ELEVATOR_CAN_ID, false, true);
+        motor = new Neo(TrapConstants.ELEVATOR_CAN_ID, false, true);
         configMotors();
     }
 
     public void configMotors() {
-        elevator.setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
-        elevator.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        elevator.setPID(TrapConstants.ELEVATOR_PID);
+        motor.setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
+        motor.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
+        motor.setPID(TrapConstants.ELEVATOR_PID);
     }
 
     @Override
     public void periodic() {
-        position = elevator.getPosition();
+        position = motor.getPosition();
         atDesiredPos = atDesiredPosition();
 
         // A value of 0 on hitGuillotineTimestamp indicates that we are not hitting the guillotine
@@ -79,7 +79,7 @@ public class Elevator extends SubsystemBase implements Logged {
 
         if (desiredPos != pos) {
             desiredPos = pos;
-            elevator.setTargetPosition(pos);
+            motor.setTargetPosition(pos);
     
             RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
                 0, 0, pos,
@@ -131,7 +131,8 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public boolean atDesiredPosition() {
-	return MathUtil.isNear(desiredPos, position, TrapConstants.ELEVATOR_DEADBAND);
+	return MathUtil.isNear(desiredPos, position, TrapConstants.ELEVATOR_DEADBAND)
+        || MathUtil.isNear(desiredOverridePos, position, TrapConstants.ELEVATOR_DEADBAND);
     }
 
     public boolean atPosition(double position) {
@@ -153,10 +154,21 @@ public class Elevator extends SubsystemBase implements Logged {
             && Robot.currentTimestamp - this.hitGuillotineTimestamp >= TrapConstants.STUCK_TIME_SECONDS
             && desiredPos > position
             && nearGuillotine()
-            && elevator.getOutputCurrent() > 35.0;
+            && motor.getOutputCurrent() > 35.0;
     }
 
     public Command resetEncoder() {
-        return runOnce(elevator::resetEncoder);
+        return runOnce(motor::resetEncoder).ignoringDisable(true);
     }
+
+    public Command overrideCommand(DoubleSupplier doubleSupplier) {
+        return run(() -> {
+            desiredOverridePos = MathUtil.clamp(
+                desiredOverridePos + doubleSupplier.getAsDouble(),
+                TrapConstants.ELEVATOR_BOTTOM_LIMIT,
+                TrapConstants.ELEVATOR_TOP_LIMIT
+            );
+            setPosition(desiredOverridePos);
+        });
+    } 
 }

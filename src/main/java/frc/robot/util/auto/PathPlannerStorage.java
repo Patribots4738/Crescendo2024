@@ -314,23 +314,8 @@ public class PathPlannerStorage implements Logged {
                     : path.getPathPoses();
             autoPoses.addAll(pathPoses);
         }
-
-        // We can only have up to 85 poses in the list, 
-        // so we need to compress it if it's too large
-        compressList(autoPoses, 84);
-
+    
         return autoPoses;
-    }
-
-    private void compressList(List<Pose2d> poses, int maxSize) {
-        int index = 0;
-        while (poses.size() > maxSize && index < poses.size()) {
-            if (index % 2 != 0) {
-                poses.remove(index);
-            } else {
-                index++;
-            }
-        }
     }
 
     public Translation2d getNextShotTranslation() {

@@ -51,7 +51,7 @@ public class ShooterCmds {
                     desiredPose = GeometryUtil.flipFieldPosition(desiredPose);
                 }
 
-                desiredTriplet = shooterCalc.calculateTriplet(desiredPose);
+                desiredTriplet = shooterCalc.calculateSpeakerTriplet(desiredPose);
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
@@ -60,7 +60,7 @@ public class ShooterCmds {
 
     public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {
         return Commands.run(() -> {
-                desiredTriplet = shooterCalc.calculateTriplet(robotPose.get().getTranslation());
+                desiredTriplet = shooterCalc.calculateSpeakerTriplet(robotPose.get().getTranslation());
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
@@ -111,6 +111,24 @@ public class ShooterCmds {
         return Commands.run(
             () -> {
                 desiredTriplet = shooterCalc.calculateSWDTriplet(robotPose.get(), speeds.get());
+                pivot.setAngle(desiredTriplet.getAngle());
+                shooter.setSpeed(desiredTriplet.getSpeeds());
+            }, pivot, shooter);
+    }
+
+    public Command prepareSWDCommandAuto(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.run(
+            () -> {
+                desiredTriplet = shooterCalc.calculateSWDTripletAuto(robotPose.get(), speeds.get());
+                pivot.setAngle(desiredTriplet.getAngle());
+                shooter.setSpeed(desiredTriplet.getSpeeds());
+            }, pivot, shooter);
+    }
+
+    public Command preparePassCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.run(
+            () -> {
+                desiredTriplet = shooterCalc.calculatePassTriplet(robotPose.get(), speeds.get());
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
             }, pivot, shooter);

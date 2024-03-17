@@ -3,37 +3,53 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.284863829514135,
-        "y": 4.099779112962734
+        "x": 8.12316948262116,
+        "y": 7.3911246590690265
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.475885011108571,
-        "y": 5.124792047647059
+        "x": 7.324091487972719,
+        "y": 6.560901508891041
       },
       "isLocked": false,
-      "linkedName": "C3"
+      "linkedName": "C1"
     },
     {
       "anchor": {
-        "x": 4.04,
-        "y": 6.338915940243228
+        "x": 4.622515516343116,
+        "y": 7.163846143852407
       },
       "prevControl": {
-        "x": 5.0599756885228055,
-        "y": 6.8229476540209415
+        "x": 5.313620260160405,
+        "y": 6.831368726556523
+      },
+      "nextControl": {
+        "x": 3.488343937399512,
+        "y": 7.709474633182031
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.8337621392595704,
+        "y": 7.619282085683008
+      },
+      "prevControl": {
+        "x": 2.5081344294422534,
+        "y": 7.404709084261246
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L"
+      "linkedName": "A"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "StopIntake & PrepareShooter",
-      "waypointRelativePos": 0,
+      "name": "Elevate",
+      "waypointRelativePos": 1.45,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,13 +57,7 @@
             {
               "type": "named",
               "data": {
-                "name": "StopIntake"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "PrepareShooter"
+                "name": "RaiseElevator"
               }
             }
           ]
@@ -55,8 +65,8 @@
       }
     },
     {
-      "name": "Shoot",
-      "waypointRelativePos": 0.7,
+      "name": "PlaceAmp",
+      "waypointRelativePos": 2.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -64,7 +74,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot"
+                "name": "PlaceAmp"
               }
             }
           ]
@@ -73,20 +83,20 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.8,
-    "maxAcceleration": 2.3,
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -173.36255043289074,
+    "rotation": -89.28384005452958,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Center Line",
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -10,14 +10,14 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 
 public class Trapper extends SubsystemBase implements Logged {
-    private final Neo trapper;
+    private final Neo motor;
 
     @Log
     private double desiredSpeed = 0;
 
     public Trapper() {
-        trapper = new Neo(TrapConstants.TRAP_CAN_ID, false, TrapConstants.TRAP_INVERTION);
-        trapper.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
+        motor = new Neo(TrapConstants.TRAP_CAN_ID, false, TrapConstants.TRAP_INVERTION);
+        motor.setSmartCurrentLimit(TrapConstants.TRAP_CURRENT_LIMIT);
     }
 
     public Command intakeFromHandoff() {
@@ -35,7 +35,7 @@ public class Trapper extends SubsystemBase implements Logged {
         if (desiredSpeed != percent) {
             desiredSpeed = percent;
             
-            trapper.set(percent);
+            motor.set(percent);
         }
     }
 
@@ -57,6 +57,10 @@ public class Trapper extends SubsystemBase implements Logged {
 
     public Command intakeSlow() {
         return runOnce(() -> setSpeed(0.2));
+    }
+
+    public Command intakeSlow(double speed) {
+        return runOnce(() -> setSpeed(speed));
     }
 
     public Command stopCommand() {
@@ -91,15 +95,10 @@ public class Trapper extends SubsystemBase implements Logged {
     }
 
     public Command setCoastMode() {
-        return runOnce(() -> trapper.setCoastMode());
+        return Commands.runOnce(() -> motor.setCoastMode()).ignoringDisable(true);
     }
 
     public Command setBrakeMode() {
-        return runOnce(() -> trapper.setBrakeMode());
+        return Commands.runOnce(() -> motor.setBrakeMode()).ignoringDisable(true);
     }
-
-    public boolean hasPiece() {
-        return false;
-    }
-
 }
