@@ -386,12 +386,8 @@ public class Swerve extends SubsystemBase implements Logged {
         return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
-    public Command updateChasePose(Supplier<Pose2d> poseSupplier) {
-        return Commands.runOnce(() -> ChasePose.updateDesiredPose(poseSupplier.get()));
-    }
-
-    public Command getChaseCommand() {
-        return new ChasePose(this);
+    public Command getChaseCommand(Supplier<Pose2d> desiredPose, BooleanSupplier cancelSupplier) {
+        return new ChasePose(this, desiredPose, cancelSupplier);
     }
 
     public void resetHDC() {

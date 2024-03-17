@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -77,7 +78,7 @@ public class Limelight extends SubsystemBase implements Logged{
                 updatePoseEstimator();
                 getTags();
             } else if (pipelineIndex == 1) {
-                notePose2d = robotPoseSupplier.get().plus(new Transform2d(getNotePose2d().getTranslation(), new Rotation2d()));
+                notePose2d = getNotePose2d();
             }
         }
     }
@@ -97,7 +98,7 @@ public class Limelight extends SubsystemBase implements Logged{
             // multiple targets detected
             if (targets.length > 1) {
                 // TODO: TUNE
-                xyStds = 0.8;
+                xyStds = 0.008;
                 radStds = 1.2;
             }
             // 1 target with large area and close to estimated pose
@@ -149,29 +150,53 @@ public class Limelight extends SubsystemBase implements Logged{
         visableTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
+    @Log
+    Pose2d noteFieldPose = new Pose2d();
+
+    @Log
+    Pose2d noteFieldPosePlus14 = new Pose2d();
+
     public Pose2d getNotePose2d() {
         if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
             LimelightHelpers.setPipelineIndex(limelightName, 1);
         }
-        if (noteInVision()) {
-            Results results = getResults();
-            for (LimelightTarget_Detector ld : results.targets_Detector) {
-                ld.calculateDistance(CameraConstants.cameras[1].getZ(), CameraConstants.cameras[1].getRotation().getZ());
-                ld.calculateXDistance(0);
-                System.out.println("Note Pose: ("+ ld.calcY + ", "+ld.calcX+") " );
-            }
-            Translation2d noteTranslationToBot = new Translation2d(results.targets_Detector[0].calcY, results.targets_Detector[0].calcX);
-            Pose2d notePose = new Pose2d(noteTranslationToBot, new Rotation2d());
-            return notePose.plus(new Transform2d(robotPoseSupplier.get().getTranslation(), new Rotation2d()));
-        }
-        return robotPoseSupplier.get();
-    }
-
-    public boolean noteInVision() {
         Results results = getResults();
-        return results.valid && results.targets_Detector.length > 0 && results.targets_Detector[0].tx != 0 && results.targets_Detector[0].ty != 0;
+        if (noteInVision(results)) {
+            for (LimelightTarget_Detector ld : results.targets_Detector) {
+                ld.calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
+                ld.calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+            }
+
+            Translation2d noteTranslationFromCamera = 
+                new Translation2d(
+                    results.targets_Detector[0].calcY,
+                    -results.targets_Detector[0].calcX
+                );
+
+            Translation2d noteTranslationFromRobot = 
+                noteTranslationFromCamera
+                .plus(CameraConstants.LL2Pose.getTranslation().toTranslation2d())
+                .rotateBy(CameraConstants.LL2Pose.getRotation().toRotation2d());
+                
+            noteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
+            Rotation2d slopeAngle = new Rotation2d(noteTranslationFromRobot.getX(), noteTranslationFromRobot.getY())
+            .plus(Rotation2d.fromDegrees(180));
+            noteFieldPosePlus14 = noteFieldPose.plus(
+                new Transform2d(
+                    new Translation2d(
+                        Units.inchesToMeters(14),
+                        slopeAngle.plus(Rotation2d.fromDegrees(180 ))
+                    ),
+                    slopeAngle)
+            );
+        }
+        return noteFieldPosePlus14;
     }
 
+    public boolean noteInVision(Results results) {
+        return results.valid && results.targets_Detector.length > 0 && LimelightHelpers.getTA(limelightName) > 0.5 && results.targets_Detector[0].tx != 0 && results.targets_Detector[0].ty != 0;
+    }
+    
     public Pose2d getPose2d() {
         return LimelightHelpers.getBotPose2d_wpiBlue(limelightName);
     }

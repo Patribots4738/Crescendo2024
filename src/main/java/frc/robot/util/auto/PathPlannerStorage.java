@@ -18,6 +18,7 @@ import frc.robot.util.custom.PatriSendableChooser;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
+import frc.robot.commands.drive.ChasePose;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
 import monologue.Logged;
@@ -181,14 +182,14 @@ public class PathPlannerStorage implements Logged {
                         .andThen(pathfindToShoot(swerve)
                         .andThen(pathfindToNextNote(() -> currentIndex + (goingDown ? 1 : -1)))), 
                     pathfindToNextNote(() -> currentIndex + (goingDown ? 1 : -1)), 
-                    limelight::noteInVision),
+                    () -> limelight.noteInVision(limelight.getResults())),
                 commandGroup.getRequirements());
         } else {
             return Commands.defer(
                 () -> Commands.sequence(
                     goToNote(swerve, limelight),
                     pathfindToShoot(swerve)
-                ).onlyIf(limelight::noteInVision), 
+                ).onlyIf(() -> limelight.noteInVision(limelight.getResults())), 
                 commandGroup.getRequirements());
         }
     }
@@ -266,17 +267,17 @@ public class PathPlannerStorage implements Logged {
      *                      pose without our vision
      * @return  The command that drives to a preset note position
      */
-    public Command goToNote(Swerve swerve, IntSupplier currentIndex) {
-        return 
-            Commands.parallel(
-                swerve.updateChasePose(
-                    () -> 
-                        new Pose2d(
-                            NOTE_POSES.get(currentIndex.getAsInt()).getTranslation(),
-                            Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)))
-                    .repeatedly().until(swerve::atHDCPose),
-                swerve.getChaseCommand());  
-    }
+    // public Command goToNote(Swerve swerve, IntSupplier currentIndex) {
+    //     return 
+    //         Commands.parallel(
+    //             swerve.updateChasePose(
+    //                 () -> 
+    //                     new Pose2d(
+    //                         NOTE_POSES.get(currentIndex.getAsInt()).getTranslation(),
+    //                         Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)))
+    //                 .repeatedly().until(swerve::atHDCPose),
+    //             swerve.getChaseCommand());  
+    // }
 
     /**
      * Uses a custom chase command to drive towards a dynamically changing note pose
@@ -287,15 +288,11 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that holonomically drives to a note position gathered from vision
      */
     public Command goToNote(Swerve swerve, Limelight limelight) {
-        return 
-            Commands.parallel(
-                swerve.updateChasePose(
-                    () -> 
-                        new Pose2d(
-                            limelight.getNotePose2d().getTranslation(), 
-                            Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))
-                ).repeatedly().until(() -> swerve.atHDCPose() || !limelight.noteInVision()),
-                swerve.getChaseCommand());  
+        return new ChasePose(swerve, 
+            () -> 
+                new Pose2d(
+                    limelight.getNotePose2d().getTranslation(), 
+                    Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)));
     }
 
     public Pose2d getPathEndPose(PathPlannerPath path) {

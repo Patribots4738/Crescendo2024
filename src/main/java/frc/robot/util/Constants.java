@@ -8,6 +8,7 @@ import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -28,7 +29,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
-import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
@@ -313,8 +313,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
 
-        public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
-        public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
+        public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(3);
+        public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(5);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
@@ -956,18 +956,22 @@ public final class Constants {
         public static final boolean FIELD_CALIBRATION_MODE = false;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
-        private static final Pose3d LL3Pose = 
+        public static final Pose3d LL3Pose = 
             new Pose3d(
+                // forward positive, right positive, up positive
                 0.204,
                 -0.234,
                 0.651,
-                new Rotation3d(0, 0, Units.degreesToRadians(13)));
-        private static final Pose3d LL2Pose =
+                new Rotation3d(0, Units.degreesToRadians(13), 0));
+        public static final Pose3d LL2Pose =
             new Pose3d(
+                // forward positive, right positive, up positive
                 -0.272724,
                 -0.311903,
                 0.433974,
-                new Rotation3d(0, Units.degreesToRadians(180), Units.degreesToRadians(-10)));
+                // Pitch angle is measure from the horizontal
+                // it is negative because it points down
+                new Rotation3d(0, Units.degreesToRadians(-11), Units.degreesToRadians(180)));
 
         public static final Pose3d[] cameras = new Pose3d[] {LL3Pose, LL2Pose};
     }

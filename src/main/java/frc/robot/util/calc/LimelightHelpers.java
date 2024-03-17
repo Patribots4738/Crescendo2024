@@ -285,7 +285,7 @@ public class LimelightHelpers {
          * @param cameraHeight the height of the center of the lens to the ground
          * @param cameraAngle the angle of the camera in degrees from vertical
          */
-        public void calculateDistance(double cameraHeight, double cameraAngle) {
+        public void calculateYDistance(double cameraHeight, double cameraAngle) {
             if (className.equals("note")) {
                 double targetHeight = Units.inchesToMeters(1); // we always assume that the note is on the ground
 
@@ -296,11 +296,11 @@ public class LimelightHelpers {
 
         /**
          * Calculate the X distance from the camera to the target (the side to side distance between the camera and the target)
-         * @param cameraAngle the angle of the camera in degrees from right (0)
+         * @param cameraAngleRads the angle of the camera in degrees from right (0)
          */
-        public void calculateXDistance(double cameraAngle) {
+        public void calculateXDistance(double cameraAngleRads) {
             if (className.equals("note")) {
-                double angleToNoteRad = cameraAngle + Units.degreesToRadians(tx);
+                double angleToNoteRad = cameraAngleRads + Units.degreesToRadians(tx);
                 this.calcX = this.calcY * Math.tan(angleToNoteRad);
             }
         }
