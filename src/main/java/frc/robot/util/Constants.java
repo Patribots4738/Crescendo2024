@@ -956,39 +956,20 @@ public final class Constants {
         public static final boolean FIELD_CALIBRATION_MODE = false;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
-        private static final double CAM_HEIGHT = Units.inchesToMeters(16);
-        private static final double CAM_X = Units.inchesToMeters(6.6 / 2.0);
-        private static final double CAM_Y = Units.inchesToMeters(15.3 / 2.0);
-        private static final double CAM_PITCH = Units.degreesToRadians(-15);
-        private static final double CAM_YAW = Units.degreesToRadians(32);
-
-        private static final Pose3d cam1 =
+        private static final Pose3d LL3Pose = 
             new Pose3d(
-                new Translation3d(CAM_X, CAM_Y, CAM_HEIGHT), 
-                new Rotation3d(0, CAM_PITCH, CAM_YAW));
-        private static final Pose3d cam2 =
+                0.204,
+                -0.234,
+                0.651,
+                new Rotation3d(0, 0, Units.degreesToRadians(13)));
+        private static final Pose3d LL2Pose =
             new Pose3d(
-                new Translation3d(CAM_X, -CAM_Y, CAM_HEIGHT),
-                new Rotation3d(0, CAM_PITCH, -CAM_YAW));
-        private static final Pose3d cam3 =
-            new Pose3d(
-                new Translation3d(-CAM_X, CAM_Y, CAM_HEIGHT),
-                new Rotation3d(0, CAM_PITCH, (Math.PI) - CAM_YAW));
-        private static final Pose3d cam4 =
-            new Pose3d(
-                new Translation3d(-CAM_X, -CAM_Y, CAM_HEIGHT),
-                new Rotation3d(0, CAM_PITCH, (Math.PI) + CAM_YAW));
-
-        private static final Pose3d cam5 = 
-            new Pose3d(
-                0.0508, -0.1524, 0.589701,
-                new Rotation3d(0, Units.degreesToRadians(-33), Units.degreesToRadians(15)));
-        private static final Pose3d cam6 =
-        new Pose3d(
-                -0.254, -0.155575, 0.589701,
+                -0.272724,
+                -0.311903,
+                0.433974,
                 new Rotation3d(0, Units.degreesToRadians(180), Units.degreesToRadians(-10)));
 
-        public static final Pose3d[] cameras = new Pose3d[] {cam5, cam6};
+        public static final Pose3d[] cameras = new Pose3d[] {LL3Pose, LL2Pose};
     }
     
     public static final class NTConstants {
