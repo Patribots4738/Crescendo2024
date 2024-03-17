@@ -63,6 +63,29 @@ public class ShooterCalc implements Logged {
             );
     }
 
+    public SpeedAngleTriplet calculateSWDTripletAuto(Pose2d pose, ChassisSpeeds speeds) {
+        Pose2d currentPose = pose;
+
+        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
+        double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
+
+        double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
+        double v0z = originalv0 * Math.sin(Units.degreesToRadians(currentTriplet.getAngle()));
+        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
+
+        double newv0 = Math.hypot(v0x, v0z);
+        Rotation2d newAngle = new Rotation2d(v0x, v0z);
+
+        double maxRPMAuto = ShooterConstants.INTERPOLATION_MAP.get(Units.metersToFeet(5)).getAverageSpeed();
+        
+        return 
+            SpeedAngleTriplet.of(
+                MathUtil.clamp(currentTriplet.getLeftSpeed(), 0, maxRPMAuto),
+                MathUtil.clamp(currentTriplet.getRightSpeed(), 0, maxRPMAuto),
+                newAngle.getDegrees()
+            );
+    }
+
     public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose, ChassisSpeeds speeds) {
         Rotation2d pivotAngle = calculatePassPivotAngle(robotPose);
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForPassApex(robotPose, pivotAngle);
