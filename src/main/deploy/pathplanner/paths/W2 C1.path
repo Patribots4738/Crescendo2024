@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.892385986339722,
-        "y": 6.982038779307121
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 2.3512739869758232,
-        "y": 6.889078258418361
-      },
-      "isLocked": false,
-      "linkedName": "W1"
-    },
-    {
-      "anchor": {
-        "x": 1.8527875727163086,
-        "y": 5.73579548108088
-      },
-      "prevControl": {
-        "x": 1.8625257653836784,
-        "y": 6.037679453769347
-      },
-      "nextControl": {
-        "x": 1.847136077923676,
-        "y": 5.5605991425092745
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
         "x": 2.901578927457967,
         "y": 5.538747023742648
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.901578927457967,
+        "y": 5.538747023742648
+      },
+      "isLocked": false,
+      "linkedName": "W2"
+    },
+    {
+      "anchor": {
+        "x": 8.12316948262116,
+        "y": 7.3911246590690265
+      },
       "prevControl": {
-        "x": 2.302037772089848,
-        "y": 5.537525660272609
+        "x": 7.12316948262116,
+        "y": 7.3911246590690265
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "W2"
+      "linkedName": "C1"
     }
   ],
   "rotationTargets": [],
@@ -49,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "StopIntake",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.05,
       "command": {
         "type": "parallel",
         "data": {
@@ -74,7 +58,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             }
           ]
@@ -90,13 +74,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -178.77350350100232,
-    "rotateFast": true
+    "rotation": 178.2100893917539,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Wings",
   "previewStartingState": {
-    "rotation": 179.34683901291848,
+    "rotation": -179.17565717915485,
     "velocity": 0
   },
   "useDefaultConstraints": true

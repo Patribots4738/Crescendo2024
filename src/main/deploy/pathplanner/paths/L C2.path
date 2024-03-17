@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.815741261941651,
-        "y": 7.161301131112901
+        "x": 6.4408612579823155,
+        "y": 7.4600717174558655
       },
       "isLocked": false,
       "linkedName": "L"
@@ -45,7 +45,19 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "SpeedyIntake",
+      "minWaypointRelativePos": 1.2,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    }
+  ],
   "eventMarkers": [
     {
       "name": "StopIntake",

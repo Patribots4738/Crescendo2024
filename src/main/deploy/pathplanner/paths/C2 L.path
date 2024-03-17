@@ -8,27 +8,11 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.038402430668243,
-        "y": 6.278778783761375
+        "x": 7.102753018495958,
+        "y": 6.54077760563136
       },
       "isLocked": false,
       "linkedName": "C2"
-    },
-    {
-      "anchor": {
-        "x": 5.743336151610713,
-        "y": 6.3607970553007185
-      },
-      "prevControl": {
-        "x": 6.470169804043686,
-        "y": 6.3473221649602385
-      },
-      "nextControl": {
-        "x": 4.96079773794486,
-        "y": 6.375304665502949
-      },
-      "isLocked": false,
-      "linkedName": null
     },
     {
       "anchor": {
@@ -49,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "Shoot",
-      "waypointRelativePos": 1.85,
+      "waypointRelativePos": 0.95,
       "command": {
         "type": "parallel",
         "data": {
@@ -73,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -168.8756864218873,
+    "rotation": -163.18871636169283,
     "rotateFast": false
   },
   "reversed": false,

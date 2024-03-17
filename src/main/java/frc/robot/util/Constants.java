@@ -401,7 +401,8 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "S W3-1 S C2-3 S",
-            "S C1-5 S"
+            "S C1-5 S",
+            "S W1-2 S C1-3 S"
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
             // "S C5-4 S",
