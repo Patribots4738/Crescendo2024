@@ -73,9 +73,12 @@ public class Limelight extends SubsystemBase implements Logged{
         if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
-            updatePoseEstimator();
-            getTags();
-            notePose2d = robotPoseSupplier.get().plus( new Transform2d(getNotePose2d().getTranslation(), new Rotation2d()));
+            if (pipelineIndex == 0) {
+                updatePoseEstimator();
+                getTags();
+            } else if (pipelineIndex == 1) {
+                notePose2d = robotPoseSupplier.get().plus(new Transform2d(getNotePose2d().getTranslation(), new Rotation2d()));
+            }
         }
     }
 
@@ -166,7 +169,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public boolean noteInVision() {
         Results results = getResults();
-        return results.valid && results.targets_Detector[0].calcX != 0 && results.targets_Detector[0].calcY != 0;
+        return results.valid && results.targets_Detector.length > 0 && results.targets_Detector[0].tx != 0 && results.targets_Detector[0].ty != 0;
     }
 
     public Pose2d getPose2d() {

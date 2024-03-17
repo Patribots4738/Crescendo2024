@@ -6,6 +6,7 @@ package frc.robot.util.calc;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -285,11 +286,10 @@ public class LimelightHelpers {
          * @param cameraAngle the angle of the camera in degrees from vertical
          */
         public void calculateDistance(double cameraHeight, double cameraAngle) {
-            if (className == "note") {
+            if (className.equals("note")) {
                 double targetHeight = Units.inchesToMeters(2); // we always assume that the note is on the ground
 
-                double angleToNoteDeg = cameraAngle + ty;
-                double angleToNoteRad = Units.degreesToRadians(angleToNoteDeg);
+                double angleToNoteRad = cameraAngle + Units.degreesToRadians(ty);
                 this.calcY = (targetHeight - cameraHeight) / Math.tan(angleToNoteRad);
             }
         }
@@ -299,9 +299,8 @@ public class LimelightHelpers {
          * @param cameraAngle the angle of the camera in degrees from right (0)
          */
         public void calculateXDistance(double cameraAngle) {
-            if (className == "note") {
-                double angleToNoteDeg = cameraAngle + tx;
-                double angleToNoteRad = Units.degreesToRadians(angleToNoteDeg);
+            if (className.equals("note")) {
+                double angleToNoteRad = cameraAngle + Units.degreesToRadians(tx);
                 this.calcX = this.calcY * Math.tan(angleToNoteRad);
             }
         }
