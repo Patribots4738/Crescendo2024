@@ -72,7 +72,7 @@ ___
   <img src="images/sim/shooting.png" width="70%" />
   
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Path Generation & Modular Autonomous Paths 
-  > We use `PathPlanner` to construct a modular autonomous. In `PathPlanner`, we use named waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, we are able to make quick decisions on whether or not we got the note, or if we should skip trying to get a note that isn't there. Additionally, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of April tags allow us to generate a path from anywhere in the starting zone as long as our Limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>) :> 
+  > We use `PathPlanner` to construct a modular autonomous. In `PathPlanner`, we use named waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, we are able to make quick decisions on whether or not we got the note, or if we should skip trying to get a note that isn't there. Additionally, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of April tags allow us to generate a path from anywhere in the starting zone as long as our Limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>) :>
   <br /> <img src="images/sim/trajectory.png" width="30%" />
 
 
@@ -106,10 +106,10 @@ _____
 Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins>Java<ins/>.
  
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Subsystems
-  > [`robot/subsystems`](src/main/java/frc/robot/subsystems) Folder containing class file for each subsystem on the robot.
+  > [`robot/subsystems`](src/main/java/frc/robot/subsystems) Folder containing class files for each subsystem on the robot.
   > - **Intake** [`robot/subsystems/intake`](src/main/java/frc/robot/subsystems/intake) An under-the-bumper intake run by a `Neo 550`.
   > - **Swerve** [`robot/subsystems/swerve`](src/main/java/frc/robot/subsystems/swerve) Drivetrain with four swerve modules using 4 `Neo Vortexs` and 4 `Neo 550`s.
-  > - **Shooter** [`robot/subsystems/shooter`](src/main/java/frc/robot/subsystems/shooter) A shooter that uses 2 Neo Vortexs & pivot which uses 1 `Neo 550` with an absolute encoder.
+  > - **Shooter** [`robot/subsystems/shooter`](src/main/java/frc/robot/subsystems/shooter) A shooter that uses 2 `Neo Vortexs` & pivot which uses 1 `Neo 550` with an absolute encoder.
   > - **Elevator** [`robot/subsystems/elevator`](src/main/java/frc/robot/subsystems/elevator) Elevator for amp & trap placement which uses 1 `Neo v1.1`.
   > - **Indexer** [`robot/subsystems/indexer`](src/main/java/frc/robot/subsystems/indexer) The Indexer between intake & shooter which uses a `Neo 550`.
   > - **Climb** [`robot/subsystems/climb`](src/main/java/frc/robot/subsystems/climb) Two independently driven climbs that conform to the curve of the unoccupied chain on stage to keep the robot level with the ground. Uses one `Neo Vortex` each.
@@ -118,15 +118,18 @@ Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins
       
 
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Commands
-> [`robot/commands`](src/main/java/frc/robot/commands) Fodler containing command files that control the robot.
-> - **LED Position Indicator (LPI)** [`robot/commands/lpi`](src/main/java/frc/robot/commands/misc/lpi) Command created to aid the technician in placing the robot on the field before auto. The command cycles through the autonomous starting positions listed in [`robot/commands/autonomous/PathPlannerStorage`](src/main/java/frc/robot/commands/autonomous/PathPlannerStorage) & isolates the position closest to the robot's current position. It separates the surrounding area into defined zones & changes the LEDs to reflect the zone it is currently in. Once it is in the correct position, it displays a pattern to help the technician rotate the robot in the correct direction.
-> - **Alignment Commands** [`robot/commands/subsystemHelpers/alignmentCmds`](src/main/frc/robot/commands/subsystemHelpers/alignmentCmds) File of commands that help that auto-align the robot to be locked in a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
-> - **Network Table PID Tuner** [`robot/commands/subsystemHelpers/NTPIDTuner`](src/main/frc/robot/commands/subsystemHelpers/NTPIDTuner) Command file that allows us to alter & tune the PID values in Advantage Scope's Network Tables for ease of access.\n\n
+> [`robot/commands`](src/main/java/frc/robot/commands) Folder containing command files that control the robot.
+> - **Alignment Commands** [`robot/commands/drive/alignmentCmds`](src/main/frc/robot/commands/drive/alignmentCmds) File of commands that help that auto-align the robot to be locked in a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
+> - **Network Table PID Tuner** [`robot/commands/logging/NTPIDTuner`](src/main/frc/robot/commands/logging/NTPIDTuner) Command file that allows us to alter & tune the PID values in `Advantage Scope's` Network Tables for ease of access.
+> - **Selective Condiditional Command** [`robot/commands/managers/SelectiveConditionalCommand`](src/main/frc/robot/commands/managers/SelectiveConditionalCommand) Command that is similar to Commands.either but instead of just checking the boolean when the Command is originally run, it constantly checks the boolean supplier and runs the correct command.
+> - **Piece Control** [`robot/commands/manager/PieceControl`](src/main/robot/commands/manager/PieceControl) Command file containing various other commands that subystems use to manage possesion over the game piece.
+>    - **getAutomaticShooterSpeeds** This is the default command for the shooter subsytem. It brings the shooter up to speed whenever the robot is in our alliances wing and we have note possesion to make the process of intaking, indexing, and then shooting significantly faster
  
  ###  <img src= "images/surelyanote.png" width="2.5%" /> Utilities
-> [`robot/util`](src/main/java/frc/robot/util)
+> [`robot/util`](src/main/java/frc/robot/util) Folder containing values, logic, and math used by other files to help them function.
 > - **Constants** [`robot/util/constants`](src/main/java/frc/robot/util/constants) contains constants used throughout the robot code to prevent a mismatch in data & hardcoding values (Ex. PIDFF values & current limits).
 > - **Calc** [`robot/util/calc`](src/main/java/frc/robot/util/calc) contains the calculations required for pivot alinment & shooter speeds when shooting while driving.
+> - **Auto** [`robot/util/auto`](src/main/java/frc/robot/util/auto) Folder containing the storage files for `Choreo` and `PathPlanner`.
    
 ## Controls 🎮
 [![Driver](https://github.com/Patribots4738/Crescendo2024/assets/65139378/d2d0000f-54cb-42d2-9b8a-7e635ca79c18)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
