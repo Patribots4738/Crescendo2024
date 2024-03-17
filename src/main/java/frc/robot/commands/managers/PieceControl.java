@@ -3,12 +3,13 @@ package frc.robot.commands.managers;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
@@ -23,8 +24,8 @@ import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Logged;
 import monologue.Annotations.Log;
+import monologue.Logged;
 
 public class PieceControl implements Logged {
 
@@ -115,7 +116,7 @@ public class PieceControl implements Logged {
                 stopIntakeAndIndexer());
     }
 
-    public Command intakeNote() {
+    public Command intakeUntilNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from trapper into indexer and then into 
@@ -125,9 +126,21 @@ public class PieceControl implements Logged {
             trapper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(colorSensor::hasNote),
-            setHasPiece(true),
             stopIntakeAndIndexer()
         );
+    }
+
+    public Command intakeNote(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        return Commands.either(
+            noteToShoot(poseSupplier, speedSupplier)
+                .andThen(
+                    Commands.defer(
+                        () -> intakeNote(poseSupplier, speedSupplier), 
+                        intakeUntilNote().getRequirements()
+                    )
+                ),
+            intakeUntilNote(), 
+            colorSensor::hasNote);
     }
 
     public Command noteToIndexer() {
