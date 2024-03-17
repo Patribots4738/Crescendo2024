@@ -2,25 +2,75 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3127322708546125,
-      "y": 5.531086239477443
+      "x": 1.2422530556147342,
+      "y": 7.161301131112901
     },
-    "rotation": 179.23260430062362
+    "rotation": -126.505624210191
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "S C1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "C1toC5"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "S C1"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C1 L"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L C2"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C2 L"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L C3"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C3 M"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]

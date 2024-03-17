@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -123,6 +124,8 @@ public class RobotContainer implements Logged {
     @Log
     public static Pose2d robotPose2d = new Pose2d();
     @Log
+    public static Transform2d visionErrorPose = new Transform2d();
+    @Log
     public static double distanceToSpeakerMeters = 0;
     @Log
     public static Pose3d robotPose3d = new Pose3d();
@@ -134,6 +137,8 @@ public class RobotContainer implements Logged {
     public static double gameModeStart = 0;
     @Log
     public static boolean hasPiece = true;
+    @Log
+    public static boolean enableVision = true;
     
     public RobotContainer() {
         
@@ -661,8 +666,18 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
-        NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("DisableLimelight", disableVision());
+        NamedCommands.registerCommand("EnableLimelight", enableVision());
         registerPathToPathCommands();
+    }
+
+    private Command disableVision() {
+        return Commands.runOnce(() -> enableVision = false).ignoringDisable(true);
+    }
+
+    private Command enableVision() {
+        return Commands.runOnce(() -> enableVision = true).ignoringDisable(true);
     }
 
     private void registerPathToPathCommands() {

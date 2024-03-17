@@ -23,8 +23,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
-import frc.robot.Robot.GameMode;
+import frc.robot.RobotContainer;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
@@ -86,29 +85,28 @@ public class Limelight extends SubsystemBase implements Logged{
 
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
-        if (hasTarget(result)) {
+        this.estimatedPose2d = estimatedRobotPose;
+        RobotContainer.visionErrorPose = RobotContainer.robotPose2d.minus(estimatedRobotPose);
+
+        if (RobotContainer.enableVision && hasTarget(result)) {
             double xyStds;
             double radStds;
             // multiple targets detected
             if (targets.length > 1) {
                 // TODO: TUNE
-                xyStds = 0.1778;
+                xyStds = Math.hypot(0.011, 0.028);
                 radStds = Units.degreesToRadians(5);
             }
-            // 1 target with large area and close to estimated pose
+            // 1 target with large area and close to estimated roxose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
-                xyStds = 0.3556;
+                xyStds = 0.192;
                 radStds = Units.degreesToRadians(15);
             }
             // conditions don't match to add a vision measurement
             else {
                 return;
             }
-
-            this.estimatedPose2d = estimatedRobotPose;
-
-            if (Robot.gameMode == GameMode.AUTONOMOUS) return;
 
             poseEstimator.setVisionMeasurementStdDevs(
                 VecBuilder.fill(xyStds, xyStds, radStds));
@@ -252,7 +250,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
         if (result == null || !result.valid 
             || (LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
-            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.09)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
             || Double.isNaN(estimatedRobotPose.getX()) 
             || Double.isNaN(estimatedRobotPose.getY()) 

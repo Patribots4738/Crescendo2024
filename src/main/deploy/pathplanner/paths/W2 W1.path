@@ -48,12 +48,12 @@
     },
     {
       "anchor": {
-        "x": 3.5129095118212637,
-        "y": 6.237410548729272
+        "x": 3.9173989210240463,
+        "y": 6.5775493701043395
       },
       "prevControl": {
-        "x": 3.333647160015485,
-        "y": 6.379901136062071
+        "x": 3.545084805735121,
+        "y": 6.908495250361161
       },
       "nextControl": null,
       "isLocked": false,
@@ -81,6 +81,12 @@
               "data": {
                 "name": "Intake"
               }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "EnableLimelight"
+              }
             }
           ]
         }
@@ -95,7 +101,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -166.86817849945314,
+    "rotation": -172.68221039827986,
     "rotateFast": false
   },
   "reversed": false,
