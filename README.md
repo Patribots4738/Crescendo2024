@@ -46,11 +46,19 @@ ___
 ## Simulation & Testing 🪄
   It is crucial to maintain both our robot & our code. Therefore, we always run our code in a simulation using `FRC Driver Station` / `WPILibs's Sim GUI` and `Advantage Scope` to catch breaking changes on our robot before they happen in real life. After our design team has constructed the CAD model of our robot in `Onshape`, we can export its moving parts into `Advantage Scope`. We then link the CAD and the code together to simulate a robot that moves similarly to a real one. Once our code passes this unit test (working in simulation), we can expect a much more specific result on the real robot. This process is used with most of our code and was essential for code involving critical math (i.e. auto alignment & shooting while driving).
 
-## Discretize Swerve 🛞
-  Our robot uses `REV MAX Swerve`. It works great, but when turning while driving, a dt of 0.02s just isn't small enough to get precise movement that doesn't drift. To remedy this, we discretize our speeds over 0.02s to get a new trajectory that results in the robot being able to spin while driving without drifting left or right. This is critical to our autonomous, since we need our position to be as accurate as possible. You can learn more about the evolution about it here: [Swerve Drive Skew and Second Order Kinematics - Chief Delphi](<https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/33>). This code is now implemented into WPILib!
+## Swerve Drive 🛞
+- **Field Centric** To make the robot more user-friendly for the driver, our swerve drive is field-centric using our `Pigeon 2.0` gyroscope to get our orientation on the field.
+  
+- **Defensive X-Pose** When our robot is stationary in teleop, we set the position of our wheels to an X. This idea was pruposed by [3255 - SuperNURDS](<https://github.com/FRCTeam3255>) and has helped us tremendosuly! In this X-pose, our robot will stay stationary, even if another robot drives into us at full speed.
+  
+- **Discretize** Our robot uses `REV MAX Swerve`. It works great, but when turning while driving, a dt of 0.02s just isn't small enough to get precise movement that doesn't drift. To remedy this, we discretize our speeds over 0.02s to get a new trajectory that results in the robot being able to spin while driving without drifting left or right. This is critical to our autonomous, since we need our position to be as accurate as possible. You can learn more about the evolution about it here: [Swerve Drive Skew and Second Order Kinematics - Chief Delphi](<https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/33>). This code is now implemented into WPILib!
+
+- **Wheel Characterization** Calculating our odometry is based on the radius of our wheels, which changes throughout the season as the tread wears out. With the `Pigeon 2.0`, and inspiration from [6328 - Mechanical Advantage](<https://github.com/Mechanical-Advantage>), we can measure when one full turn of the robot has been completed, then use the distance traveled by each wheel to find the wheels' radius, helping us maintain the accuracy of our odometry.
 
 ## Autonomous 🤖
   <img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/d47db1e3-67e7-4c6d-ab01-7f75e807eed5" width="70%" />
+  <img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/a2f07fb3-7936-4830-88a0-775047d76ef3" width="70%" />
+
   
   ### Path Generation & Modular Autonomous Paths 📈
   We use `PathPlanner` to construct a modular autonomous. In `PathPlanner`, we use named waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, we are able to make quick decisions on whether or not we got the note, or if we should skip trying to get a note that isn't there. Additionally, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of April tags allow us to generate a path from anywhere in the starting zone as long as our Limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>) :>
@@ -65,11 +73,15 @@ ___
   ### Shooting While Driving
   Our robot is able to shoot notes into the speaker while moving! This feature grants us a shorter cycle time and is most evident in autonomous. If you are curious to learn more, check out the [Math](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW? viewport=-121,-188,2715,1378&page=page:page>) behind it!
   
-  ### Field Centric Swerve Drive
-  To make the robot more user-friendly for the driver, our swerve drive is field-centric using our `Pigeon 2.0` gyroscope to get our orientation on the field.
-  
   ### Auto Alignment w/ April Tags
   Another feature for user-friendliness is our robot's ability to align to field objects such as the speaker, stage & amp. When aligned to the speaker, the driver can move the robot anywhere on the field whilst the shooter always faces the speaker. For the amp & stage, the robot becomes locked in a certain axis. This helps the driver with steering & alignment.
+
+  ### Timed Event Triggers
+When certain time relative or sequential events occour, it triggers another command or event. Some examples include:
+- Doing a gradual rumble of the driver and operator controllers in endgame that gets more intense as the fields timer gets closer to ending.
+- Flashing `Limelight` LEDs and rumbling both controllers when our `Color sensor` detects that we have a note
+- Rumbling controllers when our shooter is up to speed or when aligned to amp.
+- Telling `PathPlanner` what side of the field we are running auto on based on our alliance.
 
 _____
 
