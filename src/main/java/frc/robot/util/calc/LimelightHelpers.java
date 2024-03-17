@@ -287,7 +287,7 @@ public class LimelightHelpers {
          */
         public void calculateDistance(double cameraHeight, double cameraAngle) {
             if (className.equals("note")) {
-                double targetHeight = Units.inchesToMeters(2); // we always assume that the note is on the ground
+                double targetHeight = Units.inchesToMeters(1); // we always assume that the note is on the ground
 
                 double angleToNoteRad = cameraAngle + Units.degreesToRadians(ty);
                 this.calcY = (targetHeight - cameraHeight) / Math.tan(angleToNoteRad);
