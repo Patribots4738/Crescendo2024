@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
+import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Detector;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
 import monologue.Logged;
@@ -53,6 +54,9 @@ public class Limelight extends SubsystemBase implements Logged{
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
+    @Log
+    private Pose2d notePose2d = new Pose2d();
+
     public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName, int pipelineIndex) {
         // Uses network tables to check status of limelight
         this.limelightName = limelightName;
@@ -71,6 +75,7 @@ public class Limelight extends SubsystemBase implements Logged{
         } else {
             updatePoseEstimator();
             getTags();
+            notePose2d = robotPoseSupplier.get().plus( new Transform2d(getNotePose2d().getTranslation(), new Rotation2d()));
         }
     }
 
@@ -147,6 +152,11 @@ public class Limelight extends SubsystemBase implements Logged{
         }
         if (noteInVision()) {
             Results results = getResults();
+            for (LimelightTarget_Detector ld : results.targets_Detector) {
+                ld.calculateDistance(CameraConstants.cameras[1].getZ(), CameraConstants.cameras[1].getRotation().getZ());
+                ld.calculateXDistance(0);
+                System.out.println("Note Pose: ("+ ld.calcX + ", "+ld.calcY+") " );
+            }
             Translation2d noteTranslationToBot = new Translation2d(results.targets_Detector[0].calcX, results.targets_Detector[0].calcY);
             Pose2d notePose = new Pose2d(noteTranslationToBot, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
             return notePose.plus(new Transform2d(robotPoseSupplier.get().getTranslation(), new Rotation2d()));
