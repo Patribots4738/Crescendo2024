@@ -158,9 +158,9 @@ public class Limelight extends SubsystemBase implements Logged{
             for (LimelightTarget_Detector ld : results.targets_Detector) {
                 ld.calculateDistance(CameraConstants.cameras[1].getZ(), CameraConstants.cameras[1].getRotation().getZ());
                 ld.calculateXDistance(0);
-                System.out.println("Note Pose: ("+ ld.calcX + ", "+ld.calcY+") " );
+                System.out.println("Note Pose: ("+ ld.calcY + ", "+ld.calcX+") " );
             }
-            Translation2d noteTranslationToBot = new Translation2d(results.targets_Detector[0].calcX, results.targets_Detector[0].calcY);
+            Translation2d noteTranslationToBot = new Translation2d(results.targets_Detector[0].calcY, results.targets_Detector[0].calcX);
             Pose2d notePose = new Pose2d(noteTranslationToBot, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
             return notePose.plus(new Transform2d(robotPoseSupplier.get().getTranslation(), new Rotation2d()));
         }
