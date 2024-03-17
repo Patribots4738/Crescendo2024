@@ -401,6 +401,7 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "S W3-1 S C2-3 S",
+            "S C1-5 S"
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
             // "S C5-4 S",
@@ -465,7 +466,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.5019838755657253*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.497869699432264*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
