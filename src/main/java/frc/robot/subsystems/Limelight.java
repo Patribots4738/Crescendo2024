@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
@@ -95,13 +97,13 @@ public class Limelight extends SubsystemBase implements Logged{
             if (targets.length > 1) {
                 // TODO: TUNE
                 xyStds = Math.hypot(0.011, 0.028);
-                radStds = Units.degreesToRadians(5);
+                radStds = Units.degreesToRadians(3);
             }
             // 1 target with large area and close to estimated roxose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
                 xyStds = 0.192;
-                radStds = Units.degreesToRadians(15);
+                radStds = Units.degreesToRadians(7);
             }
             // conditions don't match to add a vision measurement
             else {
@@ -248,9 +250,11 @@ public class Limelight extends SubsystemBase implements Logged{
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
+        double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.175;
+        double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.13 : 0.07;
         if (result == null || !result.valid 
-            || (LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
-            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.09)
+            || (LimelightHelpers.getTA(limelightName) < singleTagAmbiguityThreshold && result.targets_Fiducials.length == 1)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < multiTagAmbiguityThreshold)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
             || Double.isNaN(estimatedRobotPose.getX()) 
             || Double.isNaN(estimatedRobotPose.getY()) 
