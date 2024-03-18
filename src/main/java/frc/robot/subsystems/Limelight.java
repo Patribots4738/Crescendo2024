@@ -190,7 +190,7 @@ public class Limelight extends SubsystemBase implements Logged{
                 new Transform2d(
                     new Translation2d(
                         Units.inchesToMeters(14),
-                        slopeAngle.plus(Rotation2d.fromDegrees(180 ))
+                        slopeAngle.plus(Rotation2d.fromDegrees(180))
                     ),
                     slopeAngle)
             );
@@ -199,7 +199,11 @@ public class Limelight extends SubsystemBase implements Logged{
     }
 
     public boolean noteInVision(Results results) {
-        return results.valid && results.targets_Detector.length > 0 && LimelightHelpers.getTA(limelightName) > 0.5 && results.targets_Detector[0].tx != 0 && results.targets_Detector[0].ty != 0;
+        return results.valid 
+            && results.targets_Detector.length > 0 
+            && LimelightHelpers.getTA(limelightName) > 0.5 
+            && results.targets_Detector[0].tx != 0 
+            && results.targets_Detector[0].ty != 0;
     }
     
     public Pose2d getPose2d() {
