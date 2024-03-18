@@ -26,7 +26,6 @@ import frc.robot.subsystems.Swerve;
 import monologue.Logged;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -261,7 +260,11 @@ public class PathPlannerStorage implements Logged {
                 PoseCalculations.getClosestShootingPose(swerve.getPose()), 
                 PATH_CONSTRAINTS,
                 0)
-            .andThen(NamedCommands.getCommand("ShootInstantly"));
+            .andThen(NamedCommands.getCommand("ShootInstantly"))
+            .raceWith(Commands.waitSeconds(1.5).andThen(
+                    Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
+                )
+            );
     }
 
     /**
@@ -291,10 +294,10 @@ public class PathPlannerStorage implements Logged {
                         Rotation2d.fromDegrees(
                             Robot.isRedAlliance() ^ goingDown 
                                 ? -CameraConstants.LL2_HORIZONTAL_FOV/4.0 
-                                : CameraConstants.LL2_HORIZONTAL_FOV/4.0
+                                :  CameraConstants.LL2_HORIZONTAL_FOV/4.0
                         ).plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))),
                     PATH_CONSTRAINTS,
-                    1
+                    0
                 ),
                 Commands.waitUntil(() -> limelight.noteInVision(limelight.getResults()))
             );
@@ -308,26 +311,6 @@ public class PathPlannerStorage implements Logged {
      * @param currentIndex The current index of the note so that we can get a predetermined note
      *                      pose without our vision
      * @return  The command that drives to a preset note position
-     */
-    // public Command goToNote(Swerve swerve, IntSupplier currentIndex) {
-    //     return 
-    //         Commands.parallel(
-    //             swerve.updateChasePose(
-    //                 () -> 
-    //                     new Pose2d(
-    //                         NOTE_POSES.get(currentIndex.getAsInt()).getTranslation(),
-    //                         Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)))
-    //                 .repeatedly().until(swerve::atHDCPose),
-    //             swerve.getChaseCommand());  
-    // }
-
-    /**
-     * Uses a custom chase command to drive towards a dynamically changing note pose
-     * Updates the note pose with our limelight repeatedly until we reach it
-     * 
-     * @param swerve  The swerve subsystem to use.
-     * @param limelight The limelight subsystem to use
-     * @return  The command that holonomically drives to a note position gathered from vision
      */
     public Command goToNote() {
         return swerve.getChaseCommand( 

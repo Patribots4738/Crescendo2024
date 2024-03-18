@@ -391,6 +391,10 @@ public class Swerve extends SubsystemBase implements Logged {
         return new ChasePose(this, desiredPose, cancelSupplier);
     }
 
+    public Command getChaseCommand(Supplier<Pose2d> desiredPose) {
+        return new ChasePose(this, desiredPose, () -> false);
+    }
+
     public Command getScanCommand() {
         return new ChasePose(this, () ->
             new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Robot.isRedAlliance() ? 0 : 180)).plus(

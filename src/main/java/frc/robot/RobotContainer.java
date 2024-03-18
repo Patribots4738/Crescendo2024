@@ -441,6 +441,9 @@ public class RobotContainer implements Logged {
                     ).finallyDo(() -> limelight3.setLEDState(() -> false).schedule())
                 );
         
+        controller.leftTrigger()
+            .whileTrue(swerve.getChaseCommand(limelight2::getNotePose2d));
+
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
       

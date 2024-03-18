@@ -311,7 +311,7 @@ public final class Constants {
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 8;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
@@ -972,6 +972,17 @@ public final class Constants {
                 notePoses.add(
                     new Pose2d(
                         CENTERLINE_TRANSLATIONS[i].toTranslation2d(), 
+                        new Rotation2d()));
+            }
+            return notePoses;
+        }
+
+        public static List<Pose2d> GET_ALL_NOTES() {
+            List<Pose2d> notePoses = new ArrayList<Pose2d>();
+            for (int i = 0; i < NOTE_TRANSLATIONS.length; i++) {
+                notePoses.add(
+                    new Pose2d(
+                        NOTE_TRANSLATIONS[i].toTranslation2d(), 
                         new Rotation2d()));
             }
             return notePoses;

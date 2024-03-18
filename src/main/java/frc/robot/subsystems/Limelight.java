@@ -162,48 +162,68 @@ public class Limelight extends SubsystemBase implements Logged{
     Pose2d noteFieldPosePlus14 = new Pose2d();
 
     public Pose2d getNotePose2d() {
-        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
-            LimelightHelpers.setPipelineIndex(limelightName, 1);
-        }
-        Results results = getResults();
-        if (noteInVision(results)) {
-            for (LimelightTarget_Detector ld : results.targets_Detector) {
-                ld.calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
-                ld.calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+        Translation2d noteTranslationFromRobot;
+        if (FieldConstants.IS_SIMULATION) {
+            noteFieldPose = robotPoseSupplier.get().nearest(FieldConstants.GET_CENTERLINE_NOTES());
+            noteTranslationFromRobot = noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation();
+        } else {
+            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
+                LimelightHelpers.setPipelineIndex(limelightName, 1);
             }
 
-            Translation2d noteTranslationFromCamera = 
-                new Translation2d(
+            Results results = getResults();
+
+            if (noteInVision(results)) {
+                for (LimelightTarget_Detector ld : results.targets_Detector) {
+                    ld.calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
+                    ld.calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+                }
+
+                Translation2d noteTranslationFromCamera = new Translation2d(
                     results.targets_Detector[0].calcY,
                     -results.targets_Detector[0].calcX
                 );
 
-            Translation2d noteTranslationFromRobot = 
-                noteTranslationFromCamera
-                .plus(CameraConstants.LL2Pose.getTranslation().toTranslation2d())
-                .rotateBy(CameraConstants.LL2Pose.getRotation().toRotation2d());
-                
-            noteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
-            Rotation2d slopeAngle = new Rotation2d(noteTranslationFromRobot.getX(), noteTranslationFromRobot.getY())
-            .plus(Rotation2d.fromDegrees(180));
+                noteTranslationFromRobot = noteTranslationFromCamera
+                    .plus(CameraConstants.LL2Pose.getTranslation().toTranslation2d())
+                    .rotateBy(CameraConstants.LL2Pose.getRotation().toRotation2d());
+
+                noteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
+            } else {
+                return noteFieldPosePlus14;
+            }
+        }
+
+        Rotation2d slopeAngle = new Rotation2d(
+            noteTranslationFromRobot.getX(),
+            noteTranslationFromRobot.getY()
+        ).plus(Rotation2d.fromDegrees(180));
+
+        double distanceThreshold = FieldConstants.IS_SIMULATION ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
+        if ((noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation().getNorm() > distanceThreshold)
+            || noteFieldPose.getTranslation().getDistance(noteFieldPosePlus14.getTranslation()) > Units.inchesToMeters(15)) {
+            
             noteFieldPosePlus14 = noteFieldPose.plus(
                 new Transform2d(
                     new Translation2d(
                         Units.inchesToMeters(14),
                         slopeAngle.plus(Rotation2d.fromDegrees(180))
                     ),
-                    slopeAngle)
+                    slopeAngle
+                )
             );
         }
+
         return noteFieldPosePlus14;
     }
 
     public boolean noteInVision(Results results) {
-        return results.valid 
+        return (FieldConstants.IS_SIMULATION && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
+            (results.valid 
             && results.targets_Detector.length > 0 
             && LimelightHelpers.getTA(limelightName) > 0.5 
             && results.targets_Detector[0].tx != 0 
-            && results.targets_Detector[0].ty != 0;
+            && results.targets_Detector[0].ty != 0);
     }
     
     public Pose2d getPose2d() {
