@@ -928,16 +928,16 @@ public final class Constants {
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             Pose2d L_POSE2D = new Pose2d(L_POSE, new Rotation2d(
-              GET_SPEAKER_TRANSLATION().getX() - L_POSE.getX(), 
-              GET_SPEAKER_TRANSLATION().getY() - L_POSE.getY()
+              SPEAKER_POSITIONS.get(0).getX() - L_POSE.getX(), 
+              SPEAKER_POSITIONS.get(0).getY() - L_POSE.getY()
             ));
             Pose2d R_POSE2D = new Pose2d(R_POSE, new Rotation2d(
-              GET_SPEAKER_TRANSLATION().getX() - R_POSE.getX(), 
-              GET_SPEAKER_TRANSLATION().getY() - R_POSE.getY()
+              SPEAKER_POSITIONS.get(0).getX() - R_POSE.getX(), 
+              SPEAKER_POSITIONS.get(0).getY() - R_POSE.getY()
             ));
             Pose2d M_POSE2D = new Pose2d(M_POSE, new Rotation2d(
-              GET_SPEAKER_TRANSLATION().getX() - M_POSE.getX(), 
-              GET_SPEAKER_TRANSLATION().getY() - M_POSE.getY()
+              SPEAKER_POSITIONS.get(0).getX() - M_POSE.getX(), 
+              SPEAKER_POSITIONS.get(0).getY() - M_POSE.getY()
             ));
             //Blue
             add(L_POSE2D);
