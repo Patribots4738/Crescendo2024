@@ -9,7 +9,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.ColorMatch;
-
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -312,13 +311,13 @@ public final class Constants {
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 8;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
 
-        public static final double AUTO_POSITION_TOLERANCE_METERS = 0.2;
-        public static final double AUTO_POSITION_TOLERANCE_RADIANS = 0.2;
+        public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(7);
+        public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(5);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
@@ -346,9 +345,9 @@ public final class Constants {
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
-        public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;
+        public static final double PIECE_SEARCH_OFFSET_METERS = 2.1;
 
-        public static final boolean USE_OBJECT_DETECTION = false;
+        public static final boolean USE_OBJECT_DETECTION = true;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
@@ -401,8 +400,9 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "S W3-1 S C2-3 S",
-            // "S C1-5 S",
-            "S W1-2 S C1-3 S"
+            "S C1-3 S",
+            "S W1-2 S C1-3 S",
+            "OBJ"
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
             // "S C5-4 S",
@@ -856,9 +856,9 @@ public final class Constants {
             }
         }
 
-        public static final Translation2d L_POSE = new Translation2d(5.11,6.23);
-        public static final Translation2d R_POSE = new Translation2d(5.88, 1.84);
-        public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
+        public static final Translation2d L_POSE = new Translation2d(4.319, 6.327);
+        public static final Translation2d R_POSE = new Translation2d(3, 3);
+        public static final Translation2d M_POSE = new Translation2d(4.423,4.855);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
         public static final List<Pose2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
@@ -927,13 +927,18 @@ public final class Constants {
         public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
-            Pose2d L_POSE2D = new Pose2d(L_POSE, new Rotation2d(Math.atan2(GET_SPEAKER_TRANSLATION().getY() - L_POSE.getY(), 
-            GET_SPEAKER_TRANSLATION().getX() - L_POSE.getX())));
-            Pose2d R_POSE2D = new Pose2d(R_POSE, new Rotation2d(Math.atan2(GET_SPEAKER_TRANSLATION().getY() - R_POSE.getY(), 
-            GET_SPEAKER_TRANSLATION().getX() - R_POSE.getX())));
-            Pose2d M_POSE2D = new Pose2d(M_POSE, new Rotation2d(((Math.atan2(GET_SPEAKER_TRANSLATION().getY() - M_POSE.getY(), 
-            GET_SPEAKER_TRANSLATION().getX() - M_POSE.getX())))));
-            Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
+            Pose2d L_POSE2D = new Pose2d(L_POSE, new Rotation2d(
+              GET_SPEAKER_TRANSLATION().getX() - L_POSE.getX(), 
+              GET_SPEAKER_TRANSLATION().getY() - L_POSE.getY()
+            ));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, new Rotation2d(
+              GET_SPEAKER_TRANSLATION().getX() - R_POSE.getX(), 
+              GET_SPEAKER_TRANSLATION().getY() - R_POSE.getY()
+            ));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, new Rotation2d(
+              GET_SPEAKER_TRANSLATION().getX() - M_POSE.getX(), 
+              GET_SPEAKER_TRANSLATION().getY() - M_POSE.getY()
+            ));
             //Blue
             add(L_POSE2D);
             add(R_POSE2D);
@@ -986,39 +991,24 @@ public final class Constants {
         public static final boolean FIELD_CALIBRATION_MODE = false;
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
-        private static final double CAM_HEIGHT = Units.inchesToMeters(16);
-        private static final double CAM_X = Units.inchesToMeters(6.6 / 2.0);
-        private static final double CAM_Y = Units.inchesToMeters(15.3 / 2.0);
-        private static final double CAM_PITCH = Units.degreesToRadians(-15);
-        private static final double CAM_YAW = Units.degreesToRadians(32);
+        public static final Pose3d LL3Pose = 
+            new Pose3d(
+                // forward positive, right positive, up positive
+                0.204,
+                -0.234,
+                0.651,
+                new Rotation3d(0, Units.degreesToRadians(13), 0));
+        public static final Pose3d LL2Pose =
+            new Pose3d(
+                // forward positive, right positive, up positive
+                -0.272724,
+                -0.311903,
+                0.433974,
+                // Pitch angle is measure from the horizontal
+                // it is negative because it points down
+                new Rotation3d(0, Units.degreesToRadians(-11), Units.degreesToRadians(180)));
 
-        private static final Pose3d cam1 =
-            new Pose3d(
-                new Translation3d(CAM_X, CAM_Y, CAM_HEIGHT), 
-                new Rotation3d(0, CAM_PITCH, CAM_YAW));
-        private static final Pose3d cam2 =
-            new Pose3d(
-                new Translation3d(CAM_X, -CAM_Y, CAM_HEIGHT),
-                new Rotation3d(0, CAM_PITCH, -CAM_YAW));
-        private static final Pose3d cam3 =
-            new Pose3d(
-                new Translation3d(-CAM_X, CAM_Y, CAM_HEIGHT),
-                new Rotation3d(0, CAM_PITCH, (Math.PI) - CAM_YAW));
-        private static final Pose3d cam4 =
-            new Pose3d(
-                new Translation3d(-CAM_X, -CAM_Y, CAM_HEIGHT),
-                new Rotation3d(0, CAM_PITCH, (Math.PI) + CAM_YAW));
-
-        private static final Pose3d cam5 = 
-            new Pose3d(
-                0.0508, -0.1524, 0.589701,
-                new Rotation3d(0, Units.degreesToRadians(-33), Units.degreesToRadians(15)));
-        private static final Pose3d cam6 =
-        new Pose3d(
-                -0.254, -0.155575, 0.589701,
-                new Rotation3d(0, Units.degreesToRadians(180), Units.degreesToRadians(-10)));
-
-        public static final Pose3d[] cameras = new Pose3d[] {cam5, cam6};
+        public static final Pose3d[] cameras = new Pose3d[] {LL3Pose, LL2Pose};
     }
     
     public static final class NTConstants {

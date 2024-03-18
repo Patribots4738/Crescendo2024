@@ -116,6 +116,20 @@ public class PieceControl implements Logged {
                 stopIntakeAndIndexer());
     }
 
+    public Command noteToShootUsingSensor(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from trapper into indexer and then into 
+        // shooter before stopping trapper and indexer
+        return Commands.sequence(
+                intake.inCommand(),
+                trapper.intake(),
+                indexer.toShooter(),
+                shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
+                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                stopIntakeAndIndexer());
+    }
+
     public Command intakeUntilNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 

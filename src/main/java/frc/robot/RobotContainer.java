@@ -36,8 +36,8 @@ import frc.robot.commands.managers.CalibrationControl;
 import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.leds.Commands.LPI;
 import frc.robot.leds.Strips.LedStrip;
+import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
@@ -153,7 +153,7 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 1);
             limelightMapper = new LimelightMapping(swerve.getPoseEstimator(), swerve::getPose, "limelight-three");
             
             // limelightMapper.ManuallyAddPose(12, new Pose3d(11.173, 4.096, 1.443, new Rotation3d(new Quaternion(0.003, 0.032, -0.025, -0.999))));
@@ -162,7 +162,7 @@ public class RobotContainer implements Logged {
             // limelightMapper.printJSON();
         } else {
             limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
@@ -215,7 +215,7 @@ public class RobotContainer implements Logged {
             pieceControl.getAutomaticShooterSpeeds(swerve::getPose)
         );
         
-        pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
+        pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight2);
         initializeComponents();
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
@@ -657,6 +657,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("ShootInstantly", pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootPreload());
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());

@@ -3,11 +3,12 @@
   "robotLength": 0.8636,
   "holonomicMode": true,
   "pathFolders": [
-    "Amp",
-    "Center Line",
-    "Preloads",
+    "Wings",
     "Stage",
-    "Wings"
+    "Preloads",
+    "Object Detection",
+    "Center Line",
+    "Amp"
   ],
   "autoFolders": [],
   "defaultMaxVel": 5.0,
