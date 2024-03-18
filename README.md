@@ -77,7 +77,10 @@ ___
 
 
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Note Detection
-  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing us to skip over a note location if no note is detected. Those opposing robots are fast!
+  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and holonomc drive controller. This is especially useful when to robot is at center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut-off the faster robots on the other alliance. Those opposing robots are fast!
+
+  > Here is a GIF of Terry detecting a note and chasing it! 🦖🔎
+  > <img src= "images/dino chase.gif">
 
 
 ## Teleoperated 🎮
@@ -87,7 +90,7 @@ ___
  > We use Xbox controllers to control the robot. However, the range of the joystick axis from the Xbox controller the shape of a skewed square with chamfered edges which is preferable for usage. In PatriBoxController, we remapped the range of input to a circle that is easier to use. Here's our [desmos](https://www.desmos.com/calculator/e07raajzh5) if you want to check out the math!
   
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Shooting While Driving 
-> Our robot is able to shoot notes into the speaker while moving! This feature grants us a shorter cycle time and is most evident in autonomous. If you are curious to learn more, check out the [math](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW? viewport=-121,-188,2715,1378&page=page:page>) behind it!
+> Our robot is able to shoot notes into the speaker while moving! This feature grants us a shorter cycle time and is most evident in autonomous. Shooting while driving uses the real and simulated values of [`noteTrajectory`](src/main/java/frc/robot/commands/logging/NoteTrajectory). If you are curious to learn more, visit our section deticated to note trajectory in _Simulation and Testing_ or check out the [math](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW? viewport=-121,-188,2715,1378&page=page:page>) behind it!
 
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Auto Alignment w/ April Tags
 > Another feature for user-friendliness is our robot's ability to align to field objects such as the speaker, stage & amp. When aligned to the speaker, the driver can move the robot anywhere on the field whilst the shooter always faces the speaker. For the amp & stage, the robot becomes locked in a certain axis. This helps the driver with steering & alignment.
