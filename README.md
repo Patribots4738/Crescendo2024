@@ -119,7 +119,7 @@ Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins
 
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Commands
 > [`robot/commands`](src/main/java/frc/robot/commands) Folder containing command files that control the robot.
-> - **Alignment Commands** [`robot/commands/drive/alignmentCmds`](src/main/frc/robot/commands/drive/alignmentCmds) File of commands that help that auto-align the robot to be locked in a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
+> - **Alignment Commands** [`robot/commands/drive/alignmentCmds`](src/main/frc/robot/commands/drive/alignmentCmds) File of commands that help that auto-align the robot to be locked on a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
 > - **Network Table PID Tuner** [`robot/commands/logging/NTPIDTuner`](src/main/frc/robot/commands/logging/NTPIDTuner) Command file that allows us to alter & tune the PID values in `Advantage Scope's` Network Tables for ease of access.
 > - **Selective Condiditional Command** [`robot/commands/managers/SelectiveConditionalCommand`](src/main/frc/robot/commands/managers/SelectiveConditionalCommand) Command that is similar to Commands.either but instead of just checking the boolean when the Command is originally run, it constantly checks the boolean supplier and runs the correct command.
 > - **Piece Control** [`robot/commands/manager/PieceControl`](src/main/robot/commands/manager/PieceControl) Command file containing various other commands that subystems use to manage possesion over the game piece.
