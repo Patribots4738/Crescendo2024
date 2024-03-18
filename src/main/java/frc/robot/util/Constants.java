@@ -927,10 +927,18 @@ public final class Constants {
         public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
-            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromRadians(-2.975));
-            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromRadians(2.367));
-            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromRadians(2.951));
-            Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
+            Pose2d L_POSE2D = new Pose2d(L_POSE, new Rotation2d(
+              GET_SPEAKER_TRANSLATION().getX() - L_POSE.getX(), 
+              GET_SPEAKER_TRANSLATION().getY() - L_POSE.getY()
+            ));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, new Rotation2d(
+              GET_SPEAKER_TRANSLATION().getX() - R_POSE.getX(), 
+              GET_SPEAKER_TRANSLATION().getY() - R_POSE.getY()
+            ));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, new Rotation2d(
+              GET_SPEAKER_TRANSLATION().getX() - M_POSE.getX(), 
+              GET_SPEAKER_TRANSLATION().getY() - M_POSE.getY()
+            ));
             //Blue
             add(L_POSE2D);
             add(R_POSE2D);
