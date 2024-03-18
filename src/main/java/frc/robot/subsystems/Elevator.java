@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.AmpConstants;
+import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.Robot;
 import monologue.Logged;
@@ -29,14 +29,14 @@ public class Elevator extends SubsystemBase implements Logged {
 
     /** Creates a new Elevator. */
     public Elevator() {
-        motor = new Neo(AmpConstants.ELEVATOR_CAN_ID, false, true);
+        motor = new Neo(ElevatorConstants.ELEVATOR_CAN_ID, false, true);
         configMotors();
     }
 
     public void configMotors() {
-        motor.setPositionConversionFactor(AmpConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
-        motor.setSmartCurrentLimit(AmpConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        motor.setPID(AmpConstants.ELEVATOR_PID);
+        motor.setPositionConversionFactor(ElevatorConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
+        motor.setSmartCurrentLimit(ElevatorConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
+        motor.setPID(ElevatorConstants.ELEVATOR_PID);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase implements Logged {
         
         updateStuck();
         RobotContainer.components3d[NTConstants.AMPPER_INDEX] = new Pose3d(
-            0, 0, position * AmpConstants.AMPPER_POSITION_MULTIPLIER, 
+            0, 0, position * ElevatorConstants.AMPPER_POSITION_MULTIPLIER, 
             new Rotation3d()
         );
         RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
@@ -74,8 +74,8 @@ public class Elevator extends SubsystemBase implements Logged {
     public void setPosition(double pos) {
         pos = MathUtil.clamp(
             pos,
-            AmpConstants.ELEVATOR_BOTTOM_LIMIT,
-            AmpConstants.ELEVATOR_TOP_LIMIT);
+            ElevatorConstants.ELEVATOR_BOTTOM_LIMIT,
+            ElevatorConstants.ELEVATOR_TOP_LIMIT);
 
         if (desiredPos != pos) {
             desiredPos = pos;
@@ -86,7 +86,7 @@ public class Elevator extends SubsystemBase implements Logged {
                 new Rotation3d()
             );
             RobotContainer.desiredComponents3d[NTConstants.AMPPER_INDEX] = new Pose3d(
-                0, 0, pos * AmpConstants.AMPPER_POSITION_MULTIPLIER,
+                0, 0, pos * ElevatorConstants.AMPPER_POSITION_MULTIPLIER,
                 new Rotation3d()
             );
         }
@@ -111,36 +111,36 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command toBottomCommand() {
-        return setPositionCommand(AmpConstants.BOTTOM_POS);
+        return setPositionCommand(ElevatorConstants.BOTTOM_POS);
     }
 
     public Command toTopCommand() {
-        return setPositionCommand(AmpConstants.TRAP_PLACE_POS, true);
+        return setPositionCommand(ElevatorConstants.TRAP_PLACE_POS, true);
     }
 
     public Command toNoteFixCommand() {
-        return setPositionCommand(AmpConstants.NOTE_FIX_POS, true);
+        return setPositionCommand(ElevatorConstants.NOTE_FIX_POS, true);
     }
 
     public Command toIndexCommand() {
-        return setPositionCommand(AmpConstants.INDEX_POS).andThen(toBottomCommand());
+        return setPositionCommand(ElevatorConstants.INDEX_POS).andThen(toBottomCommand());
     }
 
     public Command toDropCommand() {
-        return setPositionCommand(AmpConstants.DROP_POS);
+        return setPositionCommand(ElevatorConstants.DROP_POS);
     }
 
     public boolean atDesiredPosition() {
-	return MathUtil.isNear(desiredPos, position, AmpConstants.ELEVATOR_DEADBAND)
-        || MathUtil.isNear(desiredOverridePos, position, AmpConstants.ELEVATOR_DEADBAND);
+	return MathUtil.isNear(desiredPos, position, ElevatorConstants.ELEVATOR_DEADBAND)
+        || MathUtil.isNear(desiredOverridePos, position, ElevatorConstants.ELEVATOR_DEADBAND);
     }
 
     public boolean atPosition(double position) {
-        return MathUtil.isNear(position, this.position, AmpConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(position, this.position, ElevatorConstants.ELEVATOR_DEADBAND);
     }
 
     public boolean nearGuillotine() {
-        return atPosition(AmpConstants.GUILLOTONE_POS);
+        return atPosition(ElevatorConstants.GUILLOTONE_POS);
     }
 
     public boolean getStuck() {
@@ -151,7 +151,7 @@ public class Elevator extends SubsystemBase implements Logged {
     public void updateStuck() {
         stuckOnGuillotine =  
             hitGuillotineTimestamp != 0
-            && Robot.currentTimestamp - this.hitGuillotineTimestamp >= AmpConstants.STUCK_TIME_SECONDS
+            && Robot.currentTimestamp - this.hitGuillotineTimestamp >= ElevatorConstants.STUCK_TIME_SECONDS
             && desiredPos > position
             && nearGuillotine()
             && motor.getOutputCurrent() > 35.0;
@@ -165,8 +165,8 @@ public class Elevator extends SubsystemBase implements Logged {
         return run(() -> {
             desiredOverridePos = MathUtil.clamp(
                 desiredOverridePos + doubleSupplier.getAsDouble(),
-                AmpConstants.ELEVATOR_BOTTOM_LIMIT,
-                AmpConstants.ELEVATOR_TOP_LIMIT
+                ElevatorConstants.ELEVATOR_BOTTOM_LIMIT,
+                ElevatorConstants.ELEVATOR_TOP_LIMIT
             );
             setPosition(desiredOverridePos);
         });

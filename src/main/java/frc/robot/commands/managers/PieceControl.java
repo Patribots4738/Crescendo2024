@@ -21,7 +21,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Constants.AmpConstants;
+import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Annotations.Log;
@@ -243,10 +243,10 @@ public class PieceControl implements Logged {
     }
 
     public Command elevatorToTop() {
-        return setElevatorPosition(() -> AmpConstants.ELEVATOR_TOP_LIMIT);
+        return setElevatorPosition(() -> ElevatorConstants.ELEVATOR_TOP_LIMIT);
     }
     public Command elevatorToBottom() {
-        return setElevatorPosition(() -> AmpConstants.ELEVATOR_BOTTOM_LIMIT)
+        return setElevatorPosition(() -> ElevatorConstants.ELEVATOR_BOTTOM_LIMIT)
             .andThen(setPlaceWhenReadyCommand(false));
     }
 
@@ -264,8 +264,8 @@ public class PieceControl implements Logged {
             Commands.sequence(
                 // Toggle this state to currently unstucking if we haven't already
                 setDislodging(true),
-                elevator.setPositionCommand(AmpConstants.UNSTUCK_POS),
-                ampper.outtakeSlow(AmpConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
+                elevator.setPositionCommand(ElevatorConstants.UNSTUCK_POS),
+                ampper.outtakeSlow(ElevatorConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 elevator.setPositionCommand(desiredPose, true),
                 // Toggle unstucking state to off if the elevator isn't actually stuck anymore
                 setDislodging(false).onlyIf(() -> !elevator.getStuck())
@@ -277,8 +277,8 @@ public class PieceControl implements Logged {
             Commands.sequence(
                 stopIntakeAndIndexer(),
                 Commands.either(
-                    setElevatorPosition(() -> AmpConstants.NOTE_FIX_POS), 
-                    setElevatorPosition(() -> AmpConstants.TRAP_PLACE_POS), 
+                    setElevatorPosition(() -> ElevatorConstants.NOTE_FIX_POS), 
+                    setElevatorPosition(() -> ElevatorConstants.TRAP_PLACE_POS), 
                     () -> povLeftPosition),
                 placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }

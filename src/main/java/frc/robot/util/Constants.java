@@ -230,15 +230,15 @@ public final class Constants {
 
     }
 
-    public static final class AmpConstants {
+    public static final class ElevatorConstants {
         public static final int ELEVATOR_CAN_ID = 14;
-        public static final int AMP_CAN_ID = 15;
+        public static final int AMPPER_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = 0.03;
         public static final double OUTTAKE_SECONDS = 3;
         public static final double AMPPER_POSITION_MULTIPLIER = 1.925;
 
-        public static final int AMP_CURRENT_LIMIT = 15;
-        public static final boolean AMP_INVERTION = true;
+        public static final int AMPPER_CURRENT_LIMIT = 15;
+        public static final boolean AMPPER_INVERTION = true;
 
         private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
         private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
@@ -601,8 +601,8 @@ public final class Constants {
             /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
             /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
             /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
-            /* 14  */ put(AmpConstants.ELEVATOR_CAN_ID, "Elevator");
-            /* 15  */ put(AmpConstants.AMP_CAN_ID, "Amp");
+            /* 14  */ put(ElevatorConstants.ELEVATOR_CAN_ID, "Elevator");
+            /* 15  */ put(ElevatorConstants.AMPPER_CAN_ID, "Amp");
             /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
             /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
         }};
@@ -630,7 +630,7 @@ public final class Constants {
                 add(MOTOR_MAP.get(ShooterConstants.SHOOTER_PIVOT_CAN_ID));
             }});
             MOTOR_GROUPS.put("Elevator", new ArrayList<Neo>() {{
-                add(MOTOR_MAP.get(AmpConstants.ELEVATOR_CAN_ID));
+                add(MOTOR_MAP.get(ElevatorConstants.ELEVATOR_CAN_ID));
             }});
             MOTOR_GROUPS.put("Climb", new ArrayList<Neo>() {{
                 add(MOTOR_MAP.get(ClimbConstants.LEFT_CLIMB_CAN_ID));

@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.Constants.AmpConstants;
+import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -16,13 +16,13 @@ public class Ampper extends SubsystemBase implements Logged {
     private double desiredSpeed = 0;
 
     public Ampper() {
-        motor = new Neo(AmpConstants.AMP_CAN_ID, false, AmpConstants.AMP_INVERTION);
-        motor.setSmartCurrentLimit(AmpConstants.AMP_CURRENT_LIMIT);
+        motor = new Neo(ElevatorConstants.AMPPER_CAN_ID, false, ElevatorConstants.AMPPER_INVERTION);
+        motor.setSmartCurrentLimit(ElevatorConstants.AMPPER_CURRENT_LIMIT);
     }
 
     public Command intakeFromHandoff() {
         return intake()
-            .andThen(Commands.waitSeconds(AmpConstants.INTAKE_TIME))
+            .andThen(Commands.waitSeconds(ElevatorConstants.INTAKE_TIME))
             .andThen(stopCommand());
     }
 
@@ -30,8 +30,8 @@ public class Ampper extends SubsystemBase implements Logged {
         percent = 
             MathUtil.clamp(
                 percent, 
-                AmpConstants.AMPPER_LOWER_PERCENT_LIMIT, 
-                AmpConstants.AMPPER_UPPER_PERCENT_LIMIT);
+                ElevatorConstants.AMPPER_LOWER_PERCENT_LIMIT, 
+                ElevatorConstants.AMPPER_UPPER_PERCENT_LIMIT);
         if (desiredSpeed != percent) {
             desiredSpeed = percent;
             
@@ -40,11 +40,11 @@ public class Ampper extends SubsystemBase implements Logged {
     }
 
     public Command outtake() {
-        return runOnce(() -> setSpeed(AmpConstants.AMPPER_OUTTAKE_PERCENT));
+        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_OUTTAKE_PERCENT));
     }
 
     public Command outtakeSlow() {
-        return runOnce(() -> setSpeed(AmpConstants.AMPPER_OUTTAKE_SLOW));
+        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_OUTTAKE_SLOW));
     }
 
     public Command outtakeSlow(double seconds) {
@@ -64,11 +64,11 @@ public class Ampper extends SubsystemBase implements Logged {
     }
 
     public Command stopCommand() {
-        return runOnce(() -> setSpeed(AmpConstants.AMPPER_STOP_PERCENT));
+        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_STOP_PERCENT));
     }
 
     public Command intake() {
-        return runOnce(() -> setSpeed(AmpConstants.AMPPER_INTAKE_PERCENT));
+        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_INTAKE_PERCENT));
     }
 
     public Command intake(double seconds) {
