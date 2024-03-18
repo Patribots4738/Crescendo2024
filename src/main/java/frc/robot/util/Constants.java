@@ -311,12 +311,12 @@ public final class Constants {
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.5;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 8;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
 
-        public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(3);
+        public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(7);
         public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(5);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
@@ -345,9 +345,9 @@ public final class Constants {
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
-        public static final double PIECE_SEARCH_OFFSET_METERS = 1.0;
+        public static final double PIECE_SEARCH_OFFSET_METERS = 2.1;
 
-        public static final boolean USE_OBJECT_DETECTION = false;
+        public static final boolean USE_OBJECT_DETECTION = true;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P,
@@ -400,8 +400,9 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "S W3-1 S C2-3 S",
-            "S C1-5 S",
-            "S W1-2 S C1-3 S"
+            "S C1-3 S",
+            "S W1-2 S C1-3 S",
+            "OBJ"
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
             // "S C5-4 S",
@@ -855,9 +856,9 @@ public final class Constants {
             }
         }
 
-        public static final Translation2d L_POSE = new Translation2d(5.11,6.23);
-        public static final Translation2d R_POSE = new Translation2d(5.88, 1.84);
-        public static final Translation2d M_POSE = new Translation2d(4.46,4.81);
+        public static final Translation2d L_POSE = new Translation2d(4.319, 6.327);
+        public static final Translation2d R_POSE = new Translation2d(3, 3);
+        public static final Translation2d M_POSE = new Translation2d(4.423,4.855);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
         public static final List<Pose2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
@@ -926,9 +927,9 @@ public final class Constants {
         public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
-            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
-            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
-            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromDegrees(151.68));
+            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromRadians(-2.975));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromRadians(2.367));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromRadians(2.951));
             Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
             //Blue
             add(L_POSE2D);
