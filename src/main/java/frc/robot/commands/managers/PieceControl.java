@@ -18,10 +18,10 @@ import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Trapper;
+import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.Constants.AmpConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Annotations.Log;
@@ -33,7 +33,7 @@ public class PieceControl implements Logged {
     private Indexer indexer;
 
     private Elevator elevator;
-    private Trapper trapper;
+    private Ampper ampper;
 
     private ShooterCmds shooterCmds;
 
@@ -55,13 +55,13 @@ public class PieceControl implements Logged {
             Intake intake,
             Indexer indexer,
             Elevator elevator,
-            Trapper trapper,
+            Ampper ampper,
             ShooterCmds shooterCmds,
             ColorSensor colorSensor) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
-        this.trapper = trapper;
+        this.ampper = ampper;
         this.shooterCmds = shooterCmds;
         this.colorSensor = colorSensor;
     }
@@ -76,7 +76,7 @@ public class PieceControl implements Logged {
         return Commands.sequence(
             intake.setCoastMode(),
             indexer.setCoastMode(),
-            trapper.setCoastMode()
+            ampper.setCoastMode()
         );
     }
 
@@ -84,7 +84,7 @@ public class PieceControl implements Logged {
         return Commands.sequence(
             intake.setBrakeMode(),
             indexer.setBrakeMode(),
-            trapper.setBrakeMode()
+            ampper.setBrakeMode()
         );
     }
 
@@ -104,11 +104,11 @@ public class PieceControl implements Logged {
     public Command noteToShoot(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from trapper into indexer and then into 
-        // shooter before stopping trapper and indexer
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
         return Commands.sequence(
                 intake.inCommand(),
-                trapper.intake(),
+                ampper.intake(),
                 indexer.toShooter(),
                 NT.getWaitCommand("noteToShoot1"), // 0.7
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
@@ -119,11 +119,11 @@ public class PieceControl implements Logged {
     public Command noteToShootUsingSensor(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from trapper into indexer and then into 
-        // shooter before stopping trapper and indexer
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
         return Commands.sequence(
                 intake.inCommand(),
-                trapper.intake(),
+                ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
                 Commands.waitUntil(() -> !colorSensor.hasNote()),
@@ -133,11 +133,11 @@ public class PieceControl implements Logged {
     public Command intakeUntilNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from trapper into indexer and then into 
-        // shooter before stopping trapper and indexer
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
         return Commands.sequence(
             intake.inCommand(),
-            trapper.intake(),
+            ampper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(colorSensor::hasNote),
             stopIntakeAndIndexer()
@@ -160,7 +160,7 @@ public class PieceControl implements Logged {
     public Command noteToIndexer() {
         return Commands.sequence(
             intake.inCommand(),
-            trapper.intake(),
+            ampper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(colorSensor::hasNote),
             stopIntakeAndIndexer()
@@ -169,11 +169,11 @@ public class PieceControl implements Logged {
 
     public Command noteToTrap() {
         return Commands.sequence(
-            trapper.outtake(),
+            ampper.outtake(),
             indexer.toElevator(),
             Commands.waitUntil(() -> !colorSensor.hasNote()),
             stopIntakeAndIndexer(),
-            trapper.outtakeSlow(),
+            ampper.outtakeSlow(),
             NT.getWaitCommand("noteToTrap2"), // 0.5
             stopIntakeAndIndexer()
         );
@@ -182,12 +182,12 @@ public class PieceControl implements Logged {
     public Command ejectNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from trapper into indexer and then into 
-        // shooter before stopping trapper and indexer
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
         return Commands.sequence(
             intake.outCommand(),
             indexer.toElevator(),
-            trapper.outtake(),
+            ampper.outtake(),
             setHasPiece(false)
         );
     }
@@ -200,17 +200,17 @@ public class PieceControl implements Logged {
     }
 
     public Command panicEjectNote() {
-        return trapper.intake().alongWith(indexer.toElevator()).alongWith(intake.outCommand());
+        return ampper.intake().alongWith(indexer.toElevator()).alongWith(intake.outCommand());
     }
 
     public Command stopPanicEject() {
-        return trapper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand());
+        return ampper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand());
     }
 
     public Command intakeAuto() {
         return Commands.sequence(
                 intake.inCommand(),
-                trapper.intake(),
+                ampper.intake(),
                 indexer.toShooter());
     }
 
@@ -243,18 +243,18 @@ public class PieceControl implements Logged {
     }
 
     public Command elevatorToTop() {
-        return setElevatorPosition(() -> TrapConstants.ELEVATOR_TOP_LIMIT);
+        return setElevatorPosition(() -> AmpConstants.ELEVATOR_TOP_LIMIT);
     }
     public Command elevatorToBottom() {
-        return setElevatorPosition(() -> TrapConstants.ELEVATOR_BOTTOM_LIMIT)
+        return setElevatorPosition(() -> AmpConstants.ELEVATOR_BOTTOM_LIMIT)
             .andThen(setPlaceWhenReadyCommand(false));
     }
 
     public Command prepPiece() {
         return Commands.sequence(
-            trapper.intakeSlow(),
+            ampper.intakeSlow(),
             NT.getWaitCommand("prepPiece"),
-            trapper.stopCommand()
+            ampper.stopCommand()
         );
     }
 
@@ -264,8 +264,8 @@ public class PieceControl implements Logged {
             Commands.sequence(
                 // Toggle this state to currently unstucking if we haven't already
                 setDislodging(true),
-                elevator.setPositionCommand(TrapConstants.UNSTUCK_POS),
-                trapper.outtakeSlow(TrapConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
+                elevator.setPositionCommand(AmpConstants.UNSTUCK_POS),
+                ampper.outtakeSlow(AmpConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 elevator.setPositionCommand(desiredPose, true),
                 // Toggle unstucking state to off if the elevator isn't actually stuck anymore
                 setDislodging(false).onlyIf(() -> !elevator.getStuck())
@@ -277,8 +277,8 @@ public class PieceControl implements Logged {
             Commands.sequence(
                 stopIntakeAndIndexer(),
                 Commands.either(
-                    setElevatorPosition(() -> TrapConstants.NOTE_FIX_POS), 
-                    setElevatorPosition(() -> TrapConstants.TRAP_PLACE_POS), 
+                    setElevatorPosition(() -> AmpConstants.NOTE_FIX_POS), 
+                    setElevatorPosition(() -> AmpConstants.TRAP_PLACE_POS), 
                     () -> povLeftPosition),
                 placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }
@@ -288,7 +288,7 @@ public class PieceControl implements Logged {
             new SelectiveConditionalCommand(
                 Commands.sequence(
                     prepPiece(),
-                    trapper.outtake(0.8),
+                    ampper.outtake(0.8),
                     elevatorToBottom()
                 ),
                 setPlaceWhenReadyCommand(true),
@@ -310,7 +310,7 @@ public class PieceControl implements Logged {
         return Commands.sequence(
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 60.0)),
             indexer.toElevator(),
-            trapper.outtake()
+            ampper.outtake()
         ).onlyWhile(holdingButton)
         .andThen(
             Commands.either(
@@ -322,7 +322,7 @@ public class PieceControl implements Logged {
     public Command stopIntakeAndIndexer() {
         return intake.stopCommand()
                 .alongWith(indexer.stopCommand())
-                .alongWith(trapper.stopCommand());
+                .alongWith(ampper.stopCommand());
     }
 
     public boolean getShooterMode() {

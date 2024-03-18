@@ -230,15 +230,15 @@ public final class Constants {
 
     }
 
-    public static final class TrapConstants {
+    public static final class AmpConstants {
         public static final int ELEVATOR_CAN_ID = 14;
-        public static final int TRAP_CAN_ID = 15;
+        public static final int AMP_CAN_ID = 15;
         public static final double ELEVATOR_DEADBAND = 0.03;
         public static final double OUTTAKE_SECONDS = 3;
-        public static final double TRAPPER_POSITION_MULTIPLIER = 1.925;
+        public static final double AMPPER_POSITION_MULTIPLIER = 1.925;
 
-        public static final int TRAP_CURRENT_LIMIT = 15;
-        public static final boolean TRAP_INVERTION = true;
+        public static final int AMP_CURRENT_LIMIT = 15;
+        public static final boolean AMP_INVERTION = true;
 
         private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
         private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
@@ -251,10 +251,10 @@ public final class Constants {
         // TODO: set these values
         public static final double BOTTOM_POS = -.0254;
         public static final double INTAKE_TIME = 0;
-        public static final double TRAPPER_OUTTAKE_PERCENT = -1;
-        public static final double TRAPPER_INTAKE_PERCENT = 1;
-        public static final double TRAPPER_OUTTAKE_SLOW = -0.3;
-        public static final double TRAPPER_STOP_PERCENT = 0;
+        public static final double AMPPER_OUTTAKE_PERCENT = -1;
+        public static final double AMPPER_INTAKE_PERCENT = 1;
+        public static final double AMPPER_OUTTAKE_SLOW = -0.3;
+        public static final double AMPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
         public static final double NOTE_FIX_POS = 0.14;
         public static final double INDEX_POS = 0.09;
@@ -270,17 +270,17 @@ public final class Constants {
         public static final double ELEVATOR_TOP_LIMIT = 0.49;
         public static final double ELEVATOR_BOTTOM_LIMIT = -0.0254;
 
-        public static final double TRAPPER_LOWER_PERCENT_LIMIT = -1;
-        public static final double TRAPPER_UPPER_PERCENT_LIMIT = 1;
+        public static final double AMPPER_LOWER_PERCENT_LIMIT = -1;
+        public static final double AMPPER_UPPER_PERCENT_LIMIT = 1;
 
-        public static final double TRAPPER_HAS_PIECE_UPPER_LIMIT = 0;
-        public static final double TRAPPER_HAS_PIECE_LOWER_LIMIT = -0.25;
+        public static final double AMPPER_HAS_PIECE_UPPER_LIMIT = 0;
+        public static final double AMPPER_HAS_PIECE_LOWER_LIMIT = -0.25;
 
-        public static final double TRAPPER_HAS_PIECE_MIN_TIMESTAMP = 0.25;
+        public static final double AMPPER_HAS_PIECE_MIN_TIMESTAMP = 0.25;
 
-        public static final double TRAPPER_HAS_PIECE_MIN_CURRENT = 15;
+        public static final double AMPPER_HAS_PIECE_MIN_CURRENT = 15;
 
-        public static final double TRAPPER_HAS_PIECE_MIN_TARGET_VELO = 0.45;
+        public static final double AMPPER_HAS_PIECE_MIN_TARGET_VELO = 0.45;
     }
 
     public static final class ClimbConstants {
@@ -601,8 +601,8 @@ public final class Constants {
             /* 11  */ put(ShooterConstants.LEFT_SHOOTER_CAN_ID, "LeftShooter");
             /* 12  */ put(ShooterConstants.RIGHT_SHOOTER_CAN_ID, "RightShooter");
             /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
-            /* 14  */ put(TrapConstants.ELEVATOR_CAN_ID, "Elevator");
-            /* 15  */ put(TrapConstants.TRAP_CAN_ID, "Trap");
+            /* 14  */ put(AmpConstants.ELEVATOR_CAN_ID, "Elevator");
+            /* 15  */ put(AmpConstants.AMP_CAN_ID, "Amp");
             /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
             /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
         }};
@@ -630,7 +630,7 @@ public final class Constants {
                 add(MOTOR_MAP.get(ShooterConstants.SHOOTER_PIVOT_CAN_ID));
             }});
             MOTOR_GROUPS.put("Elevator", new ArrayList<Neo>() {{
-                add(MOTOR_MAP.get(TrapConstants.ELEVATOR_CAN_ID));
+                add(MOTOR_MAP.get(AmpConstants.ELEVATOR_CAN_ID));
             }});
             MOTOR_GROUPS.put("Climb", new ArrayList<Neo>() {{
                 add(MOTOR_MAP.get(ClimbConstants.LEFT_CLIMB_CAN_ID));
@@ -662,7 +662,7 @@ public final class Constants {
 
         public static final int TRIGGER_WHEEL_CURRENT_LIMIT_AMPS = 30;
         public static final double SHOOTER_TRIGGER_WHEEL_PERCENT = -1;
-        public static final double TRAP_TRIGGER_WHEEL_PERCENT = 1;
+        public static final double AMP_TRIGGER_WHEEL_PERCENT = 1;
     }
 
     public static final class FieldConstants {
@@ -1020,7 +1020,7 @@ public final class Constants {
     
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
-        public static final int TRAPPER_INDEX = 1;
+        public static final int AMPPER_INDEX = 1;
         public static final int ELEVATOR_INDEX = 2;
         public static final int RIGHT_CLIMB_INDEX = 3;
         public static final int LEFT_CLIMB_INDEX = 4;
