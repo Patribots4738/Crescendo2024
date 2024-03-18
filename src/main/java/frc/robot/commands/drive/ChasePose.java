@@ -28,10 +28,7 @@ public class ChasePose extends Command {
 
     /** Creates a new ChasePose. */
     public ChasePose(Swerve swerve, Supplier<Pose2d> poseSupplier) {
-        this.swerve = swerve;
-        this.desiredPoseSupplier = poseSupplier;
-        this.cancelSupplier = () -> false;
-        addRequirements(swerve);
+        this(swerve, poseSupplier, () -> false);
     }
 
     // Called when the command is initially scheduled.
@@ -55,13 +52,12 @@ public class ChasePose extends Command {
         swerve.setDesiredPose(desiredPose2d);
 
         swerve.drive(desiredSpeeds);
-
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-
+        swerve.stopDriving();
     }
 
     // Returns true when the command should end.

@@ -345,7 +345,7 @@ public final class Constants {
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
-        public static final double PIECE_SEARCH_OFFSET_METERS = 2.1;
+        public static final double PIECE_SEARCH_OFFSET_METERS = 1.7;
 
         public static final boolean USE_OBJECT_DETECTION = true;
 

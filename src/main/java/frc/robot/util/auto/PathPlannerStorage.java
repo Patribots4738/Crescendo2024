@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.custom.PatriSendableChooser;
@@ -23,6 +24,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
 import monologue.Logged;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 
 import java.util.ArrayList;
@@ -30,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.IntSupplier;
 
 /**
  * This file represents all of the auto paths that we will have
@@ -51,7 +52,9 @@ public class PathPlannerStorage implements Logged {
 
     public static List<Pose2d> NOTE_POSES = FieldConstants.GET_CENTERLINE_NOTES();
 
+    @IgnoreLogged
     private Swerve swerve;
+    @IgnoreLogged
     private Limelight limelight;
 
     public static final PathConstraints PATH_CONSTRAINTS = 
@@ -183,21 +186,37 @@ public class PathPlannerStorage implements Logged {
      */
     private Command generateObjectDetectionCommand(int i, int endingNote, boolean goingDown, SequentialCommandGroup commandGroup) {
         int currentIndex = i - 1;
+        int nextIndex = currentIndex + (goingDown ? 1 : -1);
         if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
             return Commands.defer(
                 () -> Commands.either(
                     goToNote()
-                        .andThen(pathfindToShoot()
-                        .andThen(pathfindToNextNote(currentIndex + (goingDown ? 1 : -1), goingDown))), 
-                    pathfindToNextNote(currentIndex + (goingDown ? 1 : -1), goingDown), 
+                        // This .onlyIf accounts for us trying to get a note but failing 
+                        // and needing to go to the next one
+                        .andThen(pathfindToShoot().onlyIf(colorSensorSupplier)
+                            .andThen(pathfindToNextNote(nextIndex, goingDown))),
+                    pathfindToNextNote(nextIndex, goingDown), 
                     () -> limelight.noteInVision(limelight.getResults())),
                 commandGroup.getRequirements());
         } else {
             return Commands.defer(
-                () -> Commands.sequence(
-                    goToNote(),
-                    pathfindToShoot()
-                ).onlyIf(() -> limelight.noteInVision(limelight.getResults())), 
+                () -> Commands.either(
+                    Commands.sequence(
+                        goToNote(),
+                        pathfindToShoot()
+                    ), 
+                    Commands.runOnce(swerve::stopDriving, swerve)
+                        .andThen(
+                            swerve.getScanCommand()
+                            .until(() -> limelight.noteInVision(limelight.getResults()))
+                            .andThen(
+                                Commands.sequence(
+                                    goToNote(),
+                                    pathfindToShoot()
+                                )
+                            )
+                        ),
+                    () -> limelight.noteInVision(limelight.getResults())),
                 commandGroup.getRequirements());
         }
     }
@@ -254,18 +273,29 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that will pathfind towards the next note
      */
     public Command pathfindToNextNote(int index, boolean goingDown) {
+        Translation2d searchSpot = new Translation2d(
+            NOTE_POSES.get(index).getX() + 
+                (Robot.isRedAlliance() 
+                ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
+                : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
+            NOTE_POSES.get(index).getY());
+
         return 
-            Commands.race(AutoBuilder.pathfindToPose(
-                new Pose2d(
-                    NOTE_POSES.get(index).getX() + 
-                        (Robot.isRedAlliance() 
-                        ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
-                        : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
-                    NOTE_POSES.get(index).getY(), 
-                    Rotation2d.fromDegrees(Robot.isRedAlliance() ^ goingDown ? -20 : 20)
-                        .plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))), 
-                PATH_CONSTRAINTS,
-                Units.inchesToMeters(0)),
+            // Race the path and vision
+            // once we catch sight of a note, we can go straight to it.
+            Commands.race(
+                AutoBuilder.pathfindToPose(
+                    new Pose2d(
+                        searchSpot,
+                        // Angle the robot slightly towards the note
+                        Rotation2d.fromDegrees(
+                            Robot.isRedAlliance() ^ goingDown 
+                                ? -CameraConstants.LL2_HORIZONTAL_FOV/4.0 
+                                : CameraConstants.LL2_HORIZONTAL_FOV/4.0
+                        ).plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))),
+                    PATH_CONSTRAINTS,
+                    1
+                ),
                 Commands.waitUntil(() -> limelight.noteInVision(limelight.getResults()))
             );
     }
@@ -305,7 +335,13 @@ public class PathPlannerStorage implements Logged {
                 new Pose2d(
                     limelight.getNotePose2d().getTranslation(), 
                     Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)),
-            colorSensorSupplier)
+            () -> 
+                colorSensorSupplier.getAsBoolean() 
+                // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
+                // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
+                // since the pose is from the center but the note is from the edge (since the intake gets it)
+                || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
+                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)))
             .alongWith(NamedCommands.getCommand("ToIndexer"));
     }
 
