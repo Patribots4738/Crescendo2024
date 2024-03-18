@@ -401,7 +401,7 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "S W3-1 S C2-3 S",
-            "S C1-5 S",
+            // "S C1-5 S",
             "S W1-2 S C1-3 S"
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
@@ -927,9 +927,12 @@ public final class Constants {
         public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
-            Pose2d L_POSE2D = new Pose2d(L_POSE, Rotation2d.fromDegrees(179.61));
-            Pose2d R_POSE2D = new Pose2d(R_POSE, Rotation2d.fromDegrees(148.86));
-            Pose2d M_POSE2D = new Pose2d(M_POSE, Rotation2d.fromDegrees(151.68));
+            Pose2d L_POSE2D = new Pose2d(L_POSE, new Rotation2d(Math.atan2(GET_SPEAKER_TRANSLATION().getY() - L_POSE.getY(), 
+            GET_SPEAKER_TRANSLATION().getX() - L_POSE.getX())));
+            Pose2d R_POSE2D = new Pose2d(R_POSE, new Rotation2d(Math.atan2(GET_SPEAKER_TRANSLATION().getY() - R_POSE.getY(), 
+            GET_SPEAKER_TRANSLATION().getX() - R_POSE.getX())));
+            Pose2d M_POSE2D = new Pose2d(M_POSE, new Rotation2d(((Math.atan2(GET_SPEAKER_TRANSLATION().getY() - M_POSE.getY(), 
+            GET_SPEAKER_TRANSLATION().getX() - M_POSE.getX())))));
             Pose2d W3_POSE2D = new Pose2d(W3_POSE, new Rotation2d());
             //Blue
             add(L_POSE2D);
