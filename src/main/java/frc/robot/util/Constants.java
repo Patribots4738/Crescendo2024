@@ -996,6 +996,12 @@ public final class Constants {
          *   Phone for hotspot i suppose
          */
         public static final boolean FIELD_CALIBRATION_MODE = false;
+
+        public static final double LL2_HORIZONTAL_FOV = 59.6;
+        public static final double LL2_VERTICAL_FOV = 49.7;
+        public static final double LL3_HORIZONTAL_FOV = 63.3;
+        public static final double LL3_VERTICAL_FOV = 49.7;
+
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
         public static final Pose3d LL3Pose = 
