@@ -126,7 +126,7 @@ public class PieceControl implements Logged {
                 trapper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !colorSensor.hasNote()).raceWith(Commands.waitSeconds(0.5)), // TODO: remove when we a color sensor again
                 stopIntakeAndIndexer());
     }
 
@@ -144,6 +144,21 @@ public class PieceControl implements Logged {
         );
     }
 
+    public Command intakeUntilNoteNoSensor() {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from trapper into indexer and then into 
+        // shooter before stopping trapper and indexer
+        return Commands.sequence(
+            intake.inCommand(),
+            trapper.intake(),
+            indexer.toShooterSlow(),
+            Commands.waitSeconds(1.5), // TODO: remove when we a color sensor again,
+            stopIntakeAndIndexer()
+        );
+    }
+
+    
     public Command intakeNote(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.either(
             noteToShoot(poseSupplier, speedSupplier)

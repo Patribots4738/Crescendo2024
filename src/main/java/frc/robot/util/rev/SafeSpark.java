@@ -138,7 +138,7 @@ public class SafeSpark extends CANSparkBase {
                 ". Power cycle the robot to fix.";
             for (int i = 0; i < 5; i++) {
                 System.err.println(message);
-                Timer.delay(1);
+                Timer.delay(.1);
             }
         }
     }
