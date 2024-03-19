@@ -402,7 +402,7 @@ public final class Constants {
             "S W3-1 S C2-3 S",
             "S W3-1 C1-3 OBJ",
             "S C1-3 S",
-            "C 1-3 OBJ",
+            "S C1-3 OBJ",
             "S W1-2 S C1-3 S",
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
