@@ -190,14 +190,27 @@ public class PathPlannerStorage implements Logged {
                         .andThen(pathfindToShoot()
                         .andThen(pathfindToNextNote(currentIndex + (goingDown ? 1 : -1), goingDown))), 
                     pathfindToNextNote(currentIndex + (goingDown ? 1 : -1), goingDown), 
-                    () -> limelight.noteInVision(limelight.getResults())),
+                    this::reasonableNoteInVision),
                 commandGroup.getRequirements());
         } else {
             return Commands.defer(
-                () -> Commands.sequence(
-                    goToNote(),
-                    pathfindToShoot()
-                ).onlyIf(() -> limelight.noteInVision(limelight.getResults())), 
+                () -> Commands.either(
+                    Commands.sequence(
+                        goToNote(),
+                        pathfindToShoot()
+                ), 
+                Commands.runOnce(swerve::stopDriving, swerve)
+                    .andThen(
+                        swerve.getScanCommand()
+                        .until(this::reasonableNoteInVision)
+                        .andThen(
+                            Commands.sequence(
+                                goToNote(),
+                                pathfindToShoot()
+                            )
+                        )
+                    ),
+                this::reasonableNoteInVision),
                 commandGroup.getRequirements());
         }
     }
@@ -262,12 +275,18 @@ public class PathPlannerStorage implements Logged {
                         ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
                         : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
                     NOTE_POSES.get(index).getY(), 
-                    Rotation2d.fromDegrees(Robot.isRedAlliance() ^ goingDown ? -20 : 20)
+                    Rotation2d.fromDegrees(Robot.isRedAlliance() ^ goingDown ? -15 : 15)
                         .plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))), 
                 PATH_CONSTRAINTS,
-                Units.inchesToMeters(0)),
-                Commands.waitUntil(() -> limelight.noteInVision(limelight.getResults()))
+                0),
+                Commands.waitUntil(this::reasonableNoteInVision)
             );
+    }
+
+    private boolean reasonableNoteInVision() {
+        return limelight.noteInVision(limelight.getResults())
+        && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
+            || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)));
     }
 
     /**
@@ -279,33 +298,18 @@ public class PathPlannerStorage implements Logged {
      *                      pose without our vision
      * @return  The command that drives to a preset note position
      */
-    // public Command goToNote(Swerve swerve, IntSupplier currentIndex) {
-    //     return 
-    //         Commands.parallel(
-    //             swerve.updateChasePose(
-    //                 () -> 
-    //                     new Pose2d(
-    //                         NOTE_POSES.get(currentIndex.getAsInt()).getTranslation(),
-    //                         Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)))
-    //                 .repeatedly().until(swerve::atHDCPose),
-    //             swerve.getChaseCommand());  
-    // }
-
-    /**
-     * Uses a custom chase command to drive towards a dynamically changing note pose
-     * Updates the note pose with our limelight repeatedly until we reach it
-     * 
-     * @param swerve  The swerve subsystem to use.
-     * @param limelight The limelight subsystem to use
-     * @return  The command that holonomically drives to a note position gathered from vision
-     */
     public Command goToNote() {
         return swerve.getChaseCommand( 
             () ->
                 new Pose2d(
                     limelight.getNotePose2d().getTranslation(), 
                     Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)),
-            colorSensorSupplier)
+            () -> colorSensorSupplier.getAsBoolean() 
+                // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
+                // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
+                // since the pose is from the center but the note is from the edge (since the intake gets it)
+                || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
+                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)))
             .alongWith(NamedCommands.getCommand("ToIndexer"));
     }
 

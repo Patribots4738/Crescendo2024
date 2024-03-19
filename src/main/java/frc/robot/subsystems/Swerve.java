@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -388,6 +389,24 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public Command getChaseCommand(Supplier<Pose2d> desiredPose, BooleanSupplier cancelSupplier) {
         return new ChasePose(this, desiredPose, cancelSupplier);
+    }
+    
+    public Command getChaseCommand(Supplier<Pose2d> desiredPose) {
+        return new ChasePose(this, desiredPose);
+    }
+    
+    public Command getScanCommand() {
+        return new ChasePose(this, () ->
+            new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Robot.isRedAlliance() ? 0 : 180)).plus(
+                new Transform2d(
+                    0,
+                    0, 
+                    Rotation2d.fromRadians(
+                        Math.cos(Robot.currentTimestamp)/2.0)
+                    )
+                ), 
+                () -> false
+        );
     }
 
     public void resetHDC() {
