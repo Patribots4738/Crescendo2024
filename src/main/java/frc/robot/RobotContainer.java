@@ -99,7 +99,7 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private Indexer indexer;
     @IgnoreLogged
-    private Trapper trapper;
+    private Ampper ampper;
     private ShooterCmds shooterCmds;
     @IgnoreLogged
     private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
@@ -173,7 +173,7 @@ public class RobotContainer implements Logged {
 
         shooter = new Shooter();
         elevator = new Elevator();
-        trapper = new Trapper();
+        ampper = new Ampper();
         
         pivot = new Pivot();
 
@@ -194,7 +194,7 @@ public class RobotContainer implements Logged {
             intake,
             indexer,
             elevator,
-            trapper,
+            ampper,
             shooterCmds,
             colorSensor);
 
@@ -467,7 +467,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.elevatorToPlacement(true));
 
         controller.povRight()
-            .onTrue(trapper.toggleSpeed());
+            .onTrue(ampper.toggleSpeed());
         
         controller.povDown()
             .onTrue(pieceControl.elevatorToBottom());
@@ -715,7 +715,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
-        Monologue.logObj(trapper, "Robot/Subsystems/trapper");
+        Monologue.logObj(ampper, "Robot/Subsystems/ampper");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
         Monologue.logObj(pathPlannerStorage, "Robot");

@@ -46,7 +46,7 @@ public class Indexer extends SubsystemBase {
     }
 
     public Command toElevator() {
-        return setPercentCommand(IntakeConstants.TRAP_TRIGGER_WHEEL_PERCENT);
+        return setPercentCommand(IntakeConstants.AMP_TRIGGER_WHEEL_PERCENT);
     }
 
     public Command toElevatorSlow() {
