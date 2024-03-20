@@ -2,15 +2,21 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.5134448186008644,
-      "y": 5.566325847097382
+      "x": 1.4728426619973807,
+      "y": 6.278778783761375
     },
-    "rotation": 180.0
+    "rotation": -153.23790641455108
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "EnableLimelight"
+          }
+        },
         {
           "type": "parallel",
           "data": {

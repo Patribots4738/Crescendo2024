@@ -186,16 +186,15 @@ public class PathPlannerStorage implements Logged {
     private Command generateObjectDetectionCommand(int i, int endingNote, boolean goingDown, SequentialCommandGroup commandGroup) {
         int currentIndex = i - 1;
         int nextIndex = currentIndex + (goingDown ? 1 : -1);
+
         if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
             return Commands.defer(
                 () -> Commands.either(
                     goToNote()
-                        // This .onlyIf accounts for us trying to get a note but failing 
-                        // and needing to go to the next one
-                        .andThen(pathfindToShoot().onlyIf(colorSensorSupplier)
-                            .andThen(pathfindToNextNote(nextIndex, goingDown))),
+                        .andThen(pathfindToShoot()
+                        .andThen(pathfindToNextNote(nextIndex, goingDown))), 
                     pathfindToNextNote(nextIndex, goingDown), 
-                    () -> limelight.noteInVision(limelight.getResults())),
+                    this::reasonableNoteInVision),
                 commandGroup.getRequirements());
         } else {
             return Commands.defer(
@@ -203,19 +202,19 @@ public class PathPlannerStorage implements Logged {
                     Commands.sequence(
                         goToNote(),
                         pathfindToShoot()
-                    ), 
-                    Commands.runOnce(swerve::stopDriving, swerve)
+                ), 
+                Commands.runOnce(swerve::stopDriving, swerve)
+                    .andThen(
+                        swerve.getScanCommand()
+                        .until(this::reasonableNoteInVision)
                         .andThen(
-                            swerve.getScanCommand()
-                            .until(() -> limelight.noteInVision(limelight.getResults()))
-                            .andThen(
-                                Commands.sequence(
-                                    goToNote(),
-                                    pathfindToShoot()
-                                )
+                            Commands.sequence(
+                                goToNote(),
+                                pathfindToShoot()
                             )
-                        ),
-                    () -> limelight.noteInVision(limelight.getResults())),
+                        )
+                    ),
+                this::reasonableNoteInVision),
                 commandGroup.getRequirements());
         }
     }
@@ -284,23 +283,29 @@ public class PathPlannerStorage implements Logged {
             NOTE_POSES.get(index).getY());
 
         return 
-            // Race the path and vision
-            // once we catch sight of a note, we can go straight to it.
-            Commands.race(
-                AutoBuilder.pathfindToPose(
-                    new Pose2d(
-                        searchSpot,
-                        // Angle the robot slightly towards the note
-                        Rotation2d.fromDegrees(
+            Commands.race(AutoBuilder.pathfindToPose(
+                new Pose2d(
+                    NOTE_POSES.get(index).getX() + 
+                        (Robot.isRedAlliance() 
+                        ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
+                        : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
+                    NOTE_POSES.get(index).getY(), 
+                    Rotation2d.fromDegrees(
                             Robot.isRedAlliance() ^ goingDown 
                                 ? -CameraConstants.LL2_HORIZONTAL_FOV/4.0 
                                 :  CameraConstants.LL2_HORIZONTAL_FOV/4.0
                         ).plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))),
-                    PATH_CONSTRAINTS,
-                    0
-                ),
-                Commands.waitUntil(() -> limelight.noteInVision(limelight.getResults()))
+                PATH_CONSTRAINTS,
+                0),
+                Commands.waitUntil(this::reasonableNoteInVision)
             );
+    }
+
+    private boolean reasonableNoteInVision() {
+        return 
+            limelight.noteInVision(limelight.getResults())
+            && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
+                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)));
     }
 
     /**
@@ -318,8 +323,7 @@ public class PathPlannerStorage implements Logged {
                 new Pose2d(
                     limelight.getNotePose2d().getTranslation(), 
                     Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)),
-            () -> 
-                colorSensorSupplier.getAsBoolean() 
+            () -> colorSensorSupplier.getAsBoolean() 
                 // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
                 // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
                 // since the pose is from the center but the note is from the edge (since the intake gets it)

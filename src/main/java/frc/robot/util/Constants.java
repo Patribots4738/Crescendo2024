@@ -311,10 +311,10 @@ public final class Constants {
         // The below values need to be tuned for each new robot.
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 1;
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 5;
         // Below is gotten from choreo
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
-        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(1492.90);
+        public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(792.90);
 
         public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(7);
         public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(5);
@@ -400,14 +400,16 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             "S W3-1 S C2-3 S",
+            "S W3-1 C1-3 OBJ",
             "S C1-3 S",
+            "S C1-3 OBJ",
             "S W1-2 S C1-3 S",
-            "OBJ"
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
             // "S C5-4 S",
             // "S C4-2 S",
             // "S W1 S C1-3 S"
+            // "Proxy"
         };
     }
 

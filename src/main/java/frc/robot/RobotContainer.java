@@ -405,6 +405,9 @@ public class RobotContainer implements Logged {
             ).onFalse(
                 limelight3.setLEDState(() -> false)
             );
+
+        controller.leftTrigger()
+            .whileTrue(swerve.getChaseCommand(limelight2::getNotePose2d));
                     
         controller.x()
             .toggleOnTrue(
@@ -570,6 +573,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
+        enableVision();
         return pathPlannerStorage.getSelectedAuto();
     }
 

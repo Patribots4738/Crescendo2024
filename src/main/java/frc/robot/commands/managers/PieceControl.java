@@ -143,7 +143,7 @@ public class PieceControl implements Logged {
             stopIntakeAndIndexer()
         );
     }
-
+    
     public Command intakeNote(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.either(
             noteToShoot(poseSupplier, speedSupplier)
