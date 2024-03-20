@@ -100,6 +100,7 @@ public class ShooterCalc implements Logged {
         Rotation2d pivotAngle = calculatePivotAngle(robotPose);
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForSpeakerApex(robotPose, pivotAngle);
         return SpeedAngleTriplet.of(
+            // Not Working
             // Don't ask. It works. Is this how we finally beat the hawaiian kids?
             shooterSpeeds.getFirst(),
             shooterSpeeds.getSecond(),
