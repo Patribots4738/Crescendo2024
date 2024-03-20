@@ -52,7 +52,6 @@ public class ChasePose extends Command {
         swerve.setDesiredPose(desiredPose2d);
 
         swerve.drive(desiredSpeeds);
-
     }
 
     // Called once the command ends or is interrupted.

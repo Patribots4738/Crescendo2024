@@ -40,7 +40,7 @@ public class ColorSensor extends SubsystemBase implements Logged {
 
         colorString = detectedColor.toString();
         if (FieldConstants.IS_SIMULATION) {
-            hasNote = (int) Robot.currentTimestamp/2 % 2 == 0;
+            hasNote = (int) Robot.currentTimestamp/5 % 2 == 0;
             matchString = "Simulation";
             return;
         }

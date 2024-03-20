@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.util.Constants.AutoConstants;
+import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.custom.PatriSendableChooser;
@@ -23,14 +24,13 @@ import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
 import monologue.Logged;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.IntSupplier;
 
 /**
  * This file represents all of the auto paths that we will have
@@ -51,7 +51,9 @@ public class PathPlannerStorage implements Logged {
 
     public static List<Pose2d> NOTE_POSES = FieldConstants.GET_CENTERLINE_NOTES();
 
+    @IgnoreLogged
     private Swerve swerve;
+    @IgnoreLogged
     private Limelight limelight;
 
     public static final PathConstraints PATH_CONSTRAINTS = 
@@ -183,6 +185,7 @@ public class PathPlannerStorage implements Logged {
      */
     private Command generateObjectDetectionCommand(int i, int endingNote, boolean goingDown, SequentialCommandGroup commandGroup) {
         int currentIndex = i - 1;
+        int nextIndex = currentIndex + (goingDown ? 1 : -1);
         if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
             return Commands.defer(
                 () -> Commands.either(
@@ -255,7 +258,11 @@ public class PathPlannerStorage implements Logged {
                 PoseCalculations.getClosestShootingPose(swerve.getPose()), 
                 PATH_CONSTRAINTS,
                 0)
-            .andThen(NamedCommands.getCommand("ShootInstantly"));
+            .andThen(NamedCommands.getCommand("ShootInstantly"))
+            .raceWith(Commands.waitSeconds(1.5).andThen(
+                    Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
+                )
+            );
     }
 
     /**
@@ -267,6 +274,13 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that will pathfind towards the next note
      */
     public Command pathfindToNextNote(int index, boolean goingDown) {
+        Translation2d searchSpot = new Translation2d(
+            NOTE_POSES.get(index).getX() + 
+                (Robot.isRedAlliance() 
+                ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
+                : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
+            NOTE_POSES.get(index).getY());
+
         return 
             Commands.race(AutoBuilder.pathfindToPose(
                 new Pose2d(
