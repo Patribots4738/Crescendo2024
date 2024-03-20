@@ -305,7 +305,8 @@ public class PathPlannerStorage implements Logged {
         return 
             limelight.noteInVision(limelight.getResults())
             && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
-                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)));
+                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20))
+            && limelight.getNotePose2d().getTranslation().getNorm() < 4);
     }
 
     /**
