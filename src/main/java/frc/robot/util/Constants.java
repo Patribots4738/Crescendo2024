@@ -135,7 +135,7 @@ public final class Constants {
             0.0083
         );
 
-        public static final int SHOOTER_CURRENT_LIMIT = 40;
+        public static final int SHOOTER_CURRENT_LIMIT = 50;
         public static final int PIVOT_CURRENT_LIMIT = 20;
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
@@ -143,8 +143,8 @@ public final class Constants {
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 50;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 16; 
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 60;
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 18; 
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
         
         // This mega decimal number was gotten from REV hardware client, 
         // and we zeroed the pivot at its minimum angle
