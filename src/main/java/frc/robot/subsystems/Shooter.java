@@ -106,14 +106,6 @@ public class Shooter extends SubsystemBase implements Logged{
         return (leftMotor.getVelocity() + rightMotor.getVelocity()) / 2.0;
     }
 
-    public double getLeftSpeed() {
-        return (leftMotor.getVelocity());
-    }
-
-    public double getRightSpeed() {
-        return (rightMotor.getVelocity());
-    }
-
     /**
      * The function is a command that stops both motors
      * 
