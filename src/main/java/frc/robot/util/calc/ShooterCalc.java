@@ -25,6 +25,7 @@ public class ShooterCalc implements Logged {
     private Shooter shooter;
     private Pivot pivot;
 
+
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.shooter = shooter;
         this.pivot = pivot;
@@ -139,15 +140,18 @@ public class ShooterCalc implements Logged {
     }
 
     /**
-	 * Determines if the pivot rotation is at its target with a small
+	 * Determines if the pivot and shooter is at its target for shooting with a small
 	 * tolerance
 	 * 
 	 * @return The method is returning a BooleanSupplier that returns true
-	 *         if the pivot is at its target rotation and false otherwise
+	 *         if the pivot and shooter are at their target states for shooting and false otherwise
 	 */
-    @Log
 	public BooleanSupplier readyToShootSupplier() {
-        return () -> pivot.getAtDesiredAngle() && shooter.getAtDesiredRPM();
+        return () ->  
+            pivot.getAtDesiredAngle()
+                && shooter.getAtDesiredRPM()
+                && shooter.getAverageTargetSpeed() > 0
+                && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
     }
 
     public SpeedAngleTriplet calculateSpeakerTriplet(Translation2d robotPose) {
