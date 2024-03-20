@@ -10,7 +10,10 @@
     "Center Line",
     "Amp"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Normal",
+    "OBJ"
+  ],
   "defaultMaxVel": 5.0,
   "defaultMaxAccel": 3.5,
   "defaultMaxAngVel": 1137.21,

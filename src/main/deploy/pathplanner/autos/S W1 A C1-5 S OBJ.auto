@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7412377646703784,
-      "y": 4.3334957369796125
+      "x": 1.2690658005429483,
+      "y": 6.986635249866245
     },
-    "rotation": 119.91938193435101
+    "rotation": -129.29103185979173
   },
   "command": {
     "type": "sequential",
@@ -14,36 +14,30 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S W3"
+            "pathName": "S W1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "W3 W2"
+            "pathName": "W1 A"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "W2 W1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W1 C1"
+            "pathName": "A C1 N"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "C1toC4"
+            "name": "C1toC5"
           }
         }
       ]
     }
   },
-  "folder": "Normal",
+  "folder": null,
   "choreoAuto": false
 }

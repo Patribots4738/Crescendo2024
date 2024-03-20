@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2698318789694694,
-      "y": 3.0612493923756046
+      "x": 1.0476867681809234,
+      "y": 6.62594249192555
     },
-    "rotation": 118.45372149994454
+    "rotation": -133.8576097768131
   },
   "command": {
     "type": "sequential",
@@ -26,12 +26,6 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
-                      "data": {
-                        "pathName": "P R"
-                      }
-                    },
-                    {
                       "type": "named",
                       "data": {
                         "name": "ShootWhenReady"
@@ -40,43 +34,19 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S C4"
+                        "pathName": "S W1"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "C4 R"
+                        "pathName": "S C1 N"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "M C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "M C2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C2 L"
+                        "name": "C1toC3"
                       }
                     }
                   ]
@@ -88,6 +58,6 @@
       ]
     }
   },
-  "folder": "Normal",
+  "folder": null,
   "choreoAuto": false
 }
