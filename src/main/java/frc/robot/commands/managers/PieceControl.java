@@ -126,7 +126,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote()).raceWith(Commands.waitSeconds(0.5)), // TODO: remove when we a color sensor again
+                Commands.waitUntil(() -> !colorSensor.hasNote()),
                 stopIntakeAndIndexer());
     }
 
