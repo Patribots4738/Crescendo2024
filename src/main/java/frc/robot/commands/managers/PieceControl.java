@@ -18,6 +18,7 @@ import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -34,7 +35,6 @@ public class PieceControl implements Logged {
 
     private Elevator elevator;
     private Ampper ampper;
-
     private ShooterCmds shooterCmds;
 
     private ColorSensor colorSensor;
@@ -170,7 +170,8 @@ public class PieceControl implements Logged {
     public Command noteToTrap() {
         return Commands.sequence(
             ampper.outtake(),
-            indexer.toElevator(),
+            shooterCmds.stowPivot(),
+            indexer.toElevator(),   
             Commands.waitUntil(() -> !colorSensor.hasNote()),
             stopIntakeAndIndexer(),
             ampper.outtakeSlow(),
@@ -180,12 +181,10 @@ public class PieceControl implements Logged {
     }
 
     public Command ejectNote() {
-        // this should be ran while we are aiming with pivot and shooter already
-        // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from ampper into indexer and then into 
-        // shooter before stopping ampper and indexer
+        //outtakes the note
         return Commands.sequence(
             intake.outCommand(),
+            shooterCmds.stowPivot(),
             indexer.toElevator(),
             ampper.outtake(),
             setHasPiece(false)
