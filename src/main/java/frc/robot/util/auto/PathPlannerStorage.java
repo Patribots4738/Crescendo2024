@@ -186,13 +186,14 @@ public class PathPlannerStorage implements Logged {
     private Command generateObjectDetectionCommand(int i, int endingNote, boolean goingDown, SequentialCommandGroup commandGroup) {
         int currentIndex = i - 1;
         int nextIndex = currentIndex + (goingDown ? 1 : -1);
+
         if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
             return Commands.defer(
                 () -> Commands.either(
                     goToNote()
                         .andThen(pathfindToShoot()
-                        .andThen(pathfindToNextNote(currentIndex + (goingDown ? 1 : -1), goingDown))), 
-                    pathfindToNextNote(currentIndex + (goingDown ? 1 : -1), goingDown), 
+                        .andThen(pathfindToNextNote(nextIndex, goingDown))), 
+                    pathfindToNextNote(nextIndex, goingDown), 
                     this::reasonableNoteInVision),
                 commandGroup.getRequirements());
         } else {
@@ -289,8 +290,11 @@ public class PathPlannerStorage implements Logged {
                         ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
                         : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
                     NOTE_POSES.get(index).getY(), 
-                    Rotation2d.fromDegrees(Robot.isRedAlliance() ^ goingDown ? -15 : 15)
-                        .plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))), 
+                    Rotation2d.fromDegrees(
+                            Robot.isRedAlliance() ^ goingDown 
+                                ? -CameraConstants.LL2_HORIZONTAL_FOV/4.0 
+                                :  CameraConstants.LL2_HORIZONTAL_FOV/4.0
+                        ).plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))),
                 PATH_CONSTRAINTS,
                 0),
                 Commands.waitUntil(this::reasonableNoteInVision)
@@ -298,9 +302,10 @@ public class PathPlannerStorage implements Logged {
     }
 
     private boolean reasonableNoteInVision() {
-        return limelight.noteInVision(limelight.getResults())
-        && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
-            || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)));
+        return 
+            limelight.noteInVision(limelight.getResults())
+            && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
+                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)));
     }
 
     /**
