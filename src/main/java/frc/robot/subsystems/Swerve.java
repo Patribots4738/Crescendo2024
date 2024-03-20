@@ -315,7 +315,7 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public Command resetPositionCommand(Supplier<Translation2d> pose) {
-        return runOnce(() -> resetOdometry(new Pose2d(pose.get(), getGyroRotation2d()))).ignoringDisable(true);
+        return runOnce(() -> resetOdometry(new Pose2d(pose.get(), getPose().getRotation()))).ignoringDisable(true);
     }
 
     public SwerveModuleState[] getModuleStates() {

@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -323,13 +324,13 @@ public class RobotContainer implements Logged {
         driver.povLeft()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(false)
-                .andThen(swerve.resetOdometryCommand(limelightMapper::getCurrentCalibrationPose))
+                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPosition))
             );
 
         driver.povRight()
             .onTrue(
                 limelightMapper.incrementCalibrationPose(true)
-                .andThen(swerve.resetOdometryCommand(limelightMapper::getCurrentCalibrationPose))
+                .andThen(swerve.resetPositionCommand(limelightMapper::getCurrentCalibrationPosition))
             );
 
         driver.povUp()
@@ -347,7 +348,7 @@ public class RobotContainer implements Logged {
                         swerve.getPose().getRotation().minus(Rotation2d.fromDegrees(45)))));
 
         driver.a()
-            .onTrue(limelightMapper.takeSnapshotCommand());
+            .onTrue(Commands.runOnce(() -> limelightMapper.takeSnapshot()));
 
         driver.leftBumper().and(driver.rightBumper())
             .onTrue(limelightMapper.printJSONCommand());
