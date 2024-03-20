@@ -3,9 +3,9 @@
   "startingPose": {
     "position": {
       "x": 1.197295739755632,
-      "y": 1.2528828606902995
+      "y": 1.7566065080239868
     },
-    "rotation": 176.52306064288584
+    "rotation": -118.76554314594256
   },
   "command": {
     "type": "sequential",
@@ -32,6 +32,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "OBJ",
   "choreoAuto": false
 }
