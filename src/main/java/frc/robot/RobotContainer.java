@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -36,8 +37,8 @@ import frc.robot.commands.managers.CalibrationControl;
 import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.leds.Commands.LPI;
 import frc.robot.leds.Strips.LedStrip;
+import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
@@ -99,7 +100,7 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private Indexer indexer;
     @IgnoreLogged
-    private Trapper trapper;
+    private Ampper ampper;
     private ShooterCmds shooterCmds;
     @IgnoreLogged
     private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
@@ -124,6 +125,8 @@ public class RobotContainer implements Logged {
     @Log
     public static Pose2d robotPose2d = new Pose2d();
     @Log
+    public static Transform2d visionErrorPose = new Transform2d();
+    @Log
     public static double distanceToSpeakerMeters = 0;
     @Log
     public static Pose3d robotPose3d = new Pose3d();
@@ -135,6 +138,8 @@ public class RobotContainer implements Logged {
     public static double gameModeStart = 0;
     @Log
     public static boolean hasPiece = true;
+    @Log
+    public static boolean enableVision = true;
     
     public RobotContainer() {
         
@@ -149,7 +154,7 @@ public class RobotContainer implements Logged {
         swerve = new Swerve();
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 1);
             limelightMapper = new LimelightMapping(swerve.getPoseEstimator(), swerve::getPose, "limelight-three");
             
             // limelightMapper.ManuallyAddPose(12, new Pose3d(11.173, 4.096, 1.443, new Rotation3d(new Quaternion(0.003, 0.032, -0.025, -0.999))));
@@ -158,7 +163,7 @@ public class RobotContainer implements Logged {
             // limelightMapper.printJSON();
         } else {
             limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
@@ -169,7 +174,7 @@ public class RobotContainer implements Logged {
 
         shooter = new Shooter();
         elevator = new Elevator();
-        trapper = new Trapper();
+        ampper = new Ampper();
         
         pivot = new Pivot();
 
@@ -190,7 +195,7 @@ public class RobotContainer implements Logged {
             intake,
             indexer,
             elevator,
-            trapper,
+            ampper,
             shooterCmds,
             colorSensor);
 
@@ -211,7 +216,7 @@ public class RobotContainer implements Logged {
             pieceControl.getAutomaticShooterSpeeds(swerve::getPose)
         );
         
-        pathPlannerStorage = new PathPlannerStorage(driver.y().negate());
+        pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight2);
         initializeComponents();
         prepareNamedCommands();
         // choreoPathStorage = new ChoreoStorage(driver.y());
@@ -401,6 +406,9 @@ public class RobotContainer implements Logged {
             ).onFalse(
                 limelight3.setLEDState(() -> false)
             );
+
+        controller.leftTrigger()
+            .whileTrue(swerve.getChaseCommand(limelight2::getNotePose2d));
                     
         controller.x()
             .toggleOnTrue(
@@ -437,11 +445,14 @@ public class RobotContainer implements Logged {
                     ).finallyDo(() -> limelight3.setLEDState(() -> false).schedule())
                 );
         
+        controller.leftTrigger()
+            .whileTrue(swerve.getChaseCommand(limelight2::getNotePose2d));
+
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors());
       
         controller.leftBumper()
-            .onTrue(pieceControl.intakeNote())
+            .onTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -460,13 +471,13 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.elevatorToPlacement(true));
 
         controller.povRight()
-            .onTrue(trapper.toggleSpeed());
+            .onTrue(ampper.toggleSpeed());
         
         controller.povDown()
             .onTrue(pieceControl.elevatorToBottom());
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeNote())
+            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -520,7 +531,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeNote())
+            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
@@ -563,6 +574,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
+        enableVision();
         return pathPlannerStorage.getSelectedAuto();
     }
 
@@ -648,11 +660,12 @@ public class RobotContainer implements Logged {
     private void prepareNamedCommands() {
         // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
-        NamedCommands.registerCommand("ToIndexer", pieceControl.intakeNote());
+        NamedCommands.registerCommand("ToIndexer", pieceControl.intakeUntilNote());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("ShootInstantly", pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootPreload());
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
@@ -662,8 +675,18 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterR", shooterCmds.prepareFireCommand(() -> FieldConstants.R_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
-        NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("DisableLimelight", disableVision());
+        NamedCommands.registerCommand("EnableLimelight", enableVision());
         registerPathToPathCommands();
+    }
+
+    private Command disableVision() {
+        return Commands.runOnce(() -> enableVision = false).ignoringDisable(true);
+    }
+
+    private Command enableVision() {
+        return Commands.runOnce(() -> enableVision = true).ignoringDisable(true);
     }
 
     private void registerPathToPathCommands() {
@@ -697,7 +720,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
-        Monologue.logObj(trapper, "Robot/Subsystems/trapper");
+        Monologue.logObj(ampper, "Robot/Subsystems/ampper");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
         Monologue.logObj(pathPlannerStorage, "Robot");

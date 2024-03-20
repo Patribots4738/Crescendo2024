@@ -4,6 +4,9 @@
 
 package frc.robot.commands.drive;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,12 +15,20 @@ import frc.robot.util.Constants.AutoConstants;
 
 public class ChasePose extends Command {
     private Swerve swerve;
-    private static Pose2d desiredPose = new Pose2d();
+    private Supplier<Pose2d> desiredPoseSupplier;
+    private BooleanSupplier cancelSupplier;
 
     /** Creates a new ChasePose. */
-    public ChasePose(Swerve swerve) {
+    public ChasePose(Swerve swerve, Supplier<Pose2d> poseSupplier, BooleanSupplier cancelSupplier) {
         this.swerve = swerve;
+        this.desiredPoseSupplier = poseSupplier;
+        this.cancelSupplier = cancelSupplier;
         addRequirements(swerve);
+    }
+
+    /** Creates a new ChasePose. */
+    public ChasePose(Swerve swerve, Supplier<Pose2d> poseSupplier) {
+        this(swerve, poseSupplier, () -> false);
     }
 
     // Called when the command is initially scheduled.
@@ -30,31 +41,28 @@ public class ChasePose extends Command {
     @Override
     public void execute() {
 
+        Pose2d desiredPose2d = desiredPoseSupplier.get();
+
         ChassisSpeeds desiredSpeeds = AutoConstants.HDC.calculate(
                 swerve.getPose(),
-                desiredPose,
+                desiredPose2d,
                 0,
-                desiredPose.getRotation());
+                desiredPose2d.getRotation());
 
-        swerve.setDesiredPose(desiredPose);
+        swerve.setDesiredPose(desiredPose2d);
 
         swerve.drive(desiredSpeeds);
-
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-
+        swerve.stopDriving();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return swerve.atHDCPose();
-    }
-
-    public static void updateDesiredPose(Pose2d newPose) {
-        desiredPose = newPose;
+        return swerve.atHDCPose() || cancelSupplier.getAsBoolean();
     }
 }

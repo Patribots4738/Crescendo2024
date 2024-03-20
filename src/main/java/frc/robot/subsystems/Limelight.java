@@ -18,16 +18,19 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
+import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Detector;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
 import monologue.Logged;
@@ -56,6 +59,9 @@ public class Limelight extends SubsystemBase implements Logged{
     @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
+    @Log
+    private Pose2d notePose2d = new Pose2d();
+
     public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName, int pipelineIndex) {
         // Uses network tables to check status of limelight
         this.limelightName = limelightName;
@@ -72,8 +78,12 @@ public class Limelight extends SubsystemBase implements Logged{
         if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
-            updatePoseEstimator();
-            getTags();
+            if (pipelineIndex == 0) {
+                updatePoseEstimator();
+                getTags();
+            } else if (pipelineIndex == 1) {
+                notePose2d = getNotePose2d();
+            }
         }
     }
 
@@ -86,29 +96,28 @@ public class Limelight extends SubsystemBase implements Logged{
 
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
-        if (hasTarget(result)) {
+        this.estimatedPose2d = estimatedRobotPose;
+        RobotContainer.visionErrorPose = RobotContainer.robotPose2d.minus(estimatedRobotPose);
+
+        if (RobotContainer.enableVision && hasTarget(result)) {
             double xyStds;
             double radStds;
             // multiple targets detected
             if (targets.length > 1) {
                 // TODO: TUNE
-                xyStds = 0.1778;
-                radStds = Units.degreesToRadians(5);
+                xyStds = Math.hypot(0.011, 0.028);
+                radStds = Units.degreesToRadians(3);
             }
-            // 1 target with large area and close to estimated pose
+            // 1 target with large area and close to estimated roxose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 // TODO: TUNE
-                xyStds = 0.3556;
-                radStds = Units.degreesToRadians(15);
+                xyStds = 0.192;
+                radStds = Units.degreesToRadians(7);
             }
             // conditions don't match to add a vision measurement
             else {
                 return;
             }
-
-            this.estimatedPose2d = estimatedRobotPose;
-
-            if (Robot.gameMode == GameMode.AUTONOMOUS) return;
 
             poseEstimator.setVisionMeasurementStdDevs(
                 VecBuilder.fill(xyStds, xyStds, radStds));
@@ -146,24 +155,77 @@ public class Limelight extends SubsystemBase implements Logged{
         visableTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
-    // TODO: test this logic in real life before running dynamic auto
+    @Log
+    Pose2d noteFieldPose = new Pose2d();
+
+    @Log
+    Pose2d noteFieldPosePlus14 = new Pose2d();
+
     public Pose2d getNotePose2d() {
-        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
-            LimelightHelpers.setPipelineIndex(limelightName, 1);
+        Translation2d noteTranslationFromRobot;
+        if (FieldConstants.IS_SIMULATION) {
+            noteFieldPose = robotPoseSupplier.get().nearest(FieldConstants.GET_CENTERLINE_NOTES());
+            noteTranslationFromRobot = noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation();
+        } else {
+            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
+                LimelightHelpers.setPipelineIndex(limelightName, 1);
+            }
+
+            Results results = getResults();
+
+            if (noteInVision(results)) {
+                for (LimelightTarget_Detector ld : results.targets_Detector) {
+                    ld.calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
+                    ld.calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+                }
+
+                Translation2d noteTranslationFromCamera = new Translation2d(
+                    results.targets_Detector[0].calcY,
+                    -results.targets_Detector[0].calcX
+                );
+
+                noteTranslationFromRobot = noteTranslationFromCamera
+                    .plus(CameraConstants.LL2Pose.getTranslation().toTranslation2d())
+                    .rotateBy(CameraConstants.LL2Pose.getRotation().toRotation2d());
+
+                noteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
+            } else {
+                return noteFieldPosePlus14;
+            }
         }
-        if (noteInVision()) {
-            Translation2d noteTranslation = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName).toPose2d().getTranslation();
-            Pose2d notePose = new Pose2d(noteTranslation, new Rotation2d()).rotateBy(robotPoseSupplier.get().getRotation());
-            return notePose.plus(new Transform2d(robotPoseSupplier.get().getTranslation(), new Rotation2d()));
+
+        Rotation2d slopeAngle = new Rotation2d(
+            noteTranslationFromRobot.getX(),
+            noteTranslationFromRobot.getY()
+        ).plus(Rotation2d.fromDegrees(180));
+
+        double distanceThreshold = FieldConstants.IS_SIMULATION ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
+        if ((noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation().getNorm() > distanceThreshold)
+            || noteFieldPose.getTranslation().getDistance(noteFieldPosePlus14.getTranslation()) > Units.inchesToMeters(15)) {
+            
+            noteFieldPosePlus14 = noteFieldPose.plus(
+                new Transform2d(
+                    new Translation2d(
+                        Units.inchesToMeters(14),
+                        slopeAngle.plus(Rotation2d.fromDegrees(180))
+                    ),
+                    slopeAngle
+                )
+            );
         }
-        return robotPoseSupplier.get();
+
+        return noteFieldPosePlus14;
     }
 
-    public boolean noteInVision() {
-        Results results = getResults();
-        return (hasTarget(results));
+    public boolean noteInVision(Results results) {
+        return (FieldConstants.IS_SIMULATION && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
+            (results.valid 
+            && results.targets_Detector.length > 0 
+            && LimelightHelpers.getTA(limelightName) > 0.5 
+            && results.targets_Detector[0].tx != 0 
+            && results.targets_Detector[0].ty != 0);
     }
-
+    
     public Pose2d getPose2d() {
         return LimelightHelpers.getBotPose2d_wpiBlue(limelightName);
     }
@@ -250,9 +312,11 @@ public class Limelight extends SubsystemBase implements Logged{
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
+        double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.175;
+        double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.13 : 0.07;
         if (result == null || !result.valid 
-            || (LimelightHelpers.getTA(limelightName) < 0.175 && result.targets_Fiducials.length == 1)
-            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.15)
+            || (LimelightHelpers.getTA(limelightName) < singleTagAmbiguityThreshold && result.targets_Fiducials.length == 1)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < multiTagAmbiguityThreshold)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
             || Double.isNaN(estimatedRobotPose.getX()) 
             || Double.isNaN(estimatedRobotPose.getY()) 

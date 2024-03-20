@@ -26,7 +26,7 @@ public class Pivot extends SubsystemBase implements Logged {
 		motor = new Neo(
             ShooterConstants.SHOOTER_PIVOT_CAN_ID,
             false,
-            true, 
+            false, 
             true);
 		configMotor();
 	}

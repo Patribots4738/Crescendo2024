@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -126,9 +127,9 @@ public class Swerve extends SubsystemBase implements Logged {
             // standard deviations
             // X, Y, theta
             VecBuilder.fill(
-                Units.inchesToMeters(4),
-                Units.inchesToMeters(4),
-                Units.degreesToRadians(2)
+                0.192,
+                0.192,
+                Units.degreesToRadians(15)
             )
         );
     }
@@ -386,12 +387,26 @@ public class Swerve extends SubsystemBase implements Logged {
         return new DriveHDC(this, speeds, fieldRelative, () -> false);
     }
 
-    public Command updateChasePose(Supplier<Pose2d> poseSupplier) {
-        return Commands.runOnce(() -> ChasePose.updateDesiredPose(poseSupplier.get()));
+    public Command getChaseCommand(Supplier<Pose2d> desiredPose, BooleanSupplier cancelSupplier) {
+        return new ChasePose(this, desiredPose, cancelSupplier);
     }
 
-    public Command getChaseCommand() {
-        return new ChasePose(this);
+    public Command getChaseCommand(Supplier<Pose2d> desiredPose) {
+        return new ChasePose(this, desiredPose, () -> false);
+    }
+
+    public Command getScanCommand() {
+        return new ChasePose(this, () ->
+            new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Robot.isRedAlliance() ? 0 : 180)).plus(
+                new Transform2d(
+                    0,
+                    0, 
+                    Rotation2d.fromRadians(
+                        Math.cos(Robot.currentTimestamp)/2.0)
+                    )
+                ), 
+                () -> false
+        );
     }
 
     public void resetHDC() {

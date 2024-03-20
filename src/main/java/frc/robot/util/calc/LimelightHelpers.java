@@ -6,6 +6,7 @@ package frc.robot.util.calc;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -268,8 +269,50 @@ public class LimelightHelpers {
         @JsonProperty("typ")
         public double ty_pixels;
 
+        @JsonProperty("calcY")
+        public double calcY;
+
+        @JsonProperty("calcX")
+        public double calcX;
+
         public LimelightTarget_Detector() {
         }
+
+        /**
+         * https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance
+         * Calculate the Y distance from the camera to the target (distance between the camera and the target)
+         * @param targetHeight the height of the target to the ground
+         * @param cameraHeight the height of the center of the lens to the ground
+         * @param cameraAngle the angle of the camera in degrees from vertical
+         */
+        public void calculateYDistance(double cameraHeight, double cameraAngle) {
+            if (className.equals("note")) {
+                double targetHeight = Units.inchesToMeters(1); // we always assume that the note is on the ground
+
+                double angleToNoteRad = cameraAngle + Units.degreesToRadians(ty);
+                this.calcY = (targetHeight - cameraHeight) / Math.tan(angleToNoteRad);
+            }
+        }
+
+        /**
+         * Calculate the X distance from the camera to the target (the side to side distance between the camera and the target)
+         * @param cameraAngleRads the angle of the camera in degrees from right (0)
+         */
+        public void calculateXDistance(double cameraAngleRads) {
+            if (className.equals("note")) {
+                double angleToNoteRad = cameraAngleRads + Units.degreesToRadians(tx);
+                this.calcX = this.calcY * Math.tan(angleToNoteRad);
+            }
+        }
+
+        /**
+         * Get the calculated distance from the camera to the target
+         * @return the Pose2d of the target relative to the camera
+         */
+        public Pose2d getNotePose2d() {
+            return new Pose2d(this.calcX, this.calcY, new Rotation2d());
+        }
+
     }
 
     public static class Results {
@@ -306,13 +349,13 @@ public class LimelightHelpers {
 
         @JsonProperty("botpose_tagcount")
         public double botpose_tagcount;
-       
+
         @JsonProperty("botpose_span")
         public double botpose_span;
-       
+
         @JsonProperty("botpose_avgdist")
         public double botpose_avgdist;
-       
+
         @JsonProperty("botpose_avgarea")
         public double botpose_avgarea;
 

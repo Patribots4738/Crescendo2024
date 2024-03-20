@@ -25,6 +25,7 @@ public class ShooterCalc implements Logged {
     private Shooter shooter;
     private Pivot pivot;
 
+
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.shooter = shooter;
         this.pivot = pivot;
@@ -63,6 +64,29 @@ public class ShooterCalc implements Logged {
             );
     }
 
+    public SpeedAngleTriplet calculateSWDTripletAuto(Pose2d pose, ChassisSpeeds speeds) {
+        Pose2d currentPose = pose;
+
+        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
+        double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
+
+        double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
+        double v0z = originalv0 * Math.sin(Units.degreesToRadians(currentTriplet.getAngle()));
+        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
+
+        double newv0 = Math.hypot(v0x, v0z);
+        Rotation2d newAngle = new Rotation2d(v0x, v0z);
+
+        double maxRPMAuto = ShooterConstants.INTERPOLATION_MAP.get(Units.metersToFeet(5)).getAverageSpeed();
+        
+        return 
+            SpeedAngleTriplet.of(
+                MathUtil.clamp(currentTriplet.getLeftSpeed(), 0, maxRPMAuto),
+                MathUtil.clamp(currentTriplet.getRightSpeed(), 0, maxRPMAuto),
+                newAngle.getDegrees()
+            );
+    }
+
     public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose, ChassisSpeeds speeds) {
         Rotation2d pivotAngle = calculatePassPivotAngle(robotPose);
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForPassApex(robotPose, pivotAngle);
@@ -77,6 +101,7 @@ public class ShooterCalc implements Logged {
         Rotation2d pivotAngle = calculatePivotAngle(robotPose);
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForSpeakerApex(robotPose, pivotAngle);
         return SpeedAngleTriplet.of(
+            // Not Working
             // Don't ask. It works. Is this how we finally beat the hawaiian kids?
             shooterSpeeds.getFirst(),
             shooterSpeeds.getSecond(),
@@ -110,19 +135,23 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
+        return new Rotation2d(Units.degreesToRadians(60));
+        // return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
     }
 
     /**
-	 * Determines if the pivot rotation is at its target with a small
+	 * Determines if the pivot and shooter is at its target for shooting with a small
 	 * tolerance
 	 * 
 	 * @return The method is returning a BooleanSupplier that returns true
-	 *         if the pivot is at its target rotation and false otherwise
+	 *         if the pivot and shooter are at their target states for shooting and false otherwise
 	 */
-    @Log
 	public BooleanSupplier readyToShootSupplier() {
-        return () -> pivot.getAtDesiredAngle() && shooter.getAtDesiredRPM();
+        return () ->  
+            pivot.getAtDesiredAngle()
+                && shooter.getAtDesiredRPM()
+                && shooter.getAverageTargetSpeed() > 0
+                && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
     }
 
     public SpeedAngleTriplet calculateSpeakerTriplet(Translation2d robotPose) {
