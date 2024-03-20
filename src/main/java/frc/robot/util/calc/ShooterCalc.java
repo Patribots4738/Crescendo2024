@@ -25,7 +25,6 @@ public class ShooterCalc implements Logged {
     private Shooter shooter;
     private Pivot pivot;
 
-    private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet();
 
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.shooter = shooter;
@@ -147,9 +146,10 @@ public class ShooterCalc implements Logged {
 	 */
 	public BooleanSupplier readyToShootSupplier() {
         return () ->  
-            MathUtil.isNear(pivot.getAngle(), desiredTriplet.getAngle(), ShooterConstants.PIVOT_DEADBAND)
-                && MathUtil.isNear(desiredTriplet.getRightSpeed(), shooter.getRightSpeed(), ShooterConstants.SHOOTER_RPM_DEADBAND)
-                && MathUtil.isNear(desiredTriplet.getLeftSpeed(), shooter.getLeftSpeed(), ShooterConstants.SHOOTER_RPM_DEADBAND);
+            pivot.getAtDesiredAngle()
+                && shooter.getAtDesiredRPM()
+                && shooter.getAverageTargetSpeed() > 0
+                && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
     }
 
     public SpeedAngleTriplet calculateSpeakerTriplet(Translation2d robotPose) {
