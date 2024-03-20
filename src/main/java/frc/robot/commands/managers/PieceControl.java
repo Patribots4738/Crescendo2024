@@ -199,7 +199,7 @@ public class PieceControl implements Logged {
     }
 
     public Command panicEjectNote() {
-        return ampper.intake().alongWith(indexer.toElevator()).alongWith(intake.outCommand());
+        return shooterCmds.stowPivot().andThen(ampper.intake().alongWith(indexer.toElevator()).alongWith(intake.outCommand()));
     }
 
     public Command stopPanicEject() {
