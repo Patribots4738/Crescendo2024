@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.NTConstants;
@@ -84,7 +85,7 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * @return The method is returning a Command object.
 	 */
 	public Command setAngleCommand(double angle) {
-		return runOnce(() -> setAngle(angle));
+		return runOnce(() -> setAngle(angle)).andThen(Commands.waitUntil(this::getAtDesiredAngle));
 	}
 
 	public double getAngle() {
