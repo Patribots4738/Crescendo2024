@@ -34,14 +34,29 @@ Thanks for checking us out, & be sure to star this repository if you find anythi
 ___
 
 ## ✨ Highlights ✨
+  obj detection
+on-the-fly autonomous decisions & pathfinding
+color sensor oriented piece control
+shooting while driving
+fully simulated bobot
+amp, speaker, stage auto alignment
+log replay w/ AdvantageScope
+automatic shooter startup
+  
+  
+  
+  
+  - Object detection on Limelight --
+  - Automatic shooter startup
+  - Shooting while driving
+  - Fully simulated robot, mechanisms, and motors
+  - Auto alignment to amp, speaker, stage, and source
+  - Color sensor oriented piece control
+  - Log replay using Advantage Scope
+  - Modular autonomous routines
+  - April Tag interpretation on Limelight --
   - Field-centric swerve drive
   - Under bumper intake
-  - April Tag interpretation & note detection using two Limelights
-  - Auto alignment to amp, speaker, chains/traps, and source
-  - Shooting into the speaker while driving
-  - Modular autonomous routines
-  - LEDs to communicate various actions
-  - Fully simulated motors
 
 ## Simulation & Testing 🪄
   > It is crucial to maintain both our robot & our code. Therefore, we always run our code in a simulation using `FRC Driver Station` / `WPILibs's Sim GUI` and `Advantage Scope` to catch breaking changes on our robot before they happen in real life. After our design team has constructed the CAD model of our robot in `Onshape`, we can export its moving parts into `Advantage Scope`. We then link the CAD and the code together to simulate a robot that moves similarly to a real one. Once our code passes this unit test (working in simulation), we can expect a much more specific result on the real robot. This process is used with most of our code and was essential for code involving critical math (i.e. auto alignment & shooting while driving).
