@@ -33,19 +33,7 @@ Thanks for checking us out, & be sure to star this repository if you find anythi
 
 ___
 
-## ✨ Highlights ✨
-  obj detection
-on-the-fly autonomous decisions & pathfinding
-color sensor oriented piece control
-shooting while driving
-fully simulated bobot
-amp, speaker, stage auto alignment
-log replay w/ AdvantageScope
-automatic shooter startup
-  
-  
-  
-  
+## ✨ Highlights ✨  
   - Object detection on Limelight --
   - Automatic shooter startup
   - Shooting while driving
