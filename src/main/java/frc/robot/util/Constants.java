@@ -147,11 +147,6 @@ public final class Constants {
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
 
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
-        
-        // This mega decimal number was gotten from REV hardware client, 
-        // and we zeroed the pivot at its minimum angle
-        public static final double ABSOLUTE_ENCODER_ZERO_OFFSET = 128.2069087-PIVOT_LOWER_LIMIT_DEGREES;
-
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
@@ -224,7 +219,15 @@ public final class Constants {
                 put(11, SpeedAngleTriplet.of(3174.0, 3156.0, 37.1));
                 put(12, SpeedAngleTriplet.of(3249.0, 3237.0, 34.4));
                 put(13, SpeedAngleTriplet.of(3409.0, 3397.0, 33.1));
-                put(14, SpeedAngleTriplet.of(3400, 3400.0, 32.7));
+                // put(14, SpeedAngleTriplet.of(\[]3400, 3400.0, 32.7));
+                // This second triplet also works, and looks more consistent for shooting bad notes into the speaker
+                // one thing to note is that if we go for this second approach 
+                // we may need to add this type of spin for the above presets
+                // shouldn't be hard, anges shouldn't need to change, but they might.
+                put(14, SpeedAngleTriplet.of(3860, 3400.0, 32.2));
+                put(15, SpeedAngleTriplet.of(3974.0, 3568.0, 30.6));
+                put(16, SpeedAngleTriplet.of(4025.0, 3528.0, 30.1));
+                
             }
         };
 
@@ -711,7 +714,7 @@ public final class Constants {
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
-        public static final double PASS_HEIGHT_METERS = Units.feetToMeters(11.5);
+        public static final double PASS_HEIGHT_METERS = Units.feetToMeters(13.5);
 
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
@@ -803,10 +806,20 @@ public final class Constants {
             add(redPose);
         }};
         
-        public static final List<Pose2d> PASS_POSITIONS = new ArrayList<Pose2d>() {{
+        public static final List<Pose2d> PASS_APEX_POSITIONS = new ArrayList<Pose2d>() {{
 
             // I swear bulldogs and hawaiin kids just had to get in here somehow
             Pose2d bluePose = new Pose2d(4.581, 4.359, Rotation2d.fromDegrees(0));
+            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
+
+            add(bluePose);
+            add(redPose);
+        }};
+
+        public static final List<Pose2d> PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
+
+            // I swear bulldogs and hawaiin kids just had to get in here somehow
+            Pose2d bluePose = new Pose2d(1.07, 6.99, Rotation2d.fromDegrees(0));
             Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
 
             add(bluePose);
@@ -823,8 +836,12 @@ public final class Constants {
             return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
-        public static Pose2d GET_PASS_POSITION() {
-            return PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        public static Pose2d GET_PASS_APEX_POSITION() {
+            return PASS_APEX_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_PASS_TARGET_POSITION() {
+            return PASS_TARGET_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_SOURCE_POSITION() {

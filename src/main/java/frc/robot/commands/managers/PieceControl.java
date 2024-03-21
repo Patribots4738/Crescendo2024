@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -286,11 +287,8 @@ public class PieceControl implements Logged {
     public Command placeWhenReady() {
         return
             new SelectiveConditionalCommand(
-                Commands.sequence(
-                    prepPiece(),
-                    ampper.outtake(0.8),
-                    elevatorToBottom()
-                ),
+                ampper.outtake(1.1)
+                    .andThen(elevatorToBottom()),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);
     }
@@ -386,6 +384,6 @@ public class PieceControl implements Logged {
             shooterCmds.stopShooter(),
             () -> colorSensor.hasNote()
                 && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-            .onlyIf(() -> Robot.gameMode != GameMode.TEST);
+            .onlyIf(() -> Robot.gameMode != GameMode.TEST && RobotController.getBatteryVoltage() > 9);
     }
 }

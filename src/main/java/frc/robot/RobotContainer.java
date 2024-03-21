@@ -10,7 +10,6 @@ import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -25,11 +24,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.GameMode;
 import frc.robot.commands.drive.AlignmentCmds;
 import frc.robot.commands.drive.Drive;
-import frc.robot.commands.drive.DriveHDC;
 import frc.robot.commands.drive.WheelRadiusCharacterization;
 import frc.robot.commands.logging.NT;
 import frc.robot.commands.logging.NTPIDTuner;
@@ -433,7 +432,13 @@ public class RobotContainer implements Logged {
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.alignmentCalc::onOppositeSide)
-                    ).finallyDo(() -> limelight3.setLEDState(() -> false).schedule())
+                    ).finallyDo(
+                        () -> 
+                            limelight3.setLEDState(() -> false)
+                            .andThen(shooterCmds.stowPivot()
+                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                            .schedule()
+                        )
                 );
         
         controller.leftStick()
@@ -442,7 +447,13 @@ public class RobotContainer implements Logged {
                     swerve.resetHDCCommand(),
                     limelight3.setLEDState(() -> true),
                     alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier)
-                    ).finallyDo(() -> limelight3.setLEDState(() -> false).schedule())
+                    ).finallyDo(
+                        () -> 
+                            limelight3.setLEDState(() -> false)
+                            .andThen(shooterCmds.stowPivot()
+                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                            .schedule()
+                        )
                 );
         
         controller.leftTrigger()
@@ -499,7 +510,8 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopPanicEject());
 
         controller.start().or(controller.back())
-            .whileTrue(pieceControl.sourceShooterIntake(controller.start().or(controller.back())));
+            .whileTrue(pieceControl.sourceShooterIntake(controller.start().or(controller.back())))
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightStick().and(controller.leftStick())
             .onTrue(elevator.resetEncoder());
@@ -512,7 +524,7 @@ public class RobotContainer implements Logged {
     
     private void configureCalibrationBindings(PatriBoxController controller) { 
         controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(0)));
-        controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand().alongWith(Commands.runOnce(swerve::setWheelsX)));
+        controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
         controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.leftY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
@@ -531,14 +543,16 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity)
+                .alongWith(Commands.run(swerve::setWheelsX)))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
             .onTrue(pieceControl.ejectNote());
 
         controller.pov(0, 0, testButtonBindingLoop)
-            .onTrue(pieceControl.stopIntakeAndIndexer());
+            .whileTrue(pieceControl.sourceShooterIntake(controller.pov(0, 0, testButtonBindingLoop)))
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 180, testButtonBindingLoop)
             .onTrue(calibrationControl.copyCalcTriplet());

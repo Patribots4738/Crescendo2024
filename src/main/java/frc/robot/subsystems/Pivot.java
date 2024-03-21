@@ -36,6 +36,7 @@ public class Pivot extends SubsystemBase implements Logged {
 		motor.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
 		motor.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 		motor.setPID(ShooterConstants.PIVOT_PID);
+        // motor.getAbsoluteEncoder().setZeroOffset(68.8235307-17.6);
 	}
 
 	@Override

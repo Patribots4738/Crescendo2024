@@ -159,7 +159,7 @@ public class AlignmentCmds {
 
     public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
-            speakerRotationalAlignment(driverX, driverY, shooterCmds)
+            passRotationalAlignment(driverX, driverY, shooterCmds)
                 .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
                     .finallyDo(shooterCmds.stopShooter()::initialize));
     }

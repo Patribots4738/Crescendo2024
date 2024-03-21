@@ -123,14 +123,14 @@ public class ShooterCalc implements Logged {
 
     public Rotation2d calculatePassPivotAngle(Pose2d robotPose) {
         // Calculate the robot's pose relative to the speaker's position
-        robotPose = robotPose.relativeTo(FieldConstants.GET_PASS_POSITION());
+        robotPose = robotPose.relativeTo(FieldConstants.GET_PASS_APEX_POSITION());
 
         // Calculate the distance in feet from the robot to the speaker
         double distanceMeters = robotPose.getTranslation().getNorm();
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
+        return new Rotation2d(distanceMeters, FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
     }
 
     /**
@@ -187,7 +187,7 @@ public class ShooterCalc implements Logged {
         Rotation2d currentAngleToTarget = new Rotation2d(poseRelativeToTarget.getX(), poseRelativeToTarget.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            target.equals(FieldConstants.GET_PASS_POSITION()) 
+            target.equals(FieldConstants.GET_PASS_TARGET_POSITION()) 
                 ? rpmToVelocity(calculatePassTriplet(robotPose, robotVelocity).getSpeeds()) 
                 : rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
             // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
@@ -206,11 +206,11 @@ public class ShooterCalc implements Logged {
     }
 
     public Rotation2d calculateRobotAngleToPass(Pose2d robotPose) {
-        return calculateRobotAngleToPose(robotPose, new ChassisSpeeds(), FieldConstants.GET_PASS_POSITION());
+        return calculateRobotAngleToPass(robotPose, new ChassisSpeeds());
     }
 
     public Rotation2d calculateRobotAngleToPass(Pose2d robotPose, ChassisSpeeds robotVelocity) {
-        return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_POSITION());
+        return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_TARGET_POSITION());
     }
 
 
