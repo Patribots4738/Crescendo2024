@@ -47,7 +47,7 @@ public class ChasePose extends Command {
                 swerve.getPose(),
                 desiredPose2d,
                 0,
-                desiredPose2d.getRotation()).div(1.5);
+                desiredPose2d.getRotation());
 
         swerve.setDesiredPose(desiredPose2d);
 
