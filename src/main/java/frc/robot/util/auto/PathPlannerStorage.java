@@ -192,6 +192,9 @@ public class PathPlannerStorage implements Logged {
                 () -> Commands.either(
                     goToNote()
                         .andThen(pathfindToShoot()
+                            .deadlineWith(NamedCommands.getCommand("ToIndexer")
+                            .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                            .andThen(NamedCommands.getCommand("ShootInstantly"))
                         .andThen(pathfindToNextNote(nextIndex, goingDown))), 
                     pathfindToNextNote(nextIndex, goingDown), 
                     this::reasonableNoteInVision),
@@ -202,6 +205,9 @@ public class PathPlannerStorage implements Logged {
                     Commands.sequence(
                         goToNote(),
                         pathfindToShoot()
+                            .deadlineWith(NamedCommands.getCommand("ToIndexer")
+                                .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                            .andThen(NamedCommands.getCommand("ShootInstantly"))
                 ), 
                 Commands.runOnce(swerve::stopDriving, swerve)
                     .andThen(
@@ -211,6 +217,9 @@ public class PathPlannerStorage implements Logged {
                             Commands.sequence(
                                 goToNote(),
                                 pathfindToShoot()
+                                    .deadlineWith(NamedCommands.getCommand("ToIndexer")
+                                        .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                                    .andThen(NamedCommands.getCommand("ShootInstantly"))
                             )
                         )
                     ),
@@ -259,11 +268,10 @@ public class PathPlannerStorage implements Logged {
                 PoseCalculations.getClosestShootingPose(swerve.getPose()), 
                 PATH_CONSTRAINTS,
                 0)
-            .andThen(NamedCommands.getCommand("ShootInstantly"))
             .raceWith(Commands.waitSeconds(1.5).andThen(
-                    Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
-                )
-            );
+                Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
+            )
+        );
     }
 
     /**
@@ -304,8 +312,8 @@ public class PathPlannerStorage implements Logged {
     private boolean reasonableNoteInVision() {
         return 
             limelight.noteInVision(limelight.getResults())
-            && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
-                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)));
+            && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
+                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)));
     }
 
     /**
@@ -318,18 +326,20 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that drives to a preset note position
      */
     public Command goToNote() {
-        return swerve.getChaseCommand( 
-            () ->
-                new Pose2d(
-                    limelight.getNotePose2d().getTranslation(), 
-                    Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)),
-            () -> colorSensorSupplier.getAsBoolean() 
-                // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
-                // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
-                // since the pose is from the center but the note is from the edge (since the intake gets it)
-                || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
-                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)))
-            .alongWith(NamedCommands.getCommand("ToIndexer"));
+        return 
+            swerve.getChaseCommand(() -> 
+                new Pose2d(swerve.getPose().getTranslation(),
+                limelight.getNotePose2d().getRotation())
+            ).andThen(
+            swerve.getChaseCommand( 
+                limelight::getNotePose2d,
+                () -> colorSensorSupplier.getAsBoolean() 
+                    // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
+                    // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
+                    // since the pose is from the center but the note is from the edge (since the intake gets it)
+                    || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
+                    || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)))
+            .raceWith(NamedCommands.getCommand("ToIndexer")));
     }
 
     public Pose2d getPathEndPose(PathPlannerPath path) {

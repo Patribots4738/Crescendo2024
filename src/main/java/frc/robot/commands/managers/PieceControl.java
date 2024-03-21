@@ -172,6 +172,7 @@ public class PieceControl implements Logged {
             ampper.outtake(),
             indexer.toElevator(),
             Commands.waitUntil(() -> !colorSensor.hasNote()),
+            NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             ampper.outtakeSlow(),
             NT.getWaitCommand("noteToTrap2"), // 0.5
@@ -204,7 +205,7 @@ public class PieceControl implements Logged {
     }
 
     public Command stopPanicEject() {
-        return ampper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.outCommand());
+        return ampper.stopCommand().alongWith(indexer.stopCommand()).alongWith(intake.stopCommand());
     }
 
     public Command intakeAuto() {
@@ -246,7 +247,7 @@ public class PieceControl implements Logged {
         return setElevatorPosition(() -> ElevatorConstants.ELEVATOR_TOP_LIMIT);
     }
     public Command elevatorToBottom() {
-        return setElevatorPosition(() -> ElevatorConstants.ELEVATOR_BOTTOM_LIMIT)
+        return setElevatorPosition(() -> ElevatorConstants.BOTTOM_POS)
             .andThen(setPlaceWhenReadyCommand(false));
     }
 
@@ -308,15 +309,15 @@ public class PieceControl implements Logged {
 
     public Command sourceShooterIntake(BooleanSupplier holdingButton) {
         return Commands.sequence(
-            shooterCmds.setTripletCommand(new SpeedAngleTriplet(-300.0, -300.0, 60.0)),
+            shooterCmds.sourceIntakeCommand(),
             indexer.toElevator(),
-            ampper.outtake()
-        ).onlyWhile(holdingButton)
-        .andThen(
-            Commands.either(
-                stopAllMotors(),
-                noteToTrap(),
-                this::getShooterMode));
+            ampper.outtake(),
+            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitSeconds(0.1),
+            shooterCmds.stopShooter(),
+            stopIntakeAndIndexer(),
+            shooterCmds.stowPivot()
+        );
     }
 
     public Command stopIntakeAndIndexer() {
