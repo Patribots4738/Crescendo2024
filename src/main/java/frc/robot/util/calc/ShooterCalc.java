@@ -46,7 +46,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
+        SpeedAngleTriplet currentTriplet = calculateSpeakerTriplet(pose.getTranslation());
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
