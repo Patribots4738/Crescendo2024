@@ -42,44 +42,14 @@
                       "data": {
                         "pathName": "S C4"
                       }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C4 R"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "M C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "M C2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C2 L"
-                      }
                     }
                   ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "C4toC2"
                 }
               }
             ]
@@ -88,6 +58,6 @@
       ]
     }
   },
-  "folder": "Normal",
+  "folder": "OBJ",
   "choreoAuto": false
 }

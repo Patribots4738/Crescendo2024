@@ -34,37 +34,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S C1"
+                        "pathName": "S C1 N"
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "named",
                       "data": {
-                        "pathName": "C1 L"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "L C2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C2 L"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "L C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M"
+                        "name": "C1toC3"
                       }
                     }
                   ]
@@ -76,6 +52,6 @@
       ]
     }
   },
-  "folder": "Normal",
+  "folder": "OBJ",
   "choreoAuto": false
 }

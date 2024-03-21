@@ -3,71 +3,65 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3487445803653653,
-        "y": 6.278778783761375
+        "x": 1.3721166040379995,
+        "y": 5.572415049000463
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2220739865986463,
-        "y": 6.444251723889786
+        "x": 5.0287863486108515,
+        "y": 5.820077940067149
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.899013038787556,
-        "y": 6.278778783761375
+        "x": 5.108912578073603,
+        "y": 4.006311473137587
       },
       "prevControl": {
-        "x": 3.0072977503177856,
-        "y": 6.223621137051905
+        "x": 4.470027423067989,
+        "y": 4.002660700823269
       },
       "nextControl": {
-        "x": 4.7557951515831425,
-        "y": 6.33177561548069
+        "x": 6.383648046799199,
+        "y": 4.013595675816019
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.822368314389485,
-        "y": 6.720039957437138
+        "x": 7.163057733391421,
+        "y": 3.2414701919022293
       },
       "prevControl": {
-        "x": 5.889284790887611,
-        "y": 6.513198782276624
+        "x": 6.784279194112958,
+        "y": 4.0354482838513155
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.4,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
-    "velocity": 0.65,
-    "rotation": -153.63458487744634,
+    "velocity": 0,
+    "rotation": -168.47968005228898,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Object Detection",
   "previewStartingState": {
-    "rotation": -172.8855880891621,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

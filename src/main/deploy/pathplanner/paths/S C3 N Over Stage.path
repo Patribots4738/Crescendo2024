@@ -3,71 +3,65 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3487445803653653,
-        "y": 6.278778783761375
+        "x": 1.3721166040379995,
+        "y": 5.572415049000463
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2220739865986463,
-        "y": 6.444251723889786
+        "x": 3.1695497638586083,
+        "y": 5.919322735606183
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.899013038787556,
-        "y": 6.278778783761375
+        "x": 5.75055643810324,
+        "y": 6.5998256829723445
       },
       "prevControl": {
-        "x": 3.0072977503177856,
-        "y": 6.223621137051905
+        "x": 5.111671283097626,
+        "y": 6.596174910658027
       },
       "nextControl": {
-        "x": 4.7557951515831425,
-        "y": 6.33177561548069
+        "x": 7.025291906828836,
+        "y": 6.607109885650776
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.822368314389485,
-        "y": 6.720039957437138
+        "x": 7.209652847771226,
+        "y": 3.7245474639207248
       },
       "prevControl": {
-        "x": 5.889284790887611,
-        "y": 6.513198782276624
+        "x": 7.050255761000774,
+        "y": 4.607362098341696
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.4,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
-    "velocity": 0.65,
-    "rotation": -153.63458487744634,
+    "velocity": 0,
+    "rotation": -168.47968005228898,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Object Detection",
   "previewStartingState": {
-    "rotation": -172.8855880891621,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true
