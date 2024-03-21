@@ -270,7 +270,7 @@ public class PathPlannerStorage implements Logged {
                 0)
             .raceWith(Commands.waitSeconds(1.5).andThen(
                 Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
-            )
+            ).alongWith(NamedCommands.getCommand("PrepareShooter" + PoseCalculations.getClosestShootingPoseString(swerve.getPose())))
         );
     }
 
@@ -314,7 +314,7 @@ public class PathPlannerStorage implements Logged {
             limelight.noteInVision(limelight.getResults())
             && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
                 || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X - Units.inchesToMeters(20))
-            && limelight.getNotePose2d().getTranslation().getNorm() < 2.75);
+            && limelight.getNotePose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < 2.75);
     }
 
     /**
@@ -338,8 +338,10 @@ public class PathPlannerStorage implements Logged {
                     // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
                     // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
                     // since the pose is from the center but the note is from the edge (since the intake gets it)
-                    || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
-                    || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)))
+                    || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(40))
+                    || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(40)))
+            // This race will end the command if the color sensor detects a note early. 
+            // (a robot pushes the note towards us)
             .raceWith(NamedCommands.getCommand("ToIndexer")));
     }
 

@@ -966,7 +966,7 @@ public final class Constants {
               BLUE_SPEAKER_TRANSLATION.getY() - L_POSE.getY()
             ));
             Pose2d R_POSE2D = new Pose2d(R_POSE, new Rotation2d(
-              BLUE_SPEAKER_TRANSLATION.getX() - R_POSE.getX(), 
+              BLUE_SPEAKER_TRANSLATION.getX() - R_POSE.getX(),
               BLUE_SPEAKER_TRANSLATION.getY() - R_POSE.getY()
             ));
             Pose2d M_POSE2D = new Pose2d(M_POSE, new Rotation2d(
