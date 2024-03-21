@@ -449,7 +449,7 @@ public class RobotContainer implements Logged {
             .whileTrue(swerve.getChaseCommand(limelight2::getNotePose2d));
 
         controller.povLeft()
-            .onTrue(pieceControl.stopAllMotors());
+            .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(0)));
       
         controller.leftBumper()
             .onTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
@@ -511,12 +511,12 @@ public class RobotContainer implements Logged {
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) { 
-        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors());
-        controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
+        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(0)));
+        controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand().alongWith(Commands.runOnce(swerve::setWheelsX)));
         controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
 
         controller.leftY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
-        controller.rightY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementAngle(() -> -controller.getRightY()));
+        controller.rightY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementAngle(() -> controller.getRightY()));
 
         controller.leftX(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
         controller.rightX(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));

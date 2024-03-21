@@ -88,6 +88,14 @@ public class ShooterCmds {
             shooter.setSpeed(triplet.getSpeeds());
         }, pivot, shooter).until(shooterCalc.readyToShootSupplier());
     }
+
+    public Command sourceIntakeCommand() {
+        return Commands.runOnce(() -> {
+            desiredTriplet = new SpeedAngleTriplet(-300.0, -300.0, 60.0);
+            pivot.setAngle(desiredTriplet.getAngle());
+            shooter.setSpeed(desiredTriplet.getSpeeds());
+        }, pivot, shooter);
+    }
     
     public SpeedAngleTriplet getTriplet() {
         return desiredTriplet;

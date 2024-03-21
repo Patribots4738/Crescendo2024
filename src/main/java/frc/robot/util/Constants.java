@@ -135,16 +135,18 @@ public final class Constants {
             0.0083
         );
 
-        public static final int SHOOTER_CURRENT_LIMIT = 50;
+        public static final int SHOOTER_CURRENT_LIMIT = 60;
         public static final int PIVOT_CURRENT_LIMIT = 20;
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
         public static final double PIVOT_DEADBAND = 1;
-        public static final double SHOOTER_RPM_DEADBAND = 80;
+        public static final double SHOOTER_RPM_DEADBAND = 50;
 
-        public static final double PIVOT_LOWER_LIMIT_DEGREES = 21; 
+        public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
+
+        public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
         
         // This mega decimal number was gotten from REV hardware client, 
         // and we zeroed the pivot at its minimum angle
@@ -183,7 +185,7 @@ public final class Constants {
                 // put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
 
                 // V2
-                put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
+                // put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
                 // put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
                 // put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
                 // put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
@@ -196,22 +198,33 @@ public final class Constants {
                 // // 2/28/24 - this was the day after bands were added
                 // put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
 
-                put(16, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
-                put(17, SpeedAngleTriplet.of(3986.0, 3990.0, 26.8));
-                put(18, SpeedAngleTriplet.of(3986.0, 3990.0, 26.1));
-                put(19, SpeedAngleTriplet.of(4201.0, 4205.0, 25.0));
+                // put(16, SpeedAngleTriplet.of(3986.0, 3990.0, 33.7));
+                // put(17, SpeedAngleTriplet.of(3986.0, 3990.0, 33));
+                // put(18, SpeedAngleTriplet.of(3986.0, 3990.0, 32.5));
+                // put(19, SpeedAngleTriplet.of(4201.0, 4205.0, 32.0));
 
+                // put(7, SpeedAngleTriplet.of(2840.0, 2850.0, 44.6));
+                // put(8, SpeedAngleTriplet.of(2810.0, 2820.0, 39.5));
+                // put(9, SpeedAngleTriplet.of(2886.0, 2886.0, 38.4));
+                // put(10, SpeedAngleTriplet.of(2888.0, 2897.0, 36.6));
+                // // Driverstation has some words for you:
+                // //   樀愀瘀愀㨀㐀㄀㈀⤀㨀 䰀漀漀瀀 琀椀洀攀 漀昀 　⸀　㈀猀 漀瘀攀爀爀甀渀 ＀෾਀＀￾￾￾￾￾⃾ ＀෾਀＀
+                // put(11, SpeedAngleTriplet.of(2943.0, 2930.0, 36));
+                // put(12, SpeedAngleTriplet.of(2943.0, 2935.0, 35.9));
+                // put(13, SpeedAngleTriplet.of(3319.0, 3042.0, 35.3));
+                // put(14, SpeedAngleTriplet.of(3587.0, 3310.0, 34.7));
+                // put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 34));
+
+                // NEW SHOOTER WOOOHOO
+                put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
                 put(7, SpeedAngleTriplet.of(2840.0, 2850.0, 44.6));
-                put(8, SpeedAngleTriplet.of(2810.0, 2820.0, 39.5));
-                put(9, SpeedAngleTriplet.of(2886.0, 2886.0, 37.4));
-                put(10, SpeedAngleTriplet.of(2888.0, 2897.0, 35.6));
-                // Driverstation has some words for you:
-                //   樀愀瘀愀㨀㐀㄀㈀⤀㨀 䰀漀漀瀀 琀椀洀攀 漀昀 　⸀　㈀猀 漀瘀攀爀爀甀渀 ＀෾਀＀￾￾￾￾￾⃾ ＀෾਀＀
-                put(11, SpeedAngleTriplet.of(2943.0, 2930.0, 33.3));
-                put(12, SpeedAngleTriplet.of(2943.0, 2935.0, 32.2));
-                put(13, SpeedAngleTriplet.of(3319.0, 3042.0, 30.3));
-                put(14, SpeedAngleTriplet.of(3587.0, 3310.0, 29.1));
-                put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 27.3));
+                put(8, SpeedAngleTriplet.of(3006.0, 3014.0, 41.3));
+                put(9, SpeedAngleTriplet.of(3002.0, 3002.0, 40.0));
+                put(10, SpeedAngleTriplet.of(3002.0, 3002.0, 38.5));
+                put(11, SpeedAngleTriplet.of(3174.0, 3156.0, 37.1));
+                put(12, SpeedAngleTriplet.of(3249.0, 3237.0, 34.4));
+                put(13, SpeedAngleTriplet.of(3409.0, 3397.0, 33.1));
+                put(14, SpeedAngleTriplet.of(3400, 3400.0, 45.3));
             }
         };
 
@@ -249,13 +262,15 @@ public final class Constants {
         public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
         // TODO: set these values
-        public static final double BOTTOM_POS = -.0254;
+        public static final double BOTTOM_POS = -.005;
         public static final double INTAKE_TIME = 0;
         public static final double AMPPER_OUTTAKE_PERCENT = -1;
         public static final double AMPPER_INTAKE_PERCENT = 1;
         public static final double AMPPER_OUTTAKE_SLOW = -0.3;
         public static final double AMPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
+        // This position is not used
+        public static final double AMP_PLACE_POS = 0.409;        
         public static final double NOTE_FIX_POS = 0.14;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
@@ -858,7 +873,7 @@ public final class Constants {
             }
         }
 
-        public static final Translation2d L_POSE = new Translation2d(4.319, 6.327);
+        public static final Translation2d L_POSE = new Translation2d(3.92, 6.58);
         public static final Translation2d R_POSE = new Translation2d(3, 3);
         public static final Translation2d M_POSE = new Translation2d(4.423,4.855);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();

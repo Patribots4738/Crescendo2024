@@ -46,7 +46,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
+        SpeedAngleTriplet currentTriplet = calculateSpeakerTriplet(pose.getTranslation());
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
@@ -67,15 +67,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTripletAuto(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
-        double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
-
-        double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = originalv0 * Math.sin(Units.degreesToRadians(currentTriplet.getAngle()));
-        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
-
-        double newv0 = Math.hypot(v0x, v0z);
-        Rotation2d newAngle = new Rotation2d(v0x, v0z);
+        SpeedAngleTriplet currentTriplet = calculateSWDTriplet(currentPose, speeds);
 
         double maxRPMAuto = ShooterConstants.INTERPOLATION_MAP.get(Units.metersToFeet(5)).getAverageSpeed();
         
@@ -83,7 +75,7 @@ public class ShooterCalc implements Logged {
             SpeedAngleTriplet.of(
                 MathUtil.clamp(currentTriplet.getLeftSpeed(), 0, maxRPMAuto),
                 MathUtil.clamp(currentTriplet.getRightSpeed(), 0, maxRPMAuto),
-                newAngle.getDegrees()
+                currentTriplet.getAngle()
             );
     }
 
@@ -135,8 +127,7 @@ public class ShooterCalc implements Logged {
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(Units.degreesToRadians(60));
-        // return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
+        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
     }
 
     /**
