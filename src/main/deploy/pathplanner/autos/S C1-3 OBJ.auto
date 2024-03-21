@@ -36,23 +36,23 @@
                       "data": {
                         "name": "ShootWhenReady"
                       }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "S C1 N"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "C1toC3"
-                      }
                     }
                   ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S C1 N"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C1toC3"
           }
         }
       ]

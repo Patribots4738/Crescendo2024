@@ -79,13 +79,30 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             },
             {
               "type": "named",
               "data": {
                 "name": "EnableLimelight"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 2.8499999999999996,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
               }
             }
           ]
@@ -101,7 +118,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -172.68221039827986,
+    "rotation": -165.2995790687076,
     "rotateFast": false
   },
   "reversed": false,
