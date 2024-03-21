@@ -224,7 +224,7 @@ public final class Constants {
                 put(11, SpeedAngleTriplet.of(3174.0, 3156.0, 37.1));
                 put(12, SpeedAngleTriplet.of(3249.0, 3237.0, 34.4));
                 put(13, SpeedAngleTriplet.of(3409.0, 3397.0, 33.1));
-                put(14, SpeedAngleTriplet.of(3400, 3400.0, 45.3));
+                put(14, SpeedAngleTriplet.of(3400, 3400.0, 32.7));
             }
         };
 
@@ -1100,7 +1100,7 @@ public final class Constants {
             put("dropPiece1", 0.5);
 
             put("ampPosition", 0.37);
-            put("atan++", 0.0);
+            put("atan++", 0.86);
 
             put("placeOuttake", 0.8);
             put("prepPiece", 0.3);

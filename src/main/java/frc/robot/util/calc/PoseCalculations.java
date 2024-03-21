@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
+import monologue.Annotations.Log;
 
 public class PoseCalculations implements Logged {
 
@@ -40,19 +41,24 @@ public class PoseCalculations implements Logged {
         return position.nearest(FieldConstants.GET_CHAIN_POSITIONS());
     }
 
+    @Log
+    private static Pose2d closestShootingPose;
+
+    @Log
     public static Pose2d getClosestShootingPose(Pose2d position) {
-        return position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
+        closestShootingPose = position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
+        return closestShootingPose;
     }
 
     public static String getClosestShootingPoseString(Pose2d position) {
-        Pose2d nearestPose = position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
-        if (nearestPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(0)))
+        closestShootingPose = position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
+        if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(0)))
             return "L";
 
-        if (nearestPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(1)))
+        if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(1)))
             return "R";
 
-        if (nearestPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(2)))
+        if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(2)))
             return "M";
         
         return "if you managed to get this to run you deserve a cookie... wait.. no. i want that cookie.";

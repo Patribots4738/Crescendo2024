@@ -46,7 +46,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = calculateSpeakerTriplet(pose.getTranslation());
+        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
@@ -60,7 +60,7 @@ public class ShooterCalc implements Logged {
             SpeedAngleTriplet.of(
                 currentTriplet.getLeftSpeed(),
                 currentTriplet.getRightSpeed(),
-                newAngle.getDegrees()
+                currentTriplet.getAngle()
             );
     }
 
@@ -110,12 +110,15 @@ public class ShooterCalc implements Logged {
         // Calculate the robot's pose relative to the speaker's position
         robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
 
-        // Calculate the distance in feet from the robot to the speaker
+        // Calculate the distance in meters from the robot to the speaker
         double distanceMeters = robotPose.getTranslation().getNorm();
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS + NT.getValue("atan++"));
+        return new Rotation2d(
+            distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), 
+            FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_METERS.getZ() + NT.getValue("atan++")
+        );
     }
 
     public Rotation2d calculatePassPivotAngle(Pose2d robotPose) {

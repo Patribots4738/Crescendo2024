@@ -268,9 +268,13 @@ public class PathPlannerStorage implements Logged {
                 PoseCalculations.getClosestShootingPose(swerve.getPose()), 
                 PATH_CONSTRAINTS,
                 0)
-            .raceWith(Commands.waitSeconds(1.5).andThen(
-                Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
-            ).alongWith(NamedCommands.getCommand("PrepareShooter" + PoseCalculations.getClosestShootingPoseString(swerve.getPose())))
+            .raceWith(
+                Commands.waitSeconds(1.5)
+                .andThen(
+                    Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
+                ).alongWith(
+                    NamedCommands.getCommand("PrepareShooter" + PoseCalculations.getClosestShootingPoseString(swerve.getPose()))
+                )
         );
     }
 
