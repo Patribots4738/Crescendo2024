@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.custom.SwerveKinematicLimits;
 import frc.robot.util.custom.SwerveSetpoint;
-import frc.robot.util.rev.MAXSwerveModule;
 
 public class SwerveSetpointGenerator {
     private final SwerveDriveKinematics kinematics;
