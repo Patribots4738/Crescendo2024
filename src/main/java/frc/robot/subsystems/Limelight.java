@@ -106,7 +106,11 @@ public class Limelight extends SubsystemBase implements Logged{
             if (targets.length > 1) {
                 // TODO: TUNE
                 xyStds = Math.hypot(0.011, 0.028);
-                radStds = Units.degreesToRadians(3);
+                radStds = Units.degreesToRadians(
+                    Robot.gameMode == GameMode.AUTONOMOUS && Robot.currentTimestamp - RobotContainer.gameModeStart < 3
+                        ? 0.5
+                        : 2
+                );
             }
             // 1 target with large area and close to estimated roxose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
