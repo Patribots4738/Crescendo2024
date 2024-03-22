@@ -165,7 +165,7 @@ public final class Constants {
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
                 put(4, SpeedAngleTriplet.of(1763.0, 2316.0, 56.1));
-                put(5, SpeedAngleTriplet.of(1763.0, 2316.0, 56.1));
+                put(5, SpeedAngleTriplet.of(1763.0, 2316.0, 57.6));
                 // put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
                 // put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
                 // put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
@@ -211,20 +211,14 @@ public final class Constants {
                 // put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 34));
 
                 // NEW SHOOTER WOOOHOO
-                put(6, SpeedAngleTriplet.of(3000.0, 2850.0, 48.3));
-                put(7, SpeedAngleTriplet.of(3140.0, 2850.0, 44.6));
-                put(8, SpeedAngleTriplet.of(3306.0, 3013.0, 42.9));
-                put(9, SpeedAngleTriplet.of(3302.0, 3002.0, 41.2));
-                put(10, SpeedAngleTriplet.of(3306.0, 3005.0, 39.5));
-                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 38.0));
+                put(6, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
+                put(7, SpeedAngleTriplet.of(3160.0, 2865.0, 46.3));
+                put(8, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
+                put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 41.2));
+                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 39.5));
+                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 37.6));
                 put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 35.7));
                 put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33.9));
-
-                // put(14, SpeedAngleTriplet.of(\[]3400, 3400.0, 32.7));
-                // This second triplet also works, and looks more consistent for shooting bad notes into the speaker
-                // one thing to note is that if we go for this second approach 
-                // we may need to add this type of spin for the above presets
-                // shouldn't be hard, anges shouldn't need to change, but they might.
                 put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.2));
                 put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 32.0));
                 put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.7));
