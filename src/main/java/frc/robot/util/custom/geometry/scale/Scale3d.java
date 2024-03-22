@@ -1,6 +1,6 @@
-package frc.robot.util.custom;
+package frc.robot.util.custom.geometry.scale;
 
-public class Scale3d {
+public class Scale3d implements Scale<Scale3d>{
     public double x;
     public double y;
     public double z;
@@ -15,10 +15,6 @@ public class Scale3d {
         this(x, y, 1);
     }
 
-    public Scale3d(double x) {
-        this(x, 1, 1);
-    }
-
     public Scale3d() {
         this(1, 1, 1);
     }
@@ -30,39 +26,36 @@ public class Scale3d {
     public Scale3d of(double x, double y, double z) {
         return new Scale3d(x, y, z);
     }
-
+    
+    @Override
     public Scale3d of(double x, double y) {
         return new Scale3d(x, y);
     }
-
-    public Scale3d of(double x) {
-        return new Scale3d(x);
-    }
-
+    @Override
     public Scale3d of() {
         return new Scale3d();
     }
-
+    @Override
     public Scale3d of(Scale3d scale) {
         return new Scale3d(scale);
     }
-
+    @Override
     public Scale3d add(Scale3d scale) {
         return new Scale3d(x + scale.x, y + scale.y, z + scale.z);
     }
-
+    @Override
     public Scale3d subtract(Scale3d scale) {
         return new Scale3d(x - scale.x, y - scale.y, z - scale.z);
     }
-
+    @Override
     public Scale3d multiply(Scale3d scale) {
         return new Scale3d(x * scale.x, y * scale.y, z * scale.z);
     }
-
+    @Override
     public Scale3d divide(Scale3d scale) {
         return new Scale3d(x / scale.x, y / scale.y, z / scale.z);
     }
-
+    @Override
     public Scale3d negate() {
         return new Scale3d(-x, -y, -z);
     }
