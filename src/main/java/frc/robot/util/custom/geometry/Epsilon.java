@@ -11,7 +11,7 @@ public class Epsilon {
         return epsilonEquals(a, b, EPSILON);
     }
 
-    public static boolean epsilonEquals(Twist2d a, Twist2d b, double epsilon) {
+    public static boolean epsilonEquals(CustomTwist2d a, CustomTwist2d b, double epsilon) {
         return epsilonEquals(a.dx, b.dx, epsilon) 
             && epsilonEquals(a.dy, b.dy, epsilon) 
             && epsilonEquals(a.dtheta, b.dtheta, epsilon);

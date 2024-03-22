@@ -20,7 +20,7 @@ import java.util.Objects;
  * <p>
  * A Twist can be used to represent a difference between two poses.
  */
-public class Twist2d implements ProtobufSerializable, StructSerializable {
+public class CustomTwist2d implements ProtobufSerializable, StructSerializable {
     /** Linear "dx" component. */
     public double dx;
 
@@ -31,7 +31,7 @@ public class Twist2d implements ProtobufSerializable, StructSerializable {
     public double dtheta;
 
     /** Default constructor. */
-    public Twist2d() {
+    public CustomTwist2d() {
     }
 
     /**
@@ -41,18 +41,18 @@ public class Twist2d implements ProtobufSerializable, StructSerializable {
      * @param dy     Change in y direction relative to robot.
      * @param dtheta Change in angle relative to robot.
      */
-    public Twist2d(double dx, double dy, double dtheta) {
+    public CustomTwist2d(double dx, double dy, double dtheta) {
         this.dx = dx;
         this.dy = dy;
         this.dtheta = dtheta;
     }
 
-    public Twist2d(ChassisSpeeds chassisSpeeds) {
+    public CustomTwist2d(ChassisSpeeds chassisSpeeds) {
         this(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
     }
 
-    public static Twist2d fromChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-        return new Twist2d(chassisSpeeds);
+    public static CustomTwist2d fromChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        return new CustomTwist2d(chassisSpeeds);
     }
 
     @Override
@@ -68,10 +68,10 @@ public class Twist2d implements ProtobufSerializable, StructSerializable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Twist2d) {
-            return Math.abs(((Twist2d) obj).dx - dx) < 1E-9
-                    && Math.abs(((Twist2d) obj).dy - dy) < 1E-9
-                    && Math.abs(((Twist2d) obj).dtheta - dtheta) < 1E-9;
+        if (obj instanceof CustomTwist2d) {
+            return Math.abs(((CustomTwist2d) obj).dx - dx) < 1E-9
+                    && Math.abs(((CustomTwist2d) obj).dy - dy) < 1E-9
+                    && Math.abs(((CustomTwist2d) obj).dtheta - dtheta) < 1E-9;
         }
         return false;
     }

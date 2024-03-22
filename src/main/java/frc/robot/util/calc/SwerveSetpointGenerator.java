@@ -14,7 +14,7 @@ import frc.robot.util.custom.SwerveKinematicLimits;
 import frc.robot.util.custom.SwerveSetpoint;
 import frc.robot.util.custom.geometry.Epsilon;
 import frc.robot.util.custom.geometry.Transform;
-import frc.robot.util.custom.geometry.Twist2d;
+import frc.robot.util.custom.geometry.CustomTwist2d;
 
 public class SwerveSetpointGenerator {
     private final SwerveDriveKinematics kinematics;
@@ -114,15 +114,15 @@ public class SwerveSetpointGenerator {
 
         SwerveModuleState[] desiredModuleState = kinematics.toSwerveModuleStates(desiredState);
         // Make sure desiredState respects velocity limits.
-        if (limits.kMaxDriveVelocity > 0.0) {
-            SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleState, limits.kMaxDriveVelocity);
+        if (limits.MAX_DRIVE_VELOCITY > 0.0) {
+            SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleState, limits.MAX_DRIVE_VELOCITY);
             desiredState = kinematics.toChassisSpeeds(desiredModuleState);
         }
 
         // Special case: desiredState is a complete stop. In this case, module angle is
         // arbitrary, so just use the previous angle.
         boolean need_to_steer = true;
-        if (Epsilon.epsilonEquals(Twist2d.fromChassisSpeeds(desiredState), new Twist2d(), Epsilon.EPSILON)) {
+        if (Epsilon.epsilonEquals(CustomTwist2d.fromChassisSpeeds(desiredState), new CustomTwist2d(), Epsilon.EPSILON)) {
             need_to_steer = false;
             for (int i = 0; i < modules.length; ++i) {
                 desiredModuleState[i].angle = prevSetpoint.moduleStates[i].angle;
@@ -162,10 +162,10 @@ public class SwerveSetpointGenerator {
             }
         }
         if (all_modules_should_flip &&
-                !Epsilon.epsilonEquals(Twist2d.fromChassisSpeeds(prevSetpoint.chassisSpeeds), new Twist2d(),
+                !Epsilon.epsilonEquals(CustomTwist2d.fromChassisSpeeds(prevSetpoint.chassisSpeeds), new CustomTwist2d(),
                         Epsilon.EPSILON)
                 &&
-                !Epsilon.epsilonEquals(Twist2d.fromChassisSpeeds(desiredState), new Twist2d(), Epsilon.EPSILON)) {
+                !Epsilon.epsilonEquals(CustomTwist2d.fromChassisSpeeds(desiredState), new CustomTwist2d(), Epsilon.EPSILON)) {
             // It will (likely) be faster to stop the robot, rotate the modules in place to
             // the complement of the desired
             // angle, and accelerate again.
@@ -194,7 +194,7 @@ public class SwerveSetpointGenerator {
         // and then backing out the maximum interpolant between start and goal states.
         // We remember the minimum across all modules, since
         // that is the active constraint.
-        final double max_theta_step = dt * limits.kMaxSteeringVelocity;
+        final double max_theta_step = dt * limits.MAX_STEERING_VELOCITY;
         for (int i = 0; i < modules.length; ++i) {
             if (!need_to_steer) {
                 overrideSteering.add(Optional.of(prevSetpoint.moduleStates[i].angle));
@@ -245,7 +245,7 @@ public class SwerveSetpointGenerator {
         }
 
         // Enforce drive wheel acceleration limits.
-        final double max_vel_step = dt * limits.kMaxDriveAcceleration;
+        final double max_vel_step = dt * limits.MAX_DRIVE_ACCELERATION;
         for (int i = 0; i < modules.length; ++i) {
             if (min_s == 0.0) {
                 // No need to carry on.
