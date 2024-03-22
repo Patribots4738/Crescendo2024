@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4146207015818286,
-      "y": 5.487419769165779
+      "x": 1.3617612901519198,
+      "y": 4.771136440369186
     },
-    "rotation": 179.22577983507193
+    "rotation": 152.1857061442248
   },
   "command": {
     "type": "sequential",
@@ -34,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3 2"
+                        "pathName": "S W3"
                       }
                     },
                     {
@@ -47,6 +47,12 @@
                       "type": "path",
                       "data": {
                         "pathName": "W2 W1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
                       }
                     },
                     {
