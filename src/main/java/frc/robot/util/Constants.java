@@ -211,22 +211,23 @@ public final class Constants {
                 // put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 34));
 
                 // NEW SHOOTER WOOOHOO
-                put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
-                put(7, SpeedAngleTriplet.of(2840.0, 2850.0, 44.6));
-                put(8, SpeedAngleTriplet.of(3006.0, 3014.0, 41.3));
-                put(9, SpeedAngleTriplet.of(3002.0, 3002.0, 40.0));
-                put(10, SpeedAngleTriplet.of(3002.0, 3002.0, 38.5));
-                put(11, SpeedAngleTriplet.of(3174.0, 3156.0, 37.1));
-                put(12, SpeedAngleTriplet.of(3249.0, 3237.0, 34.4));
-                put(13, SpeedAngleTriplet.of(3409.0, 3397.0, 33.1));
+                put(6, SpeedAngleTriplet.of(3000.0, 2850.0, 48.3));
+                put(7, SpeedAngleTriplet.of(3140.0, 2850.0, 44.6));
+                put(8, SpeedAngleTriplet.of(3306.0, 3013.0, 42.9));
+                put(9, SpeedAngleTriplet.of(3302.0, 3002.0, 41.2));
+                put(10, SpeedAngleTriplet.of(3306.0, 3005.0, 39.5));
+                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 38.0));
+                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 35.7));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33.9));
+
                 // put(14, SpeedAngleTriplet.of(\[]3400, 3400.0, 32.7));
                 // This second triplet also works, and looks more consistent for shooting bad notes into the speaker
                 // one thing to note is that if we go for this second approach 
                 // we may need to add this type of spin for the above presets
                 // shouldn't be hard, anges shouldn't need to change, but they might.
-                put(14, SpeedAngleTriplet.of(3860, 3400.0, 32.2));
-                put(15, SpeedAngleTriplet.of(3974.0, 3568.0, 30.6));
-                put(16, SpeedAngleTriplet.of(4025.0, 3528.0, 30.1));
+                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.2));
+                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 32.0));
+                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.7));
                 
             }
         };
@@ -905,9 +906,9 @@ public final class Constants {
             }
         }
 
-        public static final Translation2d L_POSE = new Translation2d(3.92, 6.58);
+        public static final Translation2d L_POSE = new Translation2d(3.6, 6.42);
         public static final Translation2d R_POSE = new Translation2d(3, 3);
-        public static final Translation2d M_POSE = new Translation2d(4.236,5.060);
+        public static final Translation2d M_POSE = new Translation2d(3.95,5.060);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
         public static final List<Translation2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
