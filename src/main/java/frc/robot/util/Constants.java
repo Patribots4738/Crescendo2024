@@ -334,8 +334,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Units.degreesToRadians(1137.21);
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(792.90);
 
-        public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(7);
-        public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(5);
+        public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(1);
+        public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(3);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
@@ -435,7 +435,8 @@ public final class Constants {
             "S W1 S C1-3 S OBJ",
             "S W1 A C1-5 S OBJ",
             "S C5-4 S OBJ",
-            "S W3-1 S C2-3 S 2 OBJ" //hits podium when intaking W3
+            "S W3-1 S C2-3 S 2 OBJ", //hits podium when intaking W3
+            "S W3-1 S C2-3 S OBJ" //hits podium when intaking W3
             // "S W3-1 S C2-3 S 2",
             // "S W3-1 S C1-3 S",
             // "S C5-4 S",
@@ -501,7 +502,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.497869699432264*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4842953740931015*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
@@ -906,7 +907,7 @@ public final class Constants {
 
         public static final Translation2d L_POSE = new Translation2d(3.92, 6.58);
         public static final Translation2d R_POSE = new Translation2d(3, 3);
-        public static final Translation2d M_POSE = new Translation2d(4.423,4.855);
+        public static final Translation2d M_POSE = new Translation2d(4.236,5.060);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
 
         public static final List<Translation2d> TAG_CALIBRATION_POSE = new ArrayList<>(){{
