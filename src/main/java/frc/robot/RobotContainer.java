@@ -465,7 +465,8 @@ public class RobotContainer implements Logged {
       
         controller.leftBumper()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+            .negate().and(operator.leftBumper().negate())
+                .onTrue(pieceControl.stopIntakeAndIndexer().andThen(Commands.print("stopping")));
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
@@ -490,7 +491,8 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+            .negate().and(driver.leftBumper().negate())
+                .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
