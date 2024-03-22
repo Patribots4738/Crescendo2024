@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -397,9 +398,11 @@ public class PieceControl implements Logged {
                 shooterCmds.getShooter()
             ),
             shooterCmds.stopShooter(),
-            () -> colorSensor.hasNote()
-                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
-                && RobotController.getBatteryVoltage() > 9)
+            () -> 
+                (colorSensor.hasNote() 
+                    && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
+                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached()))
+                && RobotController.getBatteryVoltage() > 10)
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 }
