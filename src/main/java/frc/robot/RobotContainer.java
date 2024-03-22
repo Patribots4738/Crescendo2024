@@ -419,7 +419,7 @@ public class RobotContainer implements Logged {
                 alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
         
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> operator.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
                 .alongWith(operator.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
@@ -497,7 +497,7 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity)
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> operator.getLeftBumper())
             .andThen(limelight3.setLEDState(() -> false))); 
 
         controller.x()

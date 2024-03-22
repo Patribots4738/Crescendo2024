@@ -1,5 +1,6 @@
 package frc.robot.commands.managers;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -228,7 +229,7 @@ public class PieceControl implements Logged {
                 indexer.toShooter());
     }
 
-    public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+    public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier operatorWantsToIntake) {
         // Defer the command to not require anyhing until it is actually ran
         // This is becuase placeTrap requires pivot, but shootWhenReady does not
         // If they are both required, then we would cancel any command that requires pivot
@@ -238,7 +239,8 @@ public class PieceControl implements Logged {
                 Commands.race(shootWhenReady(poseSupplier, speedSupplier).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)),
                 Commands.race(prepPiece().andThen(placeWhenReady()).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
                 () -> elevator.getDesiredPosition() <= 0
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+                .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));
     }
 
     private Command setDislodging(boolean dislodging) {
