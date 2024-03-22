@@ -222,7 +222,11 @@ public class RobotContainer implements Logged {
         // setupChoreoChooser();
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
-            swerve.setWheelsOCommand().andThen(new WheelRadiusCharacterization(swerve)));
+            disableVision()
+            .andThen(
+                swerve.setWheelsOCommand()
+                .andThen(new WheelRadiusCharacterization(swerve)))
+            .andThen(enableVision()));
         
         configureButtonBindings();
         configureLoggingPaths();
@@ -386,10 +390,10 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
-            .onTrue(climb.toTopCommand());
+            .onTrue(climb.toTopCommand().alongWith(pivot.setAngleCommand(0)));
         
         controller.povDown()
-            .onTrue(climb.toBottomCommand());
+            .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
         
         controller.a()
             .onTrue(swerve.resetHDCCommand())
@@ -406,9 +410,6 @@ public class RobotContainer implements Logged {
                 limelight3.setLEDState(() -> false)
             );
 
-        controller.leftTrigger()
-            .whileTrue(swerve.getChaseCommand(limelight2::getNotePose2d));
-                    
         controller.x()
             .toggleOnTrue(
                 alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
@@ -435,7 +436,7 @@ public class RobotContainer implements Logged {
                     ).finallyDo(
                         () -> 
                             limelight3.setLEDState(() -> false)
-                            .andThen(shooterCmds.stowPivot()
+                            .andThen(pivot.setAngleCommand(60)
                                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                             .schedule()
                         )
@@ -450,20 +451,20 @@ public class RobotContainer implements Logged {
                     ).finallyDo(
                         () -> 
                             limelight3.setLEDState(() -> false)
-                            .andThen(shooterCmds.stowPivot()
+                            .andThen(pivot.setAngleCommand(60)
                                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                             .schedule()
                         )
                 );
         
         controller.leftTrigger()
-            .whileTrue(swerve.getChaseCommand(limelight2::getNotePose2d));
+            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         controller.povLeft()
-            .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(0)));
+            .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
       
         controller.leftBumper()
-            .onTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -488,7 +489,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.elevatorToBottom());
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .whileTrue(pieceControl.intakeUntilNote())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -509,8 +510,8 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.panicEjectNote())
             .onFalse(pieceControl.stopPanicEject());
 
-        controller.start().or(controller.back())
-            .whileTrue(pieceControl.sourceShooterIntake(controller.start().or(controller.back())))
+        controller.start().or(controller.back()).or(controller.y())
+            .whileTrue(pieceControl.sourceShooterIntake(controller.start().or(controller.back()).or(controller.y())))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightStick().and(controller.leftStick())
@@ -523,7 +524,7 @@ public class RobotContainer implements Logged {
     }
     
     private void configureCalibrationBindings(PatriBoxController controller) { 
-        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(0)));
+        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
         controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
 
@@ -543,7 +544,7 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeNote(swerve::getPose, swerve::getRobotRelativeVelocity)
+            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity)
                 .alongWith(Commands.run(swerve::setWheelsX)))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
@@ -680,6 +681,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("ShootInstantly", pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity));
+        NamedCommands.registerCommand("ShootInstantlyWhenReady", Commands.waitSeconds(.4).andThen(pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity)));
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootPreload());
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());

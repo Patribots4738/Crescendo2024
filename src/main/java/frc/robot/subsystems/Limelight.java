@@ -163,6 +163,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
     public Pose2d getNotePose2d() {
         Translation2d noteTranslationFromRobot;
+        Pose2d nextNoteFieldPose = noteFieldPose;
         if (FieldConstants.IS_SIMULATION) {
             noteFieldPose = robotPoseSupplier.get().nearest(FieldConstants.GET_CENTERLINE_NOTES());
             noteTranslationFromRobot = noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation();
@@ -188,7 +189,7 @@ public class Limelight extends SubsystemBase implements Logged{
                     .plus(CameraConstants.LL2Pose.getTranslation().toTranslation2d())
                     .rotateBy(CameraConstants.LL2Pose.getRotation().toRotation2d());
 
-                noteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
+                nextNoteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
             } else {
                 return noteFieldPosePlus14;
             }
@@ -201,7 +202,9 @@ public class Limelight extends SubsystemBase implements Logged{
 
         double distanceThreshold = FieldConstants.IS_SIMULATION ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
         if ((noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation().getNorm() > distanceThreshold)
-            || noteFieldPose.getTranslation().getDistance(noteFieldPosePlus14.getTranslation()) > Units.inchesToMeters(15)) {
+            || noteFieldPose.getTranslation().getDistance(nextNoteFieldPose.getTranslation()) > Units.inchesToMeters(3)) {
+
+            noteFieldPose = nextNoteFieldPose;
             
             noteFieldPosePlus14 = noteFieldPose.plus(
                 new Transform2d(

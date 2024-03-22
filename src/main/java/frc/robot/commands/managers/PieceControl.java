@@ -19,13 +19,11 @@ import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
-import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
@@ -131,6 +129,21 @@ public class PieceControl implements Logged {
                 stopIntakeAndIndexer());
     }
 
+    public Command noteToShootUsingSensorWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
+        return Commands.sequence(
+                Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()),
+                intake.inCommand(),
+                ampper.intake(),
+                indexer.toShooter(),
+                shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
+                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                stopIntakeAndIndexer());
+    }
+
     public Command intakeUntilNote() {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
@@ -145,12 +158,12 @@ public class PieceControl implements Logged {
         );
     }
     
-    public Command intakeNote(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+    public Command intakeNoteDriver(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.either(
             noteToShoot(poseSupplier, speedSupplier)
                 .andThen(
                     Commands.defer(
-                        () -> intakeNote(poseSupplier, speedSupplier), 
+                        () -> intakeNoteDriver(poseSupplier, speedSupplier), 
                         intakeUntilNote().getRequirements()
                     )
                 ),
@@ -383,7 +396,8 @@ public class PieceControl implements Logged {
             ),
             shooterCmds.stopShooter(),
             () -> colorSensor.hasNote()
-                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-            .onlyIf(() -> Robot.gameMode != GameMode.TEST && RobotController.getBatteryVoltage() > 9);
+                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
+                && RobotController.getBatteryVoltage() > 9)
+            .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 }

@@ -45,13 +45,20 @@ public class PoseCalculations implements Logged {
     private static Pose2d closestShootingPose;
 
     @Log
-    public static Pose2d getClosestShootingPose(Pose2d position) {
-        closestShootingPose = position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
-        return closestShootingPose;
+    public static Pose2d getBestShootingPose(Pose2d position) {
+        double yValue = position.getY();
+        if (yValue > 5)
+            // L
+            return FieldConstants.GET_SHOOTING_POSITIONS().get(0);
+        if (yValue > 1.8) 
+            // M
+            return FieldConstants.GET_SHOOTING_POSITIONS().get(2);
+        // R
+        return FieldConstants.GET_SHOOTING_POSITIONS().get(1);
     }
 
-    public static String getClosestShootingPoseString(Pose2d position) {
-        closestShootingPose = position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
+    public static String getBestShootingPoseString(Pose2d position) {
+        closestShootingPose = getBestShootingPose(position);
         if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(0)))
             return "L";
 
