@@ -98,19 +98,25 @@ public class Limelight extends SubsystemBase implements Logged{
 
         this.estimatedPose2d = estimatedRobotPose;
         RobotContainer.visionErrorPose = RobotContainer.robotPose2d.minus(estimatedRobotPose);
-
-        if (RobotContainer.enableVision && hasTarget(result)) {
-            double xyStds;
-            double radStds;
+        double xyStds;
+        double radStds;
+        if (Robot.gameMode == GameMode.DISABLED || 
+            (Robot.gameMode == GameMode.AUTONOMOUS 
+                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3 && hasTarget(result))) {
+            xyStds = 0.001;
+            radStds = 0.0002;
+            
+            poseEstimator.setVisionMeasurementStdDevs(
+                VecBuilder.fill(xyStds, xyStds, radStds));
+            poseEstimator.addVisionMeasurement(estimatedRobotPose,
+                Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
+        }
+        else if (RobotContainer.enableVision && hasTarget(result)) {
             // multiple targets detected
             if (targets.length > 1) {
                 // TODO: TUNE
                 xyStds = Math.hypot(0.011, 0.028);
-                radStds = Units.degreesToRadians(
-                    Robot.gameMode == GameMode.AUTONOMOUS && Robot.currentTimestamp - RobotContainer.gameModeStart < 3
-                        ? 0.5
-                        : 2
-                );
+                radStds = Units.degreesToRadians(2);
             }
             // 1 target with large area and close to estimated roxose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
