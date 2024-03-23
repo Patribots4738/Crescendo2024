@@ -263,7 +263,6 @@ public class RobotContainer implements Logged {
       
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.2 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached())
         .onTrue(pieceControl.coastIntakeAndIndexer()
-            .alongWith(climb.toBottomCommand())
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
             .andThen(Commands.waitSeconds(5))
             .andThen(pieceControl.brakeIntakeAndIndexer()));
