@@ -227,7 +227,7 @@ public class Limelight extends SubsystemBase implements Logged{
             noteFieldPosePlus14 = noteFieldPose.plus(
                 new Transform2d(
                     new Translation2d(
-                        Units.inchesToMeters(14),
+                        Units.inchesToMeters(7),
                         slopeAngle.plus(Rotation2d.fromDegrees(180))
                     ),
                     slopeAngle
