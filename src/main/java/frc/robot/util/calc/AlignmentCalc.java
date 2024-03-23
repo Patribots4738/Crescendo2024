@@ -15,9 +15,11 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import monologue.Annotations.IgnoreLogged;
 
 public class AlignmentCalc {
 
+    @IgnoreLogged
     private Swerve swerve;
 
     public AlignmentCalc(Swerve swerve) {

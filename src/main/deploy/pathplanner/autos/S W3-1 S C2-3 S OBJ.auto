@@ -26,15 +26,15 @@
                       }
                     },
                     {
-                      "type": "named",
-                      "data": {
-                        "name": "DisableLimelight"
-                      }
-                    },
-                    {
                       "type": "path",
                       "data": {
                         "pathName": "S W3"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DisableLimelight"
                       }
                     },
                     {

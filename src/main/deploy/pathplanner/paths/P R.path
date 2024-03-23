@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.880091849769366,
-        "y": 1.8431846942081342
+        "x": 2.8648071629849867,
+        "y": 3.0612493923756046
       },
       "prevControl": {
-        "x": 5.310129500438173,
-        "y": 1.8202023414125221
+        "x": 2.294844813653793,
+        "y": 3.0382670395799924
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
   "reversed": false,
   "folder": "Preloads",
   "previewStartingState": {
-    "rotation": 119.93875560710661,
+    "rotation": 116.9863360812466,
     "velocity": 0
   },
   "useDefaultConstraints": true

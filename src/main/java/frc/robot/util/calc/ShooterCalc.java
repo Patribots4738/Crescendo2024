@@ -18,13 +18,15 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 
 public class ShooterCalc implements Logged {
     
+    @IgnoreLogged
     private Shooter shooter;
+    @IgnoreLogged
     private Pivot pivot;
-
 
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.shooter = shooter;
@@ -315,6 +317,6 @@ public class ShooterCalc implements Logged {
 
     private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle) {
         double desiredRPM = velocityToRPM(ShooterConstants.PASS_V0Z / (pivotAngle.getSin()));
-        return Pair.of(desiredRPM, desiredRPM);
+        return Pair.of(desiredRPM/1.5, desiredRPM/1.5);
     }
 }

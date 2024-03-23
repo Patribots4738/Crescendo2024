@@ -52,7 +52,7 @@ public final class Constants {
 
         public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = Units.degreesToRadians(1137.21); // radians per second
 
-        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = ModuleConstants.CURRENT_GEARING.maxSpeedVortex;
+        public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.7;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -214,11 +214,11 @@ public final class Constants {
                 put(6, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
                 put(7, SpeedAngleTriplet.of(3160.0, 2865.0, 46.3));
                 put(8, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
-                put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 41.2));
-                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 39.5));
-                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 37.6));
-                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 35.7));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33.9));
+                put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
+                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 38.2));
+                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 36.6));
+                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 34.7));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33));
                 put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.2));
                 put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 32.0));
                 put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.7));
@@ -420,15 +420,12 @@ public final class Constants {
             "S C1-3 OBJ Over W1",
             "S W3-1 C1-3 OBJ", //didnt crash but it shot behind stage
             "S C1-3 S OBJ",
-            "A W1 A C1-4 S OBJ",
             "OBJ", 
             "S C1-5 C5-1 OBJ",
             "S C5-1 C1-5 OBJ",
-            "P A C1 N OBJ", //dirves over W1 D:
             "S C4-2 S OBJ",
             "S C1-5 C5-1 OBJ Over W1",
             "S W1 S C1-3 S OBJ",
-            "S W1 A C1-5 S OBJ",
             "S C5-4 S OBJ",
             "S W3-1 S C2-3 S 2 OBJ", //hits podium when intaking W3
             "S W3-1 S C2-3 S OBJ" //hits podium when intaking W3
@@ -604,10 +601,10 @@ public final class Constants {
             put(NORTHWEST, Pair.of(15, 16));
         }};
 
-    }
+    }   
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = false;
+        public static final boolean SAFE_SPARK_MODE = true;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
@@ -900,7 +897,7 @@ public final class Constants {
             }
         }
 
-        public static final Translation2d L_POSE = new Translation2d(3.6, 6.42);
+        public static final Translation2d L_POSE = new Translation2d(3.47, 5.89);
         public static final Translation2d R_POSE = new Translation2d(3, 3);
         public static final Translation2d M_POSE = new Translation2d(3.95,5.060);
         public static final Translation2d W3_POSE = SPIKE_TRANSLATIONS_BLUE[0].toTranslation2d();
@@ -1106,7 +1103,7 @@ public final class Constants {
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
-            put("noteToTrap1", 0.2);
+            put("noteToTrap1", 0.1);
             put("noteToTrap2", 0.5);
             put("noteToTrap3", 0.0);
 

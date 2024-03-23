@@ -263,10 +263,17 @@ public class RobotContainer implements Logged {
       
         new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.2 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached())
         .onTrue(pieceControl.coastIntakeAndIndexer()
-            .alongWith(climb.toBottomCommand())
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
             .andThen(Commands.waitSeconds(5))
             .andThen(pieceControl.brakeIntakeAndIndexer()));
+
+        new Trigger(() -> 
+            Robot.gameMode == GameMode.TELEOP
+            && shooter.getAverageSpeed() > 2500
+            && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
+            && limelight3.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
+        .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
+        .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
@@ -465,7 +472,8 @@ public class RobotContainer implements Logged {
       
         controller.leftBumper()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+            .negate().and(operator.leftBumper().negate())
+                .onTrue(pieceControl.stopIntakeAndIndexer().andThen(Commands.print("stopping")));
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
@@ -490,7 +498,8 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+            .negate().and(driver.leftBumper().negate())
+                .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
