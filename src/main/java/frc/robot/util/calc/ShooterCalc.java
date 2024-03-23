@@ -18,13 +18,15 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 
 public class ShooterCalc implements Logged {
     
+    @IgnoreLogged
     private Shooter shooter;
+    @IgnoreLogged
     private Pivot pivot;
-
 
     public ShooterCalc(Shooter shooter, Pivot pivot) {
         this.shooter = shooter;

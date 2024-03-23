@@ -26,17 +26,24 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
 public class PieceControl implements Logged {
-
+    
+    @IgnoreLogged
     private Intake intake;
+    @IgnoreLogged
     private Indexer indexer;
-
+    
+    @IgnoreLogged
     private Elevator elevator;
+    @IgnoreLogged
     private Ampper ampper;
+    @IgnoreLogged
     private ShooterCmds shooterCmds;
+    
 
     private ColorSensor colorSensor;
 
@@ -191,6 +198,7 @@ public class PieceControl implements Logged {
             ampper.outtake(),
             shooterCmds.stowPivot(),
             indexer.toElevator(),   
+            intake.inCommandSlow(),
             Commands.waitUntil(() -> !colorSensor.hasNote()),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
