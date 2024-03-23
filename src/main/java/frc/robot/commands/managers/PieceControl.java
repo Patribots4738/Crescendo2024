@@ -156,6 +156,9 @@ public class PieceControl implements Logged {
             ampper.intake(),
             indexer.toShooterSlow(),
             Commands.waitUntil(colorSensor::hasNote),
+            stopIntakeAndIndexer(),
+            indexer.toElevatorSlow(),
+            Commands.waitSeconds(0.3),
             stopIntakeAndIndexer()
         );
     }
