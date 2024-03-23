@@ -34,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S C5 N"
+                        "pathName": "R C5 N"
                       }
                     }
                   ]
@@ -52,7 +52,13 @@
         {
           "type": "named",
           "data": {
-            "name": "C5toC4"
+            "name": "C5toC3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C3toC5"
           }
         }
       ]
