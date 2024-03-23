@@ -1083,8 +1083,8 @@ public final class Constants {
         public static final int RIGHT_CLIMB_INDEX = 3;
         public static final int LEFT_CLIMB_INDEX = 4;
         
-        public static final double PIVOT_OFFSET_X = 0.165;
-        public static final double PIVOT_OFFSET_Z = 0.2095;
+        public static final double PIVOT_OFFSET_X = -0.079531;
+        public static final double PIVOT_OFFSET_Z = 0.178995;
     
         public static final Translation3d PIVOT_OFFSET_METERS = new Translation3d(
             PIVOT_OFFSET_X,
