@@ -315,6 +315,6 @@ public class ShooterCalc implements Logged {
 
     private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle) {
         double desiredRPM = velocityToRPM(ShooterConstants.PASS_V0Z / (pivotAngle.getSin()));
-        return Pair.of(desiredRPM, desiredRPM);
+        return Pair.of(desiredRPM/1.5, desiredRPM/1.5);
     }
 }
