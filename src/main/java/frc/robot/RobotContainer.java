@@ -266,6 +266,14 @@ public class RobotContainer implements Logged {
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
             .andThen(Commands.waitSeconds(5))
             .andThen(pieceControl.brakeIntakeAndIndexer()));
+
+        new Trigger(() -> 
+            Robot.gameMode == GameMode.TELEOP
+            && shooter.getAverageSpeed() > 2500
+            && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
+            && limelight3.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
+        .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
+        .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
         
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
