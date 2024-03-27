@@ -1,5 +1,9 @@
 package lib;
 
+/**
+ * This class is used to represent a 3D scale.
+ * Primarily, for FMAPs with april tags.
+ */
 public class Scale3d {
     public double x;
     public double y;
