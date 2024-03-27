@@ -218,13 +218,11 @@ public class LimelightMapping extends SubsystemBase implements Logged {
             double radStds;
             // multiple targets detected
             if (targets.length > 1) {
-                // TODO: TUNE
                 xyStds = 0.8;
                 radStds = 1.2;
             }
             // 1 target with large area and close to estimated pose
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
-                // TODO: TUNE
                 xyStds = 1.6;
                 radStds = 4;
             }

@@ -247,7 +247,7 @@ public class PathPlannerStorage implements Logged {
 
         Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote)
             .andThen(AutoBuilder.followPath(getNoteAfterShot));
-        // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
+        //* This is a pathfinder path that enables the moment we don't see a piece or similar
         Command skipNoteCommand = AutoBuilder.followPath(skipNote);
 
         return Commands.defer(() -> 

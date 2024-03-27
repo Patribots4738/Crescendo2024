@@ -385,7 +385,6 @@ public class RobotContainer implements Logged {
         // Upon hitting start button
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
-        // TODO: for testing reset odometry to speaker
         controller.start().onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(
                 new Pose2d(

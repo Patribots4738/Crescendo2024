@@ -125,7 +125,7 @@ public class ChoreoStorage implements Logged {
 
             PathPlannerPath skipShot = pathCache.get(skippingPathName + i);
             PathPlannerPath getNextPiece = pathCache.get(shootingPathName + (shootingIndex));
-            //TODO: patritional command or no? not used so shouldn't matter smile
+            //? patritional command or no? not used so shouldn't matter :))
             fullPath.addCommands(
                     Commands.either(
                             AutoBuilder.followPath(shootPiece).andThen(AutoBuilder.followPath(getNextPiece)),

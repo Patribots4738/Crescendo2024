@@ -181,9 +181,6 @@ public class ShooterCalc implements Logged {
     public Rotation2d calculateRobotAngleToPose(Pose2d robotPose, ChassisSpeeds robotVelocity, Pose2d target) {
         Translation2d velocityVectorToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity);
         double velocityTangent = velocityVectorToSpeaker.getX();
-        // TODO: Check if this velocity should be accounted for in the x component of atan2
-        // TODO: I think this should be "newv0" from the SWD calculation for normal velocity
-        double velocityNormal = velocityVectorToSpeaker.getY();
 
         Pose2d poseRelativeToTarget = robotPose.relativeTo(target);
         Rotation2d currentAngleToTarget = new Rotation2d(poseRelativeToTarget.getX(), poseRelativeToTarget.getY());

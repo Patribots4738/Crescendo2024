@@ -259,7 +259,6 @@ public final class Constants {
 
         public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
-        // TODO: set these values
         public static final double BOTTOM_POS = -.005;
         public static final double INTAKE_TIME = 0;
         public static final double AMPPER_OUTTAKE_PERCENT = -1;
