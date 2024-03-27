@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.util.Constants.ColorSensorConstants;
-import frc.robot.util.Constants.FieldConstants;
+import frc.robot.Constants.ColorSensorConstants;
+import frc.robot.Constants.FieldConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
