@@ -15,6 +15,10 @@ import frc.robot.Constants.ShooterConstants;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
+/**
+ * This class is used to store the state of the robot. It is used to store the
+ * state of the robot at any given time.
+ */
 public class RobotState implements Logged{
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
