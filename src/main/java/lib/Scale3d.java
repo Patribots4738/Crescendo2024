@@ -1,4 +1,4 @@
-package frc.robot.custom;
+package lib;
 
 public class Scale3d {
     public double x;

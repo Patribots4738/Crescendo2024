@@ -1,4 +1,4 @@
-package frc.robot.rev;
+package lib.rev;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 

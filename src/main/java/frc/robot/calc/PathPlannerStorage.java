@@ -1,4 +1,4 @@
-package frc.robot.auto;
+package frc.robot.calc;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -19,10 +19,9 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Robot.GameMode;
-import frc.robot.calc.PoseCalculations;
-import frc.robot.custom.PatriSendableChooser;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
+import lib.PatriSendableChooser;
 import monologue.Logged;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;

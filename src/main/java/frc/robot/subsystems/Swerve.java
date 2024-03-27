@@ -40,7 +40,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.drive.ChasePose;
 import frc.robot.drive.Drive;
 import frc.robot.drive.DriveHDC;
-import frc.robot.rev.MAXSwerveModule;
+import lib.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

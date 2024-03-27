@@ -1,4 +1,4 @@
-package frc.robot.custom;
+package lib;
 
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;

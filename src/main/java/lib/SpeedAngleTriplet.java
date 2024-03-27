@@ -1,4 +1,4 @@
-package frc.robot.custom;
+package lib;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;

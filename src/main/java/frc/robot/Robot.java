@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.NeoMotorConstants;
-import frc.robot.rev.Neo;
-import frc.robot.rev.NeoPhysicsSim;
+import lib.rev.Neo;
+import lib.rev.NeoPhysicsSim;
 import monologue.Monologue;
 
 /**

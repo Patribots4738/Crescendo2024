@@ -1,5 +1,5 @@
 // Primarily referenced from https://github.com/lasarobotics/PurpleLib/blob/master/src/main/java/org/lasarobotics/hardware/revrobotics/Spark.java
-package frc.robot.rev;
+package lib.rev;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;

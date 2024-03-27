@@ -1,4 +1,4 @@
-package frc.robot.limelightHelpers;
+package lib.limelightHelpers;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.limelightHelpers.LimelightHelpers.LimelightTarget_Fiducial;
-import frc.robot.limelightHelpers.LimelightHelpers.Results;
+import lib.limelightHelpers.LimelightHelpers.LimelightTarget_Fiducial;
+import lib.limelightHelpers.LimelightHelpers.Results;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

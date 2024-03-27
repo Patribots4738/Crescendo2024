@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.custom.PatrIDConstants;
-import frc.robot.custom.SpeedAngleTriplet;
-import frc.robot.rev.Neo;
+import lib.PatrIDConstants;
+import lib.SpeedAngleTriplet;
+import lib.rev.Neo;
 import monologue.Logged;
 
 /**

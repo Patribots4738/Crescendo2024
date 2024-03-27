@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.NTConstants;
-import frc.robot.rev.Neo;
+import lib.rev.Neo;
 import frc.robot.Robot;
 import monologue.Logged;
 import monologue.Annotations.Log;

@@ -1,4 +1,4 @@
-package frc.robot.limelightHelpers;
+package lib.limelightHelpers;
 
 import org.json.simple.JSONObject;
 
@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N4;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.custom.Scale3d;
+import lib.Scale3d;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

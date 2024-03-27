@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.calc.ShooterCalc;
-import frc.robot.custom.SpeedAngleTriplet;
 import frc.robot.logging.NoteTrajectory;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
+import lib.SpeedAngleTriplet;
 import monologue.Annotations.IgnoreLogged;
 
 public class ShooterCmds {

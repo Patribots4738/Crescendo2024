@@ -1,4 +1,4 @@
-package frc.robot.custom;
+package lib;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 

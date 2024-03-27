@@ -1,6 +1,6 @@
 // Developed in tandem with Reza from Team Spyder (1622)
 
-package frc.robot.rev;
+package lib.rev;
 
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
@@ -14,7 +14,7 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NeoMotorConstants;
-import frc.robot.custom.PatrIDConstants;
+import lib.PatrIDConstants;
 
 /*
  * Some of this is adapted from 3005's 2022 Code

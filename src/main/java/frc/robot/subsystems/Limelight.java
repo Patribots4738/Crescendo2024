@@ -28,10 +28,10 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Robot.GameMode;
-import frc.robot.limelightHelpers.LimelightHelpers;
-import frc.robot.limelightHelpers.LimelightHelpers.LimelightTarget_Detector;
-import frc.robot.limelightHelpers.LimelightHelpers.LimelightTarget_Fiducial;
-import frc.robot.limelightHelpers.LimelightHelpers.Results;
+import lib.limelightHelpers.LimelightHelpers;
+import lib.limelightHelpers.LimelightHelpers.LimelightTarget_Detector;
+import lib.limelightHelpers.LimelightHelpers.LimelightTarget_Fiducial;
+import lib.limelightHelpers.LimelightHelpers.Results;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

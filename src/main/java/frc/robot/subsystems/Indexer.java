@@ -4,8 +4,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.rev.Neo;
-import frc.robot.rev.SafeSpark.TelemetryPreference;
+import lib.rev.Neo;
+import lib.rev.SafeSpark.TelemetryPreference;
 
 public class Indexer extends SubsystemBase {
     private final Neo motor;
