@@ -11,11 +11,11 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.util.Constants.ClimbConstants;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.calc.PoseCalculations;
-import frc.robot.util.rev.Neo;
+import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.NTConstants;
+import frc.robot.calc.PoseCalculations;
+import lib.rev.Neo;
 import monologue.Logged;
 import monologue.Annotations.Log;
 

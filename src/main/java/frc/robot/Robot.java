@@ -12,11 +12,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.util.Constants.AutoConstants;
-import frc.robot.util.Constants.DriveConstants;
-import frc.robot.util.Constants.NeoMotorConstants;
-import frc.robot.util.rev.Neo;
-import frc.robot.util.rev.NeoPhysicsSim;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.NeoMotorConstants;
+import lib.rev.Neo;
+import lib.rev.NeoPhysicsSim;
 import monologue.Monologue;
 
 /**
