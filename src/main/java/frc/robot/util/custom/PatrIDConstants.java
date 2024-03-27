@@ -3,8 +3,11 @@ package frc.robot.util.custom;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
-
-/** PID constants used to create PID controllers */
+/**
+ * PID constants used to create PID controllers
+ * This class is special becuase of its overloaded constructors
+ * It just helps keep everything organized
+ */
 public class PatrIDConstants implements Logged {
 
     @Log
