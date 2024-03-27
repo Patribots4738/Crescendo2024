@@ -20,12 +20,9 @@ public class LedStrip extends SubsystemBase {
     private AddressableLEDBuffer ledBuffer;
 
     private int currentPatternIndex;
-    private final Supplier<Pose2d> poseSupplier;
-
     public final HashMap<Integer, Command> patternMap = new HashMap<>();
 
     public LedStrip(Supplier<Pose2d> poseSupplier) {
-        this.poseSupplier = poseSupplier;
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
         ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
 

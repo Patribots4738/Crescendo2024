@@ -468,9 +468,7 @@ public final class Constants {
 
             private final double 
                 pinionTeeth, 
-                spurTeeth, 
-                maxSpeedNeo,
-                maxSpeedVortex;
+                spurTeeth;
 
             SwerveGearing(
                 int pinionTeeth, 
@@ -480,8 +478,6 @@ public final class Constants {
             {
                 this.pinionTeeth = pinionTeeth;
                 this.spurTeeth = spurTeeth;
-                this.maxSpeedNeo = maxSpeedNeo;
-                this.maxSpeedVortex = maxSpeedVortex;
             }
         }
 

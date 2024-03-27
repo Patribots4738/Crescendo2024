@@ -1,6 +1,5 @@
 package frc.robot.commands.managers;
 
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
