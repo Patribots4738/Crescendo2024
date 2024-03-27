@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -218,8 +219,7 @@ public class RobotContainer implements Logged {
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight2);
         initializeComponents();
         prepareNamedCommands();
-        // choreoPathStorage = new ChoreoStorage(driver.y());
-        // setupChoreoChooser();
+
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
             disableVision()
@@ -230,7 +230,8 @@ public class RobotContainer implements Logged {
         
         configureButtonBindings();
         configureLoggingPaths();
-        pdh.setSwitchableChannel(false/*true*/);
+
+        pdh.setSwitchableChannel(false);
 
     }
     
@@ -255,17 +256,23 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-
-        new Trigger(() -> (shooter.getAverageSpeed() > 1000 && (swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance())))
-            .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false/*true*/)))
-            .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
       
-        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 134.2 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached())
-        .onTrue(pieceControl.coastIntakeAndIndexer()
+        // In the last couple seconds of the match,
+        // "hail mary" the note to get a last second score just in case
+        new Trigger(() -> 
+               Robot.currentTimestamp - gameModeStart >= 134.2 
+            && Robot.gameMode == GameMode.TELEOP 
+            && RobotController.getBatteryVoltage() > 10 
+            && DriverStation.isFMSAttached()
+        ).onTrue(pieceControl.coastIntakeAndIndexer()
             .andThen(pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity))
             .andThen(Commands.waitSeconds(5))
             .andThen(pieceControl.brakeIntakeAndIndexer()));
 
+        // The switchable channel on our bot is a bright white lamp
+        // This lamp turns on when the robot knows where it is 
+        // and is confident it will make the shot
+        // if shootWhenReady is called at while this condition is true
         new Trigger(() -> 
             Robot.gameMode == GameMode.TELEOP
             && shooter.getAverageSpeed() > 2500
@@ -274,15 +281,12 @@ public class RobotContainer implements Logged {
         .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
         .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
         
+        // When our alliance changes, reflect that in the path previewer
         new Trigger(Robot::isRedAlliance)
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
-        new Trigger(swerve::isAlignedToAmp)
-            .onTrue(driver.setRumble(() -> 0.5))
-            .onFalse(driver.setRumble(() -> 0));
-        
-        new Trigger(shooterCalc.readyToShootSupplier())
+        new Trigger(swerve::isAlignedToAmp).or(shooterCalc.readyToShootSupplier())
             .onTrue(driver.setRumble(() -> 0.5))
             .onFalse(driver.setRumble(() -> 0));
         
@@ -293,6 +297,9 @@ public class RobotContainer implements Logged {
         new Trigger(() -> colorSensor.hasNote() && driver.getLeftBumper())
             .onTrue(
                 Commands.race(
+                    // I'll be honest, I was just messing around with desmos
+                    // and this provides a sort of on/off rumble rather than it being continuous
+                    // You could say that it makes this rumble coorelate to piece pickup since its distinct
                     Commands.run(() -> {
                         driver.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
                     }),
@@ -392,7 +399,7 @@ public class RobotContainer implements Logged {
             .onTrue(climb.toTopCommand());
         
         controller.povDown()
-            .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
+            .onTrue(climb.toBottomCommand());
         
         controller.a()
             .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
@@ -413,6 +420,7 @@ public class RobotContainer implements Logged {
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
+        // Speaker / Soruce / Chain rotational alignment
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
@@ -431,17 +439,22 @@ public class RobotContainer implements Logged {
                             .schedule()
                         )
                 );
-
-        controller.leftStick()
-            .onTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         
+        // Pass rotational alignment + auto shooter speeds
+        controller.leftStick()
+            .onTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));;
+        
+        // Prepare the shooter for a pass
+        // This lets the driver rotate while we prepare to pass
+        // so when the pass happens we don't have to wait
+        // for shooter to speed up
         controller.leftTrigger()
             .onTrue(elevator.toTopCommand())
             .onFalse(elevator.toBottomCommand());
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
-      
+        
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
             .onFalse(new SelectiveConditionalCommand(pieceControl.stopIntakeAndIndexer(), Commands.none(), () -> CommandScheduler.getInstance().requiring(indexer) == null));
@@ -450,6 +463,7 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.ejectNote())
             .onFalse(pieceControl.stopEjecting());
 
+        // Redundancy to turn off the lamp
         controller.povRight()
             .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
     }
