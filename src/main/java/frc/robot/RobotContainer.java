@@ -66,7 +66,7 @@ public class RobotContainer implements Logged {
 
     private AlignmentCmds alignmentCmds;
     private final BooleanSupplier robotRelativeSupplier;
-    
+
     @IgnoreLogged
     private Swerve swerve;
     @IgnoreLogged
@@ -187,11 +187,11 @@ public class RobotContainer implements Logged {
 
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
-            disableVision()
+            RobotState.disableVision()
             .andThen(
                 swerve.setWheelsOCommand()
                 .andThen(new WheelRadiusCharacterization(swerve)))
-            .andThen(enableVision()));
+            .andThen(RobotState.enableVision()));
         
         configureButtonBindings();
 
@@ -576,7 +576,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        enableVision();
+        RobotState.enableVision();
         return pathPlannerStorage.getSelectedAuto();
     }
 
@@ -677,17 +677,9 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("DisableLimelight", disableVision());
-        NamedCommands.registerCommand("EnableLimelight", enableVision());
+        NamedCommands.registerCommand("DisableLimelight", RobotState.disableVision());
+        NamedCommands.registerCommand("EnableLimelight", RobotState.enableVision());
         registerPathToPathCommands();
-    }
-
-    private Command disableVision() {
-        return Commands.runOnce(() -> RobotState.enableVision = false).ignoringDisable(true);
-    }
-
-    private Command enableVision() {
-        return Commands.runOnce(() -> RobotState.enableVision = true).ignoringDisable(true);
     }
 
     private void registerPathToPathCommands() {
@@ -715,4 +707,3 @@ public class RobotContainer implements Logged {
         limelight3.disableLEDS();
     }
 }
- 
