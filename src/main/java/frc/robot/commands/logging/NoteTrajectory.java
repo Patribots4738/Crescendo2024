@@ -20,6 +20,12 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 
+/**
+ * This command represents a trajectory of a note on the field. 
+ * It uses kinematic equations to calculate the position of the note.
+ * 
+ * We can use the resulting pose to display the note on the field, in order to create a more accurate representation of the field.
+ */
 public class NoteTrajectory extends Command implements Logged {
     double x, x0, vx0, ax, z, z0, vz0, az, y, y0, vy0, ay;
 
