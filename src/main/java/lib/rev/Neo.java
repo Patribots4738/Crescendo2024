@@ -8,10 +8,8 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NeoMotorConstants;
 import lib.PatrIDConstants;
@@ -482,19 +480,6 @@ public class Neo extends SafeSpark {
         for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {
             neo.burnFlash();
         }
-    }
-
-    public Trigger makePossessionTrigger(double possessionPercent, double rpmThreshold, double currentThreshold, double settlingTime) {
-        this.possessionPercent = possessionPercent;
-        possessionSupplier = new Trigger(() ->
-            targetPercent == possessionPercent
-            && Robot.currentTimestamp - possessionTimestamp > settlingTime
-            && this.getVelocity() < rpmThreshold
-            && this.getOutputCurrent() > currentThreshold);
-
-        possessionSupplier.onTrue(Commands.runOnce(() -> RobotContainer.hasPiece = true));
-        
-        return possessionSupplier;
     }
 
     public Trigger getPossessionTrigger() {

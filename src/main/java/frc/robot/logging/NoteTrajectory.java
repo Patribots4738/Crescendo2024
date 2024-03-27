@@ -14,7 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NTConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -89,9 +89,9 @@ public class NoteTrajectory extends Command implements Logged {
         currentNotePosition = getNotePose(initialPose, pivotAngle, x, y, z);
 
         if (realData) {
-            RobotContainer.notePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
+            RobotState.notePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
         } else {
-            RobotContainer.highNotePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
+            RobotState.highNotePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
         }
     }
 
@@ -139,9 +139,9 @@ public class NoteTrajectory extends Command implements Logged {
 
     public void zeroNote() {
         if (realData) {
-            RobotContainer.notePose3ds[noteIndex+1] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
+            RobotState.notePose3ds[noteIndex+1] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
         } else {
-            RobotContainer.highNotePose3ds[noteIndex+1] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
+            RobotState.highNotePose3ds[noteIndex+1] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
         }
     }
 
