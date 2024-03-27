@@ -95,7 +95,7 @@ public class PieceControl implements Logged {
         );
     }
 
-    // TODO: only run angle reset when we are not using prepareSWDCommand
+    //! only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
                 .andThen(noteToShoot(poseSupplier, speedSupplier));
@@ -106,7 +106,7 @@ public class PieceControl implements Logged {
                 .andThen(intakeAuto());
     }
 
-    // TODO: Possibly split this into two commands where one sends to shooter
+    //? Possibly split this into two commands where one sends to shooter
     // without waiting
     public Command noteToShoot(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
@@ -285,7 +285,7 @@ public class PieceControl implements Logged {
         );
     }
 
-    // TODO: possible repurpose for getting unstuck from any position where we have unforeseen problems
+    //? possible repurpose for getting unstuck from any position where we have unforeseen problems
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(

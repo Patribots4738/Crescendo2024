@@ -621,7 +621,6 @@ public class RobotContainer implements Logged {
 
         limelight3.disableLEDS();
 
-        // TODO: Extract this into a command file
         Commands.run(this::updateNTGains)
             .until(() -> Robot.gameMode != GameMode.DISABLED)
             .ignoringDisable(true)
@@ -693,7 +692,6 @@ public class RobotContainer implements Logged {
     }
 
     private void prepareNamedCommands() {
-        // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
         NamedCommands.registerCommand("ToIndexer", pieceControl.intakeUntilNote());
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
