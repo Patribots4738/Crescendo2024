@@ -116,7 +116,7 @@ public class LimelightConversion implements Logged {
         for (int i = 0; i < matrix.getNumRows(); i++) {
             for (int j = 0; j < matrix.getNumCols(); j++) {
                 // The weird multiplication here is removing the scientific notation
-                // We are uh, totally not rounding to 8 decimal places
+                // We are uh, totally not rounding to 8 decimal places becuase 3 isn't good enough :)
                 matrixString += Math.round(matrix.get(j, i)*100000000)/100000000.0 + ((i == 3 && j == 3) ? "" : ",");
                 matrixString += "\n";
             }
@@ -145,6 +145,7 @@ public class LimelightConversion implements Logged {
         transform = transform.times(makeScale(scale3d));
         return transform;
     }
+
     private Matrix<N4, N4> makeTranslation(Translation3d translation3d) {
         Matrix<N4, N4> transform = initMatrix();
 
@@ -155,6 +156,7 @@ public class LimelightConversion implements Logged {
 
         return transform;
     }
+
     private Matrix<N4, N4> makeScale(Scale3d scale3d) {
         Matrix<N4, N4> transform = initMatrix();
 
@@ -166,14 +168,15 @@ public class LimelightConversion implements Logged {
         return transform;
     }
 
-    // ration matrix methods 
+    // ration matrix methods
     private double evalCos(double angle, boolean isLeftHanded) {
         return Math.cos(isLeftHanded ? angle : -angle);
     }
+
     private double evalSin(double angle, boolean isLeftHanded) {
         return isLeftHanded ? Math.sin(angle) : -Math.sin(angle);
     }
-    
+
     private Matrix<N4, N4> makeRotation(Rotation3d rotation3d, CoordinateSystem dcc) {
         Matrix<N4, N4> rotation = initMatrix();
         // init the X rotation
@@ -187,6 +190,7 @@ public class LimelightConversion implements Logged {
 
         return rotation;
     }
+
     private Matrix<N4, N4> makeRotationX(Rotation3d rotation, CoordinateSystem dcc) {
         Matrix<N4, N4> rotationXMatrix = initMatrix();
 
@@ -200,6 +204,7 @@ public class LimelightConversion implements Logged {
 
         return rotationXMatrix;
     }
+
     private Matrix<N4, N4> makeRotationY(Rotation3d rotation, CoordinateSystem dcc) {
         Matrix<N4, N4> rotationYMatrix = initMatrix();
 
@@ -213,6 +218,7 @@ public class LimelightConversion implements Logged {
 
         return rotationYMatrix;
     }
+
     private Matrix<N4, N4> makeRotationZ(Rotation3d rotation, CoordinateSystem dcc) {
         Matrix<N4, N4> rotationZMatrix = initMatrix();
 
