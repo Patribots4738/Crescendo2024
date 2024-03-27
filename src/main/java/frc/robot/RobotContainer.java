@@ -61,6 +61,12 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
+    private final LedStrip ledStrip;
+    private ShooterCmds shooterCmds;
+
+    private AlignmentCmds alignmentCmds;
+    private final BooleanSupplier robotRelativeSupplier;
+    
     @IgnoreLogged
     private Swerve swerve;
     @IgnoreLogged
@@ -88,20 +94,15 @@ public class RobotContainer implements Logged {
     private ShooterCalc shooterCalc;
     @IgnoreLogged
     public static HDCTuner HDCTuner;
-
-    private final LedStrip ledStrip;
+    
     @IgnoreLogged
     private Indexer indexer;
     @IgnoreLogged
     private Ampper ampper;
-    private ShooterCmds shooterCmds;
     @IgnoreLogged
     private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
-
     @IgnoreLogged
     private PieceControl pieceControl;
-    private AlignmentCmds alignmentCmds;
-    private final BooleanSupplier robotRelativeSupplier;
     
     RobotState robotState = new RobotState();
 
