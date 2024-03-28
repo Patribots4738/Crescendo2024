@@ -100,24 +100,39 @@ public class AlignmentCmds {
      * 
      * @return        the command to align the robot to the source
      */
-    public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
-        return 
-            swerve.getDriveCommand(
-                alignmentCalc.getSourceRotationalSpeedsSupplier(driverX, driverY), 
-                robotRelativeSupplier
-        );
+    public Command sourceRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY,
+            BooleanSupplier robotRelativeSupplier) {
+        return swerve.getDriveCommand(
+                alignmentCalc.getSourceRotationalSpeedsSupplier(driverX, driverY),
+                robotRelativeSupplier);
     }
 
+    /**
+     * Command to align the robot rotationally to the speaker of the field.
+     * 
+     * @param driverX     the driver's x input
+     * @param driverY     the driver's y input
+     * @param shooterCmds the shooter commands to run the shooter
+     * @return            the command to align the robot to the speaker
+     */
     public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
-        return 
-            swerve.getDriveCommand(
+        return swerve.getDriveCommand(
                 alignmentCalc.getSpeakerRotationalSpeedsSupplier(
-                    driverX,
-                    driverY,
-                    shooterCmds),
+                        driverX,
+                        driverY,
+                        shooterCmds),
                 () -> true);
     }
 
+    /**
+     * Command to align the robot rotationally to the target of the field 
+     * and prepare the shooter to make a pass.
+     * 
+     * @param driverX     the driver's x input
+     * @param driverY     the driver's y input
+     * @param shooterCmds the shooter commands to run the shooter
+     * @return            the command to align the robot to the target
+     */
     public Command passRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return 
             swerve.getDriveCommand(
@@ -151,34 +166,59 @@ public class AlignmentCmds {
      * @param driverY the driver's y input
      * @return        the command to align the robot to the wing
      */
-    public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
-        return
-            Commands.either(
+    public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY,
+            BooleanSupplier robotRelativeSupplier) {
+        return Commands.either(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
-                    .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                        .finallyDo(shooterCmds.stopShooter()::initialize)),
+                        .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
+                                .finallyDo(shooterCmds.stopShooter()::initialize)),
                 climb::getHooksUp);
     }
 
-    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
-        return
-            passRotationalAlignment(driverX, driverY, shooterCmds)
+    /**
+     * Command to prepare the robot to pass the note to the speaker.
+     * 
+     * @param driverX               The supplier for the driver's x input
+     * @param driverY               The supplier for the driver's y input
+     * @param robotRelativeSupplier The supplier for whether the speeds should be robot relative or not
+     * @return                      The command to prepare the robot to pass the note to
+     */
+    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY,
+            BooleanSupplier robotRelativeSupplier) {
+        return passRotationalAlignment(driverX, driverY, shooterCmds)
                 .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                    .finallyDo(shooterCmds.stopShooter()::initialize));
+                        .finallyDo(shooterCmds.stopShooter()::initialize));
     }
 
+    /**
+     * Command to prepare the robot to shoot the note to the speaker
+     * from the closest shooting pose to the robot's current position,
+     * defined in the Auto naming guide in tldraw.
+     * 
+     * @param driverX        The supplier for the driver's x input
+     * @param driverY        The supplier for the driver's y input
+     * @param xButtonPressed Whether the x button is pressed
+     * @return               The command to prepare the robot to shoot the note to the speaker
+     */
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
         // The true condition represents the pose closer to C1
         // Which is to the left of the driver
         return Commands.either(
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.ORBIT_POSE),
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_SHOT_SPOT),
-            // No way I just found my first XOR use case :D
-            () -> Robot.isRedAlliance() ^ xButtonPressed
-        );
+                prepareFireAndRotateCommand(driverX, driverY, FieldConstants.ORBIT_POSE),
+                prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_SHOT_SPOT),
+                // No way I just found my first XOR use case :D
+                () -> Robot.isRedAlliance() ^ xButtonPressed);
     }
 
+    /**
+     * Command to prepare the robot to shoot the note and rotate to the given pose.
+     * 
+     * @param driverX the supplier for the driver's x input
+     * @param driverY the supplier for the driver's y input
+     * @param pose    the pose to rotate to
+     * @return        the command to prepare the robot to shoot the note and rotate to the given pose
+     */
     private Command prepareFireAndRotateCommand(DoubleSupplier driverX, DoubleSupplier driverY, Translation2d pose) {
         return shooterCmds.prepareFireCommand(
             () -> pose,

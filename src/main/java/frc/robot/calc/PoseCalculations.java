@@ -44,19 +44,31 @@ public class PoseCalculations implements Logged {
     @Log
     private static Pose2d closestShootingPose;
 
+    /**
+     * Given the robot's position, return the best shooting pose. Given the preset shooting positions
+     * on the field, defined in the Auto naming guide in tldraw
+     * @param position
+     * @return
+     */
     @Log
     public static Pose2d getBestShootingPose(Pose2d position) {
         double yValue = position.getY();
         if (yValue > 5)
             // L
             return FieldConstants.GET_SHOOTING_POSITIONS().get(0);
-        if (yValue > 1.8) 
+        if (yValue > 1.8)
             // M
             return FieldConstants.GET_SHOOTING_POSITIONS().get(2);
         // R
         return FieldConstants.GET_SHOOTING_POSITIONS().get(1);
     }
 
+    /**
+     * Given the robot's position, return the best shooting pose as a string. Given the preset shooting positions
+     * on the field, defined in the Auto naming guide in tldraw
+     * @param position
+     * @return
+     */
     public static String getBestShootingPoseString(Pose2d position) {
         closestShootingPose = getBestShootingPose(position);
         if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(0)))

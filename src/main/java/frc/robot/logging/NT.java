@@ -9,6 +9,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+/**
+ * This class is used to log values to NetworkTables 
+ * and to get values from NetworkTables for use in TimerCalibration
+ */
 public class NT {
     
     public static NetworkTable table = NetworkTableInstance.getDefault().getTable("A-TimerCalibration");

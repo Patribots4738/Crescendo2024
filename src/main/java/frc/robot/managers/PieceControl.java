@@ -368,6 +368,14 @@ public class PieceControl implements Logged {
     @Log
     private boolean desiredSide = false;
 
+    /**
+     * Moves the note to the desired position within the robot based on the desired side
+     * The note will be moved to the shooter side if desiredSide is true
+     * The note will be moved to the trap side if desiredSide is false
+     * 
+     * @param desiredSide The side of the robot to move the note to
+     * @return The command that moves the note
+     */
     public Command moveNote(boolean desiredSide) {
         return Commands.sequence(
                 Commands.runOnce(() -> this.desiredSide = desiredSide),
