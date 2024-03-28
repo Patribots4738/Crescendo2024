@@ -39,7 +39,7 @@ public class AlignmentCmds {
     /**
      * Command to align the robot rotationally to the source of the field.
      * 
-     * @param autoSpeeds       Auto alignment speeds from [-DriveConsants.MAX_SPEED_METERS_PER_SECOND
+     * @param autoSpeeds       Auto alignment speeds from [-DriveConstants.MAX_SPEED_METERS_PER_SECOND
      *                                                DriveConstants.MAX_SPEED_METERS_PER_SECOND]
      * @param controllerSpeeds Controller speeds from [-1, 1]
      * 
