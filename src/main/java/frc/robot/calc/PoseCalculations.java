@@ -113,7 +113,7 @@ public class PoseCalculations implements Logged {
      * 
      * @return              The angle to the speaker in the form of a Rotation2d object.
      */
-    public static Rotation2d calculateRobotAngleToPose(Pose2d robotPose, ChassisSpeeds robotVelocity, Pose2d target, Pair<Double, Double> shooterSpeeds) {
+    public static Rotation2d calculateRobotAngleToPose(Pose2d robotPose, ChassisSpeeds robotVelocity, Pose2d target, double averageShooterSpeed) {
         Translation2d velocityVectorToSpeaker = getVelocityVectorToSpeaker(robotPose, robotVelocity);
         double velocityTangent = velocityVectorToSpeaker.getX();
 
@@ -121,7 +121,7 @@ public class PoseCalculations implements Logged {
         Rotation2d currentAngleToTarget = new Rotation2d(poseRelativeToTarget.getX(), poseRelativeToTarget.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            ShooterCalc.rpmToVelocity(shooterSpeeds)
+            ShooterCalc.rpmToVelocity(averageShooterSpeed)
         );
         // Calculate the desired rotation to the speaker, taking into account the tangent velocity
         // Add PI because the speaker opening is the opposite direction that the robot needs to be facing
@@ -137,19 +137,19 @@ public class PoseCalculations implements Logged {
     }
 
     public static Rotation2d calculateRobotAngleToPass(Pose2d robotPose) {
-        return calculateRobotAngleToPass(robotPose, new ChassisSpeeds());
+        return calculateRobotAngleToPass(robotPose, new ChassisSpeeds(), 0);
     }
 
-    public static Rotation2d calculateRobotAngleToPass(Pose2d robotPose, ChassisSpeeds robotVelocity) {
-        return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_TARGET_POSITION());
+    public static Rotation2d calculateRobotAngleToPass(Pose2d robotPose, ChassisSpeeds robotVelocity, double averageShooterSpeed) {
+        return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_TARGET_POSITION(), averageShooterSpeed);
     }
 
     public static Rotation2d calculateRobotAngleToSpeaker(Pose2d pose) {
-        return calculateRobotAngleToSpeaker(pose, new ChassisSpeeds());
+        return calculateRobotAngleToSpeaker(pose, new ChassisSpeeds(), 0);
     }
 
-    public static Rotation2d calculateRobotAngleToSpeaker(Pose2d pose, ChassisSpeeds robotVelocity) {
-        return calculateRobotAngleToPose(pose, robotVelocity, FieldConstants.GET_SPEAKER_POSITION());
+    public static Rotation2d calculateRobotAngleToSpeaker(Pose2d pose, ChassisSpeeds robotVelocity, double averageShooterSpeed) {
+        return calculateRobotAngleToPose(pose, robotVelocity, FieldConstants.GET_SPEAKER_POSITION(), averageShooterSpeed);
     }
 
     public static Rotation2d calculateRobotAngleToSpeaker(Translation2d translation) {
@@ -181,6 +181,18 @@ public class PoseCalculations implements Logged {
         }
         
         return new Translation2d(velocityTangentToSpeaker, velocityNormalToSpeaker);
+    }
+
+    /**
+     * Detects if the robot is on the opposite side of the field.
+     * Uses the robot's x position to determine if it has crossed the centerline.
+     * 
+     * @return true if the robot is on the opposite side of the field
+     */
+    public static boolean onOppositeSide(Pose2d pose) {
+        return Robot.isRedAlliance() 
+            ? pose.getX() < FieldConstants.BLUE_WING_X 
+            : pose.getX() > FieldConstants.RED_WING_X;
     }
 
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.calc.PoseCalculations;
 import frc.robot.calc.ShooterCalc;
 import frc.robot.logging.NoteTrajectory;
 import frc.robot.subsystems.Pivot;
@@ -28,13 +29,9 @@ public class ShooterCmds {
 
     private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet();
     
-    @IgnoreLogged
-    private ShooterCalc shooterCalc;
-
     public ShooterCmds(Shooter shooter, Pivot pivot) {
         this.pivot = pivot;
         this.shooter = shooter;
-        this.shooterCalc = new ShooterCalc(shooter, pivot);
     }
 
     public Shooter getShooter() {
@@ -55,7 +52,7 @@ public class ShooterCmds {
                     desiredPose = GeometryUtil.flipFieldPosition(desiredPose);
                 }
 
-                desiredTriplet = shooterCalc.calculateSpeakerTriplet(desiredPose);
+                desiredTriplet = ShooterCalc.calculateSpeakerTriplet(desiredPose);
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
@@ -64,11 +61,11 @@ public class ShooterCmds {
 
     public Command prepareFireCommandAuto(Supplier<Pose2d> robotPose) {
         return Commands.run(() -> {
-                desiredTriplet = shooterCalc.calculateSpeakerTriplet(robotPose.get().getTranslation());
+                desiredTriplet = ShooterCalc.calculateSpeakerTriplet(robotPose.get().getTranslation());
 
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
-            }, pivot, shooter).until(shooterCalc.readyToShootSupplier());
+            }, pivot, shooter).until(readyToShootSupplier());
     }
 
     public void setTriplet(SpeedAngleTriplet triplet) {
@@ -90,7 +87,7 @@ public class ShooterCmds {
             desiredTriplet = triplet;
             pivot.setAngle(triplet.getAngle());
             shooter.setSpeed(triplet.getSpeeds());
-        }, pivot, shooter).until(shooterCalc.readyToShootSupplier());
+        }, pivot, shooter).until(readyToShootSupplier());
     }
 
     public Command sourceIntakeCommand() {
@@ -122,7 +119,7 @@ public class ShooterCmds {
     public Command prepareSWDCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
         return Commands.run(
             () -> {
-                desiredTriplet = shooterCalc.calculateSWDTriplet(robotPose.get(), speeds.get());
+                desiredTriplet = ShooterCalc.calculateSWDTriplet(robotPose.get(), speeds.get());
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
             }, pivot, shooter);
@@ -131,7 +128,7 @@ public class ShooterCmds {
     public Command prepareSWDCommandAuto(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
         return Commands.run(
             () -> {
-                desiredTriplet = shooterCalc.calculateSWDTripletAuto(robotPose.get(), speeds.get());
+                desiredTriplet = ShooterCalc.calculateSWDTripletAuto(robotPose.get(), speeds.get());
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
             }, pivot, shooter);
@@ -140,7 +137,7 @@ public class ShooterCmds {
     public Command preparePassCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
         return Commands.run(
                 () -> {
-                    desiredTriplet = shooterCalc.calculatePassTriplet(robotPose.get(), speeds.get());
+                    desiredTriplet = ShooterCalc.calculatePassTriplet(robotPose.get(), speeds.get());
                     pivot.setAngle(desiredTriplet.getAngle());
                     shooter.setSpeed(desiredTriplet.getSpeeds());
                 }, pivot, shooter);
@@ -160,14 +157,14 @@ public class ShooterCmds {
                 new NoteTrajectory(
                     currentPose,
                     currentSpeeds,
-                    shooterCalc.rpmToVelocity(realTriplet.getSpeeds()),
+                    ShooterCalc.rpmToVelocity(realTriplet.getSpeeds()),
                     realTriplet.getAngle(),
                     true
                 ).alongWith(
                     new NoteTrajectory(
-                        shooterCalc.desiredSWDPose,
+                        PoseCalculations.desiredSWDPose,
                         currentSpeeds,
-                        shooterCalc.rpmToVelocity(calculationTriplet.getSpeeds()),
+                        ShooterCalc.rpmToVelocity(calculationTriplet.getSpeeds()),
                         calculationTriplet.getAngle(),
                         false
                     )
@@ -184,8 +181,19 @@ public class ShooterCmds {
         return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
 
-    public BooleanSupplier readyToShootSupplier() {
-        return shooterCalc.readyToShootSupplier();
+    /**
+	 * Determines if the pivot and shooter is at its target for shooting with a small
+	 * tolerance
+	 * 
+	 * @return The method is returning a BooleanSupplier that returns true
+	 *         if the pivot and shooter are at their target states for shooting and false otherwise
+	 */
+	public BooleanSupplier readyToShootSupplier() {
+        return () ->  
+            pivot.getAtDesiredAngle()
+                && shooter.getAtDesiredRPM()
+                && shooter.getAverageTargetSpeed() > 0
+                && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
     }
     
 }

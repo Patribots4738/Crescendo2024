@@ -1,7 +1,5 @@
 package frc.robot.calc;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,25 +7,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Robot;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NTConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.logging.NT;
-import frc.robot.subsystems.Pivot;
-import frc.robot.subsystems.Shooter;
 import lib.SpeedAngleTriplet;
 import monologue.Logged;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-
 public class ShooterCalc implements Logged {
     
-
     private ShooterCalc() {}
-    
-    @Log
-    double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
 
     /**
      * Calculates the shooter speeds required to reach the speaker position.
@@ -135,9 +123,6 @@ public class ShooterCalc implements Logged {
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
 
-    @Log
-    private static double desiredMPSForNote = 0;
-
     /**
      * This method is averaging the speeds to make a rough estimate of the speed of the note (or the edge of the wheels).
      * The formula used is V = 2π * D/2 * RPM/60.
@@ -150,19 +135,21 @@ public class ShooterCalc implements Logged {
      * @param speeds a pair of RPM values representing the speeds of two shooter wheels
      * @return the velocity in meters per second
      */
-    public static double rpmToVelocity(Pair<Double, Double> speeds) {
-        double rotationsPerMinute = (speeds.getFirst() + speeds.getSecond()) / 2.0;
+    public static double rpmToVelocity(double averageShooterSpeed) {
+        double rotationsPerMinute = averageShooterSpeed;
         double rotationsPerSecond = rotationsPerMinute / 60.0;
         double radiansPerSecond = rotationsPerSecond * Math.PI;
 
         double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
 
-        desiredMPSForNote = diameter * radiansPerSecond;
-
         // Normally this is 1 radius * 2 pi
         // but we are doing 2 radius * 1 pi
         // because we are given a diameter
         return diameter * radiansPerSecond;
+    }
+
+    public static double rpmToVelocity(Pair<Double, Double> speeds) {
+        return rpmToVelocity((speeds.getFirst() + speeds.getSecond()) / 2.0);
     }
 
     /**

@@ -37,7 +37,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Robot.GameMode;
 import frc.robot.calc.PathPlannerStorage;
-import frc.robot.calc.ShooterCalc;
+import frc.robot.calc.PoseCalculations;
 import frc.robot.drive.AlignmentCmds;
 import frc.robot.drive.Drive;
 import frc.robot.drive.WheelRadiusCharacterization;
@@ -408,6 +408,7 @@ public class RobotContainer implements Logged {
         controller.povDown()
             .onTrue(climb.toBottomCommand());
         
+        // Amp / trap alignment (translates and rotates the robot)
         controller.a()
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(
@@ -446,8 +447,8 @@ public class RobotContainer implements Logged {
                     limelight3.setLEDState(() -> true),
                     new ActiveConditionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::onOppositeSide)
+                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, () -> shooter.getAverageSpeed(), robotRelativeSupplier),
+                        () -> PoseCalculations.onOppositeSide(swerve.getPose()))
                     ).finallyDo(
                         () -> 
                             limelight3.setLEDState(() -> false)
@@ -463,7 +464,7 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDCCommand(),
                     limelight3.setLEDState(() -> true),
-                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier)
+                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, () -> shooter.getAverageSpeed(), robotRelativeSupplier)
                     ).finallyDo(
                         () -> 
                             limelight3.setLEDState(() -> false)
@@ -739,7 +740,6 @@ public class RobotContainer implements Logged {
     }
 
     private void configureLoggingPaths() {
-        Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
         Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
         Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
         Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
@@ -798,7 +798,7 @@ public class RobotContainer implements Logged {
         }
     }
 
-    public void turnOffLamp() {
+    public void turnOffLights() {
         pdh.setSwitchableChannel(false);
         limelight3.disableLEDS();
     }

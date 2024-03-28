@@ -21,9 +21,8 @@ public class AlignmentCalc {
     @IgnoreLogged
     private Swerve swerve;
 
-    public AlignmentCalc(Swerve swerve, ShooterCalc shooterCalc) {
+    public AlignmentCalc(Swerve swerve) {
         this.swerve = swerve;
-        this.shooterCalc = shooterCalc;
     }
 
     /**
@@ -159,14 +158,14 @@ public class AlignmentCalc {
      * @param shooterCmds the shooter commands
      * @return            the rotational speeds to align the robot to the speaker
      */
-    public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY) {
+    public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, double shooterAverageSpeed) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+            getRotationalSpeeds(driverX, driverY, PoseCalculations.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity(), shooterAverageSpeed));
     }
 
-    public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY) {
+    public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, double shooterAverageSpeed) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+            getRotationalSpeeds(driverX, driverY, PoseCalculations.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity(), shooterAverageSpeed));
     }
 
     /**
@@ -191,12 +190,12 @@ public class AlignmentCalc {
      * @param driverY     the driver's y input
      * @return            the suppoer for the speeds to align the robot to the speaker
      */
-    public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
-        return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
+    public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, DoubleSupplier shooterAverageSpeed) {
+        return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterAverageSpeed.getAsDouble());
     }
 
-    public Supplier<ChassisSpeeds> getPassRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
-        return () -> getPassRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
+    public Supplier<ChassisSpeeds> getPassRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, DoubleSupplier shooterAverageSpeed) {
+        return () -> getPassRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterAverageSpeed.getAsDouble());
     }
 
     /**
@@ -262,17 +261,5 @@ public class AlignmentCalc {
 
     public Supplier<ChassisSpeeds> getTrapControllerSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
         return () -> getTrapControllerSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
-    }
-
-    /**
-     * Detects if the robot is on the opposite side of the field.
-     * Uses the robot's x position to determine if it has crossed the centerline.
-     * 
-     * @return true if the robot is on the opposite side of the field
-     */
-    public boolean onOppositeSide() {
-        return Robot.isRedAlliance() 
-            ? swerve.getPose().getX() < FieldConstants.BLUE_WING_X 
-            : swerve.getPose().getX() > FieldConstants.RED_WING_X;
     }
 }

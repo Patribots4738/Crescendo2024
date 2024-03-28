@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.calc.AlignmentCalc;
-import frc.robot.calc.ShooterCalc;
+import frc.robot.calc.PoseCalculations;
 import frc.robot.managers.ShooterCmds;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
@@ -34,7 +34,7 @@ public class AlignmentCmds {
         this.climb = climb;
         this.swerve = swerve;
         this.shooterCmds = shooterCmds;
-        this.alignmentCalc = new AlignmentCalc(swerve, shooterCalc);
+        this.alignmentCalc = new AlignmentCalc(swerve);
     }
 
     /**
@@ -109,21 +109,23 @@ public class AlignmentCmds {
         );
     }
 
-    public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
+    public Command speakerRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, DoubleSupplier shooterAverageSpeed) {
         return 
             swerve.getDriveCommand(
                 alignmentCalc.getSpeakerRotationalSpeedsSupplier(
                     driverX,
-                    driverY),
+                    driverY,
+                    shooterAverageSpeed),
                 () -> true);
     }
 
-    public Command passRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
+    public Command passRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, DoubleSupplier shooterAverageSpeed) {
         return 
             swerve.getDriveCommand(
                 alignmentCalc.getPassRotationalSpeedsSupplier(
                     driverX,
-                    driverY),
+                    driverY,
+                    shooterAverageSpeed),
                 () -> true);
     }
 
@@ -150,19 +152,19 @@ public class AlignmentCmds {
      * @param driverY the driver's y input
      * @return        the command to align the robot to the wing
      */
-    public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+    public Command wingRotationalAlignment(DoubleSupplier driverX, DoubleSupplier driverY, DoubleSupplier shooterAverageSpeed, BooleanSupplier robotRelativeSupplier) {
         return
             Commands.either(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
-                speakerRotationalAlignment(driverX, driverY, shooterCmds)
+                speakerRotationalAlignment(driverX, driverY, shooterAverageSpeed)
                     .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
                         .finallyDo(shooterCmds.stopShooter()::initialize)),
                 climb::getHooksUp);
     }
 
-    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, DoubleSupplier shooterAverageSpeed, BooleanSupplier robotRelativeSupplier) {
         return
-            passRotationalAlignment(driverX, driverY, shooterCmds)
+            passRotationalAlignment(driverX, driverY, shooterAverageSpeed)
                 .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
                     .finallyDo(shooterCmds.stopShooter()::initialize));
     }
@@ -191,7 +193,7 @@ public class AlignmentCmds {
                 return alignmentCalc.getRotationalSpeeds(
                     driverX.getAsDouble(), 
                     driverY.getAsDouble(), 
-                    shooterCalc.calculateRobotAngleToSpeaker(endingPose));
+                    PoseCalculations.calculateRobotAngleToSpeaker(endingPose));
                 },
                 () -> true
             )
