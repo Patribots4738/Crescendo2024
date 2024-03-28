@@ -1,21 +1,5 @@
 package frc.robot.logging;
 
-import frc.robot.Constants.CameraConstants;
-import frc.robot.calc.PathPlannerStorage;
-import frc.robot.calc.ShooterCalc;
-import frc.robot.managers.CalibrationControl;
-import frc.robot.managers.HDCTuner;
-import frc.robot.managers.PieceControl;
-import frc.robot.subsystems.Ampper;
-import frc.robot.subsystems.Climb;
-import frc.robot.subsystems.ColorSensor;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.Pivot;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Swerve;
-import lib.limelightHelpers.LimelightMapping;
 import monologue.Logged;
 import monologue.Monologue;
 
