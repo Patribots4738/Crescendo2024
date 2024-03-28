@@ -106,7 +106,7 @@ public class Robot extends TimedRobot {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         Robot.gameMode = GameMode.AUTONOMOUS;
         robotContainer.onEnabled();
-        // We only need to update alliance becuase
+        // We only need to update alliance because
         // sim GUI starts the bot in a "disconnected"
         // state which won't update the alliance before
         // we enable...

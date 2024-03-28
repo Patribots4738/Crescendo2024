@@ -140,7 +140,7 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public boolean nearGuillotine() {
-        return atPosition(ElevatorConstants.GUILLOTONE_POS);
+        return atPosition(ElevatorConstants.GUILLOTINE_POS);
     }
 
     public boolean getStuck() {

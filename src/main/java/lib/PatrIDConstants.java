@@ -5,7 +5,7 @@ import monologue.Annotations.Log;
 
 /**
  * PID constants used to create PID controllers
- * This class is special becuase of its overloaded constructors
+ * This class is special because of its overloaded constructors
  * It just helps keep everything organized
  */
 public class PatrIDConstants implements Logged {
