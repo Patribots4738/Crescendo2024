@@ -56,6 +56,8 @@ public class RobotContainer implements Logged {
 
     private PowerDistribution pdh;
 
+    //* We add a event loop here so we can use different bindings in a different mode
+    //* of the code (there are too many binding to fit on the controller)
     private EventLoop testButtonBindingLoop = new EventLoop();
     
     private final PatriBoxController driver;
@@ -68,9 +70,10 @@ public class RobotContainer implements Logged {
     private final BooleanSupplier robotRelativeSupplier;
     
     /**
-     * All of these @IgnoreLogged annotations are to 
+     * All of these {@see IgnoreLogged} annotations are to
      * ensure there are no redundant logging paths
-     * since we are logging these objects via the method {@link #configureLoggingPaths()}
+     * since we are logging these objects via the method
+     * {@link #configureLoggingPaths()}
      */
     @IgnoreLogged
     private Swerve swerve;

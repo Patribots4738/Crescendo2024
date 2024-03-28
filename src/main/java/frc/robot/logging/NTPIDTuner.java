@@ -129,7 +129,7 @@ public class NTPIDTuner extends Command {
     }
 
     /**
-     * Updates the PID values of the motors, which is called by {@link}updateValues.
+     * Updates the PID values of the motors, which is called by {@link #updateValues()}.
      * 
      * @param motorList the list of motors to update
      * @param name      the name of the PID value to update
