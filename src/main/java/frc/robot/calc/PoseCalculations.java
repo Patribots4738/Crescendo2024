@@ -48,19 +48,31 @@ public class PoseCalculations implements Logged {
     @Log
     private static Pose2d closestShootingPose;
 
+    /**
+     * Given the robot's position, return the best shooting pose. Given the preset shooting positions
+     * on the field, defined in the Auto naming guide in tldraw
+     * @param position
+     * @return
+     */
     @Log
     public static Pose2d getBestShootingPose(Pose2d position) {
         double yValue = position.getY();
         if (yValue > 5)
             // L
             return FieldConstants.GET_SHOOTING_POSITIONS().get(0);
-        if (yValue > 1.8) 
+        if (yValue > 1.8)
             // M
             return FieldConstants.GET_SHOOTING_POSITIONS().get(2);
         // R
         return FieldConstants.GET_SHOOTING_POSITIONS().get(1);
     }
 
+    /**
+     * Given the robot's position, return the best shooting pose as a string. Given the preset shooting positions
+     * on the field, defined in the Auto naming guide in tldraw
+     * @param position
+     * @return
+     */
     public static String getBestShootingPoseString(Pose2d position) {
         closestShootingPose = getBestShootingPose(position);
         if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(0)))
@@ -79,7 +91,7 @@ public class PoseCalculations implements Logged {
      * Given an intercept of the chain, return the height of the chain at that
      * location.
      * 
-     * @param x The posision along the X axis of the chain
+     * @param x The position along the X axis of the chain
      *          as seen in https://www.desmos.com/calculator/84ioficbl2
      *          For some reason, that desmos breaks on chrome on my home computer
      *          please send help... i used edge to make it :(
@@ -88,7 +100,7 @@ public class PoseCalculations implements Logged {
      */
     private static double getChainIntercept(double x) {
         // The ds here turn the integers into doubles
-        // so that integer divion does not occur.
+        // so that integer division does not occur.
         double calculation = 3d / 10d * Math.pow(x, 2) + 0.725;
         // Clamp the output to be no lower than the lowest point of the chain,
         // and no higher than the extension limit of our elevator

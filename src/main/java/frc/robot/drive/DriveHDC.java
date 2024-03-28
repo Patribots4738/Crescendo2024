@@ -7,13 +7,27 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-//import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.managers.HDCTuner;
 import frc.robot.subsystems.Swerve;
 
+/**
+ * This command allows for the robot to be driven with a controller that uses HDC.
+ * The HDC controller must be able to be changed as the HDC config is changed in HDCTuner
+ * 
+ * It controls the swerve drive using the controller's left stick for translation
+ * and the right stick for rotation.
+ * 
+ * The field-relative toggle button is used to switch between field-relative and robot-relative
+ * control. The drive multiplier button is used to switch between full speed and half speed.
+ * 
+ * Additionally, the shouldMirror button is used to mirror the controls, which is useful for
+ * driving the robot from the other side of the field.
+ * 
+ * This rest of the logic is handled by the Swerve and HDCTuner classes.
+ */
 public class DriveHDC extends Command {
 
     private final Swerve swerve;
@@ -57,10 +71,12 @@ public class DriveHDC extends Command {
         addRequirements(swerve);
     }
 
+    //Called when the command was initally scheduled.
     @Override
     public void initialize() {
     }
 
+    //Called everytime the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         double x = xSupplier.getAsDouble();
@@ -97,11 +113,13 @@ public class DriveHDC extends Command {
         swerve.setDesiredPose(desiredPose);
     }
 
+    //Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         swerve.drive(0, 0, 0, false);
     }
 
+    //Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;

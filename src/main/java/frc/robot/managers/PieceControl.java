@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.logging.NT;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -241,8 +241,8 @@ public class PieceControl implements Logged {
     }
 
     public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier operatorWantsToIntake) {
-        // Defer the command to not require anyhing until it is actually ran
-        // This is becuase placeTrap requires pivot, but shootWhenReady does not
+        // Defer the command to not require anything until it is actually ran
+        // This is because placeTrap requires pivot, but shootWhenReady does not
         // If they are both required, then we would cancel any command that requires pivot
         // such as prepareSWDCommand
         return 
@@ -264,7 +264,7 @@ public class PieceControl implements Logged {
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
             elevator.setPositionCommand(position, false)
-            // Run until we are no longer in our unstucking state only if elevator actually gets stuck
+            // Run until we are no longer in our unstuck state only if elevator actually gets stuck
             // getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
@@ -289,12 +289,12 @@ public class PieceControl implements Logged {
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(
-                // Toggle this state to currently unstucking if we haven't already
+                // Toggle this state to currently get unstuck if we haven't already
                 setDislodging(true),
                 elevator.setPositionCommand(ElevatorConstants.UNSTUCK_POS),
                 ampper.outtakeSlow(ElevatorConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 elevator.setPositionCommand(desiredPose, true),
-                // Toggle unstucking state to off if the elevator isn't actually stuck anymore
+                // Toggle unstuck state to off if the elevator isn't actually stuck anymore
                 setDislodging(false).onlyIf(() -> !elevator.getStuck())
             );
     }
@@ -368,6 +368,14 @@ public class PieceControl implements Logged {
     @Log
     private boolean desiredSide = false;
 
+    /**
+     * Moves the note to the desired position within the robot based on the desired side
+     * The note will be moved to the shooter side if desiredSide is true
+     * The note will be moved to the trap side if desiredSide is false
+     * 
+     * @param desiredSide The side of the robot to move the note to
+     * @return The command that moves the note
+     */
     public Command moveNote(boolean desiredSide) {
         return Commands.sequence(
                 Commands.runOnce(() -> this.desiredSide = desiredSide),
@@ -386,7 +394,7 @@ public class PieceControl implements Logged {
 
     // Think of this parameter as the desired state of shooterMode.
     // We don't want to set the state until we are done with the command that moves the note
-    // since we arent ready to do another command that moves the note until we are done with the first one
+    // since we aren't ready to do another command that moves the note until we are done with the first one
     public Command setShooterModeCommand(boolean newShooterMode) {
         return Commands.runOnce(() -> setShooterMode(newShooterMode))
                 .andThen(
@@ -410,8 +418,8 @@ public class PieceControl implements Logged {
             shooterCmds.stopShooter(),
             () -> 
                 (colorSensor.hasNote() 
-                    && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
-                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached()))
+                    && RobotState.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
+                || (Robot.currentTimestamp - RobotState.gameModeStart < 7 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached()))
                 && RobotController.getBatteryVoltage() > 10)
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }

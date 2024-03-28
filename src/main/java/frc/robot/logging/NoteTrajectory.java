@@ -14,7 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NTConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -29,7 +29,7 @@ import monologue.Logged;
 public class NoteTrajectory extends Command implements Logged {
     double x, x0, vx0, ax, z, z0, vz0, az, y, y0, vy0, ay;
 
-    ChassisSpeeds initalSpeeds;
+    ChassisSpeeds initialSpeeds;
     Pose2d initialPose;
     double initialVelocity;
     double pivotAngle;
@@ -50,7 +50,7 @@ public class NoteTrajectory extends Command implements Logged {
      */
     public NoteTrajectory(Pose2d initialPose, ChassisSpeeds initialSpeeds, double initialVelocity, double pivotAngle, boolean realData) {
         this.initialPose = initialPose;
-        this.initalSpeeds = initialSpeeds;
+        this.initialSpeeds = initialSpeeds;
         this.initialVelocity = initialVelocity;
         this.pivotAngle = pivotAngle;
         this.realData = realData;
@@ -69,8 +69,8 @@ public class NoteTrajectory extends Command implements Logged {
         y0 = 0;
         z0 = NTConstants.PIVOT_OFFSET_METERS.getZ();
       
-        vx0 = Rotation2d.fromDegrees(pivotAngle).getCos() * initialVelocity + initalSpeeds.vxMetersPerSecond;
-        vy0 = initalSpeeds.vyMetersPerSecond;
+        vx0 = Rotation2d.fromDegrees(pivotAngle).getCos() * initialVelocity + initialSpeeds.vxMetersPerSecond;
+        vy0 = initialSpeeds.vyMetersPerSecond;
         vz0 = Rotation2d.fromDegrees(pivotAngle).getSin() * initialVelocity;
       
         ax = 0;
@@ -89,9 +89,9 @@ public class NoteTrajectory extends Command implements Logged {
         currentNotePosition = getNotePose(initialPose, pivotAngle, x, y, z);
 
         if (realData) {
-            RobotContainer.notePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
+            RobotState.notePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
         } else {
-            RobotContainer.highNotePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
+            RobotState.highNotePose3ds[noteIndex+1] = getNotePose(initialPose, pivotAngle, x, y, z);
         }
     }
 
@@ -139,9 +139,9 @@ public class NoteTrajectory extends Command implements Logged {
 
     public void zeroNote() {
         if (realData) {
-            RobotContainer.notePose3ds[noteIndex+1] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
+            RobotState.notePose3ds[noteIndex+1] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
         } else {
-            RobotContainer.highNotePose3ds[noteIndex+1] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
+            RobotState.highNotePose3ds[noteIndex+1] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[noteIndex], new Rotation3d());
         }
     }
 

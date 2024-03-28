@@ -11,6 +11,20 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.Swerve;
 
+/**
+ * This command allows the robot to be driven with a controller.
+ * 
+ * It controls the swerve drive using the controller's left stick for translation
+ * and the right stick for rotation.
+ * 
+ * The field-relative toggle button is used to switch between field-relative and robot-relative
+ * control. The drive multiplier button is used to switch between full speed and half speed.
+ * 
+ * Additionally, the shouldMirror button is used to mirror the controls, which is useful for
+ * driving the robot from the other side of the field.
+ * 
+ * This rest of the logic is handled by the Swerve class.
+ */
 public class Drive extends Command {
 
     private final Swerve swerve;
@@ -56,10 +70,12 @@ public class Drive extends Command {
         addRequirements(swerve);
     }
 
+    //Called when the command was initially scheduled.
     @Override
     public void initialize() {
     }
 
+    //Called everytime the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         double x = xSupplier.getAsDouble();
@@ -83,6 +99,7 @@ public class Drive extends Command {
         }
     }
 
+    //Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         swerve.drive(0, 0, 0, false);
@@ -92,6 +109,7 @@ public class Drive extends Command {
         driveMultiplier = (driveMultiplier == 1) ? 0.5 : 1;
     }
 
+    //Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;

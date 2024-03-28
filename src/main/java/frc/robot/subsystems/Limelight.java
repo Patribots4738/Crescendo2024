@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Robot.GameMode;
@@ -43,7 +43,7 @@ public class Limelight extends SubsystemBase implements Logged{
     private final SwerveDrivePoseEstimator poseEstimator;
 
     @Log
-    Pose3d[] visableTags;
+    Pose3d[] visibleTags;
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
@@ -96,12 +96,12 @@ public class Limelight extends SubsystemBase implements Logged{
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
         this.estimatedPose2d = estimatedRobotPose;
-        RobotContainer.visionErrorPose = RobotContainer.robotPose2d.minus(estimatedRobotPose);
+        RobotState.visionErrorPose = RobotState.robotPose2d.minus(estimatedRobotPose);
         double xyStds;
         double radStds;
         if (Robot.gameMode == GameMode.DISABLED || 
             (Robot.gameMode == GameMode.AUTONOMOUS 
-                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3 && hasTarget(result))) {
+                && Robot.currentTimestamp - RobotState.gameModeStart < 3 && hasTarget(result))) {
             xyStds = 0.001;
             radStds = 0.0002;
             
@@ -110,7 +110,7 @@ public class Limelight extends SubsystemBase implements Logged{
             poseEstimator.addVisionMeasurement(estimatedRobotPose,
                 Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
         }
-        else if (RobotContainer.enableVision && hasTarget(result)) {
+        else if (RobotState.enableVision && hasTarget(result)) {
             // multiple targets detected
             if (targets.length > 1) {
                 if (Robot.gameMode == GameMode.TELEOP) {
@@ -126,7 +126,7 @@ public class Limelight extends SubsystemBase implements Logged{
                 }
                 radStds = Units.degreesToRadians(2);
             }
-            // 1 target with large area and close to estimated roxose
+            // 1 target with large area and close to estimated
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 xyStds = 0.192;
                 radStds = Units.degreesToRadians(7);
@@ -169,7 +169,7 @@ public class Limelight extends SubsystemBase implements Logged{
             }
         }
 
-        visableTags = knownFiducials.toArray(new Pose3d[0]);
+        visibleTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
     @Log
@@ -296,7 +296,7 @@ public class Limelight extends SubsystemBase implements Logged{
                 }
             }
         }
-        visableTags = poses.toArray(new Pose3d[0]);
+        visibleTags = poses.toArray(new Pose3d[0]);
     }
 
     /**
@@ -349,7 +349,7 @@ public class Limelight extends SubsystemBase implements Logged{
         {
             return false;
         }
-      
+        
         return true;
     }
 

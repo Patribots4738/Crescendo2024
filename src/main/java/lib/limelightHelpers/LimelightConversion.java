@@ -13,6 +13,7 @@ import lib.Scale3d;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 
 /**
@@ -93,7 +94,7 @@ public class LimelightConversion implements Logged {
 
     private Matrix<N4, N4> initMatrix() {
         Matrix<N4, N4> transform = new Matrix<>(Nat.N4(), Nat.N4());
-        // intialize the matrix
+        // initialize the matrix
         transform.set(0, 0, 1);
         transform.set(1, 1, 1);
         transform.set(2, 2, 1);
@@ -115,9 +116,9 @@ public class LimelightConversion implements Logged {
         String matrixString = "";
         for (int i = 0; i < matrix.getNumRows(); i++) {
             for (int j = 0; j < matrix.getNumCols(); j++) {
-                // The weird multiplication here is removing the scientific notation
-                // We are uh, totally not rounding to 8 decimal places becuase 3 isn't good enough :)
-                matrixString += Math.round(matrix.get(j, i)*100000000)/100000000.0 + ((i == 3 && j == 3) ? "" : ",");
+                // We are uh, totally not rounding to 8 decimal places because 3 isn't good enough :)
+                DecimalFormat df = new DecimalFormat("#.########");
+                matrixString += df.format(matrix.get(j, i)) + ((i == 3 && j == 3) ? "" : ",");
                 matrixString += "\n";
             }
         }

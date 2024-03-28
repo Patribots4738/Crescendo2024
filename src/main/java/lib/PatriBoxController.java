@@ -25,7 +25,7 @@ public class PatriBoxController extends CommandXboxController {
         this.deadband = deadband;
     }
 
-    // The following 24 methods will be unnecesary in 2025.
+    // The following 24 methods will be unnecessary in 2025.
     // They fix a loop overrun issue in 2024's wpilib
     // more info can be found at https://github.com/Patribots4738/Crescendo2024/issues/144
     public boolean getAButton() {
@@ -123,7 +123,7 @@ public class PatriBoxController extends CommandXboxController {
     public Trigger rightX(double threshold, EventLoop loop) {
         return new Trigger(loop, () -> Math.abs(getRightX()) > threshold);
     }
-    // This marks the end of the methods that should be unnecesary in 2025
+    // This marks the end of the methods that should be unnecessary in 2025
 
     @Override
     public double getLeftX() {

@@ -46,6 +46,7 @@ public class ActiveConditionalCommand extends Command {
         selectedCommand.initialize();
     }
 
+    //Called everytime the sceduler runs while the command is sceduled.
     @Override
     public void execute() {
         if (condition.getAsBoolean() ^ (selectedCommand == onTrueCommand))
@@ -56,6 +57,7 @@ public class ActiveConditionalCommand extends Command {
         selectedCommand.execute();
     }
 
+    //Called once command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         selectedCommand.end(interrupted);

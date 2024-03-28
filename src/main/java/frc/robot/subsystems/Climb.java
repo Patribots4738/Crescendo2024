@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NTConstants;
@@ -59,11 +59,11 @@ public class Climb extends SubsystemBase implements Logged {
         atDesiredPos = atDesiredPosition().getAsBoolean();
         hooksUp = getHooksUp();
 
-        RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
+        RobotState.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, leftMotor.getPosition(),
             new Rotation3d()
         );
-        RobotContainer.components3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
+        RobotState.components3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
             0, 0, rightMotor.getPosition(),
             new Rotation3d()
         );
@@ -93,11 +93,11 @@ public class Climb extends SubsystemBase implements Logged {
 
         rightMotor.setTargetPosition(pos2);
 
-        RobotContainer.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
+        RobotState.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, pos1,
             new Rotation3d()
         );
-        RobotContainer.desiredComponents3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
+        RobotState.desiredComponents3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
             0, 0, pos2,
             new Rotation3d()
         );

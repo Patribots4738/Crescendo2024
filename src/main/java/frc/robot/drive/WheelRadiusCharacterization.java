@@ -14,7 +14,16 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 import java.util.function.DoubleSupplier;
 
-// thanks 6328 :D <3
+/**
+ * This command is used to characterize the wheel radius of the swerve drive.
+ * What that means is that the robot is able to calculate it's own wheel radius of each wheel
+ * by driving in a circle and measuring the distance traveled by each wheel.
+ * 
+ * The wheel radius is important for the swerve drive to be able to accurately drive in a straight line.
+ * Because of the wear and tear on the wheels, the radius of the wheel can change over time.
+ * 
+ * This command is used to calculate the wheel radius of the swerve drive and is "inspired" by 6328
+ */
 public class WheelRadiusCharacterization extends Command implements Logged {
     // wheel radius (meters) =
     // gyro delta (radians) * drive base radius (meters) / wheel position delta

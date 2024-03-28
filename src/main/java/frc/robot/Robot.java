@@ -81,7 +81,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         Robot.gameMode = GameMode.DISABLED;
         robotContainer.onDisabled();
-        RobotContainer.enableVision = true;
+        RobotState.enableVision = true;
     }
     
     @Override
@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
     public void disabledExit() {
         // Shut off NetworkTables broadcasting for most logging calls
         // if we are at competition
-        RobotContainer.gameModeStart = currentTimestamp;
+        RobotState.gameModeStart = currentTimestamp;
         // Monologue.setFileOnly(DriverStation.isFMSAttached());
     }
 
@@ -106,7 +106,7 @@ public class Robot extends TimedRobot {
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         Robot.gameMode = GameMode.AUTONOMOUS;
         robotContainer.onEnabled();
-        // We only need to update alliance becuase
+        // We only need to update alliance because
         // sim GUI starts the bot in a "disconnected"
         // state which won't update the alliance before
         // we enable...
@@ -128,7 +128,7 @@ public class Robot extends TimedRobot {
     public void autonomousExit() {
         // Stop our autonomous command if it is still running.
         System.out.printf(
-            "*** Auto finished in %.2f secs ***%n", Robot.currentTimestamp - RobotContainer.gameModeStart);
+            "*** Auto finished in %.2f secs ***%n", Robot.currentTimestamp - RobotState.gameModeStart);
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }

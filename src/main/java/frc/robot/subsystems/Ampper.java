@@ -16,7 +16,7 @@ public class Ampper extends SubsystemBase implements Logged {
     private double desiredSpeed = 0;
 
     public Ampper() {
-        motor = new Neo(ElevatorConstants.AMPPER_CAN_ID, false, ElevatorConstants.AMPPER_INVERTION);
+        motor = new Neo(ElevatorConstants.AMPPER_CAN_ID, false, ElevatorConstants.AMPPER_INVERSION);
         motor.setSmartCurrentLimit(ElevatorConstants.AMPPER_CURRENT_LIMIT);
     }
 

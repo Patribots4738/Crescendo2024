@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Robot.GameMode;
@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 
 /**
  * This file represents all of the auto paths that we will have
- * They will be primarily comiled through
+ * They will be primarily compiled through
  * PathPlannerTrajectory.importChoreoPaths,
  * with each segment having its own method 
  * to make sure that the modularity stays clean
@@ -85,7 +85,7 @@ public class PathPlannerStorage implements Logged {
          * therefore being added to the auto chooser.
          * 
          * To remove old options, the deploy directory will need to be cleared manually
-         * via SSH, WinSCP, reimaging the RIO, etc.
+         * via SSH, WinSCP, re-imaging the RIO, etc.
          */
         
         // Good news! 
@@ -127,11 +127,11 @@ public class PathPlannerStorage implements Logged {
     public Command updatePathViewerCommand() {
         return Commands.either(
             Commands.runOnce(() -> {
-                RobotContainer.field2d.getObject("path")
+                RobotState.field2d.getObject("path")
                     .setPoses(getAutoPoses(getSelectedAutoName()));
             }),
             Commands.runOnce(() -> {
-                RobotContainer.field2d.getObject("path").setPoses(new ArrayList<>());
+                RobotState.field2d.getObject("path").setPoses(new ArrayList<>());
             }),
             () -> Robot.gameMode == GameMode.DISABLED
         ).ignoringDisable(true);
@@ -259,7 +259,7 @@ public class PathPlannerStorage implements Logged {
 
     /**
      * Uses Pathplanner's pathfinding algorithm to go to the closest shooting position 
-     * from the swerve subsystem's curent position
+     * from the swerve subsystem's current position
      * 
      * @param swerve  The swerve subsystem to use.
      * @return  The command that will pathfind to the shooting pose
@@ -329,49 +329,73 @@ public class PathPlannerStorage implements Logged {
      * @return  The command that drives to a preset note position
      */
     public Command goToNote() {
-        return 
-            
-            swerve.getChaseCommand( 
+        return
+
+        swerve.getChaseCommand(
                 limelight::getNotePose2d,
-                () -> colorSensorSupplier.getAsBoolean() 
-                    // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
-                    // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
-                    // since the pose is from the center but the note is from the edge (since the intake gets it)
-                    || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(40))
-                    || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(40)))
-            // This race will end the command if the color sensor detects a note early. 
-            // (a robot pushes the note towards us)
-            .raceWith(NamedCommands.getCommand("ToIndexer"));
+                () -> colorSensorSupplier.getAsBoolean()
+                        // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
+                        // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
+                        // since the pose is from the center but the note is from the edge (since the intake gets it)
+                        || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation()
+                                .getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(40))
+                        || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation()
+                                .getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(40)))
+                // This race will end the command if the color sensor detects a note early. 
+                // (a robot pushes the note towards us)
+                .raceWith(NamedCommands.getCommand("ToIndexer"));
     }
 
+    /**
+     * Given a path, this method will return the end pose of the path
+     * 
+     * @param path The path to get the end pose of
+     * @return  The end pose of the path
+     */
     public Pose2d getPathEndPose(PathPlannerPath path) {
         List<Pose2d> poses = path.getPathPoses();
-        Pose2d lastPose = poses.get(poses.size()-1);
+        Pose2d lastPose = poses.get(poses.size() - 1);
         return lastPose;
     }
 
+    /**
+     * Given the name of an auto, this method will return a list of poses
+     * in that auto
+     * 
+     * @param name The name of the auto to get the poses of
+     * @return The list of poses in the auto
+     */
     public List<Pose2d> getAutoPoses(String name) {
         List<PathPlannerPath> paths = PathPlannerStorage.AUTO_PATHS.get(name);
         List<Pose2d> autoPoses = new ArrayList<>();
-        if (paths == null) return autoPoses;
+        if (paths == null)
+            return autoPoses;
         // Flip for red alliance
         // and add all the poses to the list
         for (PathPlannerPath path : paths) {
-            List<Pose2d> pathPoses = 
-                Robot.isRedAlliance() 
-                    ? path.flipPath().getPathPoses() 
+            List<Pose2d> pathPoses = Robot.isRedAlliance()
+                    ? path.flipPath().getPathPoses()
                     : path.getPathPoses();
             autoPoses.addAll(pathPoses);
         }
-    
+
         return autoPoses;
     }
 
+    /**
+     * This method will return the next shot translation, at the end of the active path, based on the active path in the network table
+     * from path planner
+     * 
+     * @return The next shot translation at the end of the active path
+     */
     public Translation2d getNextShotTranslation() {
         double[] activeTraj = NetworkTableInstance.getDefault().getTable("PathPlanner").getEntry("activePath").getDoubleArray(new double[0]);
         
-        if (activeTraj.length == 0) return new Translation2d(0, 0);
+        if (activeTraj.length == 0)
+            return new Translation2d(0, 0);
 
+        // the elements in the array are x, y, x, y, x, y, etc.
+        // this is why we are getting the last 2 elements of the active path
         int activeTrajLength = activeTraj.length;
         double endX = activeTraj[activeTrajLength - 3];
         double endY = activeTraj[activeTrajLength - 2];

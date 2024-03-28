@@ -64,8 +64,4 @@ public class Indexer extends SubsystemBase {
     public Command setBrakeMode() {
         return runOnce(() -> motor.setBrakeMode());
     }
-
-    public boolean hasPiece() {
-        return false;
-    }
 }

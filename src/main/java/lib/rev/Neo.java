@@ -1,4 +1,4 @@
-// Developed in tandem with Reza from 1622
+// Developed in tandem with Reza from Team Spyder (1622)
 
 package lib.rev;
 
@@ -8,10 +8,7 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NeoMotorConstants;
 import lib.PatrIDConstants;
@@ -25,7 +22,6 @@ public class Neo extends SafeSpark {
     private ControlLoopType controlType = ControlLoopType.PERCENT;
 
     private Trigger possessionSupplier;
-    private double possessionTimestamp = 0;
     private double possessionPercent = -2;
     
     private double targetPosition = 0;
@@ -76,6 +72,12 @@ public class Neo extends SafeSpark {
         } else {
             setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
         }
+
+        // Add a delay to let the spark reset
+        // If a parameter set fails, this will add more time 
+        // to minimize any bus traffic.
+        // Default is 20ms
+        setCANTimeout(50);
         
         setBrakeMode();
         register();
@@ -229,7 +231,6 @@ public class Neo extends SafeSpark {
     public void set(double percent) {
         targetPercent = percent;
         if (percent == possessionPercent) {
-            possessionTimestamp = Robot.currentTimestamp;
         }
         super.set(percent);
         controlType = ControlLoopType.PERCENT;
@@ -481,19 +482,6 @@ public class Neo extends SafeSpark {
         for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {
             neo.burnFlash();
         }
-    }
-
-    public Trigger makePossessionTrigger(double possessionPercent, double rpmThreshold, double currentThreshold, double settlingTime) {
-        this.possessionPercent = possessionPercent;
-        possessionSupplier = new Trigger(() ->
-            targetPercent == possessionPercent
-            && Robot.currentTimestamp - possessionTimestamp > settlingTime
-            && this.getVelocity() < rpmThreshold
-            && this.getOutputCurrent() > currentThreshold);
-
-        possessionSupplier.onTrue(Commands.runOnce(() -> RobotContainer.hasPiece = true));
-        
-        return possessionSupplier;
     }
 
     public Trigger getPossessionTrigger() {
