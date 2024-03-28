@@ -29,7 +29,7 @@ import monologue.Logged;
 public class NoteTrajectory extends Command implements Logged {
     double x, x0, vx0, ax, z, z0, vz0, az, y, y0, vy0, ay;
 
-    ChassisSpeeds initalSpeeds;
+    ChassisSpeeds initialSpeeds;
     Pose2d initialPose;
     double initialVelocity;
     double pivotAngle;
@@ -50,7 +50,7 @@ public class NoteTrajectory extends Command implements Logged {
      */
     public NoteTrajectory(Pose2d initialPose, ChassisSpeeds initialSpeeds, double initialVelocity, double pivotAngle, boolean realData) {
         this.initialPose = initialPose;
-        this.initalSpeeds = initialSpeeds;
+        this.initialSpeeds = initialSpeeds;
         this.initialVelocity = initialVelocity;
         this.pivotAngle = pivotAngle;
         this.realData = realData;
@@ -69,8 +69,8 @@ public class NoteTrajectory extends Command implements Logged {
         y0 = 0;
         z0 = NTConstants.PIVOT_OFFSET_METERS.getZ();
       
-        vx0 = Rotation2d.fromDegrees(pivotAngle).getCos() * initialVelocity + initalSpeeds.vxMetersPerSecond;
-        vy0 = initalSpeeds.vyMetersPerSecond;
+        vx0 = Rotation2d.fromDegrees(pivotAngle).getCos() * initialVelocity + initialSpeeds.vxMetersPerSecond;
+        vy0 = initialSpeeds.vyMetersPerSecond;
         vz0 = Rotation2d.fromDegrees(pivotAngle).getSin() * initialVelocity;
       
         ax = 0;

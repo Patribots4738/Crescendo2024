@@ -98,7 +98,7 @@ public class Shooter extends SubsystemBase implements Logged{
         return runOnce(() -> setSpeed(speeds));
     }
 
-    public Pair<Double, Double> getSpeed() {
+    public Pair<Double, Double> getSpeeds() {
         return new Pair<Double, Double>(leftMotor.getVelocity(), rightMotor.getVelocity());
     }
 

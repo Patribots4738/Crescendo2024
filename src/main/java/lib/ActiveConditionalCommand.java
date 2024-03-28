@@ -8,6 +8,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import java.util.function.BooleanSupplier;
 
+/**
+ * A command composition that runs one of two commands, depending on the value of the given
+ * condition while this command executes. When the condition changes, the selected command will too.
+ *
+ * <p>The rules for command compositions apply: command instances that are passed to it cannot be
+ * added to any other composition or scheduled individually, and the composition requires all
+ * subsystems its components require.
+ *
+ * <p>This class was created by team 4738. It is not part of the official WPILib API.
+ */
 public class ActiveConditionalCommand extends Command {
     
     private final Command onTrueCommand;
@@ -36,6 +46,7 @@ public class ActiveConditionalCommand extends Command {
         selectedCommand.initialize();
     }
 
+    //Called everytime the sceduler runs while the command is sceduled.
     @Override
     public void execute() {
         if (condition.getAsBoolean() ^ (selectedCommand == onTrueCommand))
@@ -46,6 +57,7 @@ public class ActiveConditionalCommand extends Command {
         selectedCommand.execute();
     }
 
+    //Called once command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         selectedCommand.end(interrupted);

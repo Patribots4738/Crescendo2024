@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NTConstants;
 import frc.robot.Constants.ShooterConstants;
 import lib.rev.Neo;
@@ -30,6 +31,8 @@ public class Pivot extends SubsystemBase implements Logged {
             false, 
             true);
 		configMotor();
+		if (FieldConstants.IS_SIMULATION) 
+			setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
 
 	public void configMotor() {

@@ -97,12 +97,12 @@ public class PieceControl implements Logged {
 
     //! only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+        return Commands.waitUntil(shooterCmds.readyToShootSupplier())
                 .andThen(noteToShoot(poseSupplier, speedSupplier));
     }
 
     public Command shootPreload() {
-        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+        return Commands.waitUntil(shooterCmds.readyToShootSupplier())
                 .andThen(intakeAuto());
     }
 
@@ -143,7 +143,7 @@ public class PieceControl implements Logged {
         // rotation and speed before sending note from ampper into indexer and then into 
         // shooter before stopping ampper and indexer
         return Commands.sequence(
-                Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()),
+                Commands.waitUntil(shooterCmds.readyToShootSupplier()),
                 intake.inCommand(),
                 ampper.intake(),
                 indexer.toShooter(),
@@ -264,7 +264,7 @@ public class PieceControl implements Logged {
     public Command setElevatorPosition(DoubleSupplier position) {
         return Commands.sequence(
             elevator.setPositionCommand(position, false)
-            // Run until we are no longer in our unstucking state only if elevator actually gets stuck
+            // Run until we are no longer in our unstuck state only if elevator actually gets stuck
             // getUnstuck(position.getAsDouble()).onlyIf(elevator::getStuck).repeatedly().until(() -> !elevatorDislodging)
         );
     }
@@ -289,12 +289,12 @@ public class PieceControl implements Logged {
     public Command getUnstuck(double desiredPose) {
         return 
             Commands.sequence(
-                // Toggle this state to currently unstucking if we haven't already
+                // Toggle this state to currently get unstuck if we haven't already
                 setDislodging(true),
                 elevator.setPositionCommand(ElevatorConstants.UNSTUCK_POS),
                 ampper.outtakeSlow(ElevatorConstants.UNSTUCK_OUTTAKE_TIME_SECONDS),
                 elevator.setPositionCommand(desiredPose, true),
-                // Toggle unstucking state to off if the elevator isn't actually stuck anymore
+                // Toggle unstuck state to off if the elevator isn't actually stuck anymore
                 setDislodging(false).onlyIf(() -> !elevator.getStuck())
             );
     }
@@ -368,6 +368,14 @@ public class PieceControl implements Logged {
     @Log
     private boolean desiredSide = false;
 
+    /**
+     * Moves the note to the desired position within the robot based on the desired side
+     * The note will be moved to the shooter side if desiredSide is true
+     * The note will be moved to the trap side if desiredSide is false
+     * 
+     * @param desiredSide The side of the robot to move the note to
+     * @return The command that moves the note
+     */
     public Command moveNote(boolean desiredSide) {
         return Commands.sequence(
                 Commands.runOnce(() -> this.desiredSide = desiredSide),
@@ -386,7 +394,7 @@ public class PieceControl implements Logged {
 
     // Think of this parameter as the desired state of shooterMode.
     // We don't want to set the state until we are done with the command that moves the note
-    // since we arent ready to do another command that moves the note until we are done with the first one
+    // since we aren't ready to do another command that moves the note until we are done with the first one
     public Command setShooterModeCommand(boolean newShooterMode) {
         return Commands.runOnce(() -> setShooterMode(newShooterMode))
                 .andThen(

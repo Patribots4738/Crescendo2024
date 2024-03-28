@@ -13,6 +13,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.NeoMotorConstants;
 import lib.rev.Neo;
 
+/**
+ * This command is used to tune the PID values of the Neo motors using NetworkTables.
+ * 
+ * We can use Advantage Scope to tune the PID values of the Neo motors in real-time
+ * by changing the values and listening for the changes to update the PID values of the motors.
+ */
 public class NTPIDTuner extends Command {
     
     NetworkTable table = NetworkTableInstance.getDefault().getTable("Calibration");
@@ -31,6 +37,11 @@ public class NTPIDTuner extends Command {
         return true;
     }
 
+    /**
+     * Initializes the NetworkTableEntries for the PID values of each motor group.
+     * 
+     * @param motorGroups the map of motor groups and their corresponding motors
+     */
     private void initializeMotorEntries(Map<String, List<Neo>> motorGroups) {
         // Loop through each motor group
         for (int i = 0; i < motorGroups.size(); i++) {
@@ -84,6 +95,11 @@ public class NTPIDTuner extends Command {
         }
     }
 
+    /**
+     * Updates the PID values of the motors based on the values in NetworkTables.
+     * 
+     * @param entry the entry containing the motor group and its corresponding NetworkTableEntries
+     */
     private void updateValues(Map.Entry<List<Neo>, Map<NetworkTableEntry, Double>> entry) {
         for (Map.Entry<NetworkTableEntry, Double> entry2 : entry.getValue().entrySet()) {
             double NTValue = entry2.getKey().getDouble(entry2.getValue());
@@ -92,7 +108,7 @@ public class NTPIDTuner extends Command {
                 // We are given a full path like "/Calibration//FrontLeftTurn/3-FF"
                 // We just want that "FF" part
                 String lastPart = entryPath.substring(entryPath.lastIndexOf("-") + 1);
-                
+
                 if (lastPart.equals("IZone")) {
                     if (NTValue > 99) {
                         NTValue = Double.POSITIVE_INFINITY;
@@ -112,6 +128,13 @@ public class NTPIDTuner extends Command {
         }
     }
 
+    /**
+     * Updates the PID values of the motors, which is called by {@link}updateValues.
+     * 
+     * @param motorList the list of motors to update
+     * @param name      the name of the PID value to update
+     * @param NTValue   the new value to set
+     */
     private void updateController(List<Neo> motorList, String name, double NTValue) {
         // Find out if it was P, I, D, FF, or IZone and update the value
         for (Neo motor : motorList) {

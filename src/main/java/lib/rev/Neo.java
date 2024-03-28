@@ -9,7 +9,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Robot;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NeoMotorConstants;
 import lib.PatrIDConstants;
@@ -23,7 +22,6 @@ public class Neo extends SafeSpark {
     private ControlLoopType controlType = ControlLoopType.PERCENT;
 
     private Trigger possessionSupplier;
-    private double possessionTimestamp = 0;
     private double possessionPercent = -2;
     
     private double targetPosition = 0;
@@ -233,7 +231,6 @@ public class Neo extends SafeSpark {
     public void set(double percent) {
         targetPercent = percent;
         if (percent == possessionPercent) {
-            possessionTimestamp = Robot.currentTimestamp;
         }
         super.set(percent);
         controlType = ControlLoopType.PERCENT;
@@ -476,6 +473,11 @@ public class Neo extends SafeSpark {
         PERCENT;
     }
 
+    /**
+     * Burn the flash memory of all motor controllers.
+     * This is called at the end of every constructor to ensure
+     * settings have time to be set before the method is called.
+     */
     public static void incinerateMotors() {
         for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {
             neo.burnFlash();
