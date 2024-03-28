@@ -152,7 +152,11 @@ public class SafeSpark extends CANSparkBase {
     @Override
     public RelativeEncoder getEncoder() {
         if (relativeEncoder == null) {
-            relativeEncoder = getEncoder();
+            if (isSparkFlex) {
+                relativeEncoder = super.getEncoder(SparkRelativeEncoder.Type.kQuadrature, 7168);
+            } else {
+                relativeEncoder = super.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
+            }
         }
         return relativeEncoder;
     }
