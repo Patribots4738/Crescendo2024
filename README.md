@@ -52,7 +52,8 @@ ___
 ### <img src= "images/surelyanote.png" width="2.5%" /> PID Tuning w/ Network Tables
 > When tuning PID, shooter speeds, and pivot angle, we can change the values in Advantage Scopes network tables. This allows us to dynamically change the values without redeploying our code constantly, making tuning faster, easier, and more accurate.
   
-## Safe Spark 🛟
+### <img src= "images/surelyanote.png" width="2.5%" /> Safe Spark
+  >
   > REV's motor controllers do not always set the parameter first try, causing our motor to break randomly. To keep our motors, our matches, our ranking, and our money safe, we made a class called Safe Spark! Safe Spark constantly checks whether the motor has correctly set its parameters. If no parameters were set, it returns a REVLibError type of `kError` and tries to set the parameter again. It will repeat this until it recognizes that the parameter has been received and implemented, finally returning a REVLibError type of kOK!
 
 ##  Swerve Drive 🛞
