@@ -19,7 +19,7 @@ import monologue.Logged;
  * This class is used to store the state of the robot. It is used to store the
  * state of the robot at any given time.
  */
-public class RobotState implements Logged{
+public class LoggedValues implements Logged{
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
     @Log
@@ -56,7 +56,7 @@ public class RobotState implements Logged{
             new Rotation3d(0, -Units.degreesToRadians(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES), 0)
     );
         
-    public RobotState() {
+    public LoggedValues() {
     }
 
     private static void setInitialComponents3d() {
@@ -103,11 +103,11 @@ public class RobotState implements Logged{
     }
 
     public static Command enableVision() {
-        return Commands.runOnce(() -> RobotState.enableVision = true).ignoringDisable(true);
+        return Commands.runOnce(() -> LoggedValues.enableVision = true).ignoringDisable(true);
     }
 
     public static Command disableVision() {
-        return Commands.runOnce(() -> RobotState.enableVision = false).ignoringDisable(true);
+        return Commands.runOnce(() -> LoggedValues.enableVision = false).ignoringDisable(true);
     }
 
 }

@@ -7,7 +7,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotState;
+import frc.robot.LoggedValues;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NTConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -50,7 +50,7 @@ public class Pivot extends SubsystemBase implements Logged {
 		atDesiredAngle = 
             MathUtil.isNear(realAngle, desiredAngle, ShooterConstants.PIVOT_DEADBAND);
 
-		RobotState.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
+		LoggedValues.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
 			NTConstants.PIVOT_OFFSET_METERS.getZ(),
@@ -73,7 +73,7 @@ public class Pivot extends SubsystemBase implements Logged {
         motor.setTargetPosition(angle);
         desiredAngle = angle;
 		
-		RobotState.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
+		LoggedValues.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 				NTConstants.PIVOT_OFFSET_METERS.getX(),
 				0,
 				NTConstants.PIVOT_OFFSET_METERS.getZ(),

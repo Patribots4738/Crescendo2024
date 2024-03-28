@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.logging.NT;
-import frc.robot.RobotState;
+import frc.robot.LoggedValues;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -418,8 +418,8 @@ public class PieceControl implements Logged {
             shooterCmds.stopShooter(),
             () -> 
                 (colorSensor.hasNote() 
-                    && RobotState.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
-                || (Robot.currentTimestamp - RobotState.gameModeStart < 7 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached()))
+                    && LoggedValues.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
+                || (Robot.currentTimestamp - LoggedValues.gameModeStart < 7 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached()))
                 && RobotController.getBatteryVoltage() > 10)
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }

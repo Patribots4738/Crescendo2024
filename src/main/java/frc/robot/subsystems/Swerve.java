@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.RobotState;
+import frc.robot.LoggedValues;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
@@ -151,11 +151,11 @@ public class Swerve extends SubsystemBase implements Logged {
 
         currentPose = getPose();
 
-        RobotState.swerveMeasuredStates = new SwerveModuleState[] {
+        LoggedValues.swerveMeasuredStates = new SwerveModuleState[] {
                 frontLeft.getState(), frontRight.getState(), rearLeft.getState(), rearRight.getState()
         };
 
-        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(RobotState.swerveMeasuredStates);
+        ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(LoggedValues.swerveMeasuredStates);
 
         if (FieldConstants.IS_SIMULATION) {
             resetOdometry(
@@ -165,21 +165,21 @@ public class Swerve extends SubsystemBase implements Logged {
                                     speeds.omegaRadiansPerSecond * .02)));
         }
 
-        RobotState.field2d.setRobotPose(currentPose);
+        LoggedValues.field2d.setRobotPose(currentPose);
 
         if ((Double.isNaN(currentPose.getX())
             || Double.isNaN(currentPose.getY())
             || Double.isNaN(currentPose.getRotation().getDegrees())))
         {
             // Something in our pose was NaN...
-            resetOdometry(RobotState.robotPose2d);
+            resetOdometry(LoggedValues.robotPose2d);
             resetEncoders();
             resetHDC();
         } else {
-            RobotState.robotPose2d = currentPose;
+            LoggedValues.robotPose2d = currentPose;
         }
 
-        RobotState.robotPose3d = new Pose3d(
+        LoggedValues.robotPose3d = new Pose3d(
                 new Translation3d(
                         currentPose.getX(),
                         currentPose.getY(),
@@ -190,7 +190,7 @@ public class Swerve extends SubsystemBase implements Logged {
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
                 new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
 
-        RobotState.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
+        LoggedValues.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
 
     }
 
@@ -296,7 +296,7 @@ public class Swerve extends SubsystemBase implements Logged {
         rearLeft.setDesiredState(desiredStates[2]);
         rearRight.setDesiredState(desiredStates[3]);
 
-        RobotState.swerveDesiredStates = desiredStates;
+        LoggedValues.swerveDesiredStates = desiredStates;
     }
 
     public void resetOdometry(Pose2d pose) {

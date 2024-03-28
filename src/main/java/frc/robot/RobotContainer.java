@@ -110,7 +110,7 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private PieceControl pieceControl;
     
-    RobotState robotState = new RobotState();
+    LoggedValues robotState = new LoggedValues();
 
     public RobotContainer() {
         
@@ -187,16 +187,16 @@ public class RobotContainer implements Logged {
         );
         
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight2);
-        RobotState.initComponents();
+        LoggedValues.initComponents();
         prepareNamedCommands();
 
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
-            RobotState.disableVision()
+            LoggedValues.disableVision()
             .andThen(
                 swerve.setWheelsOCommand()
                 .andThen(new WheelRadiusCharacterization(swerve)))
-            .andThen(RobotState.enableVision()));
+            .andThen(LoggedValues.enableVision()));
         
         configureButtonBindings();
 
@@ -237,7 +237,7 @@ public class RobotContainer implements Logged {
         // In the last couple seconds of the match,
         // "hail mary" the note to get a last second score just in case
         new Trigger( () -> 
-            Robot.currentTimestamp - RobotState.gameModeStart >= 134.2 
+            Robot.currentTimestamp - LoggedValues.gameModeStart >= 134.2 
             && Robot.gameMode == GameMode.TELEOP 
             && RobotController.getBatteryVoltage() > 10 
             && DriverStation.isFMSAttached()
@@ -291,14 +291,14 @@ public class RobotContainer implements Logged {
         // Have the controllers pulse when the match is about to end to signal the drivers
         // Pulses get more extreme as the clock approaches 0
         // Starts when there are five seconds left in the match
-        new Trigger(() -> Robot.currentTimestamp - RobotState.gameModeStart >= 130 && Robot.currentTimestamp - RobotState.gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
+        new Trigger(() -> Robot.currentTimestamp - LoggedValues.gameModeStart >= 130 && Robot.currentTimestamp - LoggedValues.gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
             .whileTrue(
                 Commands.run(
                     () -> {
                         double rumbleSpeed =
-                            (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - RobotState.gameModeStart) + Math.PI)
+                            (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - LoggedValues.gameModeStart) + Math.PI)
                             /
-                            ((135 - Robot.currentTimestamp - RobotState.gameModeStart)*2.0)); 
+                            ((135 - Robot.currentTimestamp - LoggedValues.gameModeStart)*2.0)); 
                         driver.setRumble(rumbleSpeed);
                         operator.setRumble(rumbleSpeed);
                     }
@@ -585,7 +585,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        RobotState.enableVision();
+        LoggedValues.enableVision();
         return pathPlannerStorage.getSelectedAuto();
     }
 
@@ -612,9 +612,9 @@ public class RobotContainer implements Logged {
         } else if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
-        RobotState.gameModeStart = Robot.currentTimestamp;
+        LoggedValues.gameModeStart = Robot.currentTimestamp;
         pathPlannerStorage.updatePathViewerCommand().schedule();
-        RobotState.startCode();
+        LoggedValues.startCode();
     }
 
     public void updateNTGains() {
@@ -686,8 +686,8 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("DisableLimelight", RobotState.disableVision());
-        NamedCommands.registerCommand("EnableLimelight", RobotState.enableVision());
+        NamedCommands.registerCommand("DisableLimelight", LoggedValues.disableVision());
+        NamedCommands.registerCommand("EnableLimelight", LoggedValues.enableVision());
         registerPathToPathCommands();
     }
 
