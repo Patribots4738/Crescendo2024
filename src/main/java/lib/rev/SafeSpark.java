@@ -14,6 +14,7 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import com.revrobotics.jni.CANSparkMaxJNI;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.Constants.FieldConstants;
