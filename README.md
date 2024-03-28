@@ -3,7 +3,7 @@
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
 
 
-<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/1c6c852f-4c20-4b9f-b6bc-79065b717ee7" width="100%">
+<img src="images/ILUVUTERRY.png" width="100%">
 
 ____
 
