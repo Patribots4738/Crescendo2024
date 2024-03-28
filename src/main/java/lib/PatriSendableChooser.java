@@ -15,21 +15,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
+
 /**
  * The {@link PatriSendableChooser} class is a useful tool for presenting a
- * selection of options to the
- * {@link SmartDashboard}.
+ * selection of options to the {@link SmartDashboard}.
  *
  * <p>
  * For instance, you may wish to be able to select between multiple autonomous
- * modes. You can do
- * this by putting every possible Command you want to run as an autonomous into
- * a {@link
- * PatriSendableChooser} and then put it into the {@link SmartDashboard} to have
- * a list of options appear
- * on the laptop. Once autonomous starts, simply ask the
- * {@link PatriSendableChooser} what the selected
- * value is.
+ * modes. You can do this by putting every possible Command you want to run as
+ * an autonomous into a {@link PatriSendableChooser} and then put it into the
+ * {@link SmartDashboard} to have a list of options appear on the laptop. Once
+ * autonomous starts, simply ask the {@link PatriSendableChooser} what the
+ * selected value is.
  *
  * @param <V> The type of the values to be stored
  */

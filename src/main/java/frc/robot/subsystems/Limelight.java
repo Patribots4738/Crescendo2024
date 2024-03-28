@@ -43,7 +43,7 @@ public class Limelight extends SubsystemBase implements Logged{
     private final SwerveDrivePoseEstimator poseEstimator;
 
     @Log
-    Pose3d[] visableTags;
+    Pose3d[] visibleTags;
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
@@ -126,7 +126,7 @@ public class Limelight extends SubsystemBase implements Logged{
                 }
                 radStds = Units.degreesToRadians(2);
             }
-            // 1 target with large area and close to estimated roxose
+            // 1 target with large area and close to estimated
             else if (LimelightHelpers.getTA(limelightName) > 0.175) {
                 xyStds = 0.192;
                 radStds = Units.degreesToRadians(7);
@@ -169,7 +169,7 @@ public class Limelight extends SubsystemBase implements Logged{
             }
         }
 
-        visableTags = knownFiducials.toArray(new Pose3d[0]);
+        visibleTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
     @Log
@@ -296,7 +296,7 @@ public class Limelight extends SubsystemBase implements Logged{
                 }
             }
         }
-        visableTags = poses.toArray(new Pose3d[0]);
+        visibleTags = poses.toArray(new Pose3d[0]);
     }
 
     /**
@@ -349,7 +349,7 @@ public class Limelight extends SubsystemBase implements Logged{
         {
             return false;
         }
-      
+        
         return true;
     }
 

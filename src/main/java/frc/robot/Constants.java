@@ -248,7 +248,7 @@ public final class Constants {
         public static final double AMPPER_POSITION_MULTIPLIER = 1.925;
 
         public static final int AMPPER_CURRENT_LIMIT = 15;
-        public static final boolean AMPPER_INVERTION = true;
+        public static final boolean AMPPER_INVERSION = true;
 
         private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
         private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
@@ -270,7 +270,7 @@ public final class Constants {
         public static final double NOTE_FIX_POS = 0.14;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
-        public static final double GUILLOTONE_POS = 0.224;
+        public static final double GUILLOTINE_POS = 0.224;
         public static final double UNSTUCK_POS = 0.175;
 
         public static double PREP_PIECE_SECONDS = 0.3;
@@ -417,7 +417,7 @@ public final class Constants {
             "S W3-1 C1-3 OBJ",
             "S C1-3 OBJ",
             "S C1-3 OBJ Over W1",
-            "S W3-1 C1-3 OBJ", //didnt crash but it shot behind stage
+            "S W3-1 C1-3 OBJ", //didn't crash but it shot behind stage
             "S C1-3 S OBJ",
             // "OBJ", 
             "S C1-5 C5-1 OBJ",
@@ -1030,17 +1030,17 @@ public final class Constants {
          * Things to do when we are in field calibration
          * First off: Take snapshots at W2 (both alliances), and C3
          * 
-         * Then, attempt to quickly make the fmap and verify the accuracy using a hotspot
+         * Then, attempt to quickly make the fmap and verify the accuracy using a hot spot
          * (look up "april tag map builder limelight") or visit https://tools.limelightvision.io/map-builder
          * Then, go back and take another shot from either W1 or W3 to verify the accuracy
          * 
          * Finally, move the robot around and see if the vision helps us out...
-         * Power cycle the limelight to force megatag to stop giving us outdated readings
+         * Power cycle the limelight to force mega-tag to stop giving us outdated readings
          * 
          * Make sure to bring:
          *   Tape measure to verify the accuracy (Sub is 36 in out from field wall)
          *   Square (to make sure the robot is perfectly in the center of the spike mark)
-         *   Phone for hotspot i suppose
+         *   Phone for hot spot i suppose
          */
         public static final boolean FIELD_CALIBRATION_MODE = false;
 
