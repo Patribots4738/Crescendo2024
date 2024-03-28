@@ -55,7 +55,6 @@ public class ShooterCalc implements Logged {
         double v0z = originalv0 * Math.sin(Units.degreesToRadians(currentTriplet.getAngle()));
         double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
 
-        double newv0 = Math.hypot(v0x, v0z);
         Rotation2d newAngle = new Rotation2d(v0x, v0z);
 
         return 
