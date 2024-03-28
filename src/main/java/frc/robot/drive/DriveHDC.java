@@ -71,10 +71,12 @@ public class DriveHDC extends Command {
         addRequirements(swerve);
     }
 
+    //Called when the command was initally scheduled.
     @Override
     public void initialize() {
     }
 
+    //Called everytime the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         double x = xSupplier.getAsDouble();
@@ -111,11 +113,13 @@ public class DriveHDC extends Command {
         swerve.setDesiredPose(desiredPose);
     }
 
+    //Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         swerve.drive(0, 0, 0, false);
     }
 
+    //Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;

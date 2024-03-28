@@ -70,10 +70,12 @@ public class Drive extends Command {
         addRequirements(swerve);
     }
 
+    //Called when the command was initially scheduled.
     @Override
     public void initialize() {
     }
 
+    //Called everytime the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         double x = xSupplier.getAsDouble();
@@ -97,6 +99,7 @@ public class Drive extends Command {
         }
     }
 
+    //Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         swerve.drive(0, 0, 0, false);
@@ -106,6 +109,7 @@ public class Drive extends Command {
         driveMultiplier = (driveMultiplier == 1) ? 0.5 : 1;
     }
 
+    //Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;
