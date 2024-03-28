@@ -197,9 +197,13 @@ public class RobotContainer implements Logged {
         
         configureButtonBindings();
 
-        new ConfigureMonologuePaths(calibrationControl, HDCTuner, pieceControl, swerve, intake, climb,
+        Logged[] objs = new Logged[]{
+                calibrationControl, HDCTuner, pieceControl, swerve, intake, climb,
                 limelightMapper, limelight2, limelight3, colorSensor, shooter, elevator, pivot, ampper,
-                pathPlannerStorage);
+                pathPlannerStorage
+        };
+
+        new ConfigureMonologuePaths(objs);
 
         pdh.setSwitchableChannel(false);
 
@@ -227,11 +231,10 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-      
         // In the last couple seconds of the match,
         // "hail mary" the note to get a last second score just in case
-        new Trigger(() -> 
-               Robot.currentTimestamp - RobotState.gameModeStart >= 134.2 
+        new Trigger( () -> 
+            Robot.currentTimestamp - RobotState.gameModeStart >= 134.2 
             && Robot.gameMode == GameMode.TELEOP 
             && RobotController.getBatteryVoltage() > 10 
             && DriverStation.isFMSAttached()
@@ -339,7 +342,7 @@ public class RobotContainer implements Logged {
         driver.leftStick()
             .whileTrue(limelightMapper.updatePoseEstimatorCommand());
     }
- 
+
     private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
