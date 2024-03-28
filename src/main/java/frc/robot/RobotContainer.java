@@ -31,7 +31,7 @@ import frc.robot.Constants.NTConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Robot.GameMode;
 import frc.robot.calc.PathPlannerStorage;
-import frc.robot.calc.ShooterCalc;
+import frc.robot.calc.PoseCalculations;
 import frc.robot.drive.AlignmentCmds;
 import frc.robot.drive.Drive;
 import frc.robot.drive.WheelRadiusCharacterization;
@@ -63,10 +63,15 @@ public class RobotContainer implements Logged {
 
     private final LedStrip ledStrip;
     private ShooterCmds shooterCmds;
-
+    
     private AlignmentCmds alignmentCmds;
     private final BooleanSupplier robotRelativeSupplier;
-
+    
+    /**
+     * All of these @IgnoreLogged annotations are to 
+     * ensure there are no redundant logging paths
+     * since we are logging these objects via the method {@link #configureLoggingPaths()}
+     */
     @IgnoreLogged
     private Swerve swerve;
     @IgnoreLogged
@@ -90,8 +95,6 @@ public class RobotContainer implements Logged {
     private CalibrationControl calibrationControl;
     @IgnoreLogged
     private PathPlannerStorage pathPlannerStorage;
-    @IgnoreLogged
-    private ShooterCalc shooterCalc;
     @IgnoreLogged
     public static HDCTuner HDCTuner;
     
@@ -121,7 +124,7 @@ public class RobotContainer implements Logged {
             limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 0);
             limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 1);
             limelightMapper = new LimelightMapping(swerve.getPoseEstimator(), swerve::getPose, "limelight-three");
-            
+            // "Unit Test": 
             // limelightMapper.ManuallyAddPose(12, new Pose3d(11.173, 4.096, 1.443, new Rotation3d(new Quaternion(0.003, 0.032, -0.025, -0.999))));
             // limelightMapper.ManuallyAddPose(2, new Pose3d(16.787, 5.036, 1.562, new Rotation3d(new Quaternion(.00099, -0.019, -0.017, -1.000))));
             // limelightMapper.ManuallyAddPose(3, new Pose3d(16.776, 5.599, 1.562, new Rotation3d(new Quaternion(0.009, 0.016, -0.003, -1.000))));
@@ -132,7 +135,6 @@ public class RobotContainer implements Logged {
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
-
 
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
@@ -147,12 +149,12 @@ public class RobotContainer implements Logged {
             AutoConstants.HDC.getXController(),
             AutoConstants.HDC.getThetaController());
 
+        // Burn flash for every motor
         Neo.incinerateMotors();
         new NTPIDTuner().schedule();
         new NT(NTConstants.WAIT_TIMES);
 
-        shooterCalc = new ShooterCalc(shooter, pivot);
-        shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
+        shooterCmds = new ShooterCmds(shooter, pivot);
 
         alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
 
@@ -195,9 +197,13 @@ public class RobotContainer implements Logged {
         
         configureButtonBindings();
 
-        new ConfigureMonologuePaths(shooterCalc, calibrationControl, HDCTuner, pieceControl, swerve, intake, climb,
+        Logged[] objs = new Logged[]{
+                calibrationControl, HDCTuner, pieceControl, swerve, intake, climb,
                 limelightMapper, limelight2, limelight3, colorSensor, shooter, elevator, pivot, ampper,
-                pathPlannerStorage);
+                pathPlannerStorage
+        };
+
+        new ConfigureMonologuePaths(objs);
 
         pdh.setSwitchableChannel(false);
 
@@ -225,11 +231,10 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
-      
         // In the last couple seconds of the match,
         // "hail mary" the note to get a last second score just in case
-        new Trigger(() -> 
-               Robot.currentTimestamp - RobotState.gameModeStart >= 134.2 
+        new Trigger( () -> 
+            Robot.currentTimestamp - RobotState.gameModeStart >= 134.2 
             && Robot.gameMode == GameMode.TELEOP 
             && RobotController.getBatteryVoltage() > 10 
             && DriverStation.isFMSAttached()
@@ -255,7 +260,7 @@ public class RobotContainer implements Logged {
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
-        new Trigger(swerve::isAlignedToAmp).or(shooterCalc.readyToShootSupplier())
+        new Trigger(swerve::isAlignedToAmp).or(shooterCmds.readyToShootSupplier())
             .onTrue(driver.setRumble(() -> 0.5)
                 .alongWith(operator.setRumble(() -> 0.5)))
             .onFalse(driver.setRumble(() -> 0)
@@ -337,7 +342,7 @@ public class RobotContainer implements Logged {
         driver.leftStick()
             .whileTrue(limelightMapper.updatePoseEstimatorCommand());
     }
- 
+
     private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
@@ -372,6 +377,7 @@ public class RobotContainer implements Logged {
         controller.povDown()
             .onTrue(climb.toBottomCommand());
         
+        // Amp / trap alignment (translates and rotates the robot)
         controller.a()
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(
@@ -409,8 +415,8 @@ public class RobotContainer implements Logged {
                     limelight3.setLEDState(() -> true),
                     new ActiveConditionalCommand(
                         alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::onOppositeSide)
+                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, () -> shooter.getAverageSpeed(), robotRelativeSupplier),
+                        () -> PoseCalculations.onOppositeSide(swerve.getPose()))
                     ).finallyDo(
                         () -> 
                             limelight3.setLEDState(() -> false)
@@ -426,7 +432,7 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     swerve.resetHDCCommand(),
                     limelight3.setLEDState(() -> true),
-                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier)
+                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, () -> shooter.getAverageSpeed(), robotRelativeSupplier)
                     ).finallyDo(
                         () -> 
                             limelight3.setLEDState(() -> false)
