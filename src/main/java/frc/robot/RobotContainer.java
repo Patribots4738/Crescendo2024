@@ -9,11 +9,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -21,7 +17,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,13 +29,13 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NTConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Robot.GameMode;
 import frc.robot.calc.PathPlannerStorage;
 import frc.robot.calc.ShooterCalc;
 import frc.robot.drive.AlignmentCmds;
 import frc.robot.drive.Drive;
 import frc.robot.drive.WheelRadiusCharacterization;
+import frc.robot.logging.ConfigureMonologuePaths;
 import frc.robot.logging.NT;
 import frc.robot.logging.NTPIDTuner;
 import frc.robot.managers.CalibrationControl;
@@ -55,9 +50,7 @@ import lib.PatriBoxController;
 import lib.limelightHelpers.LimelightMapping;
 import lib.rev.Neo;
 import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
 import monologue.Logged;
-import monologue.Monologue;
 
 public class RobotContainer implements Logged {
 
@@ -67,6 +60,12 @@ public class RobotContainer implements Logged {
     
     private final PatriBoxController driver;
     private final PatriBoxController operator;
+
+    private final LedStrip ledStrip;
+    private ShooterCmds shooterCmds;
+
+    private AlignmentCmds alignmentCmds;
+    private final BooleanSupplier robotRelativeSupplier;
 
     @IgnoreLogged
     private Swerve swerve;
@@ -95,52 +94,18 @@ public class RobotContainer implements Logged {
     private ShooterCalc shooterCalc;
     @IgnoreLogged
     public static HDCTuner HDCTuner;
-
-    private final LedStrip ledStrip;
+    
     @IgnoreLogged
     private Indexer indexer;
     @IgnoreLogged
     private Ampper ampper;
-    private ShooterCmds shooterCmds;
     @IgnoreLogged
     private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
-
     @IgnoreLogged
     private PieceControl pieceControl;
-    private AlignmentCmds alignmentCmds;
-    private final BooleanSupplier robotRelativeSupplier;
     
-    @Log
-    public static Pose3d[] components3d = new Pose3d[5];
-    @Log
-    public static Pose3d[] desiredComponents3d = new Pose3d[5];
-    @Log
-    public static Pose3d[] notePose3ds = new Pose3d[12];
-    @Log
-    public static Pose3d[] highNotePose3ds = new Pose3d[12];
-    @Log
-    private boolean freshCode = true;
-    @Log
-    public static Field2d field2d = new Field2d();
-    @Log
-    public static Pose2d robotPose2d = new Pose2d();
-    @Log
-    public static Transform2d visionErrorPose = new Transform2d();
-    @Log
-    public static double distanceToSpeakerMeters = 0;
-    @Log
-    public static Pose3d robotPose3d = new Pose3d();
-    @Log
-    public static SwerveModuleState[] swerveMeasuredStates;
-    @Log
-    public static SwerveModuleState[] swerveDesiredStates;
-    @Log
-    public static double gameModeStart = 0;
-    @Log
-    public static boolean hasPiece = true;
-    @Log
-    public static boolean enableVision = true;
-    
+    RobotState robotState = new RobotState();
+
     public RobotContainer() {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
@@ -217,19 +182,22 @@ public class RobotContainer implements Logged {
         );
         
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight2);
-        initializeComponents();
+        RobotState.initComponents();
         prepareNamedCommands();
 
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
-            disableVision()
+            RobotState.disableVision()
             .andThen(
                 swerve.setWheelsOCommand()
                 .andThen(new WheelRadiusCharacterization(swerve)))
-            .andThen(enableVision()));
+            .andThen(RobotState.enableVision()));
         
         configureButtonBindings();
-        configureLoggingPaths();
+
+        new ConfigureMonologuePaths(shooterCalc, calibrationControl, HDCTuner, pieceControl, swerve, intake, climb,
+                limelightMapper, limelight2, limelight3, colorSensor, shooter, elevator, pivot, ampper,
+                pathPlannerStorage);
 
         pdh.setSwitchableChannel(false);
 
@@ -261,7 +229,7 @@ public class RobotContainer implements Logged {
         // In the last couple seconds of the match,
         // "hail mary" the note to get a last second score just in case
         new Trigger(() -> 
-               Robot.currentTimestamp - gameModeStart >= 134.2 
+               Robot.currentTimestamp - RobotState.gameModeStart >= 134.2 
             && Robot.gameMode == GameMode.TELEOP 
             && RobotController.getBatteryVoltage() > 10 
             && DriverStation.isFMSAttached()
@@ -315,14 +283,14 @@ public class RobotContainer implements Logged {
         // Have the controllers pulse when the match is about to end to signal the drivers
         // Pulses get more extreme as the clock approaches 0
         // Starts when there are five seconds left in the match
-        new Trigger(() -> Robot.currentTimestamp - gameModeStart >= 130 && Robot.currentTimestamp - gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
+        new Trigger(() -> Robot.currentTimestamp - RobotState.gameModeStart >= 130 && Robot.currentTimestamp - RobotState.gameModeStart < 135 && Robot.gameMode == GameMode.TELEOP)
             .whileTrue(
                 Commands.run(
                     () -> {
                         double rumbleSpeed =
-                            (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - gameModeStart) + Math.PI)
+                            (Math.cos(2*Math.PI*(135 - Robot.currentTimestamp - RobotState.gameModeStart) + Math.PI)
                             /
-                            ((135 - Robot.currentTimestamp - gameModeStart)*2.0)); 
+                            ((135 - Robot.currentTimestamp - RobotState.gameModeStart)*2.0)); 
                         driver.setRumble(rumbleSpeed);
                         operator.setRumble(rumbleSpeed);
                     }
@@ -431,8 +399,7 @@ public class RobotContainer implements Logged {
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> operator.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
-                .alongWith(operator.setRumble(() -> 0.5, 0.3))
-            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
+                .alongWith(operator.setRumble(() -> 0.5, 0.3)));
 
         // Speaker / Soruce / Chain rotational alignment
         controller.rightStick()
@@ -609,7 +576,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        enableVision();
+        RobotState.enableVision();
         return pathPlannerStorage.getSelectedAuto();
     }
 
@@ -636,9 +603,9 @@ public class RobotContainer implements Logged {
         } else if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
-        gameModeStart = Robot.currentTimestamp;
+        RobotState.gameModeStart = Robot.currentTimestamp;
         pathPlannerStorage.updatePathViewerCommand().schedule();
-        this.freshCode = false;
+        RobotState.startCode();
     }
 
     public void updateNTGains() {
@@ -710,17 +677,9 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareShooterW3", shooterCmds.prepareFireCommand(() -> FieldConstants.W3_POSE, Robot::isRedAlliance));
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommand(pathPlannerStorage::getNextShotTranslation, () -> false));
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("DisableLimelight", disableVision());
-        NamedCommands.registerCommand("EnableLimelight", enableVision());
+        NamedCommands.registerCommand("DisableLimelight", RobotState.disableVision());
+        NamedCommands.registerCommand("EnableLimelight", RobotState.enableVision());
         registerPathToPathCommands();
-    }
-
-    private Command disableVision() {
-        return Commands.runOnce(() -> enableVision = false).ignoringDisable(true);
-    }
-
-    private Command enableVision() {
-        return Commands.runOnce(() -> enableVision = true).ignoringDisable(true);
     }
 
     private void registerPathToPathCommands() {
@@ -734,32 +693,6 @@ public class RobotContainer implements Logged {
         }
     }
 
-    private void configureLoggingPaths() {
-        Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
-        Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
-        Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
-        Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
-
-        Monologue.logObj(swerve, "Robot/Swerve");
-
-        Monologue.logObj(intake, "Robot/Subsystems/intake");
-        Monologue.logObj(climb, "Robot/Subsystems/climb");
-        if (CameraConstants.FIELD_CALIBRATION_MODE) {
-            Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
-        } else {
-            Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
-            Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-        }
-        Monologue.logObj(colorSensor, "Robot/ColorSensors/colorSensor");
-        Monologue.logObj(shooter, "Robot/Subsystems/shooter");
-        Monologue.logObj(elevator, "Robot/Subsystems/elevator");
-        Monologue.logObj(pivot, "Robot/Subsystems/pivot");
-        Monologue.logObj(ampper, "Robot/Subsystems/ampper");
-        Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
-        
-        Monologue.logObj(pathPlannerStorage, "Robot");
-    }
-
     /**
      * This is explained in detail in discussion #180 of the 2024 repository of 4738
      * https://github.com/Patribots4738/Crescendo2024/discussions/180
@@ -769,34 +702,8 @@ public class RobotContainer implements Logged {
         pathPlannerStorage.configureAutoChooser();
     }
 
-    private void initializeComponents() {
-
-        Pose3d initialShooterPose = new Pose3d(
-                NTConstants.PIVOT_OFFSET_METERS.getX(),
-                0,
-                NTConstants.PIVOT_OFFSET_METERS.getZ(),
-            new Rotation3d(0, -Units.degreesToRadians(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES), 0)
-        );
-
-        components3d[0] = initialShooterPose;
-        desiredComponents3d[0] = initialShooterPose;
-
-        for (int i = 1; i < components3d.length; i++) {
-            components3d[i] = new Pose3d();
-            desiredComponents3d[i] = new Pose3d();
-        }
-
-        notePose3ds[0] = new Pose3d();
-        highNotePose3ds[0] = new Pose3d(0,0,-0.1, new Rotation3d());
-        for (int i = 1; i < notePose3ds.length; i++) {
-            notePose3ds[i] = new Pose3d(FieldConstants.NOTE_TRANSLATIONS[i-1], new Rotation3d());
-            highNotePose3ds[i] = new Pose3d(FieldConstants.HIGH_NOTE_TRANSLATIONS[i-1], new Rotation3d());
-        }
-    }
-
     public void turnOffLamp() {
         pdh.setSwitchableChannel(false);
         limelight3.disableLEDS();
     }
 }
- 

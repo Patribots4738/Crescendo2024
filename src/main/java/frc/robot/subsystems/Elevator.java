@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.NTConstants;
 import lib.rev.Neo;
@@ -53,11 +53,11 @@ public class Elevator extends SubsystemBase implements Logged {
             hitGuillotineTimestamp = 0;
         
         updateStuck();
-        RobotContainer.components3d[NTConstants.AMPPER_INDEX] = new Pose3d(
+        RobotState.components3d[NTConstants.AMPPER_INDEX] = new Pose3d(
             0, 0, position * ElevatorConstants.AMPPER_POSITION_MULTIPLIER, 
             new Rotation3d()
         );
-        RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+        RobotState.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
             0, 0, position,
             new Rotation3d()
         );
@@ -81,11 +81,11 @@ public class Elevator extends SubsystemBase implements Logged {
             desiredPos = pos;
             motor.setTargetPosition(pos);
     
-            RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
+            RobotState.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
                 0, 0, pos,
                 new Rotation3d()
             );
-            RobotContainer.desiredComponents3d[NTConstants.AMPPER_INDEX] = new Pose3d(
+            RobotState.desiredComponents3d[NTConstants.AMPPER_INDEX] = new Pose3d(
                 0, 0, pos * ElevatorConstants.AMPPER_POSITION_MULTIPLIER,
                 new Rotation3d()
             );
