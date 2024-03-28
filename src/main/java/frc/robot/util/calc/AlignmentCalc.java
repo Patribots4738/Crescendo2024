@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.AutoConstants;
@@ -275,5 +276,9 @@ public class AlignmentCalc {
         return Robot.isRedAlliance() 
             ? swerve.getPose().getX() < FieldConstants.BLUE_WING_X 
             : swerve.getPose().getX() > FieldConstants.RED_WING_X;
+    }
+
+    public boolean closeToSpeaker() {
+        return RobotContainer.distanceToSpeakerMeters < 6;
     }
 }

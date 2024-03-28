@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.logging.NoteTrajectory;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.SpeedAngleTriplet;
@@ -143,6 +144,10 @@ public class ShooterCmds {
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
             }, pivot, shooter);
+    }
+
+    public Command prepareSubwooferCommand() {
+        return setTripletCommand(shooterCalc.calculateSpeakerTriplet(FieldConstants.GET_SUBWOOFER_POSITION().getTranslation()));
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {

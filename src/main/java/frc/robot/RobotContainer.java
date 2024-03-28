@@ -65,7 +65,6 @@ public class RobotContainer implements Logged {
     private EventLoop testButtonBindingLoop = new EventLoop();
     
     private final PatriBoxController driver;
-    private final PatriBoxController operator;
 
     @IgnoreLogged
     private Swerve swerve;
@@ -143,7 +142,6 @@ public class RobotContainer implements Logged {
     public RobotContainer() {
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
-        operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         
         pdh = new PowerDistribution(30, ModuleType.kRev);
         pdh.setSwitchableChannel(false); 
@@ -242,7 +240,6 @@ public class RobotContainer implements Logged {
         }
 
         configureDriverBindings(driver);
-        configureOperatorBindings(operator);
         configureTimedEvents();
         configureTestBindings();
     }
@@ -252,7 +249,7 @@ public class RobotContainer implements Logged {
         // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
         // for more information 
         // configureHDCBindings(driver);
-        configureCalibrationBindings(operator);
+        configureCalibrationBindings(driver);
     }
     
     private void configureTimedEvents() {
@@ -280,30 +277,25 @@ public class RobotContainer implements Logged {
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
         new Trigger(swerve::isAlignedToAmp)
-            .onTrue(driver.setRumble(() -> 0.5)
-                .alongWith(operator.setRumble(() -> 0.5)))
-            .onFalse(driver.setRumble(() -> 0)
-                .alongWith(operator.setRumble(() -> 0)));
+            .onTrue(driver.setRumble(() -> 0.5))
+            .onFalse(driver.setRumble(() -> 0));
         
         new Trigger(shooterCalc.readyToShootSupplier())
-            .onTrue(driver.setRumble(() -> 0.5)
-                .alongWith(operator.setRumble(() -> 0.5)))
-            .onFalse(driver.setRumble(() -> 0)
-                .alongWith(operator.setRumble(() -> 0)));
+            .onTrue(driver.setRumble(() -> 0.5))
+            .onFalse(driver.setRumble(() -> 0));
         
         // Make the controllers pulse just like the LEDs do
         // The reason we are checking bumpers
         // is so this doesn't happen on pieceControl::moveNote
         // TODO: make work with source intake
-        new Trigger(() -> colorSensor.hasNote() && (operator.getLeftBumper() || driver.getLeftBumper()))
+        new Trigger(() -> colorSensor.hasNote() && driver.getLeftBumper())
             .onTrue(
                 Commands.race(
                     Commands.run(() -> {
                         driver.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
-                        operator.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
                     }),
                     Commands.waitSeconds(1)
-                ).andThen(driver.setRumble(() -> 0).alongWith(operator.setRumble(() -> 0)))
+                ).andThen(driver.setRumble(() -> 0))
                 // TODO: Figure out why this doesn't work
                 .alongWith(limelight3.blinkLeds(() -> 1))
                 .alongWith(limelight2.blinkLeds(() -> 1))
@@ -321,12 +313,10 @@ public class RobotContainer implements Logged {
                             /
                             ((135 - Robot.currentTimestamp - gameModeStart)*2.0)); 
                         driver.setRumble(rumbleSpeed);
-                        operator.setRumble(rumbleSpeed);
                     }
                 )
             ).onFalse(
                 driver.setRumble(() -> 0)
-                .alongWith(operator.setRumble(() -> 0))
             );
     }
     
@@ -397,39 +387,25 @@ public class RobotContainer implements Logged {
                 swerve));
 
         controller.povUp()
-            .onTrue(climb.toTopCommand().alongWith(pivot.setAngleCommand(0)));
+            .onTrue(climb.toTopCommand());
         
         controller.povDown()
             .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
         
         controller.a()
-            .onTrue(swerve.resetHDCCommand())
-            .whileTrue(
-                Commands.sequence(
-                    Commands.either(
-                        alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
-                        alignmentCmds.ampAlignmentCommand(controller::getLeftX), 
-                        climb::getHooksUp)
-                ).alongWith(
-                    limelight3.setLEDState(() -> true)
-                )
-            ).onFalse(
-                limelight3.setLEDState(() -> false)
-            );
+            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         controller.x()
-            .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
+            .onTrue(pieceControl.setShooterModeCommand(true));
 
         controller.b()
-            .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
+            .onTrue(pieceControl.setShooterModeCommand(false));
         
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> operator.getLeftBumper())
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> controller.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
-                .alongWith(operator.setRumble(() -> 0.5, 0.3))
-            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
+            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false))
+            .andThen(pivot.setAngleCommand(60)));
 
         controller.rightStick()
             .toggleOnTrue(
@@ -437,9 +413,9 @@ public class RobotContainer implements Logged {
                     swerve.resetHDCCommand(),
                     limelight3.setLEDState(() -> true),
                     new ActiveConditionalCommand(
-                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::onOppositeSide)
+                        alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                        alignmentCmds.alignmentCalc::closeToSpeaker)
                     ).finallyDo(
                         () -> 
                             limelight3.setLEDState(() -> false)
@@ -448,32 +424,20 @@ public class RobotContainer implements Logged {
                             .schedule()
                         )
                 );
-        
+
         controller.leftStick()
-            .toggleOnTrue(
-                Commands.sequence(
-                    swerve.resetHDCCommand(),
-                    limelight3.setLEDState(() -> true),
-                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier)
-                    ).finallyDo(
-                        () -> 
-                            limelight3.setLEDState(() -> false)
-                            .andThen(pivot.setAngleCommand(60)
-                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-                            .schedule()
-                        )
-                );
+            .onTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         
         controller.leftTrigger()
-            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+            .onTrue(elevator.toTopCommand())
+            .onFalse(elevator.toBottomCommand());
 
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
       
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .negate().and(operator.leftBumper().negate())
-                .onTrue(pieceControl.stopIntakeAndIndexer().andThen(Commands.print("stopping")));
+            .whileTrue(pieceControl.intakeUntilNote())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
@@ -506,7 +470,7 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> operator.getLeftBumper())
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> controller.getLeftBumper())
             .andThen(limelight3.setLEDState(() -> false))); 
 
         controller.x()
@@ -527,7 +491,7 @@ public class RobotContainer implements Logged {
             .onTrue(elevator.resetEncoder());
 
         controller.rightStick().toggleOnTrue(
-            elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY()))
+            elevator.overrideCommand(() -> Units.inchesToMeters(controller.getRightY()))
         );
         
     }
@@ -617,12 +581,11 @@ public class RobotContainer implements Logged {
             .schedule();
 
         driver.setRumble(0);
-        operator.setRumble(0);
     }
 
     public void onEnabled() {
-        if (Robot.gameMode == GameMode.TELEOP) {
-            new LPI(ledStrip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
+        if (Robot.gameMode == GameMode.TELEOP && !DriverStation.isFMSAttached()) {
+            new LPI(ledStrip, swerve::getPose, driver, swerve::setDesiredPose).schedule();
         } else if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
