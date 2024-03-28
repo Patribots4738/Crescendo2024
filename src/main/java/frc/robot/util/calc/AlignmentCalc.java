@@ -202,7 +202,7 @@ public class AlignmentCalc {
      * @param driverX     the driver's x input
      * @param driverY     the driver's y input
      * @param shooterCmds the shooter commands
-     * @return            the suppoer for the speeds to align the robot to the speaker
+     * @return            the supplier for the speeds to align the robot to the speaker
      */
     public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
@@ -250,8 +250,8 @@ public class AlignmentCalc {
 
         // Make the pose always relative to the blue alliance
         // Closest chain is the actual chain position
-        // when we use our comparitors below, we use things from
-        // the origin of the field's persepctive
+        // when we use our comparators below, we use things from
+        // the origin of the field's perspective
         if (Robot.isRedAlliance()) {
             closestChain = GeometryUtil.flipFieldPose(closestChain);
         }

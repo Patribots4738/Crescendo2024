@@ -301,7 +301,7 @@ public class RobotContainer implements Logged {
                 Commands.race(
                     // I'll be honest, I was just messing around with desmos
                     // and this provides a sort of on/off rumble rather than it being continuous
-                    // You could say that it makes this rumble coorelate to piece pickup since its distinct
+                    // You could say that it makes this rumble correlate to piece pickup since its distinct
                     Commands.run(() -> {
                         driver.setRumble(Math.cos(2*Math.PI*Robot.currentTimestamp*4)/2.0);
                     }),
@@ -422,7 +422,7 @@ public class RobotContainer implements Logged {
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
-        // Speaker / Soruce / Chain rotational alignment
+        // Speaker / Source / Chain rotational alignment
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(

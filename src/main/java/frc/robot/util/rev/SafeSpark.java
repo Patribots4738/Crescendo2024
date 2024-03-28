@@ -11,9 +11,8 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
-import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.jni.CANSparkMaxJNI;
-
+import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -549,7 +548,7 @@ public class SafeSpark extends CANSparkBase {
     }
 
     /**
-     * Set the motor fedeback device to the PIDController
+     * Set the motor feedback device to the PIDController
      * 
      * @return {@link REVLibError#kOk} if successful
      */
@@ -781,13 +780,13 @@ public class SafeSpark extends CANSparkBase {
 
     /**
      * Set the telemetry preference of the Neo
-     * This will disable the telemtry status frames
+     * This will disable the telemetry status frames
      * which is found at
      * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
      * 
      * @param type the enum to represent the telemetry preference
      *             this will tell the motor to only send
-     *             that type of telemtry
+     *             that type of telemetry
      */
     public void setTelemetryPreference(TelemetryPreference type) {
         int minDelay = NeoMotorConstants.FAST_PERIODIC_STATUS_TIME_MS;
