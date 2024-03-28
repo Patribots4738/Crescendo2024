@@ -97,12 +97,12 @@ public class PieceControl implements Logged {
 
     //! only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+        return Commands.waitUntil(shooterCmds.readyToShootSupplier())
                 .andThen(noteToShoot(poseSupplier, speedSupplier));
     }
 
     public Command shootPreload() {
-        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+        return Commands.waitUntil(shooterCmds.readyToShootSupplier())
                 .andThen(intakeAuto());
     }
 
@@ -143,7 +143,7 @@ public class PieceControl implements Logged {
         // rotation and speed before sending note from ampper into indexer and then into 
         // shooter before stopping ampper and indexer
         return Commands.sequence(
-                Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()),
+                Commands.waitUntil(shooterCmds.readyToShootSupplier()),
                 intake.inCommand(),
                 ampper.intake(),
                 indexer.toShooter(),

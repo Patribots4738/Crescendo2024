@@ -28,12 +28,13 @@ public class ShooterCmds {
 
     private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet();
     
-    public ShooterCalc shooterCalc;
+    @IgnoreLogged
+    private ShooterCalc shooterCalc;
 
-    public ShooterCmds(Shooter shooter, Pivot pivot, ShooterCalc shooterCalc) {
+    public ShooterCmds(Shooter shooter, Pivot pivot) {
         this.pivot = pivot;
         this.shooter = shooter;
-        this.shooterCalc = shooterCalc;
+        this.shooterCalc = new ShooterCalc(shooter, pivot);
     }
 
     public Shooter getShooter() {
@@ -149,7 +150,7 @@ public class ShooterCmds {
         return Commands.runOnce(
             () -> {
                 SpeedAngleTriplet calculationTriplet = new SpeedAngleTriplet(shooter.getDesiredSpeeds(), pivot.getTargetAngle());
-                SpeedAngleTriplet realTriplet = new SpeedAngleTriplet(shooter.getSpeed(), pivot.getAngle());
+                SpeedAngleTriplet realTriplet = new SpeedAngleTriplet(shooter.getSpeeds(), pivot.getAngle());
                 
                 Pose2d currentPose = pose.get();
                 ChassisSpeeds currentSpeeds = speeds.get();
@@ -182,5 +183,9 @@ public class ShooterCmds {
 	public Command stowPivot() {
         return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
+
+    public BooleanSupplier readyToShootSupplier() {
+        return shooterCalc.readyToShootSupplier();
+    }
     
 }

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.calc.AlignmentCalc;
+import frc.robot.calc.ShooterCalc;
 import frc.robot.managers.ShooterCmds;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
@@ -27,13 +28,13 @@ public class AlignmentCmds {
 
     private ShooterCmds shooterCmds;
     @IgnoreLogged
-    public AlignmentCalc alignmentCalc;
+    private AlignmentCalc alignmentCalc;
 
     public AlignmentCmds(Swerve swerve, Climb climb, ShooterCmds shooterCmds) {
         this.climb = climb;
         this.swerve = swerve;
         this.shooterCmds = shooterCmds;
-        this.alignmentCalc = new AlignmentCalc(swerve);
+        this.alignmentCalc = new AlignmentCalc(swerve, shooterCalc);
     }
 
     /**
@@ -113,8 +114,7 @@ public class AlignmentCmds {
             swerve.getDriveCommand(
                 alignmentCalc.getSpeakerRotationalSpeedsSupplier(
                     driverX,
-                    driverY,
-                    shooterCmds),
+                    driverY),
                 () -> true);
     }
 
@@ -123,8 +123,7 @@ public class AlignmentCmds {
             swerve.getDriveCommand(
                 alignmentCalc.getPassRotationalSpeedsSupplier(
                     driverX,
-                    driverY,
-                    shooterCmds),
+                    driverY),
                 () -> true);
     }
 
@@ -192,7 +191,7 @@ public class AlignmentCmds {
                 return alignmentCalc.getRotationalSpeeds(
                     driverX.getAsDouble(), 
                     driverY.getAsDouble(), 
-                    shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(endingPose));
+                    shooterCalc.calculateRobotAngleToSpeaker(endingPose));
                 },
                 () -> true
             )

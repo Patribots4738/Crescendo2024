@@ -13,7 +13,6 @@ import frc.robot.Robot;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.managers.ShooterCmds;
 import frc.robot.subsystems.Swerve;
 import monologue.Annotations.IgnoreLogged;
 
@@ -22,8 +21,9 @@ public class AlignmentCalc {
     @IgnoreLogged
     private Swerve swerve;
 
-    public AlignmentCalc(Swerve swerve) {
+    public AlignmentCalc(Swerve swerve, ShooterCalc shooterCalc) {
         this.swerve = swerve;
+        this.shooterCalc = shooterCalc;
     }
 
     /**
@@ -159,14 +159,14 @@ public class AlignmentCalc {
      * @param shooterCmds the shooter commands
      * @return            the rotational speeds to align the robot to the speaker
      */
-    public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
+    public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+            getRotationalSpeeds(driverX, driverY, shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
-    public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
+    public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+            getRotationalSpeeds(driverX, driverY, shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
     /**
@@ -189,15 +189,14 @@ public class AlignmentCalc {
      * 
      * @param driverX     the driver's x input
      * @param driverY     the driver's y input
-     * @param shooterCmds the shooter commands
      * @return            the suppoer for the speeds to align the robot to the speaker
      */
-    public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
-        return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
+    public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
-    public Supplier<ChassisSpeeds> getPassRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
-        return () -> getPassRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
+    public Supplier<ChassisSpeeds> getPassRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getPassRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
     /**

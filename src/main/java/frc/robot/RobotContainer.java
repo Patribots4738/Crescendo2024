@@ -68,6 +68,11 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
+    /**
+     * All of these @IgnoreLogged annotations are to 
+     * ensure there are no redundant logging paths
+     * since we are logging these objects via the method {@link #configureLoggingPaths()}
+     */
     @IgnoreLogged
     private Swerve swerve;
     @IgnoreLogged
@@ -92,8 +97,6 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private PathPlannerStorage pathPlannerStorage;
     @IgnoreLogged
-    private ShooterCalc shooterCalc;
-    @IgnoreLogged
     public static HDCTuner HDCTuner;
 
     private final LedStrip ledStrip;
@@ -110,6 +113,7 @@ public class RobotContainer implements Logged {
     private AlignmentCmds alignmentCmds;
     private final BooleanSupplier robotRelativeSupplier;
     
+    // Variables to be logged
     @Log
     public static Pose3d[] components3d = new Pose3d[5];
     @Log
@@ -118,6 +122,7 @@ public class RobotContainer implements Logged {
     public static Pose3d[] notePose3ds = new Pose3d[12];
     @Log
     public static Pose3d[] highNotePose3ds = new Pose3d[12];
+    // freshCode tells us if there was ever an enable since the last deploy/power cycle
     @Log
     private boolean freshCode = true;
     @Log
@@ -156,7 +161,7 @@ public class RobotContainer implements Logged {
             limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 0);
             limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 1);
             limelightMapper = new LimelightMapping(swerve.getPoseEstimator(), swerve::getPose, "limelight-three");
-            
+            // "Unit Test": 
             // limelightMapper.ManuallyAddPose(12, new Pose3d(11.173, 4.096, 1.443, new Rotation3d(new Quaternion(0.003, 0.032, -0.025, -0.999))));
             // limelightMapper.ManuallyAddPose(2, new Pose3d(16.787, 5.036, 1.562, new Rotation3d(new Quaternion(.00099, -0.019, -0.017, -1.000))));
             // limelightMapper.ManuallyAddPose(3, new Pose3d(16.776, 5.599, 1.562, new Rotation3d(new Quaternion(0.009, 0.016, -0.003, -1.000))));
@@ -167,7 +172,6 @@ public class RobotContainer implements Logged {
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
-
 
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
@@ -182,12 +186,12 @@ public class RobotContainer implements Logged {
             AutoConstants.HDC.getXController(),
             AutoConstants.HDC.getThetaController());
 
+        // Burn flash for every motor
         Neo.incinerateMotors();
         new NTPIDTuner().schedule();
         new NT(NTConstants.WAIT_TIMES);
 
-        shooterCalc = new ShooterCalc(shooter, pivot);
-        shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
+        shooterCmds = new ShooterCmds(shooter, pivot);
 
         alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
 
@@ -287,7 +291,7 @@ public class RobotContainer implements Logged {
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
-        new Trigger(swerve::isAlignedToAmp).or(shooterCalc.readyToShootSupplier())
+        new Trigger(swerve::isAlignedToAmp).or(shooterCmds.readyToShootSupplier())
             .onTrue(driver.setRumble(() -> 0.5)
                 .alongWith(operator.setRumble(() -> 0.5)))
             .onFalse(driver.setRumble(() -> 0)

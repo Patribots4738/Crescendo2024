@@ -472,6 +472,11 @@ public class Neo extends SafeSpark {
         PERCENT;
     }
 
+    /**
+     * Burn the flash memory of all motor controllers.
+     * This is called at the end of every constructor to ensure
+     * settings have time to be set before the method is called.
+     */
     public static void incinerateMotors() {
         for (Neo neo : NeoMotorConstants.MOTOR_MAP.values()) {
             neo.burnFlash();
