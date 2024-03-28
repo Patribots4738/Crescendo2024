@@ -87,7 +87,7 @@ ___
 
 
 ## Teleoperated 🎮
-  <img src="images/sim/betterAmp.png" width="40%" />
+  <img src="images/sim/amp.png" width="40%" />
 
 ###  <img src= "images/surelyanote.png" width="2.5%" />  Joystick Axis Remapping
  > We use Xbox controllers to control the robot. However, the range of the joystick axis from the Xbox controller is the shape of a skewed square with chamfered edges which is preferable for usage. In PatriBoxController, we remapped the range of input to a circle that is easier to use. Here's our [desmos](https://www.desmos.com/calculator/e07raajzh5) if you want to check out the math!

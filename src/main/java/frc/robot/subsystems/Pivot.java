@@ -30,6 +30,8 @@ public class Pivot extends SubsystemBase implements Logged {
             false, 
             true);
 		configMotor();
+		if (FieldConstants.IS_SIMULATION) 
+			setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
 
 	public void configMotor() {
