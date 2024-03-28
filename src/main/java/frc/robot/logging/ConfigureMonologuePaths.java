@@ -30,8 +30,7 @@ import monologue.Monologue;
  */
 public class ConfigureMonologuePaths {
 
-    public ConfigureMonologuePaths(ShooterCalc shooterCalc,
-            CalibrationControl calibrationControl,
+    public ConfigureMonologuePaths(CalibrationControl calibrationControl,
             HDCTuner HDCTuner,
             PieceControl pieceControl,
             Swerve swerve,
@@ -46,13 +45,12 @@ public class ConfigureMonologuePaths {
             Pivot pivot,
             Ampper ampper,
             PathPlannerStorage pathPlannerStorage) {
-        configureLoggingPaths(shooterCalc, calibrationControl, HDCTuner, pieceControl, swerve, intake, climb,
+        configureLoggingPaths(calibrationControl, HDCTuner, pieceControl, swerve, intake, climb,
                 limelightMapper, limelight2, limelight3, colorSensor, shooter, elevator, pivot, ampper,
                 pathPlannerStorage);
     }
 
-    private void configureLoggingPaths(ShooterCalc shooterCalc,
-            CalibrationControl calibrationControl,
+    private void configureLoggingPaths(CalibrationControl calibrationControl,
             HDCTuner HDCTuner,
             PieceControl pieceControl,
             Swerve swerve,
@@ -67,7 +65,6 @@ public class ConfigureMonologuePaths {
             Pivot pivot,
             Ampper ampper,
             PathPlannerStorage pathPlannerStorage) {
-        Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
         Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
         Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
         Monologue.logObj(pieceControl, "Robot/Math/PieceControl");

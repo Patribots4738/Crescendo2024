@@ -147,7 +147,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
-        robotContainer.turnOffLights();
+        robotContainer.turnOffLamp();
     }
 
     @Override
