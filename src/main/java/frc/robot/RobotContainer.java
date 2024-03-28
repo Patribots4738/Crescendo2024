@@ -65,6 +65,8 @@ public class RobotContainer implements Logged {
 
     private PowerDistribution pdh;
 
+    //* We add a event loop here so we can use different bindings in a different mode
+    //* of the code (there are too many binding to fit on the controller)
     private EventLoop testButtonBindingLoop = new EventLoop();
     
     private final PatriBoxController driver;
