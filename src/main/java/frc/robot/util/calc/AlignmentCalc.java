@@ -117,6 +117,11 @@ public class AlignmentCalc {
         return getRotationalSpeeds(driverX, driverY, closestChain.getRotation());
     }
 
+    public ChassisSpeeds getAmpRotationalSpeeds(double driverX, double driverY) {
+        Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
+        return getRotationalSpeeds(driverX, driverY, ampPose.getRotation());
+    }
+
     /**
      * Supplier for the rotational speeds to align the robot rotationally to the chain.
      * 
@@ -126,6 +131,10 @@ public class AlignmentCalc {
      */
     public Supplier<ChassisSpeeds> getChainRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
         return () -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
+    }
+
+    public Supplier<ChassisSpeeds> getAmpRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getAmpRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
     /**

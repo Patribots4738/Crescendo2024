@@ -75,6 +75,14 @@ public class AlignmentCmds {
             );
     }
 
+    public Command ampRotationalAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return 
+            swerve.getDriveCommand(
+                alignmentCalc.getAmpRotationalSpeedsSupplier(driverX, driverY),
+                () -> true
+            );
+    }
+
     /**
      * Command to align the robot rotationally to the nearest chain of the stage.
      * 

@@ -43,6 +43,7 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.ColorSensorConstants;
 import frc.robot.util.Constants.DriveConstants;
+import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
@@ -400,6 +401,10 @@ public class RobotContainer implements Logged {
 
         controller.b()
             .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
+
+        // If this is nice to work with, then we keep it. If not... bye bye!
+        new Trigger(() -> elevator.atPosition(ElevatorConstants.TRAP_PLACE_POS))
+            .whileTrue(alignmentCmds.ampRotationalAlignmentCommand(driver::getLeftX, driver::getLeftY));
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> controller.getLeftBumper())
