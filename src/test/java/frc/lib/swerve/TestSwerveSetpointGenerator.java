@@ -130,5 +130,8 @@ public class TestSwerveSetpointGenerator {
 
         goalSpeeds = new ChassisSpeeds(1.0, 0.4, 0.0);
         setpoint = driveToGoal(setpoint, goalSpeeds, generator);
+
+        goalSpeeds = new ChassisSpeeds(1.0, 0.0, 1.0);
+        setpoint = driveToGoal(setpoint, goalSpeeds, generator);
     }
 }

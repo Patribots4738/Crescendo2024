@@ -327,7 +327,7 @@ public final class Constants {
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
-        public static final double dt = 0.01; // s
+        public static final double dt = 0.02; // s
         public static final double MAX_STEERING_VELOCITY_ERROR = Math.toRadians(2.0); // rad/s
         public static final double MAX_ACCELERATION_ERROR = 0.01; // m/s^2
 

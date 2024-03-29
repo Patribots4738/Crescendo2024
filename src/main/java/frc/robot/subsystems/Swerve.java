@@ -42,8 +42,6 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.SwerveSetpointGenerator;
 import frc.robot.util.custom.SwerveKinematicLimits;
 import frc.robot.util.custom.SwerveSetpoint;
-import frc.robot.util.custom.geometry.CustomTwist2d;
-import frc.robot.util.custom.geometry.Epsilon;
 import frc.robot.util.custom.geometry.Transform;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
@@ -247,10 +245,10 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public void drive(ChassisSpeeds robotRelativeSpeeds) {
 
-        SwerveModuleState[] newSwerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-                ChassisSpeeds.discretize(robotRelativeSpeeds, (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
+        // SwerveModuleState[] newSwerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+                // ChassisSpeeds.discretize(robotRelativeSpeeds, (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
 
-        setModuleStates(newSwerveModuleStates);
+        setModuleStates(DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(robotRelativeSpeeds));
     }
 
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
@@ -264,9 +262,9 @@ public class Swerve extends SubsystemBase implements Logged {
             robotRelativeSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rotSpeed);
         }
 
-        ChassisSpeeds discretizedSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, timeDifference);
+        // ChassisSpeeds discretizedSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, timeDifference);
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS
-                .toSwerveModuleStates(discretizedSpeeds);
+                .toSwerveModuleStates(robotRelativeSpeeds);
 
         setModuleStates(swerveModuleStates);
     }
@@ -325,34 +323,67 @@ public class Swerve extends SubsystemBase implements Logged {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-                desiredStates,
-                DriveConstants.MAX_SPEED_METERS_PER_SECOND);
-        frontLeft.setDesiredState(desiredStates[0]);
-        frontRight.setDesiredState(desiredStates[1]);
-        rearLeft.setDesiredState(desiredStates[2]);
-        rearRight.setDesiredState(desiredStates[3]);
+        // SwerveDriveKinematics.desaturateWheelSpeeds(
+        //         desiredStates,
+        //         DriveConstants.MAX_SPEED_METERS_PER_SECOND);
+        // frontLeft.setDesiredState(desiredStates[0]);
+        // frontRight.setDesiredState(desiredStates[1]);
+        // rearLeft.setDesiredState(desiredStates[2]);
+        // rearRight.setDesiredState(desiredStates[3]);
 
-        RobotContainer.swerveDesiredStates = desiredStates;
-        // setModuleStatesWithSetpoints(desiredStates);
+        // RobotContainer.swerveDesiredStates = desiredStates;
+        setModuleStatesWithSetpoints(desiredStates);
     }
 
     public void setModuleStatesWithSetpoints(SwerveModuleState[] desiredStates) {
         
-        
-        swerveSetpoint = setpointGenerator.generateSetpoint(KINEMATIC_LIMITS, swerveSetpoint,
-        DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(desiredStates) , AutoConstants.dt);
-        
         SwerveDriveKinematics.desaturateWheelSpeeds(
-                swerveSetpoint.moduleStates,
+                desiredStates,
                 DriveConstants.MAX_SPEED_METERS_PER_SECOND);
+        
+        SwerveSetpoint prev = swerveSetpoint;
 
+        swerveSetpoint = setpointGenerator.generateSetpoint(KINEMATIC_LIMITS, swerveSetpoint,
+                DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(desiredStates), AutoConstants.dt);
+
+        SwerveSetpoint next = swerveSetpoint;
+
+        if (!satisfiesConstraints(prev, next)) return;
+        
         frontLeft.setDesiredState(swerveSetpoint.moduleStates[0]);
         frontRight.setDesiredState(swerveSetpoint.moduleStates[1]);
         rearLeft.setDesiredState(swerveSetpoint.moduleStates[2]);
         rearRight.setDesiredState(swerveSetpoint.moduleStates[3]);
         
         RobotContainer.swerveDesiredStates = swerveSetpoint.moduleStates;
+    }
+
+    private boolean satisfiesConstraints(SwerveSetpoint prev, SwerveSetpoint next) {
+        for (int i = 0; i < prev.moduleStates.length; ++i) {
+            final var prevModule = prev.moduleStates[i];
+            final var nextModule = next.moduleStates[i];
+            Rotation2d diffRotation = Transform.inverse(prevModule.angle).rotateBy(nextModule.angle);
+
+            boolean checkSteeringVelocity = Math.abs(diffRotation.getRadians()) < KINEMATIC_LIMITS.MAX_STEERING_VELOCITY
+                    + AutoConstants.MAX_STEERING_VELOCITY_ERROR;
+            boolean checkMaxDriveVelocity = Math
+                    .abs(nextModule.speedMetersPerSecond) <= KINEMATIC_LIMITS.MAX_DRIVE_VELOCITY;
+            boolean checkMaxDriveAcceleration = Math
+                    .abs(nextModule.speedMetersPerSecond - prevModule.speedMetersPerSecond)
+                    / AutoConstants.dt <= KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION
+                            + AutoConstants.MAX_ACCELERATION_ERROR;
+
+            // If we should check acceleration, check that we are reaching max acceleration
+            // at all times.
+            // boolean checkAcceleration = (Math
+            //         .abs(nextModule.speedMetersPerSecond - prevModule.speedMetersPerSecond)
+            //         / AutoConstants.dt) == KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION;
+
+            if (!checkSteeringVelocity || !checkMaxDriveVelocity || !checkMaxDriveAcceleration)
+                return false;
+
+        }
+        return true;
     }
 
     public void resetOdometry(Pose2d pose) {
