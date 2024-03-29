@@ -458,7 +458,7 @@ public class RobotContainer implements Logged {
         
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .onFalse(new SelectiveConditionalCommand(pieceControl.stopIntakeAndIndexer(), Commands.none(), () -> CommandScheduler.getInstance().requiring(indexer) == null));
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
