@@ -453,6 +453,10 @@ public class Swerve extends SubsystemBase implements Logged {
         return atPose(desiredHDCPose);
     }
 
+    public boolean atHDCAngle() {
+        return MathUtil.isNear(desiredHDCPose.getRotation().getRadians(), getPose().getRotation().getRadians(), AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
+    }
+
     public boolean isAlignedToAmp() {
         Translation2d touchingAmpPose = new Translation2d(
             FieldConstants.GET_AMP_POSITION().getX(),

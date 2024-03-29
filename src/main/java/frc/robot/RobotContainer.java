@@ -35,6 +35,7 @@ import frc.robot.commands.logging.NTPIDTuner;
 import frc.robot.commands.managers.CalibrationControl;
 import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
+import frc.robot.commands.managers.SelectiveConditionalCommand;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.Strips.LedStrip;
 import frc.robot.leds.Commands.LPI;
@@ -403,11 +404,12 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
 
         // If this is nice to work with, then we keep it. If not... bye bye!
-        new Trigger(() -> elevator.atPosition(ElevatorConstants.TRAP_PLACE_POS))
+        new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS)
+            .onTrue(swerve.resetHDCCommand())
             .whileTrue(alignmentCmds.ampRotationalAlignmentCommand(driver::getLeftX, driver::getLeftY));
         
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> controller.getLeftBumper())
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
@@ -442,7 +444,7 @@ public class RobotContainer implements Logged {
       
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+            .onFalse(new SelectiveConditionalCommand(pieceControl.stopIntakeAndIndexer(), Commands.none(), () -> CommandScheduler.getInstance().requiring(indexer) == null));
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
@@ -475,7 +477,7 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> controller.getLeftBumper())
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
             .andThen(limelight3.setLEDState(() -> false))); 
 
         controller.x()
@@ -504,7 +506,7 @@ public class RobotContainer implements Logged {
     private void configureCalibrationBindings(PatriBoxController controller) { 
         controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
-        controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity));
+        controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity, () -> true));
 
         controller.leftY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
         controller.rightY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementAngle(() -> controller.getRightY()));

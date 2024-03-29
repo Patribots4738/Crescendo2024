@@ -69,9 +69,10 @@ public class AlignmentCalc {
      * @return             the rotational HDC speeds to align the robot to the desired angle
      */
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {
+        swerve.setDesiredPose(new Pose2d(swerve.getPose().getTranslation(), desiredAngle));
         return MathUtil.applyDeadband(AutoConstants.HDC.getThetaController().calculate(
             swerve.getPose().getRotation().getRadians(),
-            desiredAngle.getRadians()),  0.02);
+            desiredAngle.getRadians()), 0.02);
     }
 
     /**
@@ -188,6 +189,7 @@ public class AlignmentCalc {
      * @return             the rotational speeds to rotationally align the robot
      */
     public ChassisSpeeds getRotationalSpeeds(double driverX, double driverY, Rotation2d desiredAngle) {
+        swerve.setDesiredPose(new Pose2d(swerve.getPose().getTranslation(), desiredAngle));
         return new ChassisSpeeds(
             driverX * (Robot.isRedAlliance() ? -1 : 1),
             driverY * (Robot.isRedAlliance() ? -1 : 1),
