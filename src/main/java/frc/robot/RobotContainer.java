@@ -70,6 +70,7 @@ public class RobotContainer implements Logged {
     private EventLoop testButtonBindingLoop = new EventLoop();
     
     private final PatriBoxController driver;
+    private PatriBoxController operator = null;
 
     @IgnoreLogged
     private Swerve swerve;
@@ -146,6 +147,9 @@ public class RobotContainer implements Logged {
     
     public RobotContainer() {
         
+        if (!OIConstants.IS_SINGLE_DRIVER) {
+            operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
+        }
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         
         pdh = new PowerDistribution(30, ModuleType.kRev);
@@ -244,7 +248,14 @@ public class RobotContainer implements Logged {
             return;
         }
 
-        configureDriverBindings(driver);
+        if (OIConstants.IS_SINGLE_DRIVER) {
+            configureSoloDiverBindings(driver);
+        } else {
+            configureDriverBindings(driver);
+            configureOperatorBindings(operator);
+        }
+        
+
         configureTimedEvents();
         configureTestBindings();
     }
@@ -367,8 +378,8 @@ public class RobotContainer implements Logged {
         driver.leftStick()
             .whileTrue(limelightMapper.updatePoseEstimatorCommand());
     }
- 
-    private void configureDriverBindings(PatriBoxController controller) {
+
+    private void configureSoloDiverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
         // reset the orientation of the robot
@@ -470,65 +481,188 @@ public class RobotContainer implements Logged {
             .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
     }
 
-    private void configureOperatorBindings(PatriBoxController controller) {
+    private void configureDriverBindings(PatriBoxController controller) {
+
+        // Upon hitting start or back,
+        // reset the orientation of the robot
+        // to be facing AWAY FROM the driver station
+        controller.back().onTrue(
+                Commands.runOnce(() -> swerve.resetOdometry(
+                        new Pose2d(
+                                Robot.isRedAlliance() ? FieldConstants.FIELD_WIDTH_METERS - 1.31 : 1.31,
+                                5.53,
+                                Rotation2d.fromDegrees(
+                                        Robot.isRedAlliance()
+                                                ? 0
+                                                : 180))),
+                        swerve));
+        // Upon hitting start button
+        // reset the orientation of the robot
+        // to be facing TOWARDS the driver station
+        // TODO: for testing reset odometry to speaker
+        controller.start().onTrue(
+                Commands.runOnce(() -> swerve.resetOdometry(
+                        new Pose2d(
+                                swerve.getPose().getTranslation(),
+                                Rotation2d.fromDegrees(
+                                        Robot.isRedAlliance()
+                                                ? 180
+                                                : 0))),
+                        swerve));
+
         controller.povUp()
-            .onTrue(pieceControl.elevatorToPlacement(false));
+                .onTrue(climb.toTopCommand().alongWith(pivot.setAngleCommand(0)));
+
+        controller.povDown()
+                .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
+
+        controller.a()
+                .onTrue(swerve.resetHDCCommand())
+                .whileTrue(
+                        Commands.sequence(
+                                Commands.either(
+                                        alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
+                                        alignmentCmds.ampAlignmentCommand(controller::getLeftX),
+                                        climb::getHooksUp))
+                                .alongWith(
+                                        limelight3.setLEDState(() -> true)))
+                .onFalse(
+                        limelight3.setLEDState(() -> false));
+
+        controller.x()
+                .toggleOnTrue(
+                        alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
+
+        controller.b()
+                .toggleOnTrue(
+                        alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
+
+        controller.rightTrigger()
+            .onTrue(pieceControl
+                .noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle,
+                    () -> controller.getLeftBumper())
+                .alongWith(driver.setRumble(() -> 0.5, 0.3))
+                .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
+
+        controller.rightStick()
+                .toggleOnTrue(
+                        Commands.sequence(
+                                swerve.resetHDCCommand(),
+                                limelight3.setLEDState(() -> true),
+                                new ActiveConditionalCommand(
+                                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX,
+                                                controller::getLeftY, robotRelativeSupplier),
+                                        alignmentCmds.wingRotationalAlignment(controller::getLeftX,
+                                                controller::getLeftY, robotRelativeSupplier),
+                                        alignmentCmds.alignmentCalc::onOppositeSide))
+                                .finallyDo(
+                                        () -> limelight3.setLEDState(() -> false)
+                                                .andThen(pivot.setAngleCommand(60)
+                                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                                                .schedule()));
+
+        controller.leftStick()
+                .toggleOnTrue(
+                        Commands.sequence(
+                                swerve.resetHDCCommand(),
+                                limelight3.setLEDState(() -> true),
+                                alignmentCmds
+                                        .preparePassCommand(
+                                                controller::getLeftX, controller::getLeftY, robotRelativeSupplier))
+                                .finallyDo(
+                                        () -> limelight3.setLEDState(() -> false)
+                                                .andThen(pivot.setAngleCommand(60)
+                                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                                                .schedule()));
+
+        controller.leftTrigger()
+                .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose)
+                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         controller.povLeft()
-            .onTrue(pieceControl.elevatorToPlacement(true));
-
-        controller.povRight()
-            .onTrue(ampper.toggleSpeed());
-        
-        controller.povDown()
-            .onTrue(pieceControl.elevatorToBottom());
+                .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeUntilNote())
-            .negate().and(driver.leftBumper().negate())
+                .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
+                .negate().and(operator.leftBumper().negate())
+                .onTrue(pieceControl.stopIntakeAndIndexer().andThen(Commands.print("stopping")));
+
+        controller.rightBumper()
+                .onTrue(pieceControl.ejectNote())
+                .onFalse(pieceControl.stopEjecting());
+
+        controller.povRight()
+                .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
+    }
+
+    private void configureOperatorBindings(PatriBoxController controller) {
+        controller.povUp()
+                .onTrue(pieceControl.elevatorToPlacement(false));
+
+        controller.povLeft()
+                .onTrue(pieceControl.elevatorToPlacement(true));
+
+        controller.povRight()
+                .onTrue(ampper.toggleSpeed());
+
+        controller.povDown()
+                .onTrue(pieceControl.elevatorToBottom());
+
+        controller.leftBumper()
+                .whileTrue(pieceControl.intakeUntilNote())
+                .negate().and(driver.leftBumper().negate())
                 .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
-            .onTrue(pieceControl.ejectNote())
-            .onFalse(pieceControl.stopEjecting());
+                .onTrue(pieceControl.ejectNote())
+                .onFalse(pieceControl.stopEjecting());
 
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
-            .andThen(limelight3.setLEDState(() -> false))); 
+                .onTrue(pieceControl
+                        .noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle,
+                                () -> controller.getLeftBumper())
+                        .alongWith(driver.setRumble(() -> 0.5, 0.3))
+                        .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
         controller.x()
-            .onTrue(pieceControl.setShooterModeCommand(true));
+                .onTrue(pieceControl.setShooterModeCommand(true));
 
         controller.b()
-            .onTrue(pieceControl.setShooterModeCommand(false));
-            
+                .onTrue(pieceControl.setShooterModeCommand(false));
+
         controller.a()
-            .onTrue(pieceControl.panicEjectNote())
-            .onFalse(pieceControl.stopPanicEject());
+                .onTrue(pieceControl.panicEjectNote())
+                .onFalse(pieceControl.stopPanicEject());
 
         controller.start().or(controller.back()).or(controller.y())
-            .whileTrue(pieceControl.sourceShooterIntake(controller.start().or(controller.back()).or(controller.y())))
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+                .whileTrue(
+                        pieceControl.sourceShooterIntake(controller.start().or(controller.back()).or(controller.y())))
+                .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightStick().and(controller.leftStick())
-            .onTrue(elevator.resetEncoder());
+                .onTrue(elevator.resetEncoder());
 
         controller.rightStick().toggleOnTrue(
-            elevator.overrideCommand(() -> Units.inchesToMeters(controller.getRightY()))
-        );
-        
+                elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY())));
+
     }
-    
-    private void configureCalibrationBindings(PatriBoxController controller) { 
-        controller.leftBumper(testButtonBindingLoop).onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
+
+    private void configureCalibrationBindings(PatriBoxController controller) {
+        controller.leftBumper(testButtonBindingLoop)
+                .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
-        controller.rightTrigger(0.5, testButtonBindingLoop).onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity, () -> true));
+        controller.rightTrigger(0.5, testButtonBindingLoop)
+                .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity, () -> true));
 
-        controller.leftY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
-        controller.rightY(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementAngle(() -> controller.getRightY()));
+        controller.leftY(0.3, testButtonBindingLoop)
+                .whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
+        controller.rightY(0.3, testButtonBindingLoop)
+                .whileTrue(calibrationControl.incrementAngle(() -> controller.getRightY()));
 
-        controller.leftX(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
-        controller.rightX(0.3, testButtonBindingLoop).whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
+        controller.leftX(0.3, testButtonBindingLoop)
+                .whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
+        controller.rightX(0.3, testButtonBindingLoop)
+                .whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
 
         controller.back(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(-1));
         controller.start(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(1));
@@ -540,19 +674,19 @@ public class RobotContainer implements Logged {
         controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
 
         controller.pov(0, 270, testButtonBindingLoop)
-            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity)
-                .alongWith(Commands.run(swerve::setWheelsX)))
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+                .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity)
+                        .alongWith(Commands.run(swerve::setWheelsX)))
+                .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 90, testButtonBindingLoop)
-            .onTrue(pieceControl.ejectNote());
+                .onTrue(pieceControl.ejectNote());
 
         controller.pov(0, 0, testButtonBindingLoop)
-            .whileTrue(pieceControl.sourceShooterIntake(controller.pov(0, 0, testButtonBindingLoop)))
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+                .whileTrue(pieceControl.sourceShooterIntake(controller.pov(0, 0, testButtonBindingLoop)))
+                .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 180, testButtonBindingLoop)
-            .onTrue(calibrationControl.copyCalcTriplet());
+                .onTrue(calibrationControl.copyCalcTriplet());
     }
     
     private void configureHDCBindings(PatriBoxController controller) {
