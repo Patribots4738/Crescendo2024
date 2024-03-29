@@ -128,8 +128,8 @@ public class Limelight extends SubsystemBase implements Logged{
                 radStds = Units.degreesToRadians(2);
             }
             // 1 target with large area and close to estimated roxose
-            else if (LimelightHelpers.getTA(limelightName) > 0.175) {
-                xyStds = 0.192;
+            else if (LimelightHelpers.getTA(limelightName) > 0.14) {
+                xyStds = Math.hypot(0.015, 0.033);
                 radStds = Units.degreesToRadians(7);
             }
             // conditions don't match to add a vision measurement

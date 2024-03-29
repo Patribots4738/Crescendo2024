@@ -150,21 +150,20 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
-            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-two", 1);
-            limelightMapper = new LimelightMapping(swerve.getPoseEstimator(), swerve::getPose, "limelight-three");
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-threeg", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 1);
+            limelightMapper = new LimelightMapping(swerve.getPoseEstimator(), swerve::getPose, "limelight-threeg");
             
             // limelightMapper.ManuallyAddPose(12, new Pose3d(11.173, 4.096, 1.443, new Rotation3d(new Quaternion(0.003, 0.032, -0.025, -0.999))));
             // limelightMapper.ManuallyAddPose(2, new Pose3d(16.787, 5.036, 1.562, new Rotation3d(new Quaternion(.00099, -0.019, -0.017, -1.000))));
             // limelightMapper.ManuallyAddPose(3, new Pose3d(16.776, 5.599, 1.562, new Rotation3d(new Quaternion(0.009, 0.016, -0.003, -1.000))));
             // limelightMapper.printJSON();
         } else {
-            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-two", 1);
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-threeg", 0);
+            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 1);
             limelight2.disableLEDS();
             limelight3.disableLEDS();
         }
-
 
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
