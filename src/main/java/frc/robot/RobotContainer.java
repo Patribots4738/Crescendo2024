@@ -395,7 +395,7 @@ public class RobotContainer implements Logged {
             .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
         
         controller.a()
-            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         controller.x()
             .onTrue(pieceControl.setShooterModeCommand(true));
