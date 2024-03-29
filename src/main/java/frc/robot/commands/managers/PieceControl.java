@@ -199,7 +199,10 @@ public class PieceControl implements Logged {
             shooterCmds.stowPivot(),
             indexer.toElevator(),   
             intake.inCommandSlow(),
-            Commands.waitUntil(() -> !colorSensor.hasNote()),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                () -> FieldConstants.IS_SIMULATION),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             ampper.outtakeSlow(),
@@ -249,7 +252,7 @@ public class PieceControl implements Logged {
         return 
             new SelectiveConditionalCommand(
                 Commands.race(shootWhenReady(poseSupplier, speedSupplier).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)),
-                Commands.race(prepPiece().andThen(placeWhenReady()).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
+                Commands.race(placeWhenReady().andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
                 () -> elevator.getDesiredPosition() <= 0
             ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
                 .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));

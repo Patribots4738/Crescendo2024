@@ -399,13 +399,12 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.setShooterModeCommand(true));
 
         controller.b()
-            .onTrue(pieceControl.setShooterModeCommand(false));
+            .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
         
         controller.rightTrigger()
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, () -> controller.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
-            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false))
-            .andThen(pivot.setAngleCommand(60)));
+            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
         controller.rightStick()
             .toggleOnTrue(
@@ -420,6 +419,7 @@ public class RobotContainer implements Logged {
                         () -> 
                             limelight3.setLEDState(() -> false)
                             .andThen(pivot.setAngleCommand(60)
+                                .alongWith(shooterCmds.stopShooter())
                                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                             .schedule()
                         )

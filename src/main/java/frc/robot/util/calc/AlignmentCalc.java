@@ -279,6 +279,6 @@ public class AlignmentCalc {
     }
 
     public boolean closeToSpeaker() {
-        return RobotContainer.distanceToSpeakerMeters < 6;
+        return RobotContainer.distanceToSpeakerMeters < 7.3;
     }
 }

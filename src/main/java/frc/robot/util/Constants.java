@@ -1119,10 +1119,10 @@ public final class Constants {
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
-            put("noteToTrap1", 0.1);
+            put("noteToTrap1", 0.3255);
             put("noteToTrap2", 0.5);
             put("noteToTrap3", 0.0);
-
+            
             put("dropPiece1", 0.5);
 
             put("ampPosition", 0.37);

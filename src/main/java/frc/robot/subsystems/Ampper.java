@@ -56,7 +56,7 @@ public class Ampper extends SubsystemBase implements Logged {
     }
 
     public Command intakeSlow() {
-        return runOnce(() -> setSpeed(0.2));
+        return runOnce(() -> setSpeed(0.4));
     }
 
     public Command intakeSlow(double speed) {
