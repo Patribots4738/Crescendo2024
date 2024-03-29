@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 
 /**
  * This file represents all of the auto paths that we will have
- * They will be primarily comiled through
+ * They will be primarily compiled through
  * PathPlannerTrajectory.importChoreoPaths,
  * with each segment having its own method 
  * to make sure that the modularity stays clean
@@ -86,7 +86,7 @@ public class PathPlannerStorage implements Logged {
          * therefore being added to the auto chooser.
          * 
          * To remove old options, the deploy directory will need to be cleared manually
-         * via SSH, WinSCP, reimaging the RIO, etc.
+         * via SSH, WinSCP, re-imaging the RIO, etc.
          */
         
         // Good news! 
@@ -260,7 +260,7 @@ public class PathPlannerStorage implements Logged {
 
     /**
      * Uses Pathplanner's pathfinding algorithm to go to the closest shooting position 
-     * from the swerve subsystem's curent position
+     * from the swerve subsystem's current position
      * 
      * @param swerve  The swerve subsystem to use.
      * @return  The command that will pathfind to the shooting pose

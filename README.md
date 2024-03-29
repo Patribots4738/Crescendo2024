@@ -2,10 +2,8 @@
 
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
 
-![Robot Image](images/robot.gif)
 
-
-<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/1c6c852f-4c20-4b9f-b6bc-79065b717ee7" width="100%">
+<img src="images/ILUVUTERRY.png" width="100%">
 
 ____
 
@@ -54,7 +52,8 @@ ___
 ### <img src= "images/surelyanote.png" width="2.5%" /> PID Tuning w/ Network Tables
 > When tuning PID, shooter speeds, and pivot angle, we can change the values in Advantage Scopes network tables. This allows us to dynamically change the values without redeploying our code constantly, making tuning faster, easier, and more accurate.
   
-## Safe Spark 🛟
+### <img src= "images/surelyanote.png" width="2.5%" /> Safe Spark
+  >
   > REV's motor controllers do not always set the parameter first try, causing our motor to break randomly. To keep our motors, our matches, our ranking, and our money safe, we made a class called Safe Spark! Safe Spark constantly checks whether the motor has correctly set its parameters. If no parameters were set, it returns a REVLibError type of `kError` and tries to set the parameter again. It will repeat this until it recognizes that the parameter has been received and implemented, finally returning a REVLibError type of kOK!
 
 ##  Swerve Drive 🛞
@@ -83,11 +82,12 @@ ___
   > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when to robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
 
   > Here is a GIF of Terry detecting a note and chasing it! 🦖🔎
-  > <img src= "images/dino chase.gif">
+  
+  > <img src= "images/GIF/dino chase.gif">
 
 
 ## Teleoperated 🎮
-  <img src="images/sim/betterAmp.png" width="40%" />
+  <img src="images/sim/amp.png" width="40%" />
 
 ###  <img src= "images/surelyanote.png" width="2.5%" />  Joystick Axis Remapping
  > We use Xbox controllers to control the robot. However, the range of the joystick axis from the Xbox controller is the shape of a skewed square with chamfered edges which is preferable for usage. In PatriBoxController, we remapped the range of input to a circle that is easier to use. Here's our [desmos](https://www.desmos.com/calculator/e07raajzh5) if you want to check out the math!

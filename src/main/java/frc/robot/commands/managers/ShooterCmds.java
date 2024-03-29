@@ -137,10 +137,14 @@ public class ShooterCmds {
             }, pivot, shooter);
     }
 
-    public Command preparePassCommand(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+    public Command prepareStillSpeakerCommand(Supplier<Pose2d> robotPose) {
+        return prepareSWDCommand(robotPose, () -> new ChassisSpeeds());
+    }
+
+    public Command preparePassCommand(Supplier<Pose2d> robotPose) {
         return Commands.run(
             () -> {
-                desiredTriplet = shooterCalc.calculatePassTriplet(robotPose.get(), speeds.get());
+                desiredTriplet = shooterCalc.calculatePassTriplet(robotPose.get());
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
             }, pivot, shooter);

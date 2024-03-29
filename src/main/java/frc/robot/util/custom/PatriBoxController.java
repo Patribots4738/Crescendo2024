@@ -25,6 +25,9 @@ public class PatriBoxController extends CommandXboxController {
         this.deadband = deadband;
     }
 
+    // The following 24 methods will be unnecesary in 2025.
+    // They fix a loop overrun issue in 2024's wpilib
+    // more info can be found at https://github.com/Patribots4738/Crescendo2024/issues/144
     public boolean getAButton() {
         return super.getHID().getAButton();
     }
@@ -120,6 +123,7 @@ public class PatriBoxController extends CommandXboxController {
     public Trigger rightX(double threshold, EventLoop loop) {
         return new Trigger(loop, () -> Math.abs(getRightX()) > threshold);
     }
+    // This marks the end of the methods that should be unnecesary in 2025
 
     @Override
     public double getLeftX() {
@@ -127,10 +131,9 @@ public class PatriBoxController extends CommandXboxController {
     }
 
     @Override
-    // This is inverted because for some reason when you
-    // go forward on the controller, it returns a negative value
+    
     public double getLeftY() {
-        return -getLeftAxis().getY();
+        return getLeftAxis().getY();
     }
 
     @Override
@@ -140,18 +143,23 @@ public class PatriBoxController extends CommandXboxController {
 
     @Override
     public double getRightY() {
-        return -getRightAxis().getY();
+        return getRightAxis().getY();
     }
 
     public Translation2d getLeftAxis() {
-        Translation2d driverLeftAxis = toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
-                MathUtil.applyDeadband(super.getLeftY(), deadband));
-        return driverLeftAxis;
+        // The Y inverted because for some reason when you
+        // go forward on the controller, it returns a negative value.
+        // I don't like that.
+        return toCircle(MathUtil.applyDeadband(super.getLeftX(), deadband),
+                MathUtil.applyDeadband(-super.getLeftY(), deadband));
     }
 
     public Translation2d getRightAxis() {
+        // The Y inverted because for some reason when you
+        // go forward on the controller, it returns a negative value.
+        // I don't like that.
         return toCircle(MathUtil.applyDeadband(super.getRightX(), deadband),
-                MathUtil.applyDeadband(super.getRightY(), deadband));
+                MathUtil.applyDeadband(-super.getRightY(), deadband));
     }
 
     // All calculations can be referenced here

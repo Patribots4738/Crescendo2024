@@ -75,7 +75,7 @@ public class PoseCalculations implements Logged {
      * Given an intercept of the chain, return the height of the chain at that
      * location.
      * 
-     * @param x The posision along the X axis of the chain
+     * @param x The position along the X axis of the chain
      *          as seen in https://www.desmos.com/calculator/84ioficbl2
      *          For some reason, that desmos breaks on chrome on my home computer
      *          please send help... i used edge to make it :(
@@ -84,7 +84,7 @@ public class PoseCalculations implements Logged {
      */
     private static double getChainIntercept(double x) {
         // The ds here turn the integers into doubles
-        // so that integer divion does not occur.
+        // so that integer division does not occur.
         double calculation = 3d / 10d * Math.pow(x, 2) + 0.725;
         // Clamp the output to be no lower than the lowest point of the chain,
         // and no higher than the extension limit of our elevator

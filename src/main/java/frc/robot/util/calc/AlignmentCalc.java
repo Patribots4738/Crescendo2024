@@ -69,9 +69,10 @@ public class AlignmentCalc {
      * @return             the rotational HDC speeds to align the robot to the desired angle
      */
     public double getAlignmentSpeeds(Rotation2d desiredAngle) {
+        swerve.setDesiredPose(new Pose2d(swerve.getPose().getTranslation(), desiredAngle));
         return MathUtil.applyDeadband(AutoConstants.HDC.getThetaController().calculate(
             swerve.getPose().getRotation().getRadians(),
-            desiredAngle.getRadians()),  0.02);
+            desiredAngle.getRadians()), 0.02);
     }
 
     /**
@@ -117,6 +118,11 @@ public class AlignmentCalc {
         return getRotationalSpeeds(driverX, driverY, closestChain.getRotation());
     }
 
+    public ChassisSpeeds getAmpRotationalSpeeds(double driverX, double driverY) {
+        Pose2d ampPose = FieldConstants.GET_AMP_POSITION();
+        return getRotationalSpeeds(driverX, driverY, ampPose.getRotation());
+    }
+
     /**
      * Supplier for the rotational speeds to align the robot rotationally to the chain.
      * 
@@ -126,6 +132,10 @@ public class AlignmentCalc {
      */
     public Supplier<ChassisSpeeds> getChainRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
         return () -> getChainRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
+    }
+
+    public Supplier<ChassisSpeeds> getAmpRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return () -> getAmpRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
     /**
@@ -167,7 +177,7 @@ public class AlignmentCalc {
 
     public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose()));
     }
 
     /**
@@ -179,6 +189,7 @@ public class AlignmentCalc {
      * @return             the rotational speeds to rotationally align the robot
      */
     public ChassisSpeeds getRotationalSpeeds(double driverX, double driverY, Rotation2d desiredAngle) {
+        swerve.setDesiredPose(new Pose2d(swerve.getPose().getTranslation(), desiredAngle));
         return new ChassisSpeeds(
             driverX * (Robot.isRedAlliance() ? -1 : 1),
             driverY * (Robot.isRedAlliance() ? -1 : 1),
@@ -191,7 +202,7 @@ public class AlignmentCalc {
      * @param driverX     the driver's x input
      * @param driverY     the driver's y input
      * @param shooterCmds the shooter commands
-     * @return            the suppoer for the speeds to align the robot to the speaker
+     * @return            the supplier for the speeds to align the robot to the speaker
      */
     public Supplier<ChassisSpeeds> getSpeakerRotationalSpeedsSupplier(DoubleSupplier driverX, DoubleSupplier driverY, ShooterCmds shooterCmds) {
         return () -> getSpeakerRotationalSpeeds(driverX.getAsDouble(), driverY.getAsDouble(), shooterCmds);
@@ -239,8 +250,8 @@ public class AlignmentCalc {
 
         // Make the pose always relative to the blue alliance
         // Closest chain is the actual chain position
-        // when we use our comparitors below, we use things from
-        // the origin of the field's persepctive
+        // when we use our comparators below, we use things from
+        // the origin of the field's perspective
         if (Robot.isRedAlliance()) {
             closestChain = GeometryUtil.flipFieldPose(closestChain);
         }
@@ -279,6 +290,6 @@ public class AlignmentCalc {
     }
 
     public boolean closeToSpeaker() {
-        return RobotContainer.distanceToSpeakerMeters < 6;
+        return RobotContainer.distanceToSpeakerMeters < 7.3;
     }
 }

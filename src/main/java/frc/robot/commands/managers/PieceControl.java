@@ -97,8 +97,8 @@ public class PieceControl implements Logged {
     }
 
     // TODO: only run angle reset when we are not using prepareSWDCommand
-    public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        return Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier())
+    public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier atDesiredAngle) {
+        return Commands.waitUntil(() -> shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() && atDesiredAngle.getAsBoolean())
                 .andThen(noteToShoot(poseSupplier, speedSupplier));
     }
 
@@ -107,8 +107,6 @@ public class PieceControl implements Logged {
                 .andThen(intakeAuto());
     }
 
-    // TODO: Possibly split this into two commands where one sends to shooter
-    // without waiting
     public Command noteToShoot(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
@@ -199,7 +197,10 @@ public class PieceControl implements Logged {
             shooterCmds.stowPivot(),
             indexer.toElevator(),   
             intake.inCommandSlow(),
-            Commands.waitUntil(() -> !colorSensor.hasNote()),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                () -> FieldConstants.IS_SIMULATION),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             ampper.outtakeSlow(),
@@ -241,15 +242,15 @@ public class PieceControl implements Logged {
                 indexer.toShooter());
     }
 
-    public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier operatorWantsToIntake) {
+    public Command noteToTarget(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier atDesiredAngle, BooleanSupplier operatorWantsToIntake) {
         // Defer the command to not require anyhing until it is actually ran
         // This is becuase placeTrap requires pivot, but shootWhenReady does not
         // If they are both required, then we would cancel any command that requires pivot
         // such as prepareSWDCommand
         return 
             new SelectiveConditionalCommand(
-                Commands.race(shootWhenReady(poseSupplier, speedSupplier).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)),
-                Commands.race(prepPiece().andThen(placeWhenReady()).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
+                Commands.race(shootWhenReady(poseSupplier, speedSupplier, atDesiredAngle).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)),
+                Commands.race(placeWhenReady().andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
                 () -> elevator.getDesiredPosition() <= 0
             ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
                 .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));
@@ -314,7 +315,7 @@ public class PieceControl implements Logged {
     public Command placeWhenReady() {
         return
             new SelectiveConditionalCommand(
-                ampper.outtake(1.1)
+                ampper.outtake(NT.getValue("placeOuttake"))
                     .andThen(elevatorToBottom()),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);

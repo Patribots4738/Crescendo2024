@@ -11,9 +11,8 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
-import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.jni.CANSparkMaxJNI;
-
+import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -30,6 +29,7 @@ public class SafeSpark extends CANSparkBase {
     protected SparkAbsoluteEncoder absoluteEncoder;
 
     private final int MAX_ATTEMPTS = (NeoMotorConstants.SAFE_SPARK_MODE) ? 20 : 2;
+    private final int CAN_TIMEOUT_MS = 50;
     private final int SPARK_MAX_MEASUREMENT_PERIOD = 16;
     private final int SPARK_FLEX_MEASUREMENT_PERIOD = 32;
     private final int SPARK_MAX_AVERAGE_DEPTH = 2;
@@ -48,6 +48,11 @@ public class SafeSpark extends CANSparkBase {
         // we do this so we can hot-swap sparks without needing to reconfigure them
         // this requires the code to configure the sparks after construction
         restoreFactoryDefaults();
+        // Add a delay to let the spark reset
+        // If a parameter set fails, this will add more time 
+        // to minimize any bus traffic.
+        // Default is 20ms
+        setCANTimeout(CAN_TIMEOUT_MS);        
 
         if (useAbsoluteEncoder) {
             setFeedbackDevice(getAbsoluteEncoder());
@@ -543,7 +548,7 @@ public class SafeSpark extends CANSparkBase {
     }
 
     /**
-     * Set the motor fedeback device to the PIDController
+     * Set the motor feedback device to the PIDController
      * 
      * @return {@link REVLibError#kOk} if successful
      */
@@ -647,7 +652,7 @@ public class SafeSpark extends CANSparkBase {
     public REVLibError setSmartCurrentLimit(int limit) {
         return applyParameter(
             () -> super.setSmartCurrentLimit(limit),
-            () -> true,
+            () -> CANSparkMaxJNI.c_SparkMax_GetSmartCurrentStallLimit(sparkMaxHandle) == limit,
             "Set current limit failure!");
     }
 
@@ -775,13 +780,13 @@ public class SafeSpark extends CANSparkBase {
 
     /**
      * Set the telemetry preference of the Neo
-     * This will disable the telemtry status frames
+     * This will disable the telemetry status frames
      * which is found at
      * https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
      * 
      * @param type the enum to represent the telemetry preference
      *             this will tell the motor to only send
-     *             that type of telemtry
+     *             that type of telemetry
      */
     public void setTelemetryPreference(TelemetryPreference type) {
         int minDelay = NeoMotorConstants.FAST_PERIODIC_STATUS_TIME_MS;

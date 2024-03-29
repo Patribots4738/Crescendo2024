@@ -1108,8 +1108,8 @@ public final class Constants {
             PIVOT_OFFSET_Z);
         
         public static final Map<String, Number> WAIT_TIMES = new HashMap<>() {{
-            put("noteToShoot1", 0.7);
-            put("noteToShoot2", 0.4);
+            put("noteToShoot1", 0.05);
+            put("noteToShoot2", 0.3);
             put("noteToShoot3", 0.0);
 
             put("intakeToTrap1", 0.2);
@@ -1119,16 +1119,16 @@ public final class Constants {
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
-            put("noteToTrap1", 0.1);
-            put("noteToTrap2", 0.5);
+            put("noteToTrap1", 0.3255);
+            put("noteToTrap2", 0.3647);
             put("noteToTrap3", 0.0);
-
+            
             put("dropPiece1", 0.5);
 
             put("ampPosition", 0.37);
             put("atan++", 0.86);
 
-            put("placeOuttake", 0.8);
+            put("placeOuttake", 0.6995);
             put("prepPiece", 0.3);
         }};
     }
