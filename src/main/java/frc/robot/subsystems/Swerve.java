@@ -73,8 +73,8 @@ public class Swerve extends SubsystemBase implements Logged {
     protected final static SwerveKinematicLimits KINEMATIC_LIMITS = new SwerveKinematicLimits();
     static {
         KINEMATIC_LIMITS.MAX_DRIVE_VELOCITY = AutoConstants.MAX_SPEED_METERS_PER_SECOND; // m/s
-        KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION = AutoConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED; // m/s^2
-        KINEMATIC_LIMITS.MAX_STEERING_VELOCITY = AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND; // rad/s
+        KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION = KINEMATIC_LIMITS.MAX_DRIVE_VELOCITY / 0.1; // m/s^2
+        KINEMATIC_LIMITS.MAX_STEERING_VELOCITY = Units.degreesToRadians(1600); // rad/s
     };
 
     /**
@@ -337,9 +337,9 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public void setModuleStatesWithSetpoints(SwerveModuleState[] desiredStates) {
         
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-                desiredStates,
-                DriveConstants.MAX_SPEED_METERS_PER_SECOND);
+        // SwerveDriveKinematics.desaturateWheelSpeeds(
+        //         desiredStates,
+        //         DriveConstants.MAX_SPEED_METERS_PER_SECOND);
         
         SwerveSetpoint prev = swerveSetpoint;
 
@@ -375,11 +375,11 @@ public class Swerve extends SubsystemBase implements Logged {
 
             // If we should check acceleration, check that we are reaching max acceleration
             // at all times.
-            // boolean checkAcceleration = (Math
-            //         .abs(nextModule.speedMetersPerSecond - prevModule.speedMetersPerSecond)
-            //         / AutoConstants.dt) == KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION;
+            boolean checkAcceleration = (Math
+                    .abs(nextModule.speedMetersPerSecond - prevModule.speedMetersPerSecond)
+                    / AutoConstants.dt) == KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION;
 
-            if (!checkSteeringVelocity || !checkMaxDriveVelocity || !checkMaxDriveAcceleration)
+            if ((!checkSteeringVelocity || !checkMaxDriveVelocity || !checkMaxDriveAcceleration) && !checkAcceleration)
                 return false;
 
         }
