@@ -70,7 +70,7 @@ public class RobotContainer implements Logged {
     private EventLoop testButtonBindingLoop = new EventLoop();
     
     private final PatriBoxController driver;
-    private PatriBoxController operator = null;
+    private final PatriBoxController operator;
 
     @IgnoreLogged
     private Swerve swerve;
@@ -147,10 +147,8 @@ public class RobotContainer implements Logged {
     
     public RobotContainer() {
         
-        if (!OIConstants.IS_SINGLE_DRIVER) {
-            operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
-        }
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
+        operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         
         pdh = new PowerDistribution(30, ModuleType.kRev);
         pdh.setSwitchableChannel(false); 
@@ -379,64 +377,30 @@ public class RobotContainer implements Logged {
             .whileTrue(limelightMapper.updatePoseEstimatorCommand());
     }
 
-    private void configureSoloDiverBindings(PatriBoxController controller) {
-        
+    private void configureCommonDriverBindings(PatriBoxController controller) {
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing AWAY FROM the driver station
-        controller.back().onTrue(
-            Commands.runOnce(() -> swerve.resetOdometry(
-                new Pose2d(
-                    Robot.isRedAlliance() ? FieldConstants.FIELD_WIDTH_METERS - 1.31 : 1.31,
-                    5.53, 
-                    Rotation2d.fromDegrees(
-                        Robot.isRedAlliance()
-                            ? 0
-                            : 180))), 
-                swerve));
+        controller.back()
+            .onTrue(Commands.runOnce(() -> 
+                swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve
+            ));
+        
         // Upon hitting start button
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
         // TODO: for testing reset odometry to speaker
-        controller.start().onTrue(
-            Commands.runOnce(() -> swerve.resetOdometry(
-                new Pose2d(
-                    swerve.getPose().getTranslation(),
-                    Rotation2d.fromDegrees(
-                        Robot.isRedAlliance()
-                            ? 180
-                            : 0))), 
-                swerve));
+        controller.start()
+            .onTrue(Commands.runOnce(() -> 
+                swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION().plus(new Transform2d(0,0, Rotation2d.fromDegrees(180)))), swerve
+            ));
 
-        controller.povUp()
-            .onTrue(climb.toTopCommand());
-        
-        controller.povDown()
-            .onTrue(climb.toBottomCommand());
-        
-        controller.a()
-            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
-
-        controller.x()
-            .onTrue(pieceControl.setShooterModeCommand(true));
-
-        controller.b()
-            .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
-
-        // If this is nice to work with, then we keep it. If not... bye bye!
-        new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS)
-            .onTrue(swerve.resetHDCCommand())
-            .whileTrue(alignmentCmds.ampRotationalAlignmentCommand(driver::getLeftX, driver::getLeftY));
-        
-        controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
-                .alongWith(driver.setRumble(() -> 0.5, 0.3))
-            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
         // Speaker / Source / Chain rotational alignment
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
+                    elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
                     limelight3.setLEDState(() -> true),
                     new ActiveConditionalCommand(
@@ -452,69 +416,74 @@ public class RobotContainer implements Logged {
                             .schedule()
                         )
                 );
-        
-        // Pass rotational alignment + auto shooter speeds
-        controller.leftStick()
-            .onTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));;
-        
-        // Prepare the shooter for a pass
-        // This lets the driver rotate while we prepare to pass
-        // so when the pass happens we don't have to wait
-        // for shooter to speed up
-        controller.leftTrigger()
-            .onTrue(elevator.toTopCommand())
-            .onFalse(elevator.toBottomCommand());
 
-        controller.povLeft()
-            .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
+
+        // Climbing controls
+        controller.povUp()
+            .onTrue(climb.toTopCommand());
+
+        controller.povDown()
+            .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
         
+        // Note to target will either place amp or shoot,
+        // depending on if the elevator is up or not
+        controller.rightTrigger()
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
+                .alongWith(driver.setRumble(() -> 0.5, 0.3))
+            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
+        
+
+        // Intake controls
+        // The warning of dead code only applies if we are using single driver mode
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeUntilNote())
-            .onFalse(new SelectiveConditionalCommand(pieceControl.stopIntakeAndIndexer(), Commands.none(), () -> CommandScheduler.getInstance().requiring(indexer) == null));
-
+            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .negate().and(() -> OIConstants.IS_SINGLE_DRIVER || !operator.getLeftBumper())
+            .onTrue(pieceControl.stopIntakeAndIndexer());
+        
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
             .onFalse(pieceControl.stopEjecting());
 
-        // Redundancy to turn off the lamp
+        // POV left and right are uncommonly used but needed incase of emergency
+        controller.povLeft()
+            .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
+        
         controller.povRight()
             .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
     }
 
+    private void configureSoloDiverBindings(PatriBoxController controller) {
+        
+        configureCommonDriverBindings(controller);
+
+        controller.a()
+            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+
+        controller.x()
+            .onTrue(pieceControl.setShooterModeCommand(true));
+
+        controller.b()
+            .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
+
+        // If this is nice to work with, then we keep it. If not... bye bye!
+        new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS)
+            .onTrue(swerve.resetHDCCommand())
+            .whileTrue(alignmentCmds.ampRotationalAlignmentCommand(driver::getLeftX, driver::getLeftY));
+        
+        // Subwoofer preset incase something goes south
+        controller.leftStick()
+            .toggleOnTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        
+        // Quick uppies for double amping
+        controller.leftTrigger()
+            .onTrue(elevator.toNoteFixCommand())
+            .onFalse(elevator.toTopCommand().andThen(pieceControl.prepPiece()));
+
+    }
+
     private void configureDriverBindings(PatriBoxController controller) {
 
-        // Upon hitting start or back,
-        // reset the orientation of the robot
-        // to be facing AWAY FROM the driver station
-        controller.back().onTrue(
-                Commands.runOnce(() -> swerve.resetOdometry(
-                        new Pose2d(
-                                Robot.isRedAlliance() ? FieldConstants.FIELD_WIDTH_METERS - 1.31 : 1.31,
-                                5.53,
-                                Rotation2d.fromDegrees(
-                                        Robot.isRedAlliance()
-                                                ? 0
-                                                : 180))),
-                        swerve));
-        // Upon hitting start button
-        // reset the orientation of the robot
-        // to be facing TOWARDS the driver station
-        // TODO: for testing reset odometry to speaker
-        controller.start().onTrue(
-                Commands.runOnce(() -> swerve.resetOdometry(
-                        new Pose2d(
-                                swerve.getPose().getTranslation(),
-                                Rotation2d.fromDegrees(
-                                        Robot.isRedAlliance()
-                                                ? 180
-                                                : 0))),
-                        swerve));
-
-        controller.povUp()
-                .onTrue(climb.toTopCommand().alongWith(pivot.setAngleCommand(0)));
-
-        controller.povDown()
-                .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
+        configureCommonDriverBindings(controller);
 
         controller.a()
                 .onTrue(swerve.resetHDCCommand())
@@ -537,62 +506,9 @@ public class RobotContainer implements Logged {
                 .toggleOnTrue(
                         alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
 
-        controller.rightTrigger()
-            .onTrue(pieceControl
-                .noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle,
-                    () -> controller.getLeftBumper())
-                .alongWith(driver.setRumble(() -> 0.5, 0.3))
-                .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
-
-        controller.rightStick()
-                .toggleOnTrue(
-                        Commands.sequence(
-                                swerve.resetHDCCommand(),
-                                limelight3.setLEDState(() -> true),
-                                new ActiveConditionalCommand(
-                                        alignmentCmds.sourceRotationalAlignment(controller::getLeftX,
-                                                controller::getLeftY, robotRelativeSupplier),
-                                        alignmentCmds.wingRotationalAlignment(controller::getLeftX,
-                                                controller::getLeftY, robotRelativeSupplier),
-                                        alignmentCmds.alignmentCalc::onOppositeSide))
-                                .finallyDo(
-                                        () -> limelight3.setLEDState(() -> false)
-                                                .andThen(pivot.setAngleCommand(60)
-                                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-                                                .schedule()));
-
-        controller.leftStick()
-                .toggleOnTrue(
-                        Commands.sequence(
-                                swerve.resetHDCCommand(),
-                                limelight3.setLEDState(() -> true),
-                                alignmentCmds
-                                        .preparePassCommand(
-                                                controller::getLeftX, controller::getLeftY, robotRelativeSupplier))
-                                .finallyDo(
-                                        () -> limelight3.setLEDState(() -> false)
-                                                .andThen(pivot.setAngleCommand(60)
-                                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-                                                .schedule()));
-
         controller.leftTrigger()
                 .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose)
                         .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
-
-        controller.povLeft()
-                .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
-
-        controller.leftBumper()
-                .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-                .negate().and(operator.leftBumper().negate())
-                .onTrue(pieceControl.stopIntakeAndIndexer().andThen(Commands.print("stopping")));
-
-        controller.rightBumper()
-                .onTrue(pieceControl.ejectNote())
-                .onFalse(pieceControl.stopEjecting());
-
-        controller.povRight()
-                .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
     }
 
     private void configureOperatorBindings(PatriBoxController controller) {
