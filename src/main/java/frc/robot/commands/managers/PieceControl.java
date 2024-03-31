@@ -343,7 +343,7 @@ public class PieceControl implements Logged {
         return Commands.runOnce(() -> this.placeWhenReady = placeWhenReady);
     }
 
-    public Command sourceShooterIntake(BooleanSupplier holdingButton) {
+    public Command sourceShooterIntake() {
         return Commands.sequence(
             shooterCmds.sourceIntakeCommand(),
             indexer.toElevator(),

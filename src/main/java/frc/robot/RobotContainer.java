@@ -304,9 +304,18 @@ public class RobotContainer implements Logged {
         // Make the controllers pulse just like the LEDs do
         // The reason we are checking bumpers
         // is so this doesn't happen on pieceControl::moveNote
-        // TODO: make work with source intake
-        new Trigger(() -> colorSensor.hasNote() && driver.getLeftBumper())
-            .onTrue(
+        new Trigger(
+            () -> colorSensor.hasNote() 
+                && (
+                    // All of these buttons command intake
+                    // Whether that be source or not
+                    driver.getLeftTrigger() 
+                    || driver.getXButton() 
+                    || operator.getLeftBumper() 
+                    || operator.getStartButton() 
+                    || operator.getBackButton()
+                )
+            ).onTrue(
                 Commands.race(
                     // I'll be honest, I was just messing around with desmos
                     // and this provides a sort of on/off rumble rather than it being continuous
@@ -316,7 +325,6 @@ public class RobotContainer implements Logged {
                     }),
                     Commands.waitSeconds(1)
                 ).andThen(driver.setRumble(() -> 0))
-                // TODO: Figure out why this doesn't work
                 .alongWith(limelight3.blinkLeds(() -> 1))
                 .alongWith(limelight2.blinkLeds(() -> 1))
             );
@@ -435,7 +443,7 @@ public class RobotContainer implements Logged {
 
         // Intake controls
         // The warning of dead code only applies if we are using single driver mode
-        controller.leftBumper()
+        controller.leftTrigger()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
             .negate().and(() -> OIConstants.IS_SINGLE_DRIVER || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
@@ -460,7 +468,7 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         controller.x()
-            .onTrue(pieceControl.setShooterModeCommand(true));
+            .whileTrue(pieceControl.sourceShooterIntake());
 
         controller.b()
             .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
@@ -475,9 +483,9 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         
         // Quick uppies for double amping
-        controller.leftTrigger()
-            .onTrue(elevator.toNoteFixCommand())
-            .onFalse(elevator.toTopCommand().andThen(pieceControl.prepPiece()));
+        controller.leftBumper()
+            .onTrue(elevator.toNoteFixCommand().alongWith(pieceControl.intakeUntilNote()))
+            .onFalse(pieceControl.stopIntakeAndIndexer().andThen(elevator.toTopCommand().andThen(pieceControl.prepPiece())));
 
     }
 
@@ -506,7 +514,7 @@ public class RobotContainer implements Logged {
                 .toggleOnTrue(
                         alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
 
-        controller.leftTrigger()
+        controller.leftBumper()
                 .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose)
                         .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
@@ -526,7 +534,7 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
                 .whileTrue(pieceControl.intakeUntilNote())
-                .negate().and(driver.leftBumper().negate())
+                .negate().and(driver.leftTrigger().negate())
                 .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -551,8 +559,7 @@ public class RobotContainer implements Logged {
                 .onFalse(pieceControl.stopPanicEject());
 
         controller.start().or(controller.back()).or(controller.y())
-                .whileTrue(
-                        pieceControl.sourceShooterIntake(controller.start().or(controller.back()).or(controller.y())))
+                .whileTrue(pieceControl.sourceShooterIntake())
                 .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightStick().and(controller.leftStick())
@@ -598,7 +605,7 @@ public class RobotContainer implements Logged {
                 .onTrue(pieceControl.ejectNote());
 
         controller.pov(0, 0, testButtonBindingLoop)
-                .whileTrue(pieceControl.sourceShooterIntake(controller.pov(0, 0, testButtonBindingLoop)))
+                .whileTrue(pieceControl.sourceShooterIntake())
                 .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.pov(0, 180, testButtonBindingLoop)
