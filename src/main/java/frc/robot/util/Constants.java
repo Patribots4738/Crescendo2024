@@ -564,6 +564,8 @@ public final class Constants {
         // https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
+
+        public static final boolean SINGLE_DRIVER_MODE = true;
     }
 
     public static final class LEDConstants {

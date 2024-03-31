@@ -249,8 +249,16 @@ public class PieceControl implements Logged {
         // such as prepareSWDCommand
         return 
             new SelectiveConditionalCommand(
-                Commands.race(shootWhenReady(poseSupplier, speedSupplier, atDesiredAngle).andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)),
-                Commands.race(placeWhenReady().andThen(setHasPiece(false)),Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)),
+                Commands.race(
+                    shootWhenReady(poseSupplier, speedSupplier, atDesiredAngle)
+                        .andThen(setHasPiece(false)),
+                    Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)
+                ),
+                Commands.race(
+                    placeWhenReady()
+                        .andThen(setHasPiece(false)),
+                    Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)
+                ),
                 () -> elevator.getDesiredPosition() <= 0
             ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
                 .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));
@@ -316,7 +324,10 @@ public class PieceControl implements Logged {
         return
             new SelectiveConditionalCommand(
                 ampper.outtake(NT.getValue("placeOuttake"))
-                    .andThen(elevatorToBottom()),
+                    .andThen(
+                        elevatorToBottom()
+                        .alongWith(shooterCmds.raisePivot())
+                    ),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);
     }
@@ -332,7 +343,7 @@ public class PieceControl implements Logged {
         return Commands.runOnce(() -> this.placeWhenReady = placeWhenReady);
     }
 
-    public Command sourceShooterIntake(BooleanSupplier holdingButton) {
+    public Command sourceShooterIntake() {
         return Commands.sequence(
             shooterCmds.sourceIntakeCommand(),
             indexer.toElevator(),
