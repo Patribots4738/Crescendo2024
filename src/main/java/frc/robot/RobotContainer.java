@@ -411,6 +411,8 @@ public class RobotContainer implements Logged {
                     swerve.resetHDCCommand(),
                     limelight3.setLEDState(() -> true),
                     new ActiveConditionalCommand(
+                        // This runs SWD on heading control 
+                        // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.alignmentCalc::closeToSpeaker)
