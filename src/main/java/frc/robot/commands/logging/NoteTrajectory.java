@@ -81,7 +81,7 @@ public class NoteTrajectory extends Command implements Logged {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double t = timer.get();
+        double t = timer.get() * .7;
         x = kinematicEquation3(x0, vx0, ax, t);
         y = kinematicEquation3(y0, vy0, ay, t);
         z = kinematicEquation3(z0, vz0, az, t);
