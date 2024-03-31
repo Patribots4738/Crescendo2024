@@ -246,7 +246,7 @@ public class RobotContainer implements Logged {
             return;
         }
 
-        if (OIConstants.IS_SINGLE_DRIVER) {
+        if (OIConstants.SINGLE_DRIVER_MODE) {
             configureSoloDiverBindings(driver);
         } else {
             configureDriverBindings(driver);
@@ -445,7 +445,7 @@ public class RobotContainer implements Logged {
         // The warning of dead code only applies if we are using single driver mode
         controller.leftTrigger()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .negate().and(() -> OIConstants.IS_SINGLE_DRIVER || !operator.getLeftBumper())
+            .negate().and(() -> OIConstants.SINGLE_DRIVER_MODE || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
         
         controller.rightBumper()
