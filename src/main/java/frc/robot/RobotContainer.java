@@ -36,7 +36,6 @@ import frc.robot.commands.logging.NTPIDTuner;
 import frc.robot.commands.managers.CalibrationControl;
 import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
-import frc.robot.commands.managers.SelectiveConditionalCommand;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.Strips.LedStrip;
 import frc.robot.leds.Commands.LPI;
