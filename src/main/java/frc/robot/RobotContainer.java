@@ -429,7 +429,7 @@ public class RobotContainer implements Logged {
 
         // Climbing controls
         controller.povUp()
-            .onTrue(climb.toTopCommand());
+            .onTrue(climb.povUpCommand());
 
         controller.povDown()
             .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
