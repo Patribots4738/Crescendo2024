@@ -199,6 +199,7 @@ public class RobotContainer implements Logged {
             elevator,
             ampper,
             shooterCmds,
+            alignmentCmds,
             colorSensor);
 
         calibrationControl = new CalibrationControl(shooterCmds);

@@ -44,6 +44,7 @@ public class PieceControl implements Logged {
     private Ampper ampper;
     @IgnoreLogged
     private ShooterCmds shooterCmds;
+    @IgnoreLogged
     private AlignmentCmds alignmentCmds;
     
 
@@ -67,12 +68,14 @@ public class PieceControl implements Logged {
             Elevator elevator,
             Ampper ampper,
             ShooterCmds shooterCmds,
+            AlignmentCmds alignmentCmds,
             ColorSensor colorSensor) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.ampper = ampper;
         this.shooterCmds = shooterCmds;
+        this.alignmentCmds = alignmentCmds;
         this.colorSensor = colorSensor;
     }
 
