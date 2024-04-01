@@ -102,7 +102,8 @@ public class Limelight extends SubsystemBase implements Logged{
         double radStds;
         if (Robot.gameMode == GameMode.DISABLED || 
             (Robot.gameMode == GameMode.AUTONOMOUS 
-                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3 && hasTarget(result))) {
+                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3 
+                && hasTarget(result))) {
             xyStds = 0.001;
             radStds = 0.0002;
             
@@ -117,13 +118,18 @@ public class Limelight extends SubsystemBase implements Logged{
                 if (Robot.gameMode == GameMode.TELEOP) {
                     // Trust the vision even more
                     if (targets.length > 2) {
-                        xyStds = Math.hypot(0.004, 0.002);
+                        if (LimelightHelpers.getTA(limelightName) > .1) {
+                            xyStds = Math.hypot(0.004, 0.002);
+                        } else {
+                            // The target is smaller, (less trust)
+                            xyStds = Math.hypot(0.024, 0.056);
+                        }
                     } else {
-                        // We can only see two tags, it's trustable still
+                        // We can only see two tags, (still trustable)
                         xyStds = Math.hypot(0.01, 0.005);
                     }
                 } else {
-                    xyStds = Math.hypot(0.011, 0.028);
+                    xyStds = Math.hypot(0.011, 0.019);
                 }
                 radStds = Units.degreesToRadians(2);
             }
@@ -333,8 +339,8 @@ public class Limelight extends SubsystemBase implements Logged{
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
-        double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.175;
-        double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.13 : 0.07;
+        double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
+        double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.1 : 0.05;
         if (result == null || !result.valid 
             || (LimelightHelpers.getTA(limelightName) < singleTagAmbiguityThreshold && result.targets_Fiducials.length == 1)
             || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < multiTagAmbiguityThreshold)
