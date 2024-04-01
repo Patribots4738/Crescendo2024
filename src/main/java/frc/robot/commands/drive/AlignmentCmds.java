@@ -39,7 +39,7 @@ public class AlignmentCmds {
     /**
      * Command to align the robot rotationally to the source of the field.
      * 
-     * @param autoSpeeds       Auto alignment speeds from [-DriveConsants.MAX_SPEED_METERS_PER_SECOND
+     * @param autoSpeeds       Auto alignment speeds from [-DriveConstants.MAX_SPEED_METERS_PER_SECOND
      *                                                DriveConstants.MAX_SPEED_METERS_PER_SECOND]
      * @param controllerSpeeds Controller speeds from [-1, 1]
      * 
@@ -72,6 +72,14 @@ public class AlignmentCmds {
                         0,
                         swerve.getPose().getRotation()
                     )
+            );
+    }
+
+    public Command ampRotationalAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return 
+            swerve.getDriveCommand(
+                alignmentCalc.getAmpRotationalSpeedsSupplier(driverX, driverY),
+                () -> true
             );
     }
 
@@ -156,16 +164,14 @@ public class AlignmentCmds {
             Commands.either(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
-                    .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                        .finallyDo(shooterCmds.stopShooter()::initialize)),
+                    .alongWith(shooterCmds.prepareStillSpeakerCommand(swerve::getPose)),
                 climb::getHooksUp);
     }
 
     public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
             passRotationalAlignment(driverX, driverY, shooterCmds)
-                .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                    .finallyDo(shooterCmds.stopShooter()::initialize));
+                .alongWith(shooterCmds.preparePassCommand(swerve::getPose));
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {

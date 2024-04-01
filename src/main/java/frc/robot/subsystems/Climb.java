@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.ClimbConstants;
@@ -73,6 +74,10 @@ public class Climb extends SubsystemBase implements Logged {
         setPosition(positionPair.getFirst(), positionPair.getSecond());
     }
 
+    public void setPosition(double pos) {
+        setPosition(pos, pos);
+    }
+
     public void setPosition(double pos1, double pos2) {
         pos1 = 
             MathUtil.clamp(
@@ -104,28 +109,30 @@ public class Climb extends SubsystemBase implements Logged {
     }
 
     public void toTop() {
-        setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT);
+        setPosition(ClimbConstants.TOP_LIMIT);
     }
 
     public void toBottom() {
-        setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT);
+        setPosition(ClimbConstants.BOTTOM_LIMIT);
     }
 
     public Command toTopCommand() {
-        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT, ClimbConstants.TOP_LIMIT));
+        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT));
+    }
+
+    public Command toMiddleCommand() {
+        return runOnce(() -> setPosition(ClimbConstants.TOP_LIMIT * 4.0/7.0));
     }
 
     public Command toBottomCommand() {
-        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT, ClimbConstants.BOTTOM_LIMIT));
+        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT));
     }
 
-    public Command povUpCommand(Supplier<Pose2d> positionSupplier) {
-        return runEnd(() -> {
-                Pair<Double, Double> positionPair = PoseCalculations.getChainIntercepts(positionSupplier.get());
-                setPosition(positionPair);
-            }, 
-            this::toTop
-        );
+    public Command povUpCommand() {
+        return Commands.either(
+            toMiddleCommand(), 
+            toTopCommand(), 
+            () -> targetPosLeft == ClimbConstants.TOP_LIMIT || targetPosRight == ClimbConstants.BOTTOM_LIMIT);
     }
 
     public BooleanSupplier atDesiredPosition() {

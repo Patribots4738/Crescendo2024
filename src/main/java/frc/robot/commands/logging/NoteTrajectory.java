@@ -20,6 +20,12 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import monologue.Logged;
 
+/**
+ * This command represents a trajectory of a note on the field. 
+ * It uses kinematic equations to calculate the position of the note.
+ * 
+ * We can use the resulting pose to display the note on the field, in order to create a more accurate representation of the field.
+ */
 public class NoteTrajectory extends Command implements Logged {
     double x, x0, vx0, ax, z, z0, vz0, az, y, y0, vy0, ay;
 
@@ -75,7 +81,7 @@ public class NoteTrajectory extends Command implements Logged {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double t = timer.get();
+        double t = timer.get() * .7;
         x = kinematicEquation3(x0, vx0, ax, t);
         y = kinematicEquation3(y0, vy0, ay, t);
         z = kinematicEquation3(z0, vz0, az, t);

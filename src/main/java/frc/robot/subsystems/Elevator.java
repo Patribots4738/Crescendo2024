@@ -25,6 +25,9 @@ public class Elevator extends SubsystemBase implements Logged {
     private double position = 0, desiredPos = 0, hitGuillotineTimestamp = 0, desiredOverridePos = 0;
 
     @Log
+    private boolean overrideMode = false;
+
+    @Log
     private boolean atDesiredPos = false, stuckOnGuillotine = false;
 
     /** Creates a new Elevator. */
@@ -131,8 +134,9 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public boolean atDesiredPosition() {
-	return MathUtil.isNear(desiredPos, position, ElevatorConstants.ELEVATOR_DEADBAND)
-        || MathUtil.isNear(desiredOverridePos, position, ElevatorConstants.ELEVATOR_DEADBAND);
+        if (overrideMode)
+            return MathUtil.isNear(desiredOverridePos, position, ElevatorConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(desiredPos, position, ElevatorConstants.ELEVATOR_DEADBAND);
     }
 
     public boolean atPosition(double position) {
@@ -169,6 +173,8 @@ public class Elevator extends SubsystemBase implements Logged {
                 ElevatorConstants.ELEVATOR_TOP_LIMIT
             );
             setPosition(desiredOverridePos);
-        });
+        })
+        .beforeStarting(Commands.runOnce(() -> overrideMode = true))
+        .finallyDo(() -> overrideMode = false);
     } 
 }

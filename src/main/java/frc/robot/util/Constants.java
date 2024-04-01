@@ -269,7 +269,7 @@ public final class Constants {
         public static final double TRAP_PLACE_POS = 0.49;
         // This position is not used
         public static final double AMP_PLACE_POS = 0.409;        
-        public static final double NOTE_FIX_POS = 0.14;
+        public static final double NOTE_FIX_POS = 0.129;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
@@ -564,6 +564,8 @@ public final class Constants {
         // https://docs.google.com/spreadsheets/d/1Lytrh6q9jkz4u1gmF1Sk8kTpj8DxW-uwRE_QMnTt8Lk
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
+
+        public static final boolean SINGLE_DRIVER_MODE = true;
     }
 
     public static final class LEDConstants {
@@ -757,6 +759,17 @@ public final class Constants {
             add(GeometryUtil.flipFieldPose(blueSource));
         }};
 
+        public static final List<Pose2d> SUBWOOFER_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Source
+            Pose2d blueSubwoofer = new Pose2d(1.29, 5.55, Rotation2d.fromDegrees(180));
+            add(blueSubwoofer);
+
+            // Red Source
+            add(GeometryUtil.flipFieldPose(blueSubwoofer));
+        }};
+
         public static final List<Pose3d> CHAIN_POSE3DS = new ArrayList<Pose3d>() {{
             // All points are in meters and radians
             // All relative to the blue origin
@@ -828,6 +841,10 @@ public final class Constants {
 
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_SUBWOOFER_POSITION() {
+            return SUBWOOFER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_PASS_APEX_POSITION() {
@@ -1093,8 +1110,8 @@ public final class Constants {
             PIVOT_OFFSET_Z);
         
         public static final Map<String, Number> WAIT_TIMES = new HashMap<>() {{
-            put("noteToShoot1", 0.7);
-            put("noteToShoot2", 0.4);
+            put("noteToShoot1", 0.05);
+            put("noteToShoot2", 0.3);
             put("noteToShoot3", 0.0);
 
             put("intakeToTrap1", 0.2);
@@ -1104,16 +1121,16 @@ public final class Constants {
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
-            put("noteToTrap1", 0.1);
-            put("noteToTrap2", 0.5);
+            put("noteToTrap1", 0.3255);
+            put("noteToTrap2", 0.3647);
             put("noteToTrap3", 0.0);
-
+            
             put("dropPiece1", 0.5);
 
             put("ampPosition", 0.37);
             put("atan++", 0.86);
 
-            put("placeOuttake", 0.8);
+            put("placeOuttake", 0.6995);
             put("prepPiece", 0.3);
         }};
     }

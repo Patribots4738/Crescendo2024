@@ -81,7 +81,7 @@ public class ShooterCalc implements Logged {
             );
     }
 
-    public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose, ChassisSpeeds speeds) {
+    public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose) {
         Rotation2d pivotAngle = calculatePassPivotAngle(robotPose);
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForPassApex(robotPose, pivotAngle);
         return SpeedAngleTriplet.of(
@@ -190,7 +190,7 @@ public class ShooterCalc implements Logged {
         double velocityArcTan = Math.atan2(
             velocityTangent,
             target.equals(FieldConstants.GET_PASS_TARGET_POSITION()) 
-                ? rpmToVelocity(calculatePassTriplet(robotPose, robotVelocity).getSpeeds()) 
+                ? rpmToVelocity(calculatePassTriplet(robotPose).getSpeeds()) 
                 : rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
             // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         );
@@ -214,8 +214,6 @@ public class ShooterCalc implements Logged {
     public Rotation2d calculateRobotAngleToPass(Pose2d robotPose, ChassisSpeeds robotVelocity) {
         return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_TARGET_POSITION());
     }
-
-
 
     public Rotation2d calculateRobotAngleToSpeaker(Pose2d pose) {
         return calculateRobotAngleToSpeaker(pose, new ChassisSpeeds());
