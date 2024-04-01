@@ -421,7 +421,7 @@ public class PieceControl implements Logged {
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose) {
+    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, BooleanSupplier intaking) {
         return new ActiveConditionalCommand(
             Commands.runOnce(
                 () -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
@@ -429,9 +429,13 @@ public class PieceControl implements Logged {
             ),
             shooterCmds.stopShooter(),
             () -> 
-                (colorSensor.hasNote() 
-                    && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
-                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached()))
+                (((colorSensor.hasNote() 
+                        && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
+                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean()))
+                
+                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 
+                    && Robot.gameMode == GameMode.TELEOP 
+                    && DriverStation.isFMSAttached()))
                 && RobotController.getBatteryVoltage() > 10)
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
