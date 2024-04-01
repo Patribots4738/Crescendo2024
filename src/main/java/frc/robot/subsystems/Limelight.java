@@ -95,15 +95,15 @@ public class Limelight extends SubsystemBase implements Logged{
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
 
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
-
+        
         this.estimatedPose2d = estimatedRobotPose;
         RobotContainer.visionErrorPose = RobotContainer.robotPose2d.minus(estimatedRobotPose);
         double xyStds;
         double radStds;
-        if (Robot.gameMode == GameMode.DISABLED || 
-            (Robot.gameMode == GameMode.AUTONOMOUS 
-                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3 
-                && hasTarget(result))) {
+        if ((Robot.gameMode == GameMode.DISABLED || 
+            Robot.gameMode == GameMode.AUTONOMOUS
+                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3)
+                && hasTarget(result)) {
             xyStds = 0.001;
             radStds = 0.0002;
             
@@ -341,7 +341,7 @@ public class Limelight extends SubsystemBase implements Logged{
 
         double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
         double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.1 : 0.05;
-        if (result == null || !result.valid 
+        if (result == null || !result.valid
             || (LimelightHelpers.getTA(limelightName) < singleTagAmbiguityThreshold && result.targets_Fiducials.length == 1)
             || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < multiTagAmbiguityThreshold)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
