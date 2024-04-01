@@ -76,9 +76,9 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private final Intake intake;
     @IgnoreLogged
-    private Limelight limelight3;
+    private Limelight limelight3g;
     @IgnoreLogged
-    private Limelight limelight2;
+    private Limelight limelight3;
     @IgnoreLogged
     private LimelightMapping limelightMapper;
     @IgnoreLogged
@@ -156,8 +156,8 @@ public class RobotContainer implements Logged {
         climb = new Climb();
         swerve = new Swerve();
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
-            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-threeg", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 1);
+            limelight3g = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-threeg", 0);
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-three", 1);
             limelightMapper = new LimelightMapping(swerve.getPoseEstimator(), swerve::getPose, "limelight-threeg");
             
             // limelightMapper.ManuallyAddPose(12, new Pose3d(11.173, 4.096, 1.443, new Rotation3d(new Quaternion(0.003, 0.032, -0.025, -0.999))));
@@ -165,10 +165,10 @@ public class RobotContainer implements Logged {
             // limelightMapper.ManuallyAddPose(3, new Pose3d(16.776, 5.599, 1.562, new Rotation3d(new Quaternion(0.009, 0.016, -0.003, -1.000))));
             // limelightMapper.printJSON();
         } else {
-            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-threeg", 0);
-            limelight2 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 1);
-            limelight2.disableLEDS();
+            limelight3g = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-threeg", 0);
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 1);
             limelight3.disableLEDS();
+            limelight3g.disableLEDS();
         }
 
         ledStrip = new LedStrip(swerve::getPose);
@@ -218,7 +218,7 @@ public class RobotContainer implements Logged {
             pieceControl.getAutomaticShooterSpeeds(swerve::getPose)
         );
         
-        pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight2);
+        pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight3);
         initializeComponents();
         prepareNamedCommands();
 
@@ -286,7 +286,7 @@ public class RobotContainer implements Logged {
             Robot.gameMode == GameMode.TELEOP
             && shooter.getAverageSpeed() > 2500
             && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
-            && limelight3.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
+            && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
         .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
         .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
         
@@ -323,8 +323,8 @@ public class RobotContainer implements Logged {
                     }),
                     Commands.waitSeconds(1)
                 ).andThen(driver.setRumble(() -> 0))
+                .alongWith(limelight3g.blinkLeds(() -> 1))
                 .alongWith(limelight3.blinkLeds(() -> 1))
-                .alongWith(limelight2.blinkLeds(() -> 1))
             );
 
         // Have the controllers pulse when the match is about to end to signal the drivers
@@ -408,7 +408,7 @@ public class RobotContainer implements Logged {
                 Commands.sequence(
                     elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
-                    limelight3.setLEDState(() -> true),
+                    limelight3g.setLEDState(() -> true),
                     new ActiveConditionalCommand(
                         // This runs SWD on heading control 
                         // and shooting-while-still on shooter
@@ -417,7 +417,7 @@ public class RobotContainer implements Logged {
                         alignmentCmds.alignmentCalc::closeToSpeaker)
                     ).finallyDo(
                         () -> 
-                            limelight3.setLEDState(() -> false)
+                            limelight3g.setLEDState(() -> false)
                             .andThen(pivot.setAngleCommand(60)
                                 .alongWith(shooterCmds.stopShooter())
                                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
@@ -502,9 +502,9 @@ public class RobotContainer implements Logged {
                         alignmentCmds.ampAlignmentCommand(controller::getLeftX),
                         climb::getHooksUp))
                     .alongWith(
-                        limelight3.setLEDState(() -> true)))
+                        limelight3g.setLEDState(() -> true)))
             .onFalse(
-                limelight3.setLEDState(() -> false));
+                limelight3g.setLEDState(() -> false));
 
         controller.x()
             .toggleOnTrue(
@@ -652,7 +652,7 @@ public class RobotContainer implements Logged {
         pathPlannerStorage.updatePathViewerCommand().schedule();
         fixPathPlannerCommands();
 
-        limelight3.disableLEDS();
+        limelight3g.disableLEDS();
 
         // TODO: Extract this into a command file
         Commands.run(this::updateNTGains)
@@ -758,7 +758,7 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j, swerve, limelight2));
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j, swerve, limelight3));
             }
         }
     }
@@ -776,8 +776,8 @@ public class RobotContainer implements Logged {
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
         } else {
-            Monologue.logObj(limelight2, "Robot/Limelights/limelight2");
             Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
+            Monologue.logObj(limelight3g, "Robot/Limelights/limelight3g");
         }
         Monologue.logObj(colorSensor, "Robot/ColorSensors/colorSensor");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
@@ -825,7 +825,7 @@ public class RobotContainer implements Logged {
 
     public void turnOffLamp() {
         pdh.setSwitchableChannel(false);
-        limelight3.disableLEDS();
+        limelight3g.disableLEDS();
     }
 }
  
