@@ -56,7 +56,6 @@ public class Robot extends TimedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
-        RobotController.setBrownoutVoltage(6.0);
         URCL.start(NeoMotorConstants.CAN_ID_MAP);
     }
 
