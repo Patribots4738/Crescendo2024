@@ -26,6 +26,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
+import frc.robot.commands.drive.AlignmentCmds;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -43,6 +44,7 @@ public class PieceControl implements Logged {
     private Ampper ampper;
     @IgnoreLogged
     private ShooterCmds shooterCmds;
+    private AlignmentCmds alignmentCmds;
     
 
     private ColorSensor colorSensor;
@@ -97,12 +99,12 @@ public class PieceControl implements Logged {
     }
 
     // TODO: only run angle reset when we are not using prepareSWDCommand
-    public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+    public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier robotRelativeSupplier) {
         return
         new ActiveConditionalCommand (
             Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()).andThen(noteToShoot(poseSupplier, speedSupplier)),
-            Commands.waitUntil(shooterCmds.shooterCalc.readyToPassSupplier()).andThen(noteToShoot(poseSupplier, speedSupplier))),
-            shooterCmds.preparePassCommand().isScheduled();
+            Commands.waitUntil(shooterCmds.shooterCalc.readyToPassSupplier()).andThen(noteToShoot(poseSupplier, speedSupplier)),
+            alignmentCmds.alignmentCalc::closeToSpeaker);
         
     }
 
