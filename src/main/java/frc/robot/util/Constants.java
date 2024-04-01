@@ -269,7 +269,7 @@ public final class Constants {
         public static final double TRAP_PLACE_POS = 0.49;
         // This position is not used
         public static final double AMP_PLACE_POS = 0.409;        
-        public static final double NOTE_FIX_POS = 0.14;
+        public static final double NOTE_FIX_POS = 0.129;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;

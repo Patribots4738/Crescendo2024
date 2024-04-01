@@ -167,6 +167,13 @@ public class PieceControl implements Logged {
             stopIntakeAndIndexer()
         );
     }
+
+    public Command intakeForDoubleAmp() {
+        return Commands.sequence(
+            intake.inCommand(),
+            ampper.intake()
+        );
+    }
     
     public Command intakeNoteDriver(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         return Commands.either(
@@ -326,7 +333,7 @@ public class PieceControl implements Logged {
                 ampper.outtake(NT.getValue("placeOuttake"))
                     .andThen(
                         elevatorToBottom()
-                        .alongWith(shooterCmds.raisePivot())
+                        .andThen(shooterCmds.raisePivot())
                     ),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);
