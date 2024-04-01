@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.29235458470917,
-      "y": 4.778983272252259
+      "x": 1.3617612901519198,
+      "y": 4.771136440369186
     },
-    "rotation": 152.1857061442248
+    "rotation": 151.53108100340572
   },
   "command": {
     "type": "sequential",
@@ -34,13 +34,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootInstantlyWhenReady"
+                        "name": "EnableLimelight"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "EnableLimelight"
+                        "name": "ShootInstantlyWhenReady"
                       }
                     }
                   ]
@@ -58,18 +58,18 @@
         {
           "type": "path",
           "data": {
-            "pathName": "W1 C2 N"
+            "pathName": "W1 C2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "C2toC3"
+            "name": "C2toC3nonOBJ"
           }
         }
       ]
     }
   },
-  "folder": "OBJ",
+  "folder": "Normal",
   "choreoAuto": false
 }
