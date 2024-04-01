@@ -54,6 +54,8 @@ public final class Constants {
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.7;
 
+        public static final double PASS_ROTATION_DEADBAND = 10;
+
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
         public static final double TRACK_WIDTH = Units.inchesToMeters(25.5);
@@ -142,6 +144,7 @@ public final class Constants {
 
         public static final double PIVOT_DEADBAND = 1;
         public static final double SHOOTER_RPM_DEADBAND = 50;
+        public static final double PASS_RPM_DEADBAND = 100;
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
