@@ -215,7 +215,10 @@ public class RobotContainer implements Logged {
         ));
 
         shooter.setDefaultCommand(
-            pieceControl.getAutomaticShooterSpeeds(swerve::getPose)
+            pieceControl.getAutomaticShooterSpeeds(
+                swerve::getPose,
+                () -> driver.getLeftTrigger() || (!OIConstants.SINGLE_DRIVER_MODE && operator.getLeftBumper())    
+            )
         );
         
         pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight3);
@@ -468,7 +471,8 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
 
         controller.x()
-            .whileTrue(pieceControl.sourceShooterIntake());
+            .whileTrue(pieceControl.sourceShooterIntake())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.b()
             .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));

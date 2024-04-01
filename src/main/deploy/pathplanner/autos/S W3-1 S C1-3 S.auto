@@ -2,31 +2,32 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7412377646703784,
-      "y": 4.3334957369796125
+      "x": 1.29235458470917,
+      "y": 4.778983272252259
     },
-    "rotation": 119.91938193435101
+    "rotation": 147.09475707701208
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "S W3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W3 W2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W2 W1"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "S W3-1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
           }
         },
         {
