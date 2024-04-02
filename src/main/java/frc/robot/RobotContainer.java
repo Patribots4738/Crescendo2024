@@ -145,6 +145,8 @@ public class RobotContainer implements Logged {
     public static boolean enableVision = true;
     
     public RobotContainer() {
+
+        System.out.println("Constructing Robot Container...");
         
         driver = new PatriBoxController(OIConstants.DRIVER_CONTROLLER_PORT, OIConstants.DRIVER_DEADBAND);
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
@@ -221,7 +223,7 @@ public class RobotContainer implements Logged {
             )
         );
         
-        pathPlannerStorage = new PathPlannerStorage(driver.y().negate(), colorSensor::hasNote, swerve, limelight3);
+        pathPlannerStorage = new PathPlannerStorage(colorSensor::hasNote, swerve, limelight3);
         initializeComponents();
         prepareNamedCommands();
 
@@ -288,6 +290,7 @@ public class RobotContainer implements Logged {
         new Trigger(() -> 
             Robot.gameMode == GameMode.TELEOP
             && shooter.getAverageSpeed() > 2500
+            && shooter.getAverageTargetSpeed() != 2500
             && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
             && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
         .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
@@ -468,7 +471,8 @@ public class RobotContainer implements Logged {
         configureCommonDriverBindings(controller);
 
         controller.a()
-            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+            .whileTrue(pieceControl.blepNote())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.x()
             .whileTrue(pieceControl.sourceShooterIntake())
@@ -488,7 +492,7 @@ public class RobotContainer implements Logged {
         
         // Quick uppies for double amping
         controller.leftBumper()
-            .onTrue(shooterCmds.stowPivot().andThen(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
+            .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
             .onFalse(pieceControl.stopIntakeAndIndexer().andThen(elevator.toTopCommand()));
 
     }
@@ -762,7 +766,8 @@ public class RobotContainer implements Logged {
                 if (i == j) {
                     continue;
                 }
-                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogic(i, j, swerve, limelight3));
+                NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogicOBJ(i, j, swerve, limelight3));
+                NamedCommands.registerCommand("C" + i + "toC" + j + "nonOBJ", pathPlannerStorage.generateCenterLogicNonOBJ(i, j, swerve));
             }
         }
     }

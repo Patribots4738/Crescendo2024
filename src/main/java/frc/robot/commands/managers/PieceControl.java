@@ -26,6 +26,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
+import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -147,7 +148,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !colorSensor.hasNote() || FieldConstants.IS_SIMULATION),
                 stopIntakeAndIndexer());
     }
 
@@ -163,7 +164,10 @@ public class PieceControl implements Logged {
             Commands.waitUntil(colorSensor::hasNote),
             stopIntakeAndIndexer(),
             indexer.toElevatorSlow(),
-            Commands.waitSeconds(0.3),
+            ampper.outtakeSlow(),
+            Commands.waitSeconds(.1),
+            ampper.stopCommand(),
+            Commands.waitSeconds(0.2),
             stopIntakeAndIndexer()
         );
     }
@@ -171,7 +175,20 @@ public class PieceControl implements Logged {
     public Command intakeForDoubleAmp() {
         return Commands.sequence(
             intake.inCommand(),
-            ampper.intake()
+            ampper.intake(),
+            indexer.toShooterSlow()
+        );
+    }
+
+    public Command blepNote() {
+        return Commands.parallel(
+            intake.inCommand(),
+            ampper.intake(),
+            indexer.toShooter(),
+            shooterCmds.setTripletCommand(new SpeedAngleTriplet(500, 500, 0))
+        ).andThen(
+            Commands.waitUntil(() -> !colorSensor.hasNote()),
+            stopAllMotors()
         );
     }
     
@@ -333,7 +350,7 @@ public class PieceControl implements Logged {
                 ampper.outtake(NT.getValue("placeOuttake"))
                     .andThen(
                         elevatorToBottom()
-                        .andThen(shooterCmds.raisePivot())
+                        .alongWith(shooterCmds.raisePivot())
                     ),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);

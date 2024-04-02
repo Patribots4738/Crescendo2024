@@ -246,7 +246,14 @@ public class PathPlannerStorage implements Logged {
         PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
 
         if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
-            return Commands.defer(() ->  AutoBuilder.followPath(shootNote), commandGroup.getRequirements());
+            return Commands.defer(() ->  
+                AutoBuilder.followPath(shootNote)
+                    .deadlineWith(NamedCommands.getCommand("StopIntake")
+                            .andThen(NamedCommands.getCommand("ToIndexer")
+                            .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
+                    .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
+                    .deadlineWith(NamedCommands.getCommand("PrepareSWD")), 
+                commandGroup.getRequirements());
         }
 
         PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
@@ -254,16 +261,17 @@ public class PathPlannerStorage implements Logged {
 
         Command shootAndMoveToNextNote = 
             AutoBuilder.followPath(shootNote)
-                .deadlineWith(NamedCommands.getCommand("ToIndexer")
-                    .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
-                .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady")
-                .deadlineWith(NamedCommands.getCommand("PrepareSWD")),
-                    AutoBuilder.followPath(getNoteAfterShot)
+                .deadlineWith(NamedCommands.getCommand("StopIntake")
+                        .andThen(NamedCommands.getCommand("ToIndexer")
+                        .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
+                .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
+                .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
+                .andThen(AutoBuilder.followPath(getNoteAfterShot)
                     .alongWith(NamedCommands.getCommand("StopAll")
                         .andThen(NamedCommands.getCommand("ToIndexer"))));
 
         Command skipNoteCommand = AutoBuilder.followPath(skipNote)
-            .raceWith(NamedCommands.getCommand("ToIndexer"), Commands.waitUntil(colorSensorSupplier));
+            .raceWith(NamedCommands.getCommand("ToIndexer"));
 
         return Commands.waitUntil(colorSensorSupplier).withTimeout(0.3).andThen(
             Commands.defer(() -> 
