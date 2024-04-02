@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.29235458470917,
-        "y": 4.778983272252259
+        "x": 1.29,
+        "y": 5.55
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6973036409678643,
-        "y": 4.247138796629217
+        "x": 1.6949490562586944,
+        "y": 5.018155524376958
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Sub"
     },
     {
       "anchor": {
-        "x": 2.4787036360186945,
-        "y": 4.168998797124134
+        "x": 2.5982118705558803,
+        "y": 4.421804677875873
       },
       "prevControl": {
-        "x": 2.2313539056437075,
-        "y": 3.9274690604050284
+        "x": 2.5438107087286053,
+        "y": 4.008355847988578
       },
       "nextControl": {
-        "x": 2.8694036335441093,
-        "y": 4.5505058535313045
+        "x": 2.621194223351493,
+        "y": 4.59647055912253
       },
       "isLocked": false,
       "linkedName": null
@@ -63,7 +63,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7,
-      "rotationDegrees": 179.78434028883294,
+      "rotationDegrees": 160.04500243607646,
       "rotateFast": false
     },
     {
@@ -91,8 +91,8 @@
     },
     {
       "name": "Slow w3",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.5499999999999999,
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.95,
       "constraints": {
         "maxVelocity": 5.0,
         "maxAcceleration": 3.0,
@@ -145,7 +145,7 @@
   "reversed": false,
   "folder": "Preloads",
   "previewStartingState": {
-    "rotation": 153.56913073103783,
+    "rotation": -179.9080895145809,
     "velocity": 0
   },
   "useDefaultConstraints": false

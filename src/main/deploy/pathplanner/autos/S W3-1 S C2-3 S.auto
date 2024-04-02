@@ -56,9 +56,48 @@
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "W1 C2"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "W1 C2"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.3
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StopAll"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ToIndexer"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {

@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3387789373563073,
+      "x": 1.29,
       "y": 5.55
     },
     "rotation": 179.22577983507193
@@ -28,19 +28,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S2 to W3 Prep"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "DisableLimelight"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "S W3-1"
+                        "pathName": "S W3-1 2"
                       }
                     },
                     {
@@ -76,7 +64,7 @@
         {
           "type": "named",
           "data": {
-            "name": "C2toC4nonOBJ"
+            "name": "C2toC3nonOBJ"
           }
         }
       ]
