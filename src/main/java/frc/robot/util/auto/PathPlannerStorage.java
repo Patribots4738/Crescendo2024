@@ -6,6 +6,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -252,7 +253,7 @@ public class PathPlannerStorage implements Logged {
                             .andThen(NamedCommands.getCommand("ToIndexer")
                             .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
                     .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
-                    .deadlineWith(NamedCommands.getCommand("PrepareSWD")), 
+                    .deadlineWith(NamedCommands.getCommand("PrepareSWD")).onlyIf(colorSensorSupplier), 
                 commandGroup.getRequirements());
         }
 
@@ -337,11 +338,15 @@ public class PathPlannerStorage implements Logged {
     }
 
     private boolean reasonableNoteInVision() {
+        Translation2d noteTranslation = limelight.getNotePose2d().getTranslation();
+        double x_cushon = Units.inchesToMeters(40);
+        double y_cushon = Units.inchesToMeters(12);
         return 
             limelight.noteInVision(limelight.getResults())
-            && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X + Units.inchesToMeters(40))
-                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X - Units.inchesToMeters(40))
-            && limelight.getNotePose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < 2.75);
+            && ((Robot.isBlueAlliance() && noteTranslation.getX() < FieldConstants.CENTERLINE_X + x_cushon)
+                || (Robot.isRedAlliance() && noteTranslation.getX() > FieldConstants.CENTERLINE_X - x_cushon)
+            && noteTranslation.getDistance(swerve.getPose().getTranslation()) < 2.75
+            && MathUtil.clamp(noteTranslation.getY(), -y_cushon, FieldConstants.FIELD_HEIGHT_METERS+y_cushon) == noteTranslation.getY());
     }
 
     /**
