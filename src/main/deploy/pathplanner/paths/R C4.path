@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.227899276069792,
-        "y": 2.820589287422505
+        "x": 3.986345979410884,
+        "y": 2.4085505729802055
       },
       "isLocked": false,
       "linkedName": "R"
     },
     {
       "anchor": {
-        "x": 6.711437167328638,
-        "y": 2.906396868694359
+        "x": 5.645671851254118,
+        "y": 1.5627999901016596
       },
       "prevControl": {
-        "x": 6.398216452156063,
-        "y": 2.3090922490629366
+        "x": 4.971234434826018,
+        "y": 1.5665677968973468
       },
       "nextControl": {
-        "x": 7.083467639755098,
-        "y": 3.615850327740169
+        "x": 6.468440081337051,
+        "y": 1.5582035195425377
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 2.436296745792339
       },
       "prevControl": {
-        "x": 7.6875203262385225,
-        "y": 3.044796719584566
+        "x": 7.401523604838924,
+        "y": 2.4499188080123084
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,25 +46,7 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "ToIndexer",
-      "waypointRelativePos": 0.6,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToIndexer"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 3.5,
@@ -73,8 +55,8 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 139.87129378764038,
-    "rotateFast": true
+    "rotation": -169.22190068678276,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Stage",

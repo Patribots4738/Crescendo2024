@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4146207015818286,
-      "y": 5.487419769165779
+      "x": 1.3387789373563073,
+      "y": 5.55
     },
     "rotation": 179.22577983507193
   },
@@ -23,6 +23,12 @@
                       "type": "named",
                       "data": {
                         "name": "ShootWhenReady"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "S2 to W3 Prep"
                       }
                     },
                     {

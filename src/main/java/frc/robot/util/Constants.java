@@ -412,29 +412,15 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
+            "S C5-4 S OBJ",
             "S W3-1 S C2-3 S",
             "S W3-1 S C2-3 S 2",
-            "S C1-3 S",
-            "S W1-2 S C1-3 S",
+            "S W3-1 S C2-3 S 2 OBJ",
+            "S W3-1 S C2-3 S OBJ",
             "S W3-1 C1-3 OBJ",
-            "S C1-3 OBJ",
             "S C1-3 OBJ Over W1",
-            "S W3-1 C1-3 OBJ", //didnt crash but it shot behind stage
-            "S C1-3 S OBJ",
-            // "OBJ", 
-            "S C1-5 C5-1 OBJ",
-            "S C5-1 C1-5 OBJ",
-            "S C4-2 S OBJ",
             "S C1-5 C5-1 OBJ Over W1",
-            "S W1 S C1-3 S OBJ",
-            "S C5-4 S OBJ",
-            "S W3-1 S C2-3 S 2 OBJ", //hits podium when intaking W3
-            "S W3-1 S C2-3 S OBJ" //hits podium when intaking W3
-            // "S W3-1 S C2-3 S 2",
-            // "S W3-1 S C1-3 S",
-            // "S C5-4 S",
-            // "S C4-2 S",
-            // "S W1 S C1-3 S"
+            "S C5-1 C1-5 OBJ",
             // "Proxy"
         };
     }

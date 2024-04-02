@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3617612901519198,
-      "y": 4.771136440369186
+      "x": 1.29235458470917,
+      "y": 4.778983272252259
     },
     "rotation": 151.53108100340572
   },
@@ -42,30 +42,6 @@
                       "data": {
                         "name": "ShootInstantlyWhenReady"
                       }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W1 C2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C2 L"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "L C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M"
-                      }
                     }
                   ]
                 }
@@ -82,7 +58,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "M C4"
+            "pathName": "W1 C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C2toC3nonOBJ"
           }
         }
       ]

@@ -41,7 +41,6 @@ import java.util.function.Consumer;
  */
 public class PathPlannerStorage implements Logged {
 
-    private final BooleanSupplier hasPieceSupplier;
     private final BooleanSupplier colorSensorSupplier;
     
     @Log.NT
@@ -69,8 +68,7 @@ public class PathPlannerStorage implements Logged {
      * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
      *                         This could be a sensor, motor current, or other system.
      */
-    public PathPlannerStorage(BooleanSupplier hasPieceSupplier, BooleanSupplier colorSensorSupplier, Swerve swerve, Limelight limelight) {
-        this.hasPieceSupplier = hasPieceSupplier;
+    public PathPlannerStorage(BooleanSupplier colorSensorSupplier, Swerve swerve, Limelight limelight) {
         this.colorSensorSupplier = colorSensorSupplier;
         this.swerve = swerve;
         this.limelight = limelight;
@@ -93,6 +91,7 @@ public class PathPlannerStorage implements Logged {
         // This auto caches our paths so we don't need to manually load them
         
         for (String autoName : AutoConstants.AUTO_NAMES) {
+            System.out.println("Configuring " + autoName);
             // Load the auto and add it to the auto chooser
             Command auto = AutoBuilder.buildAuto(autoName);
             autoChooser.addOption(autoName, auto);
@@ -164,17 +163,25 @@ public class PathPlannerStorage implements Logged {
      * @param limelight The limelight subsystem to use
      * @return  The command that will execute the logic for the given notes
      */
-    public Command generateCenterLogic(int startingNote, int endingNote, Swerve swerve, Limelight limelight) {
+    public Command generateCenterLogicNonOBJ(int startingNote, int endingNote, Swerve swerve) {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         boolean goingDown = startingNote < endingNote;
         int increment = goingDown ? 1 : -1;
 
         for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
-            if (AutoConstants.USE_OBJECT_DETECTION) {
-                commandGroup.addCommands(generateObjectDetectionCommand(i, endingNote, goingDown, commandGroup));
-            } else {
-                commandGroup.addCommands(generateNonObjectDetectionCommand(i, endingNote, goingDown, increment, commandGroup));
-            }
+            commandGroup.addCommands(generateNonObjectDetectionCommand(i, endingNote, goingDown, increment, commandGroup));
+        }
+
+        return commandGroup;
+    }
+
+    public Command generateCenterLogicOBJ(int startingNote, int endingNote, Swerve swerve, Limelight limelight) {
+        SequentialCommandGroup commandGroup = new SequentialCommandGroup();
+        boolean goingDown = startingNote < endingNote;
+        int increment = goingDown ? 1 : -1;
+
+        for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
+            commandGroup.addCommands(generateObjectDetectionCommand(i, endingNote, goingDown, commandGroup));
         }
 
         return commandGroup;
@@ -245,17 +252,26 @@ public class PathPlannerStorage implements Logged {
         PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
         PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
 
-        Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote)
-            .andThen(AutoBuilder.followPath(getNoteAfterShot));
-        // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
-        Command skipNoteCommand = AutoBuilder.followPath(skipNote);
+        Command shootAndMoveToNextNote = 
+            AutoBuilder.followPath(shootNote)
+                .deadlineWith(NamedCommands.getCommand("ToIndexer")
+                    .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady")
+                .deadlineWith(NamedCommands.getCommand("PrepareSWD")),
+                    AutoBuilder.followPath(getNoteAfterShot)
+                    .alongWith(NamedCommands.getCommand("StopAll")
+                        .andThen(NamedCommands.getCommand("ToIndexer"))));
 
-        return Commands.defer(() -> 
-            Commands.either(
-                shootAndMoveToNextNote,
-                skipNoteCommand,
-                hasPieceSupplier), 
-            commandGroup.getRequirements());
+        Command skipNoteCommand = AutoBuilder.followPath(skipNote)
+            .raceWith(NamedCommands.getCommand("ToIndexer"), Commands.waitUntil(colorSensorSupplier));
+
+        return Commands.waitUntil(colorSensorSupplier).withTimeout(0.3).andThen(
+            Commands.defer(() -> 
+                Commands.either(
+                    shootAndMoveToNextNote,
+                    skipNoteCommand,
+                    colorSensorSupplier),
+            commandGroup.getRequirements()));
     }
 
     /**

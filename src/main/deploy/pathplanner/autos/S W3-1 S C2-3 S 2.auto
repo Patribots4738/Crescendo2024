@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.4146207015818286,
-      "y": 5.487419769165779
+      "x": 1.3387789373563073,
+      "y": 5.55
     },
     "rotation": 179.22577983507193
   },
@@ -12,15 +12,9 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "PrepareSWD"
-                }
-              },
               {
                 "type": "sequential",
                 "data": {
@@ -32,6 +26,12 @@
                       }
                     },
                     {
+                      "type": "path",
+                      "data": {
+                        "pathName": "S2 to W3 Prep"
+                      }
+                    },
+                    {
                       "type": "named",
                       "data": {
                         "name": "DisableLimelight"
@@ -40,19 +40,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3 2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W3 W2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W2 W1"
+                        "pathName": "S W3-1"
                       }
                     },
                     {
@@ -66,35 +54,29 @@
                       "data": {
                         "name": "EnableLimelight"
                       }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W1 C2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C2 L"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "L C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M"
-                      }
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W1 C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C2toC4nonOBJ"
           }
         }
       ]
