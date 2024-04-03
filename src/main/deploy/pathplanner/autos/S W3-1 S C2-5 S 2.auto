@@ -2,25 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.0476867681809234,
-      "y": 6.62594249192555
+      "x": 1.29,
+      "y": 5.55
     },
-    "rotation": -133.8576097768131
+    "rotation": 179.22577983507193
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "PrepareSWD"
-                }
-              },
               {
                 "type": "sequential",
                 "data": {
@@ -34,19 +28,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W1"
+                        "pathName": "S W3-1 2"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "DisableLimelight"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W1 W2"
+                        "name": "ShootWhenReady"
                       }
                     },
                     {
@@ -54,47 +42,68 @@
                       "data": {
                         "name": "EnableLimelight"
                       }
-                    },
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W2 C1"
+                        "pathName": "W1 C2"
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "wait",
                       "data": {
-                        "pathName": "C1 L"
+                        "waitTime": 0.3
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StopAll"
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "named",
                       "data": {
-                        "pathName": "L C2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C2 L"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "L C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M"
+                        "name": "ToIndexer"
                       }
                     }
                   ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C2toC5nonOBJ"
           }
         }
       ]

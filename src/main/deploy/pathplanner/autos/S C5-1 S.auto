@@ -5,22 +5,16 @@
       "x": 1.2698318789694694,
       "y": 3.0612493923756046
     },
-    "rotation": 118.45372149994454
+    "rotation": 117.98745319075599
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "PrepareSWD"
-                }
-              },
               {
                 "type": "sequential",
                 "data": {
@@ -36,53 +30,68 @@
                       "data": {
                         "name": "ShootWhenReady"
                       }
-                    },
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S C4"
+                        "pathName": "S C5"
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "wait",
                       "data": {
-                        "pathName": "C4 R"
+                        "waitTime": 0.3
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StopAll"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "M C3"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C3 M"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "M C2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "C2 L"
+                        "name": "ToIndexer"
                       }
                     }
                   ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C5toC1nonOBJ"
           }
         }
       ]

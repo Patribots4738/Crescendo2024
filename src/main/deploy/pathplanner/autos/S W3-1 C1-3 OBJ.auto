@@ -66,6 +66,12 @@
           "data": {
             "name": "C1toC3"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C3toC1"
+          }
         }
       ]
     }

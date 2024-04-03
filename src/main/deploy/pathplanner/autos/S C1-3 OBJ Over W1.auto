@@ -30,12 +30,6 @@
                       "data": {
                         "name": "ShootWhenReady"
                       }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "S C1 N Over W1"
-                      }
                     }
                   ]
                 }
@@ -47,6 +41,18 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopAll"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S C1 N Over W1"
           }
         },
         {

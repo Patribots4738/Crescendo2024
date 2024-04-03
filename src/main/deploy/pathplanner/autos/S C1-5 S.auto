@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.29,
-      "y": 5.55
+      "x": 1.2422530556147342,
+      "y": 7.161301131112901
     },
-    "rotation": 179.22577983507193
+    "rotation": -128.23889760719103
   },
   "command": {
     "type": "sequential",
@@ -24,24 +24,6 @@
                       "data": {
                         "name": "ShootWhenReady"
                       }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "S W3-1 2"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "EnableLimelight"
-                      }
                     }
                   ]
                 }
@@ -56,15 +38,54 @@
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "W1 C2"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "S C1"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.3
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StopAll"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ToIndexer"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "C2toC3nonOBJ"
+            "name": "C1toC5nonOBJ"
           }
         }
       ]
