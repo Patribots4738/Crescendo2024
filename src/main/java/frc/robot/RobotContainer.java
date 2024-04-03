@@ -482,7 +482,8 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
 
         // If this is nice to work with, then we keep it. If not... bye bye!
-        new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS)
+        new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS 
+                    && swerve.getPose().getY() > FieldConstants.FIELD_WIDTH_METERS/2.0)
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(alignmentCmds.ampRotationalAlignmentCommand(driver::getLeftX, driver::getLeftY));
         
