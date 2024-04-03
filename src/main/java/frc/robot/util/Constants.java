@@ -221,7 +221,7 @@ public final class Constants {
                 put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 38.2));
                 put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 35.8));
                 put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 34.4));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33.5));
                 put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.2));
                 put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 32.0));
                 put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.7));
@@ -272,7 +272,7 @@ public final class Constants {
         public static final double TRAP_PLACE_POS = 0.49;
         // This position is not used
         public static final double AMP_PLACE_POS = 0.409;        
-        public static final double NOTE_FIX_POS = 0.14;
+        public static final double NOTE_FIX_POS = 0.129;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
@@ -415,29 +415,15 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
+            "S C5-4 S OBJ",
             "S W3-1 S C2-3 S",
             "S W3-1 S C2-3 S 2",
-            "S C1-3 S",
-            "S W1-2 S C1-3 S",
+            "S W3-1 S C2-3 S 2 OBJ",
+            "S W3-1 S C2-3 S OBJ",
             "S W3-1 C1-3 OBJ",
-            "S C1-3 OBJ",
             "S C1-3 OBJ Over W1",
-            "S W3-1 C1-3 OBJ", //didnt crash but it shot behind stage
-            "S C1-3 S OBJ",
-            // "OBJ", 
-            "S C1-5 C5-1 OBJ",
-            "S C5-1 C1-5 OBJ",
-            "S C4-2 S OBJ",
             "S C1-5 C5-1 OBJ Over W1",
-            "S W1 S C1-3 S OBJ",
-            "S C5-4 S OBJ",
-            "S W3-1 S C2-3 S 2 OBJ", //hits podium when intaking W3
-            "S W3-1 S C2-3 S OBJ" //hits podium when intaking W3
-            // "S W3-1 S C2-3 S 2",
-            // "S W3-1 S C1-3 S",
-            // "S C5-4 S",
-            // "S C4-2 S",
-            // "S W1 S C1-3 S"
+            "S C5-1 C1-5 OBJ",
             // "Proxy"
         };
     }

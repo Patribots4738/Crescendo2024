@@ -1,7 +1,11 @@
-[![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
+![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle)
+
 
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
 
+[![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
+
+![Robot Image](images/robot.gif)
 
 <img src="images/ILUVUTERRY.png" width="100%">
 

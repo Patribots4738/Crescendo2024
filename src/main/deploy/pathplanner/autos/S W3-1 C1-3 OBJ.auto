@@ -22,37 +22,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "EnableLimelight"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
                         "name": "ShootWhenReady"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "DisableLimelight"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W3 W2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W2 W1"
+                        "pathName": "S W3-1"
                       }
                     },
                     {
@@ -62,9 +38,9 @@
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "named",
                       "data": {
-                        "pathName": "S C1 N"
+                        "name": "ShootInstantlyWhenReady"
                       }
                     }
                   ]
@@ -77,6 +53,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W1 C1 N"
           }
         },
         {

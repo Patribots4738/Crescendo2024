@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3617612901519198,
-      "y": 4.771136440369186
+      "x": 1.29235458470917,
+      "y": 4.778983272252259
     },
     "rotation": 152.1857061442248
   },
@@ -28,31 +28,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3"
+                        "pathName": "S W3-1"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "DisableLimelight"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W3 W2"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "W2 W1"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
+                        "name": "ShootInstantlyWhenReady"
                       }
                     },
                     {
@@ -76,7 +58,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S C2 N"
+            "pathName": "W1 C2 N"
           }
         },
         {

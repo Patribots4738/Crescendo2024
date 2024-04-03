@@ -27,6 +27,7 @@ import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.commands.drive.AlignmentCmds;
+import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -156,7 +157,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !colorSensor.hasNote() || FieldConstants.IS_SIMULATION),
                 stopIntakeAndIndexer());
     }
 
@@ -172,8 +173,31 @@ public class PieceControl implements Logged {
             Commands.waitUntil(colorSensor::hasNote),
             stopIntakeAndIndexer(),
             indexer.toElevatorSlow(),
-            Commands.waitSeconds(0.3),
+            ampper.outtakeSlow(),
+            Commands.waitSeconds(.1),
+            ampper.stopCommand(),
+            Commands.waitSeconds(0.2),
             stopIntakeAndIndexer()
+        );
+    }
+
+    public Command intakeForDoubleAmp() {
+        return Commands.sequence(
+            intake.inCommand(),
+            ampper.intake(),
+            indexer.toShooterSlow()
+        );
+    }
+
+    public Command blepNote() {
+        return Commands.parallel(
+            intake.inCommand(),
+            ampper.intake(),
+            indexer.toShooter(),
+            shooterCmds.setTripletCommand(new SpeedAngleTriplet(500, 500, 0))
+        ).andThen(
+            Commands.waitUntil(() -> !colorSensor.hasNote()),
+            stopAllMotors()
         );
     }
     
@@ -423,7 +447,7 @@ public class PieceControl implements Logged {
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose) {
+    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, BooleanSupplier intaking) {
         return new ActiveConditionalCommand(
             Commands.runOnce(
                 () -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
@@ -431,9 +455,13 @@ public class PieceControl implements Logged {
             ),
             shooterCmds.stopShooter(),
             () -> 
-                (colorSensor.hasNote() 
-                    && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS
-                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 && Robot.gameMode == GameMode.TELEOP && DriverStation.isFMSAttached()))
+                (((colorSensor.hasNote() 
+                        && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
+                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean()))
+                
+                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 
+                    && Robot.gameMode == GameMode.TELEOP 
+                    && DriverStation.isFMSAttached()))
                 && RobotController.getBatteryVoltage() > 10)
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
