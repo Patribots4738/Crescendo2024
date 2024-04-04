@@ -219,10 +219,11 @@ public final class Constants {
                 put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 38.2));
                 put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 35.8));
                 put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 34.15));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33));
-                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.35));
-                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 32.0));
-                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.7));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 32.25));
+                // Future note, 13.2ft is a common shot which should have its own calibration point
+                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 31.8));
+                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 31.45));
+                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.85));
                 
             }
         };
@@ -1109,7 +1110,7 @@ public final class Constants {
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
-            put("noteToTrap1", 0.118);
+            put("noteToTrap1", 0.15);
             put("noteToTrap2", 0.254);
             put("noteToTrap3", 0.0);
             
