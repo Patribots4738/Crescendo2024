@@ -424,7 +424,7 @@ public class RobotContainer implements Logged {
                     ).finallyDo(
                         () -> 
                             limelight3g.setLEDState(() -> false)
-                            .andThen(pivot.setAngleCommand(60)
+                            .andThen(shooterCmds.raisePivot()
                                 .alongWith(shooterCmds.stopShooter())
                                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                             .schedule()
@@ -437,7 +437,7 @@ public class RobotContainer implements Logged {
             .onTrue(climb.povUpCommand());
 
         controller.povDown()
-            .onTrue(climb.toBottomCommand().alongWith(pivot.setAngleCommand(0)));
+            .onTrue(climb.toBottomCommand().alongWith(shooterCmds.stowPivot()));
         
         // Note to target will either place amp or shoot,
         // depending on if the elevator is up or not
@@ -460,7 +460,7 @@ public class RobotContainer implements Logged {
 
         // POV left and right are uncommonly used but needed incase of emergency
         controller.povLeft()
-            .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
+            .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
         
         controller.povRight()
             .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
@@ -472,11 +472,11 @@ public class RobotContainer implements Logged {
 
         controller.a()
             .whileTrue(pieceControl.blepNote())
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+            .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
 
         controller.x()
             .whileTrue(pieceControl.sourceShooterIntake())
-            .onFalse(pieceControl.stopIntakeAndIndexer());
+            .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
 
         controller.b()
             .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
@@ -494,7 +494,7 @@ public class RobotContainer implements Logged {
         // Quick uppies for double amping
         controller.leftBumper()
             .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
-            .onFalse(pieceControl.stopIntakeAndIndexer().andThen(elevator.toTopCommand()));
+            .onFalse(pieceControl.stopIntakeAndIndexer().andThen(pieceControl.doubleAmpElevatorEnd()));
 
     }
 
@@ -581,7 +581,7 @@ public class RobotContainer implements Logged {
 
     private void configureCalibrationBindings(PatriBoxController controller) {
         controller.leftBumper(testButtonBindingLoop)
-            .onTrue(pieceControl.stopAllMotors().andThen(pivot.setAngleCommand(60)));
+            .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
         controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
         controller.rightTrigger(0.5, testButtonBindingLoop)
             .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity, () -> true));

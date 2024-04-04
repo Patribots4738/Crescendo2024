@@ -145,6 +145,7 @@ public final class Constants {
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
+        public static final double PIVOT_RAISE_ANGLE_DEGREES = 49;
 
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
 
