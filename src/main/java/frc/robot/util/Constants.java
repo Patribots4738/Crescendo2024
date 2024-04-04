@@ -218,9 +218,9 @@ public final class Constants {
                 put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
                 put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 38.2));
                 put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 35.8));
-                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 34.4));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33.5));
-                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.2));
+                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 34.15));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33));
+                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.35));
                 put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 32.0));
                 put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.7));
                 
@@ -421,6 +421,7 @@ public final class Constants {
             "S W3-1 C1-3 OBJ",
             "S C1-3 OBJ Over W1",
             "S C1-5 C5-1 OBJ Over W1",
+            "S C1-5 S Over W1",
             "S C5-1 C1-5 OBJ",
             // "Proxy"
         };
@@ -594,7 +595,7 @@ public final class Constants {
     }   
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = false;
+        public static final boolean SAFE_SPARK_MODE = true;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
@@ -1108,8 +1109,8 @@ public final class Constants {
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
-            put("noteToTrap1", 0.3255);
-            put("noteToTrap2", 0.3647);
+            put("noteToTrap1", 0.118);
+            put("noteToTrap2", 0.254);
             put("noteToTrap3", 0.0);
             
             put("dropPiece1", 0.5);
