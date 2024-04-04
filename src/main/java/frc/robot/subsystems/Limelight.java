@@ -116,20 +116,15 @@ public class Limelight extends SubsystemBase implements Logged{
             // multiple targets detected
             if (targets.length > 1) {
                 if (Robot.gameMode == GameMode.TELEOP) {
-                    // Trust the vision even more
+                    // Trust the vision even MORE
                     if (targets.length > 2) {
-                        if (LimelightHelpers.getTA(limelightName) > .1) {
-                            xyStds = Math.hypot(0.004, 0.002);
-                        } else {
-                            // The target is smaller, (less trust)
-                            xyStds = Math.hypot(0.024, 0.056);
-                        }
+                        xyStds = Math.hypot(0.002, 0.003);
                     } else {
                         // We can only see two tags, (still trustable)
-                        xyStds = Math.hypot(0.01, 0.005);
+                        xyStds = Math.hypot(0.005, 0.008);
                     }
                 } else {
-                    xyStds = Math.hypot(0.011, 0.019);
+                    xyStds = Math.hypot(0.014, 0.016);
                 }
                 radStds = Units.degreesToRadians(2);
             }
