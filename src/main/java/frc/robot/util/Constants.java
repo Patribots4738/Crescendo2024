@@ -221,9 +221,9 @@ public final class Constants {
                 put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 33.9));
                 put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 32.25));
                 // Future note, 13.2ft is a common shot which should have its own calibration point
-                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 31.8));
-                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 30.9));
-                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 29.9));
+                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 29.9));
+                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 29));
+                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 27.5));
                 
             }
         };
