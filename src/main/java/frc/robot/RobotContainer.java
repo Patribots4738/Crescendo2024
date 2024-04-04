@@ -492,9 +492,14 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         
         // Quick uppies for double amping
+        // controller.leftBumper()
+        //     .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
+        //     .onFalse(pieceControl.stopIntakeAndIndexer().andThen(pieceControl.doubleAmpElevatorEnd()));
+
         controller.leftBumper()
-            .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
-            .onFalse(pieceControl.stopIntakeAndIndexer().andThen(pieceControl.doubleAmpElevatorEnd()));
+            .whileTrue(pieceControl.intakeUntilNote())
+            .negate().and(driver.leftTrigger().negate())
+            .onTrue(pieceControl.stopIntakeAndIndexer());
 
     }
 
