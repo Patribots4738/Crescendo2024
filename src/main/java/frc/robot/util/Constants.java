@@ -217,8 +217,8 @@ public final class Constants {
                 put(8, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
                 put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
                 put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
-                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.2));
-                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 33));
+                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
+                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 33.3));
                 put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 30.9));
                 // Future note, 13.2ft is a common shot which should have its own calibration point
                 put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 29.4));
@@ -415,17 +415,17 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
-            "S C5-4 S OBJ",
+            // "S C5-4 S OBJ",
             "S C5-1 S",
             "S W3-1 S C2-5 S",
             "S W3-1 S C2-5 S 2",
-            "S W3-1 S C2-3 S 2 OBJ",
-            "S W3-1 S C2-3 S OBJ",
-            "S W3-1 C1-3 OBJ",
-            "S C1-3 OBJ Over W1",
-            "S C1-5 C5-1 OBJ Over W1",
+            // "S W3-1 S C2-3 S 2 OBJ",
+            // "S W3-1 S C2-3 S OBJ",
+            // "S W3-1 C1-3 OBJ",
+            // "S C1-3 OBJ Over W1",
+            // "S C1-5 C5-1 OBJ Over W1",
             "S C1-5 S Over W1",
-            "S C5-1 C1-5 OBJ",
+            // "S C5-1 C1-5 OBJ",
             // "Proxy"
         };
     }
