@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.NeoPhysicsSim;
@@ -56,7 +55,8 @@ public class Robot extends TimedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(false/* true */);
-        URCL.start(NeoMotorConstants.CAN_ID_MAP);
+        // Remove if not at comp:
+        RobotController.setBrownoutVoltage(6.0);
     }
 
     /**
@@ -70,6 +70,7 @@ public class Robot extends TimedRobot {
      */
     private boolean updatedAlready = false;
     private boolean updateTimer = false;
+    private boolean startedURCL = false;
     @Override
     public void robotPeriodic() {
         // Set the previous to the current timestamp before it updates
@@ -117,6 +118,10 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         // Update "constants"
         Monologue.updateAll();
+        if (!startedURCL) {
+            URCL.start(NeoMotorConstants.CAN_ID_MAP);
+            startedURCL = true;
+        }
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         Robot.gameMode = GameMode.AUTONOMOUS;
         robotContainer.onEnabled();
