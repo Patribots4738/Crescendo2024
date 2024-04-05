@@ -25,6 +25,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
 import monologue.Logged;
+import monologue.Monologue;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import java.util.ArrayList;
@@ -267,9 +268,19 @@ public class PathPlannerStorage implements Logged {
                         .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
                 .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
                 .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
-                .andThen(AutoBuilder.followPath(getNoteAfterShot)
-                    .alongWith(NamedCommands.getCommand("StopAll")
-                        .andThen(NamedCommands.getCommand("ToIndexer"))));
+                .andThen(
+                    Commands.race(
+                        Commands.sequence(
+                            AutoBuilder.followPath(getNoteAfterShot),
+                            Commands.waitSeconds(.3)
+                        ),
+                        Commands.sequence(
+                            NamedCommands.getCommand("StopAll"),
+                            Commands.waitSeconds(1),
+                            NamedCommands.getCommand("ToIndexer")
+                        )
+                    )
+                );
 
         Command skipNoteCommand = AutoBuilder.followPath(skipNote)
             .raceWith(NamedCommands.getCommand("ToIndexer"));
