@@ -324,9 +324,10 @@ public class RobotContainer implements Logged {
                     // Whether that be source or not
                     driver.getLeftTrigger() 
                     || driver.getXButton() 
-                    || operator.getLeftBumper() 
-                    || operator.getStartButton() 
-                    || operator.getBackButton()
+                    || (!OIConstants.SINGLE_DRIVER_MODE 
+                        &&(operator.getLeftBumper() 
+                        || operator.getStartButton() 
+                        || operator.getBackButton()))
                 )
             ).onTrue(
                 Commands.race(
