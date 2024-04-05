@@ -392,6 +392,10 @@ public class Limelight extends SubsystemBase implements Logged{
             ).ignoringDisable(true).asProxy();
     }
 
+    public Command setLEDState(boolean enabled) {
+        return setLEDState(() -> enabled);
+    }
+
     public void enableLEDS() {
         LimelightHelpers.setLEDMode_ForceOn(limelightName);
     }
