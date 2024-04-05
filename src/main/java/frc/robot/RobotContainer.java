@@ -506,12 +506,12 @@ public class RobotContainer implements Logged {
         //     .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
         //     .onFalse(pieceControl.stopIntakeAndIndexer().andThen(pieceControl.doubleAmpElevatorEnd()));
 
-        controller.leftBumper()
-            .onTrue(elevator.toTopIshButNotFullCommand())
-            .onFalse(elevator.toBottomCommand());
+        // controller.leftBumper()
+        //     .onTrue(elevator.toTopIshButNotFullCommand())
+        //     .onFalse(elevator.toBottomCommand());
 
         controller.leftBumper()
-            .whileTrue(pieceControl.intakeUntilNote())
+            .whileTrue(pieceControl.intakeAuto())
             .negate().and(driver.leftTrigger().negate())
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
