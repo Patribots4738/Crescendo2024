@@ -52,8 +52,8 @@
         "y": 6.982038779307121
       },
       "prevControl": {
-        "x": 1.330187514299404,
-        "y": 5.8881756330048
+        "x": 1.4291761916786625,
+        "y": 5.8294737866069
       },
       "nextControl": null,
       "isLocked": false,
@@ -81,7 +81,7 @@
     {
       "name": "Slow w2",
       "minWaypointRelativePos": 2.3000000000000003,
-      "maxWaypointRelativePos": 2.6,
+      "maxWaypointRelativePos": 2.65,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 4.2,

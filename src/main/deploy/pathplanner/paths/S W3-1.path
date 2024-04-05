@@ -81,7 +81,7 @@
     {
       "name": "Slow w2",
       "minWaypointRelativePos": 2.3000000000000003,
-      "maxWaypointRelativePos": 2.6,
+      "maxWaypointRelativePos": 2.65,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 4.2,
