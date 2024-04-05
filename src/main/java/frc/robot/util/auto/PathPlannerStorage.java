@@ -268,6 +268,8 @@ public class PathPlannerStorage implements Logged {
                         .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
                 .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
                 .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
+                .raceWith(Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean() && swerve.insideOwnWing()))
+
                 .andThen(
                     Commands.race(
                         Commands.sequence(

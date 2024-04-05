@@ -116,6 +116,7 @@ public class Robot extends TimedRobot {
     @Override   
     public void autonomousInit() {
         // Update "constants"
+        Monologue.updateAll();
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         Robot.gameMode = GameMode.AUTONOMOUS;
         robotContainer.onEnabled();

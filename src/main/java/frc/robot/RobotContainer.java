@@ -222,8 +222,15 @@ public class RobotContainer implements Logged {
                 () -> driver.getLeftTrigger() || (!OIConstants.SINGLE_DRIVER_MODE && operator.getLeftBumper())    
             )
         );
+
+        BooleanSupplier autoDecisionMaker;
+        if (FieldConstants.IS_SIMULATION) {
+            autoDecisionMaker = driver::getYButton;
+        } else {
+            autoDecisionMaker = colorSensor::hasNote;
+        }
+        pathPlannerStorage = new PathPlannerStorage(autoDecisionMaker, swerve, limelight3);
         
-        pathPlannerStorage = new PathPlannerStorage(colorSensor::hasNote, swerve, limelight3);
         initializeComponents();
         prepareNamedCommands();
 
@@ -734,15 +741,37 @@ public class RobotContainer implements Logged {
     }
 
     private void prepareNamedCommands() {
-        // TODO: prepare to shoot while driving (w1 - c1)
         NamedCommands.registerCommand("Intake", pieceControl.intakeAuto());
-        NamedCommands.registerCommand("ToIndexer", pieceControl.intakeUntilNote());
+        // If you can fix this formatting I salute you
+        NamedCommands.registerCommand("ToIndexer",
+            Commands.either(
+                pieceControl.intakeUntilNote(),
+                Commands.waitUntil(driver::getYButton),
+                () -> !FieldConstants.IS_SIMULATION
+            )
+        );
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
         NamedCommands.registerCommand("StopAll", pieceControl.stopAllMotors());
         NamedCommands.registerCommand("PrepareShooter", shooterCmds.prepareFireCommandAuto(swerve::getPose));
         NamedCommands.registerCommand("Shoot", pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("ShootInstantly", pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity));
-        NamedCommands.registerCommand("ShootInstantlyWhenReady", Commands.waitSeconds(.4).andThen(pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity)));
+        NamedCommands.registerCommand("ShootInstantly", 
+            Commands.either(
+                pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
+                Commands.waitUntil(() -> !driver.getYButton()), 
+                () -> !FieldConstants.IS_SIMULATION
+            )
+        );
+        // This one too, what a necessary nightmare :(
+        NamedCommands.registerCommand("ShootInstantlyWhenReady",
+            Commands.waitSeconds(.4)
+                .andThen(
+                    Commands.either(
+                        pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity),
+                        Commands.waitUntil(() -> !driver.getYButton()), 
+                        () -> !FieldConstants.IS_SIMULATION
+                    )
+                )
+            );
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootPreload());
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
         NamedCommands.registerCommand("LowerElevator", elevator.toBottomCommand());
