@@ -246,6 +246,7 @@ public class RobotContainer implements Logged {
         configureLoggingPaths();
 
         pdh.setSwitchableChannel(false);
+        Monologue.updateAll();
 
     }
     
