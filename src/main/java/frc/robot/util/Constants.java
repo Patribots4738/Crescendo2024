@@ -269,6 +269,7 @@ public final class Constants {
         public static final double AMPPER_OUTTAKE_SLOW = -0.3;
         public static final double AMPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
+        public static final double DEBUG_ELEVATOR_POS = 0.47;
         // This position is not used
         public static final double AMP_PLACE_POS = 0.409;        
         public static final double NOTE_FIX_POS = 0.129;
@@ -597,7 +598,7 @@ public final class Constants {
     }   
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = false;
+        public static final boolean SAFE_SPARK_MODE = true;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 

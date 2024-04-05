@@ -300,8 +300,10 @@ public class RobotContainer implements Logged {
             && shooter.getAverageTargetSpeed() != 2500
             && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
             && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
-        .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true)))
-        .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
+        .onTrue(Commands.runOnce(() -> 
+            pdh.setSwitchableChannel(true)).alongWith(limelight3g.blinkLeds(() -> 1), driver.setRumble(() -> 1)))
+        .onFalse(Commands.runOnce(() -> 
+            pdh.setSwitchableChannel(false)).alongWith(driver.setRumble(() -> 0)));
         
         // When our alliance changes, reflect that in the path previewer
         new Trigger(Robot::isRedAlliance)
@@ -490,7 +492,7 @@ public class RobotContainer implements Logged {
 
         // If this is nice to work with, then we keep it. If not... bye bye!
         new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS 
-                    && swerve.getPose().getY() > FieldConstants.FIELD_WIDTH_METERS/2.0)
+                    && swerve.getPose().getY() > FieldConstants.FIELD_HEIGHT_METERS/2.0)
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(alignmentCmds.ampRotationalAlignmentCommand(driver::getLeftX, driver::getLeftY));
         
@@ -502,6 +504,10 @@ public class RobotContainer implements Logged {
         // controller.leftBumper()
         //     .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
         //     .onFalse(pieceControl.stopIntakeAndIndexer().andThen(pieceControl.doubleAmpElevatorEnd()));
+
+        controller.leftBumper()
+            .onTrue(elevator.toTopIshButNotFullCommand())
+            .onFalse(elevator.toBottomCommand());
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())

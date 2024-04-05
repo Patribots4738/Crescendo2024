@@ -121,6 +121,10 @@ public class Elevator extends SubsystemBase implements Logged {
         return setPositionCommand(ElevatorConstants.TRAP_PLACE_POS, true);
     }
 
+    public Command toTopIshButNotFullCommand() {
+        return setPositionCommand(ElevatorConstants.DEBUG_ELEVATOR_POS, true);
+    }
+
     public Command toNoteFixCommand() {
         return setPositionCommand(ElevatorConstants.NOTE_FIX_POS, true);
     }
