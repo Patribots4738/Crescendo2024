@@ -68,13 +68,25 @@ public class Robot extends TimedRobot {
      * and
      * SmartDashboard integrated updating.
      */
+    private boolean updatedAlready = false;
+    private boolean updateTimer = false;
     @Override
     public void robotPeriodic() {
         // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-        if (gameMode != GameMode.DISABLED || (int) (Robot.currentTimestamp / 10) % 2 == 0) 
+        if (gameMode != GameMode.DISABLED) {
             Monologue.updateAll();
+        }
+        else {
+            updateTimer = (int) (Robot.currentTimestamp / 10) % 2 == 0;
+            if (updateTimer && !updatedAlready) {
+                updatedAlready = true;
+                Monologue.updateAll();
+            } else if (!updateTimer) {
+                updatedAlready = false;
+            }
+        }
         CommandScheduler.getInstance().run();
     }
 
