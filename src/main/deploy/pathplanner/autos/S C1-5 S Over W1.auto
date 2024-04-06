@@ -22,7 +22,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootWhenReady"
+                        "name": "ShootInstantlyWhenReady"
                       }
                     }
                   ]
@@ -64,6 +64,12 @@
                 "type": "sequential",
                 "data": {
                   "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.7
+                      }
+                    },
                     {
                       "type": "named",
                       "data": {
