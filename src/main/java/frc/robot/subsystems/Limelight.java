@@ -102,7 +102,7 @@ public class Limelight extends SubsystemBase implements Logged{
         double radStds;
         if ((Robot.gameMode == GameMode.DISABLED || 
             Robot.gameMode == GameMode.AUTONOMOUS
-                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3)
+                && Robot.currentTimestamp - RobotContainer.gameModeStart < 1.75)
                 && hasTarget(result)) {
             xyStds = 0.001;
             radStds = 0.0002;
