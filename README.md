@@ -36,7 +36,7 @@ Thanks for checking us out, & be sure to star this repository if you find anythi
 ___
 
 ## ✨ Highlights ✨  
-  - Object detection on Limelight --
+  - Object detection on Limelight -- 
   - Automatic shooter startup
   - Shooting while driving
   - Fully simulated robot, mechanisms, and motors
@@ -83,7 +83,7 @@ ___
 
 
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Note Detection
-  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when to robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
+  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when the robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
 
   > Here is a GIF of Terry detecting a note and chasing it! 🦖🔎
   
