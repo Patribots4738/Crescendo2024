@@ -53,6 +53,7 @@ import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.Constants.LEDConstants.LED_SECTIONS;
 import frc.robot.util.rev.Neo;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -94,7 +95,9 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     public static HDCTuner HDCTuner;
 
-    private final LedStrip ledStrip = new LedStrip();
+    private final LedStrip elevator1Strip = new LedStrip(LED_SECTIONS.ELEVATOR1);
+    private final LedStrip elevator2Strip = new LedStrip(LED_SECTIONS.ELEVATOR2);
+    
     private Indexer indexer;
     private Trapper trapper;
     private ShooterCmds shooterCmds;
@@ -229,21 +232,35 @@ public class RobotContainer implements Logged {
     }
     
     private void configureTimedEvents() {
+        // Elevator tracking 
         new Trigger(() -> elevator.getDesiredPosition() != 0)
-                .whileTrue(
-                    new LEDFollowerCommand(
-                        ledStrip.getLEDCommands(),
-                        elevator::getPosition,
-                        TrapConstants.ELEVATOR_TOP_LIMIT,
-                        Color.kBlue));
-
+            .whileTrue(
+                new LEDFollowerCommand(
+                    elevator1Strip.getLEDCommands(),
+                    elevator::getPosition,
+                    TrapConstants.ELEVATOR_TOP_LIMIT,
+                    Color.kBlue));
         new Trigger(() -> elevator.getDesiredPosition() == 0)
-                .whileTrue(
-                    new LEDFollowerCommand(
-                        ledStrip.getLEDCommands(),
-                        elevator::getPosition,
-                        TrapConstants.ELEVATOR_TOP_LIMIT,
-                        Color.kRed));
+            .whileTrue(
+                new LEDFollowerCommand(
+                    elevator1Strip.getLEDCommands(),
+                    elevator::getPosition,
+                    TrapConstants.ELEVATOR_TOP_LIMIT,
+                    Color.kRed));
+        new Trigger(() -> elevator.getDesiredPosition() != 0)
+            .whileTrue(
+                new LEDFollowerCommand(
+                    elevator2Strip.getLEDCommands(),
+                    elevator::getPosition,
+                    TrapConstants.ELEVATOR_TOP_LIMIT,
+                    Color.kBlue));
+        new Trigger(() -> elevator.getDesiredPosition() == 0)
+            .whileTrue(
+                new LEDFollowerCommand(
+                    elevator2Strip.getLEDCommands(),
+                    elevator::getPosition,
+                    TrapConstants.ELEVATOR_TOP_LIMIT,
+                    Color.kRed));
 
         // TODO: configure button bindings for LEDs
 
@@ -321,7 +338,7 @@ public class RobotContainer implements Logged {
         driver.leftBumper().and(driver.rightBumper())
             .onTrue(limelightMapper.printJSONCommand());
     }
- 
+
     private void configureDriverBindings(PatriBoxController controller) {
         
         // Upon hitting start or back,
@@ -525,7 +542,7 @@ public class RobotContainer implements Logged {
 
     public void onEnabled() {
         if (Robot.gameMode == GameMode.TELEOP) {
-            new LPI(ledStrip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
+            new LPI(elevator2Strip, swerve::getPose, operator, swerve::setDesiredPose).schedule();
         } else if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }

@@ -11,6 +11,7 @@ import frc.robot.Robot;
 import frc.robot.leds.commands.animations.LEDCommands;
 import frc.robot.leds.commands.animations.LEDConditionalCommand;
 import frc.robot.util.Constants.LEDConstants;
+import frc.robot.util.Constants.LEDConstants.LED_SECTIONS;
 
 import java.util.List;
 
@@ -23,9 +24,10 @@ public class LedStrip extends SubsystemBase {
 
     private LEDCommands ledFunctionCommand = new LEDCommands(this);
 
-    public LedStrip() {
+    public LedStrip(LED_SECTIONS section) {
         this.led = new AddressableLED(LEDConstants.PWM_PORT);
-        ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
+        Pair<Integer, Integer> lengthPair = LEDConstants.LED_SECTION_MAP.get(section);
+        ledBuffer = new AddressableLEDBuffer(lengthPair.getSecond()-lengthPair.getFirst());
 
         led.setLength(ledBuffer.getLength());
 

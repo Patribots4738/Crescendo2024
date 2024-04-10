@@ -502,7 +502,6 @@ public final class Constants {
                 10
         );
 
-
         public static final HashMap<LED_SECTIONS, Pair<Integer,Integer>> LED_SECTION_MAP = new HashMap<>(){{
             put(LED_SECTIONS.ELEVATOR1, LED_SECTIONS.ELEVATOR1.getIndexRange());
             put(LED_SECTIONS.ELEVATOR2, LED_SECTIONS.ELEVATOR2.getIndexRange());

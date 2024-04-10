@@ -54,7 +54,6 @@ public class LPI extends Command implements Logged {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("IMPORTANT PRINT: HHffffff");
         xboxController.setRumble(() -> 0);
     }
 
