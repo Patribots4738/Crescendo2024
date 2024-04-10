@@ -337,7 +337,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(792.90);
 
         public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(1);
-        public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(3);
+        public static final double AUTO_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(3);
+        public static final double PASS_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(10);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 

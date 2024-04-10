@@ -40,6 +40,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -452,7 +453,7 @@ public class Swerve extends SubsystemBase implements Logged {
 		double distance = currentPose.relativeTo(position).getTranslation().getNorm();
         return 
             MathUtil.isNear(0, distance, AutoConstants.AUTO_POSITION_TOLERANCE_METERS)
-            && MathUtil.isNear(0, angleDiff, AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
+            && MathUtil.isNear(0, angleDiff, AutoConstants.AUTO_ROTATION_TOLERANCE_RADIANS);
     }
 
     public boolean atHDCPose() {
@@ -460,7 +461,12 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public boolean atHDCAngle() {
-        return MathUtil.isNear(desiredHDCPose.getRotation().getRadians(), getPose().getRotation().getRadians(), AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
+        return MathUtil.isNear(
+            desiredHDCPose.getRotation().getRadians(), 
+            getPose().getRotation().getRadians(), 
+            PoseCalculations.closeToSpeaker()
+                ? AutoConstants.AUTO_ROTATION_TOLERANCE_RADIANS
+                : AutoConstants.PASS_ROTATION_TOLERANCE_RADIANS);
     }
 
     public boolean isAlignedToAmp() {
