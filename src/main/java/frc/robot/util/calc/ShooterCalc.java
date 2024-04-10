@@ -152,10 +152,9 @@ public class ShooterCalc implements Logged {
 
     public BooleanSupplier readyToPassSupplier() {
         return () ->
-        pivot.getAtDesiredAngle()
-        && shooter.getAtDesiredPassRPM()
-        && shooter.getAverageTargetSpeed() > 0
-        && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
+            pivot.getAtDesiredAngle()
+                && shooter.getAtDesiredPassRPM()
+                && shooter.getAverageTargetSpeed() > 0;
     }
 
     public SpeedAngleTriplet calculateSpeakerTriplet(Translation2d robotPose) {

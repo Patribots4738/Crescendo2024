@@ -1,6 +1,5 @@
 package frc.robot.commands.managers;
 
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -24,6 +23,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.commands.drive.AlignmentCmds;
@@ -45,9 +45,6 @@ public class PieceControl implements Logged {
     private Ampper ampper;
     @IgnoreLogged
     private ShooterCmds shooterCmds;
-    @IgnoreLogged
-    private AlignmentCmds alignmentCmds;
-    
 
     private ColorSensor colorSensor;
 
@@ -76,7 +73,6 @@ public class PieceControl implements Logged {
         this.elevator = elevator;
         this.ampper = ampper;
         this.shooterCmds = shooterCmds;
-        this.alignmentCmds = alignmentCmds;
         this.colorSensor = colorSensor;
     }
 
@@ -105,11 +101,11 @@ public class PieceControl implements Logged {
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier robotRelativeSupplier) {
         return
-        new ActiveConditionalCommand (
-            Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()).andThen(noteToShoot(poseSupplier, speedSupplier)),
-            Commands.waitUntil(shooterCmds.shooterCalc.readyToPassSupplier()).andThen(noteToShoot(poseSupplier, speedSupplier)),
-            alignmentCmds.alignmentCalc::closeToSpeaker);
-        
+            new ActiveConditionalCommand (
+                Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()).andThen(noteToShoot(poseSupplier, speedSupplier)),
+                Commands.waitUntil(shooterCmds.shooterCalc.readyToPassSupplier()).andThen(noteToShoot(poseSupplier, speedSupplier)),
+                PoseCalculations::closeToSpeaker);
+                
     }
 
     public Command shootPreload() {
