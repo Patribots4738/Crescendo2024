@@ -177,7 +177,7 @@ public class AlignmentCalc {
 
     public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose()));
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
     /**
