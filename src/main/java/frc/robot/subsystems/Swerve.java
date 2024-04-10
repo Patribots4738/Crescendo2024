@@ -73,8 +73,8 @@ public class Swerve extends SubsystemBase implements Logged {
     protected final static SwerveKinematicLimits KINEMATIC_LIMITS = new SwerveKinematicLimits();
     static {
         KINEMATIC_LIMITS.MAX_DRIVE_VELOCITY = AutoConstants.MAX_SPEED_METERS_PER_SECOND; // m/s
-        KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION = KINEMATIC_LIMITS.MAX_DRIVE_VELOCITY / 0.1; // m/s^2
-        KINEMATIC_LIMITS.MAX_STEERING_VELOCITY = Units.degreesToRadians(1600); // rad/s
+        KINEMATIC_LIMITS.MAX_DRIVE_ACCELERATION = 30.0; // m/s^2
+        KINEMATIC_LIMITS.MAX_STEERING_VELOCITY = Units.degreesToRadians(3500); // rad/s
     };
 
     /**
@@ -245,10 +245,10 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public void drive(ChassisSpeeds robotRelativeSpeeds) {
 
-        // SwerveModuleState[] newSwerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-                // ChassisSpeeds.discretize(robotRelativeSpeeds, (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
+        SwerveModuleState[] newSwerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
+                ChassisSpeeds.discretize(robotRelativeSpeeds, (Timer.getFPGATimestamp() - Robot.previousTimestamp)));
 
-        setModuleStates(DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(robotRelativeSpeeds));
+        setModuleStates(newSwerveModuleStates);
     }
 
     public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
@@ -262,9 +262,9 @@ public class Swerve extends SubsystemBase implements Logged {
             robotRelativeSpeeds = new ChassisSpeeds(xSpeed, ySpeed, rotSpeed);
         }
 
-        // ChassisSpeeds discretizedSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, timeDifference);
+        ChassisSpeeds discretizedSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, timeDifference);
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS
-                .toSwerveModuleStates(robotRelativeSpeeds);
+                .toSwerveModuleStates(discretizedSpeeds);
 
         setModuleStates(swerveModuleStates);
     }
@@ -323,23 +323,14 @@ public class Swerve extends SubsystemBase implements Logged {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        // SwerveDriveKinematics.desaturateWheelSpeeds(
-        //         desiredStates,
-        //         DriveConstants.MAX_SPEED_METERS_PER_SECOND);
-        // frontLeft.setDesiredState(desiredStates[0]);
-        // frontRight.setDesiredState(desiredStates[1]);
-        // rearLeft.setDesiredState(desiredStates[2]);
-        // rearRight.setDesiredState(desiredStates[3]);
-
-        // RobotContainer.swerveDesiredStates = desiredStates;
         setModuleStatesWithSetpoints(desiredStates);
     }
 
     public void setModuleStatesWithSetpoints(SwerveModuleState[] desiredStates) {
         
-        // SwerveDriveKinematics.desaturateWheelSpeeds(
-        //         desiredStates,
-        //         DriveConstants.MAX_SPEED_METERS_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(
+                desiredStates,
+                DriveConstants.MAX_SPEED_METERS_PER_SECOND);
         
         SwerveSetpoint prev = swerveSetpoint;
 
