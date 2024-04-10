@@ -53,6 +53,10 @@ public class Intake extends SubsystemBase implements Logged {
         return setPercentCommand(IntakeConstants.INTAKE_PERCENT/3.0);
     }
 
+    public Command inCommandSlow(double speed) {
+        return setPercentCommand(speed);
+    }
+
     public Command outCommand() {
         return setPercentCommand(IntakeConstants.OUTTAKE_PERCENT);
     }

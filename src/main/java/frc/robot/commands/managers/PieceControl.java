@@ -174,8 +174,8 @@ public class PieceControl implements Logged {
 
     public Command intakeForDoubleAmp() {
         return Commands.sequence(
-            intake.inCommand(),
-            ampper.intake(),
+            intake.inCommandSlow(.45),
+            ampper.intakeSlow(),
             indexer.toShooterSlow(),
             Commands.runOnce(this::restartDoubleAmpTimer)
         );
@@ -453,7 +453,7 @@ public class PieceControl implements Logged {
             () -> 
                 (((colorSensor.hasNote() 
                         && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean()))
+                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean() && elevator.getDesiredPosition() <= 0.1))
                 
                 || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 
                     && Robot.gameMode == GameMode.TELEOP 
