@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
         // Remove if not at comp:
-        RobotController.setBrownoutVoltage(6.0);
+        RobotController.setBrownoutVoltage(8.0);
     }
 
     /**
