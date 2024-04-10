@@ -100,16 +100,13 @@ public class PieceControl implements Logged {
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier atDesiredAngle) {
         return
-            new ActiveConditionalCommand(
-                Commands.waitUntil(() -> 
-                    shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() 
-                    && atDesiredAngle.getAsBoolean())
-                .andThen(noteToShoot(poseSupplier, speedSupplier)),
-                Commands.waitUntil(() -> 
-                    shooterCmds.shooterCalc.readyToPassSupplier().getAsBoolean() 
-                    && atDesiredAngle.getAsBoolean())
-                .andThen(noteToShoot(poseSupplier, speedSupplier)),
-                PoseCalculations::closeToSpeaker);
+            Commands.waitUntil(() -> 
+                    (PoseCalculations.closeToSpeaker()
+                        ? shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() 
+                        : shooterCmds.shooterCalc.readyToPassSupplier().getAsBoolean())
+                    && atDesiredAngle.getAsBoolean()
+                )
+            .andThen(noteToShoot(poseSupplier, speedSupplier));
                 
     }
 
