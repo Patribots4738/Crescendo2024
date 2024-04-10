@@ -149,6 +149,7 @@ public final class Constants {
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
+        public static final double PIVOT_RAISE_ANGLE_DEGREES = 49;
 
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
 
@@ -219,13 +220,14 @@ public final class Constants {
                 put(7, SpeedAngleTriplet.of(3160.0, 2865.0, 46.3));
                 put(8, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
                 put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
-                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 38.2));
-                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 35.8));
-                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 34.4));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 33.5));
-                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 32.2));
-                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 32.0));
-                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 30.7));
+                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
+                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
+                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 33.3));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 30.9));
+                // Future note, 13.2ft is a common shot which should have its own calibration point
+                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 29.4));
+                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 28));
+                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 26.7));
                 
             }
         };
@@ -238,7 +240,7 @@ public final class Constants {
             }
         }};
 
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
+        public static final double SHOOTER_WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
         public static final double GRAVITY = 9.81;
         public static final double SPEAKER_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
         public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.PASS_HEIGHT_METERS);
@@ -271,9 +273,10 @@ public final class Constants {
         public static final double AMPPER_OUTTAKE_SLOW = -0.3;
         public static final double AMPPER_STOP_PERCENT = 0;
         public static final double TRAP_PLACE_POS = 0.49;
+        public static final double DEBUG_ELEVATOR_POS = 0.47;
         // This position is not used
         public static final double AMP_PLACE_POS = 0.409;        
-        public static final double NOTE_FIX_POS = 0.129;
+        public static final double NOTE_FIX_POS = 0.096;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
@@ -416,15 +419,20 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
-            "S C5-4 S OBJ",
-            "S W3-1 S C2-3 S",
-            "S W3-1 S C2-3 S 2",
-            "S W3-1 S C2-3 S 2 OBJ",
-            "S W3-1 S C2-3 S OBJ",
-            "S W3-1 C1-3 OBJ",
-            "S C1-3 OBJ Over W1",
-            "S C1-5 C5-1 OBJ Over W1",
-            "S C5-1 C1-5 OBJ",
+            // "S C5-4 S OBJ",
+            "S C5-1 S",
+            "S W3-1 S C2-5 S",
+            "S W3-1 S C2-5 S 2",
+
+            "S W3-1 S C1-2 S",
+            "S W3-1 S C1-2 S 2",
+            // "S W3-1 S C2-3 S 2 OBJ",
+            // "S W3-1 S C2-3 S OBJ",
+            // "S W3-1 C1-3 OBJ",
+            // "S C1-3 OBJ Over W1",
+            // "S C1-5 C5-1 OBJ Over W1",
+            "S C1-5 S Over W1",
+            // "S C5-1 C1-5 OBJ",
             // "Proxy"
         };
     }
@@ -485,7 +493,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4842953740931015*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.468519624221792*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
@@ -602,7 +610,7 @@ public final class Constants {
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
         public static final int MAX_PERIODIC_STATUS_TIME_MS = 32766;
-        public static final int FAST_PERIODIC_STATUS_TIME_MS = 20;
+        public static final int FAST_PERIODIC_STATUS_TIME_MS = 15;
 
         // This gets filled out as motors are created on the robot
         public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
@@ -1111,8 +1119,8 @@ public final class Constants {
             put("noteToIndexer2", 0.07);
             put("noteToIndexer3", 0.0);
 
-            put("noteToTrap1", 0.3255);
-            put("noteToTrap2", 0.3647);
+            put("noteToTrap1", 0.15);
+            put("noteToTrap2", 0.254);
             put("noteToTrap3", 0.0);
             
             put("dropPiece1", 0.5);

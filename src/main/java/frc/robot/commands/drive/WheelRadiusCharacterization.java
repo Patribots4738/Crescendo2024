@@ -63,6 +63,8 @@ public class WheelRadiusCharacterization extends Command implements Logged {
             averageWheelPosition += Math.abs(wheelPositions[i] - startWheelPositions[i]);
         }
 
+        System.out.println(averageWheelPosition);
+
         averageWheelPosition /= 4.0;
         
         double driveRadius = Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0;
@@ -72,6 +74,7 @@ public class WheelRadiusCharacterization extends Command implements Logged {
 
     @Override
     public void end(boolean interrupted) {
+        swerve.stopDriving();
         if (accumGyroYawRads <= Math.PI * 2.0) {
             System.out.println("\nNot enough data for characterization\n" + accumGyroYawRads);
         } else {

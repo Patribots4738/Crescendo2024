@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.29235458470917,
-      "y": 4.778983272252259
+      "x": 1.29,
+      "y": 5.55
     },
-    "rotation": 151.53108100340572
+    "rotation": 179.22577983507193
   },
   "command": {
     "type": "sequential",
@@ -28,7 +28,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3-1"
+                        "pathName": "S W3-1 2"
                       }
                     },
                     {
@@ -89,6 +89,12 @@
                       }
                     },
                     {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
                       "type": "named",
                       "data": {
                         "name": "ToIndexer"
@@ -103,7 +109,13 @@
         {
           "type": "named",
           "data": {
-            "name": "C1toC5nonOBJ"
+            "name": "C1toC2nonOBJ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L C2"
           }
         }
       ]

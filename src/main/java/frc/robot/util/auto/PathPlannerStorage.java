@@ -6,6 +6,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,6 +25,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
 import monologue.Logged;
+import monologue.Monologue;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import java.util.ArrayList;
@@ -252,7 +254,7 @@ public class PathPlannerStorage implements Logged {
                             .andThen(NamedCommands.getCommand("ToIndexer")
                             .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
                     .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
-                    .deadlineWith(NamedCommands.getCommand("PrepareSWD")), 
+                    .deadlineWith(NamedCommands.getCommand("PrepareSWD")).onlyIf(colorSensorSupplier), 
                 commandGroup.getRequirements());
         }
 
@@ -266,14 +268,26 @@ public class PathPlannerStorage implements Logged {
                         .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
                 .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
                 .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
-                .andThen(AutoBuilder.followPath(getNoteAfterShot)
-                    .alongWith(NamedCommands.getCommand("StopAll")
-                        .andThen(NamedCommands.getCommand("ToIndexer"))));
+                .raceWith(Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean() && swerve.insideOwnWing()))
+
+                .andThen(
+                    Commands.race(
+                        Commands.sequence(
+                            AutoBuilder.followPath(getNoteAfterShot),
+                            Commands.waitSeconds(.3)
+                        ),
+                        Commands.sequence(
+                            NamedCommands.getCommand("StopAll"),
+                            Commands.waitSeconds(1),
+                            NamedCommands.getCommand("ToIndexer")
+                        )
+                    )
+                );
 
         Command skipNoteCommand = AutoBuilder.followPath(skipNote)
             .raceWith(NamedCommands.getCommand("ToIndexer"));
 
-        return Commands.waitUntil(colorSensorSupplier).withTimeout(0.3).andThen(
+        return Commands.waitUntil(colorSensorSupplier).withTimeout(0.45).andThen(
             Commands.defer(() -> 
                 Commands.either(
                     shootAndMoveToNextNote,
@@ -337,11 +351,15 @@ public class PathPlannerStorage implements Logged {
     }
 
     private boolean reasonableNoteInVision() {
+        Translation2d noteTranslation = limelight.getNotePose2d().getTranslation();
+        double x_cushon = Units.inchesToMeters(40);
+        double y_cushon = Units.inchesToMeters(12);
         return 
             limelight.noteInVision(limelight.getResults())
-            && ((Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X + Units.inchesToMeters(40))
-                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X - Units.inchesToMeters(40))
-            && limelight.getNotePose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < 2.75);
+            && ((Robot.isBlueAlliance() && noteTranslation.getX() < FieldConstants.CENTERLINE_X + x_cushon)
+                || (Robot.isRedAlliance() && noteTranslation.getX() > FieldConstants.CENTERLINE_X - x_cushon)
+            && noteTranslation.getDistance(swerve.getPose().getTranslation()) < 2.75
+            && MathUtil.clamp(noteTranslation.getY(), -y_cushon, FieldConstants.FIELD_HEIGHT_METERS+y_cushon) == noteTranslation.getY());
     }
 
     /**

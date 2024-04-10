@@ -193,7 +193,7 @@ public class ShooterCmds {
 	}
 
     public Command raisePivot() {
-        return pivot.setAngleCommand(ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
+        return pivot.setAngleCommand(ShooterConstants.PIVOT_RAISE_ANGLE_DEGREES);
 	}
     
 }

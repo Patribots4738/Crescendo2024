@@ -278,7 +278,7 @@ public class ShooterCalc implements Logged {
         double rotationsPerSecond = rotationsPerMinute / 60.0;
         double radiansPerSecond = rotationsPerSecond * Math.PI;
 
-        double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
+        double diameter = ShooterConstants.SHOOTER_WHEEL_DIAMETER_METERS;
 
         desiredMPSForNote = diameter * radiansPerSecond;
 
@@ -296,7 +296,7 @@ public class ShooterCalc implements Logged {
      * @return the RPM (Rotations Per Minute) of the shooter wheel
      */
     public double velocityToRPM(double noteVelocity) {
-        double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
+        double diameter = ShooterConstants.SHOOTER_WHEEL_DIAMETER_METERS;
     
         // Convert velocity back to radians per second
         double radiansPerSecond = noteVelocity / (2*Math.PI);

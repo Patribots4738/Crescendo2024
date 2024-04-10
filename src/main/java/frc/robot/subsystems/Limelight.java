@@ -102,7 +102,7 @@ public class Limelight extends SubsystemBase implements Logged{
         double radStds;
         if ((Robot.gameMode == GameMode.DISABLED || 
             Robot.gameMode == GameMode.AUTONOMOUS
-                && Robot.currentTimestamp - RobotContainer.gameModeStart < 3)
+                && Robot.currentTimestamp - RobotContainer.gameModeStart < 1.75)
                 && hasTarget(result)) {
             xyStds = 0.001;
             radStds = 0.0002;
@@ -116,20 +116,15 @@ public class Limelight extends SubsystemBase implements Logged{
             // multiple targets detected
             if (targets.length > 1) {
                 if (Robot.gameMode == GameMode.TELEOP) {
-                    // Trust the vision even more
+                    // Trust the vision even MORE
                     if (targets.length > 2) {
-                        if (LimelightHelpers.getTA(limelightName) > .1) {
-                            xyStds = Math.hypot(0.004, 0.002);
-                        } else {
-                            // The target is smaller, (less trust)
-                            xyStds = Math.hypot(0.024, 0.056);
-                        }
+                        xyStds = Math.hypot(0.002, 0.003);
                     } else {
                         // We can only see two tags, (still trustable)
-                        xyStds = Math.hypot(0.01, 0.005);
+                        xyStds = Math.hypot(0.005, 0.008);
                     }
                 } else {
-                    xyStds = Math.hypot(0.011, 0.019);
+                    xyStds = Math.hypot(0.014, 0.016);
                 }
                 radStds = Units.degreesToRadians(2);
             }
@@ -395,6 +390,10 @@ public class Limelight extends SubsystemBase implements Logged{
                 Commands.runOnce(this::disableLEDS), 
                 enabled
             ).ignoringDisable(true).asProxy();
+    }
+
+    public Command setLEDState(boolean enabled) {
+        return setLEDState(() -> enabled);
     }
 
     public void enableLEDS() {

@@ -207,6 +207,12 @@ public class Swerve extends SubsystemBase implements Logged {
         return this.gyroRotation2d;
     }
 
+    public boolean insideOwnWing() {
+        return Robot.isBlueAlliance() 
+            ? getPose().getX() < FieldConstants.BLUE_WING_X 
+            : getPose().getX() > FieldConstants.RED_WING_X;
+    }
+
     public SwerveDrivePoseEstimator getPoseEstimator() {
         return poseEstimator;
     }

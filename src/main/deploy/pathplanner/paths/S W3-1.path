@@ -81,7 +81,7 @@
     {
       "name": "Slow w2",
       "minWaypointRelativePos": 2.3000000000000003,
-      "maxWaypointRelativePos": 2.6,
+      "maxWaypointRelativePos": 2.65,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 4.2,
@@ -139,7 +139,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -151.21029155275556,
+    "rotation": -149.36485747779972,
     "rotateFast": false
   },
   "reversed": false,

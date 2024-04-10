@@ -34,13 +34,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootWhenReady"
+                        "name": "EnableLimelight"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "EnableLimelight"
+                        "name": "ShootInstantlyWhenReady"
                       }
                     }
                   ]
@@ -56,15 +56,60 @@
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "W1 C2"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "W1 C2"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.3
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StopAll"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ToIndexer"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "C2toC3nonOBJ"
+            "name": "C2toC5nonOBJ"
           }
         }
       ]

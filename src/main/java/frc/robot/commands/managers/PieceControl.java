@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -177,10 +178,15 @@ public class PieceControl implements Logged {
 
     public Command intakeForDoubleAmp() {
         return Commands.sequence(
-            intake.inCommand(),
-            ampper.intake(),
-            indexer.toShooterSlow()
+            intake.inCommandSlow(.45),
+            ampper.intakeSlow(),
+            indexer.toShooterSlow(),
+            Commands.runOnce(this::restartDoubleAmpTimer)
         );
+    }
+
+    public Command doubleAmpElevatorEnd() {
+        return Commands.either(elevatorToTop(), elevatorToBottom(), this::doubleAmpTimerReady);
     }
 
     public Command blepNote() {
@@ -451,12 +457,21 @@ public class PieceControl implements Logged {
             () -> 
                 (((colorSensor.hasNote() 
                         && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean()))
+                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean() && elevator.getDesiredPosition() <= 0.1))
                 
                 || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 
                     && Robot.gameMode == GameMode.TELEOP 
                     && DriverStation.isFMSAttached()))
                 && RobotController.getBatteryVoltage() > 10)
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
+    }
+
+    private Timer doubleAmpTimer = new Timer();
+    public void restartDoubleAmpTimer() {
+        doubleAmpTimer.restart();
+    }
+
+    public boolean doubleAmpTimerReady() {
+        return doubleAmpTimer.get() > 0.35;
     }
 }
