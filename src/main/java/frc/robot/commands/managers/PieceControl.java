@@ -66,7 +66,6 @@ public class PieceControl implements Logged {
             Elevator elevator,
             Ampper ampper,
             ShooterCmds shooterCmds,
-            AlignmentCmds alignmentCmds,
             ColorSensor colorSensor) {
         this.intake = intake;
         this.indexer = indexer;
