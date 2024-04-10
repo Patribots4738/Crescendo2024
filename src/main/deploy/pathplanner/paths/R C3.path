@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.880091849769366,
-        "y": 1.8431846942081342
+        "x": 2.739170301035638,
+        "y": 3.1367081173878657
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.344335376240742,
-        "y": 3.4747643932392345
+        "x": 3.7044291184513694,
+        "y": 2.929866942227352
       },
       "isLocked": false,
       "linkedName": "R"
     },
     {
       "anchor": {
-        "x": 8.178327129330631,
-        "y": 4.099779112962734
+        "x": 4.726377739429611,
+        "y": 3.6358082122659208
       },
       "prevControl": {
-        "x": 6.692849261410368,
-        "y": 4.146016444328521
+        "x": 4.207493325080779,
+        "y": 3.336214234933559
+      },
+      "nextControl": {
+        "x": 5.498584793362196,
+        "y": 4.081665856500806
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.26566006995396,
+        "y": 4.095455268178173
+      },
+      "prevControl": {
+        "x": 6.188055377230576,
+        "y": 4.178464364016941
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,28 +46,10 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "ToIndexer",
-      "waypointRelativePos": 0.65,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToIndexer"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 4.5,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },

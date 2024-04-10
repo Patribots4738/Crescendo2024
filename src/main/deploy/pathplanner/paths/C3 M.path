@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.178327129330631,
-        "y": 4.099779112962734
+        "x": 8.26566006995396,
+        "y": 4.095455268178173
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.6595766487538945,
-        "y": 3.9496277413647314
+        "x": 6.746909589377223,
+        "y": 3.9453038965801706
       },
       "isLocked": false,
       "linkedName": "C3"
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 3.9982201950219505,
-        "y": 5.159921241828299
+        "x": 3.954170685497026,
+        "y": 5.046924673916537
       },
       "prevControl": {
-        "x": 4.587717544229416,
-        "y": 4.643201343140275
+        "x": 4.543668034704492,
+        "y": 4.530204775228513
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,25 +46,7 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 1.8,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 6.5,
@@ -73,7 +55,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 174.19676195301267,
+    "rotation": 172.85862277789553,
     "rotateFast": false
   },
   "reversed": false,

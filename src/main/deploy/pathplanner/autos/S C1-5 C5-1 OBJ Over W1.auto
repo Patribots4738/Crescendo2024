@@ -1,0 +1,56 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.2322620938792657,
+      "y": 7.14545417230197
+    },
+    "rotation": -127.00560004320243
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootWhenReady"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S C1 N Over W1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C1toC5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C5toC1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "OBJ",
+  "choreoAuto": false
+}

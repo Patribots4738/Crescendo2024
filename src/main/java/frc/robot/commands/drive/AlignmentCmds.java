@@ -16,13 +16,17 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.AlignmentCalc;
+import monologue.Annotations.IgnoreLogged;
 
 public class AlignmentCmds {
     
+    @IgnoreLogged
     private Climb climb;
+    @IgnoreLogged
     private Swerve swerve;
-    private ShooterCmds shooterCmds;
 
+    private ShooterCmds shooterCmds;
+    @IgnoreLogged
     public AlignmentCalc alignmentCalc;
 
     public AlignmentCmds(Swerve swerve, Climb climb, ShooterCmds shooterCmds) {
@@ -35,7 +39,7 @@ public class AlignmentCmds {
     /**
      * Command to align the robot rotationally to the source of the field.
      * 
-     * @param autoSpeeds       Auto alignment speeds from [-DriveConsants.MAX_SPEED_METERS_PER_SECOND
+     * @param autoSpeeds       Auto alignment speeds from [-DriveConstants.MAX_SPEED_METERS_PER_SECOND
      *                                                DriveConstants.MAX_SPEED_METERS_PER_SECOND]
      * @param controllerSpeeds Controller speeds from [-1, 1]
      * 
@@ -68,6 +72,14 @@ public class AlignmentCmds {
                         0,
                         swerve.getPose().getRotation()
                     )
+            );
+    }
+
+    public Command ampRotationalAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
+        return 
+            swerve.getDriveCommand(
+                alignmentCalc.getAmpRotationalSpeedsSupplier(driverX, driverY),
+                () -> true
             );
     }
 
@@ -152,16 +164,14 @@ public class AlignmentCmds {
             Commands.either(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
-                    .alongWith(shooterCmds.prepareSWDCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                        .finallyDo(shooterCmds.stopShooter()::initialize)),
+                    .alongWith(shooterCmds.prepareStillSpeakerCommand(swerve::getPose)),
                 climb::getHooksUp);
     }
 
     public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
         return
-            speakerRotationalAlignment(driverX, driverY, shooterCmds)
-                .alongWith(shooterCmds.preparePassCommand(swerve::getPose, swerve::getRobotRelativeVelocity)
-                    .finallyDo(shooterCmds.stopShooter()::initialize));
+            passRotationalAlignment(driverX, driverY, shooterCmds)
+                .alongWith(shooterCmds.preparePassCommand(swerve::getPose));
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {

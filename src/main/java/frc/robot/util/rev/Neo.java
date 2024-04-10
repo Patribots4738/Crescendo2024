@@ -1,4 +1,4 @@
-// Developed in tandem with Reza from Team Spyder (1622)
+// Developed in tandem with Reza from 1622
 
 package frc.robot.util.rev;
 
@@ -76,12 +76,6 @@ public class Neo extends SafeSpark {
         } else {
             setTelemetryPreference(TelemetryPreference.ONLY_RELATIVE_ENCODER);
         }
-
-        // Add a delay to let the spark reset
-        // If a parameter set fails, this will add more time 
-        // to minimize any bus traffic.
-        // Default is 20ms
-        setCANTimeout(50);
         
         setBrakeMode();
         register();

@@ -1,0 +1,81 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.329585996238062,
+      "y": 7.156704660553778
+    },
+    "rotation": -128.50065372034544
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "EnableLimelight"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopAll"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S C1 N Over W1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C1toC3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C3toC1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C1toC3"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "OBJ",
+  "choreoAuto": false
+}

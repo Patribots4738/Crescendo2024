@@ -18,11 +18,14 @@ import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 
 public class ShooterCalc implements Logged {
     
+    @IgnoreLogged
     private Shooter shooter;
+    @IgnoreLogged
     private Pivot pivot;
 
     public ShooterCalc(Shooter shooter, Pivot pivot) {
@@ -45,7 +48,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTriplet(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
+        SpeedAngleTriplet currentTriplet = calculateSpeakerTriplet(pose.getTranslation());
         double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
 
         double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
@@ -66,15 +69,7 @@ public class ShooterCalc implements Logged {
     public SpeedAngleTriplet calculateSWDTripletAuto(Pose2d pose, ChassisSpeeds speeds) {
         Pose2d currentPose = pose;
 
-        SpeedAngleTriplet currentTriplet = calculateApexTriplet(pose);
-        double normalVelocity = getVelocityVectorToSpeaker(currentPose, speeds).getY();
-
-        double originalv0 = rpmToVelocity(currentTriplet.getSpeeds());
-        double v0z = originalv0 * Math.sin(Units.degreesToRadians(currentTriplet.getAngle()));
-        double v0x = originalv0 * Math.cos(Units.degreesToRadians(currentTriplet.getAngle())) + normalVelocity;
-
-        double newv0 = Math.hypot(v0x, v0z);
-        Rotation2d newAngle = new Rotation2d(v0x, v0z);
+        SpeedAngleTriplet currentTriplet = calculateSWDTriplet(currentPose, speeds);
 
         double maxRPMAuto = ShooterConstants.INTERPOLATION_MAP.get(Units.metersToFeet(5)).getAverageSpeed();
         
@@ -82,11 +77,11 @@ public class ShooterCalc implements Logged {
             SpeedAngleTriplet.of(
                 MathUtil.clamp(currentTriplet.getLeftSpeed(), 0, maxRPMAuto),
                 MathUtil.clamp(currentTriplet.getRightSpeed(), 0, maxRPMAuto),
-                newAngle.getDegrees()
+                currentTriplet.getAngle()
             );
     }
 
-    public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose, ChassisSpeeds speeds) {
+    public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose) {
         Rotation2d pivotAngle = calculatePassPivotAngle(robotPose);
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForPassApex(robotPose, pivotAngle);
         return SpeedAngleTriplet.of(
@@ -100,6 +95,7 @@ public class ShooterCalc implements Logged {
         Rotation2d pivotAngle = calculatePivotAngle(robotPose);
         Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForSpeakerApex(robotPose, pivotAngle);
         return SpeedAngleTriplet.of(
+            // Not Working
             // Don't ask. It works. Is this how we finally beat the hawaiian kids?
             shooterSpeeds.getFirst(),
             shooterSpeeds.getSecond(),
@@ -116,36 +112,42 @@ public class ShooterCalc implements Logged {
         // Calculate the robot's pose relative to the speaker's position
         robotPose = robotPose.relativeTo(FieldConstants.GET_SPEAKER_POSITION());
 
-        // Calculate the distance in feet from the robot to the speaker
+        // Calculate the distance in meters from the robot to the speaker
         double distanceMeters = robotPose.getTranslation().getNorm();
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.SPEAKER_HEIGHT_METERS + NT.getValue("atan++"));
+        return new Rotation2d(
+            distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), 
+            FieldConstants.SPEAKER_HEIGHT_METERS - NTConstants.PIVOT_OFFSET_METERS.getZ() + NT.getValue("atan++")
+        );
     }
 
     public Rotation2d calculatePassPivotAngle(Pose2d robotPose) {
         // Calculate the robot's pose relative to the speaker's position
-        robotPose = robotPose.relativeTo(FieldConstants.GET_PASS_POSITION());
+        robotPose = robotPose.relativeTo(FieldConstants.GET_PASS_APEX_POSITION());
 
         // Calculate the distance in feet from the robot to the speaker
         double distanceMeters = robotPose.getTranslation().getNorm();
 
         // Return a new rotation object that represents the pivot angle
         // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters - NTConstants.PIVOT_OFFSET_METERS.getX(), FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
+        return new Rotation2d(distanceMeters, FieldConstants.PASS_HEIGHT_METERS + NT.getValue("atan++"));
     }
 
     /**
-	 * Determines if the pivot rotation is at its target with a small
+	 * Determines if the pivot and shooter is at its target for shooting with a small
 	 * tolerance
 	 * 
 	 * @return The method is returning a BooleanSupplier that returns true
-	 *         if the pivot is at its target rotation and false otherwise
+	 *         if the pivot and shooter are at their target states for shooting and false otherwise
 	 */
-    @Log
 	public BooleanSupplier readyToShootSupplier() {
-        return () -> pivot.getAtDesiredAngle() && shooter.getAtDesiredRPM();
+        return () ->  
+            pivot.getAtDesiredAngle()
+                && shooter.getAtDesiredRPM()
+                && shooter.getAverageTargetSpeed() > 0
+                && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
     }
 
     public SpeedAngleTriplet calculateSpeakerTriplet(Translation2d robotPose) {
@@ -187,8 +189,8 @@ public class ShooterCalc implements Logged {
         Rotation2d currentAngleToTarget = new Rotation2d(poseRelativeToTarget.getX(), poseRelativeToTarget.getY());
         double velocityArcTan = Math.atan2(
             velocityTangent,
-            target.equals(FieldConstants.GET_PASS_POSITION()) 
-                ? rpmToVelocity(calculatePassTriplet(robotPose, robotVelocity).getSpeeds()) 
+            target.equals(FieldConstants.GET_PASS_TARGET_POSITION()) 
+                ? rpmToVelocity(calculatePassTriplet(robotPose).getSpeeds()) 
                 : rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
             // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         );
@@ -206,14 +208,12 @@ public class ShooterCalc implements Logged {
     }
 
     public Rotation2d calculateRobotAngleToPass(Pose2d robotPose) {
-        return calculateRobotAngleToPose(robotPose, new ChassisSpeeds(), FieldConstants.GET_PASS_POSITION());
+        return calculateRobotAngleToPass(robotPose, new ChassisSpeeds());
     }
 
     public Rotation2d calculateRobotAngleToPass(Pose2d robotPose, ChassisSpeeds robotVelocity) {
-        return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_POSITION());
+        return calculateRobotAngleToPose(robotPose, robotVelocity, FieldConstants.GET_PASS_TARGET_POSITION());
     }
-
-
 
     public Rotation2d calculateRobotAngleToSpeaker(Pose2d pose) {
         return calculateRobotAngleToSpeaker(pose, new ChassisSpeeds());
@@ -271,7 +271,7 @@ public class ShooterCalc implements Logged {
         double rotationsPerSecond = rotationsPerMinute / 60.0;
         double radiansPerSecond = rotationsPerSecond * Math.PI;
 
-        double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
+        double diameter = ShooterConstants.SHOOTER_WHEEL_DIAMETER_METERS;
 
         desiredMPSForNote = diameter * radiansPerSecond;
 
@@ -289,7 +289,7 @@ public class ShooterCalc implements Logged {
      * @return the RPM (Rotations Per Minute) of the shooter wheel
      */
     public double velocityToRPM(double noteVelocity) {
-        double diameter = ShooterConstants.WHEEL_DIAMETER_METERS;
+        double diameter = ShooterConstants.SHOOTER_WHEEL_DIAMETER_METERS;
     
         // Convert velocity back to radians per second
         double radiansPerSecond = noteVelocity / (2*Math.PI);
@@ -315,6 +315,6 @@ public class ShooterCalc implements Logged {
 
     private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle) {
         double desiredRPM = velocityToRPM(ShooterConstants.PASS_V0Z / (pivotAngle.getSin()));
-        return Pair.of(desiredRPM, desiredRPM);
+        return Pair.of(desiredRPM/1.5, desiredRPM/1.5);
     }
 }

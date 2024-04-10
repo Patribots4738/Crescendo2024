@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4728426619973807,
+      "y": 6.278778783761375
+    },
+    "rotation": 177.8389921898016
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S C1 N"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C1toC5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C5toC1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "OBJ",
+  "choreoAuto": false
+}

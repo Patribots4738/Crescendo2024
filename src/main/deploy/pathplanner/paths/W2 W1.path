@@ -48,12 +48,12 @@
     },
     {
       "anchor": {
-        "x": 3.9173989210240463,
-        "y": 6.5775493701043395
+        "x": 3.774908333691248,
+        "y": 5.915657609590695
       },
       "prevControl": {
-        "x": 3.545084805735121,
-        "y": 6.908495250361161
+        "x": 3.650803628594939,
+        "y": 6.356918783266457
       },
       "nextControl": null,
       "isLocked": false,
@@ -67,7 +67,30 @@
       "rotateFast": false
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.44999999999999996,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    },
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0.8999999999999999,
+      "maxWaypointRelativePos": 0,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    }
+  ],
   "eventMarkers": [
     {
       "name": "Intake",
@@ -79,7 +102,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Intake"
+                "name": "ToIndexer"
               }
             },
             {
@@ -95,13 +118,13 @@
   ],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 4.5,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -172.68221039827986,
+    "rotation": -174.09910671361112,
     "rotateFast": false
   },
   "reversed": false,

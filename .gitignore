@@ -105,6 +105,7 @@ Temporary Items
 
 ### VisualStudioCode ###
 .vscode/*
+!.vscode/java-formatter.xml
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -181,3 +182,8 @@ ctre_sim/
 
 # Choreo trajectories to stop branches from losing their sync-ness
 *.traj
+
+# Ignore all files in the .git-story_media directory
+git-story_media/images
+git-story_media/videos/*/partial_movie_files
+git-story_media/texts

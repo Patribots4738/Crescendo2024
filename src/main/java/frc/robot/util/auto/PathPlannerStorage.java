@@ -5,6 +5,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.util.Constants.AutoConstants;
-import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.custom.PatriSendableChooser;
@@ -24,9 +25,9 @@ import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
 import monologue.Logged;
+import monologue.Monologue;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,14 +36,13 @@ import java.util.function.Consumer;
 
 /**
  * This file represents all of the auto paths that we will have
- * They will be primarily comiled through
+ * They will be primarily compiled through
  * PathPlannerTrajectory.importChoreoPaths,
  * with each segment having its own method 
  * to make sure that the modularity stays clean
  */
 public class PathPlannerStorage implements Logged {
 
-    private final BooleanSupplier hasPieceSupplier;
     private final BooleanSupplier colorSensorSupplier;
     
     @Log.NT
@@ -70,8 +70,7 @@ public class PathPlannerStorage implements Logged {
      * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
      *                         This could be a sensor, motor current, or other system.
      */
-    public PathPlannerStorage(BooleanSupplier hasPieceSupplier, BooleanSupplier colorSensorSupplier, Swerve swerve, Limelight limelight) {
-        this.hasPieceSupplier = hasPieceSupplier;
+    public PathPlannerStorage(BooleanSupplier colorSensorSupplier, Swerve swerve, Limelight limelight) {
         this.colorSensorSupplier = colorSensorSupplier;
         this.swerve = swerve;
         this.limelight = limelight;
@@ -87,13 +86,14 @@ public class PathPlannerStorage implements Logged {
          * therefore being added to the auto chooser.
          * 
          * To remove old options, the deploy directory will need to be cleared manually
-         * via SSH, WinSCP, reimaging the RIO, etc.
+         * via SSH, WinSCP, re-imaging the RIO, etc.
          */
         
         // Good news! 
         // This auto caches our paths so we don't need to manually load them
         
         for (String autoName : AutoConstants.AUTO_NAMES) {
+            System.out.println("Configuring " + autoName);
             // Load the auto and add it to the auto chooser
             Command auto = AutoBuilder.buildAuto(autoName);
             autoChooser.addOption(autoName, auto);
@@ -165,17 +165,25 @@ public class PathPlannerStorage implements Logged {
      * @param limelight The limelight subsystem to use
      * @return  The command that will execute the logic for the given notes
      */
-    public Command generateCenterLogic(int startingNote, int endingNote, Swerve swerve, Limelight limelight) {
+    public Command generateCenterLogicNonOBJ(int startingNote, int endingNote, Swerve swerve) {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         boolean goingDown = startingNote < endingNote;
         int increment = goingDown ? 1 : -1;
 
         for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
-            if (AutoConstants.USE_OBJECT_DETECTION) {
-                commandGroup.addCommands(generateObjectDetectionCommand(i, endingNote, goingDown, commandGroup));
-            } else {
-                commandGroup.addCommands(generateNonObjectDetectionCommand(i, endingNote, goingDown, increment, commandGroup));
-            }
+            commandGroup.addCommands(generateNonObjectDetectionCommand(i, endingNote, goingDown, increment, commandGroup));
+        }
+
+        return commandGroup;
+    }
+
+    public Command generateCenterLogicOBJ(int startingNote, int endingNote, Swerve swerve, Limelight limelight) {
+        SequentialCommandGroup commandGroup = new SequentialCommandGroup();
+        boolean goingDown = startingNote < endingNote;
+        int increment = goingDown ? 1 : -1;
+
+        for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
+            commandGroup.addCommands(generateObjectDetectionCommand(i, endingNote, goingDown, commandGroup));
         }
 
         return commandGroup;
@@ -186,17 +194,20 @@ public class PathPlannerStorage implements Logged {
      */
     private Command generateObjectDetectionCommand(int i, int endingNote, boolean goingDown, SequentialCommandGroup commandGroup) {
         int currentIndex = i - 1;
-        int nextIndex = currentIndex + (goingDown ? 1 : -1);
+    int nextIndex = currentIndex + (goingDown ? 1 : -1);
+
         if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
             return Commands.defer(
                 () -> Commands.either(
                     goToNote()
-                        // This .onlyIf accounts for us trying to get a note but failing 
-                        // and needing to go to the next one
-                        .andThen(pathfindToShoot().onlyIf(colorSensorSupplier)
-                            .andThen(pathfindToNextNote(nextIndex, goingDown))),
+                        .andThen(pathfindToShoot()
+                            .deadlineWith(NamedCommands.getCommand("ToIndexer")
+                                .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                            .andThen(Commands.runOnce(swerve::stopDriving).andThen(NamedCommands.getCommand("PrepareSWD"))
+                                .raceWith(NamedCommands.getCommand("ShootInstantlyWhenReady")))
+                        .andThen(pathfindToNextNote(nextIndex, goingDown))), 
                     pathfindToNextNote(nextIndex, goingDown), 
-                    () -> limelight.noteInVision(limelight.getResults())),
+                    this::reasonableNoteInVision),
                 commandGroup.getRequirements());
         } else {
             return Commands.defer(
@@ -204,19 +215,27 @@ public class PathPlannerStorage implements Logged {
                     Commands.sequence(
                         goToNote(),
                         pathfindToShoot()
-                    ), 
-                    Commands.runOnce(swerve::stopDriving, swerve)
+                            .deadlineWith(NamedCommands.getCommand("ToIndexer")
+                                .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                            .andThen(Commands.runOnce(swerve::stopDriving).andThen(NamedCommands.getCommand("PrepareSWD"))
+                                .raceWith(NamedCommands.getCommand("ShootInstantlyWhenReady")))
+                ), 
+                Commands.runOnce(swerve::stopDriving, swerve)
+                    .andThen(
+                        swerve.getScanCommand()
+                        .until(this::reasonableNoteInVision)
                         .andThen(
-                            swerve.getScanCommand()
-                            .until(() -> limelight.noteInVision(limelight.getResults()))
-                            .andThen(
-                                Commands.sequence(
-                                    goToNote(),
-                                    pathfindToShoot()
-                                )
+                            Commands.sequence(
+                                goToNote(),
+                                pathfindToShoot()
+                                    .deadlineWith(NamedCommands.getCommand("ToIndexer")
+                                        .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                                    .andThen(Commands.runOnce(swerve::stopDriving).andThen(NamedCommands.getCommand("PrepareSWD"))
+                                        .raceWith(NamedCommands.getCommand("ShootInstantlyWhenReady")))
                             )
-                        ),
-                    () -> limelight.noteInVision(limelight.getResults())),
+                        )
+                    ),
+                this::reasonableNoteInVision),
                 commandGroup.getRequirements());
         }
     }
@@ -229,28 +248,57 @@ public class PathPlannerStorage implements Logged {
         PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
 
         if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
-            return Commands.defer(() ->  AutoBuilder.followPath(shootNote), commandGroup.getRequirements());
+            return Commands.defer(() ->  
+                AutoBuilder.followPath(shootNote)
+                    .deadlineWith(NamedCommands.getCommand("StopIntake")
+                            .andThen(NamedCommands.getCommand("ToIndexer")
+                            .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
+                    .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
+                    .deadlineWith(NamedCommands.getCommand("PrepareSWD")).onlyIf(colorSensorSupplier), 
+                commandGroup.getRequirements());
         }
 
         PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
         PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
 
-        Command shootAndMoveToNextNote = AutoBuilder.followPath(shootNote)
-            .andThen(AutoBuilder.followPath(getNoteAfterShot));
-        // TODO: This one could be a pathfinder path that enables the moment we don't see a piece or simialar
-        Command skipNoteCommand = AutoBuilder.followPath(skipNote);
+        Command shootAndMoveToNextNote = 
+            AutoBuilder.followPath(shootNote)
+                .deadlineWith(NamedCommands.getCommand("StopIntake")
+                        .andThen(NamedCommands.getCommand("ToIndexer")
+                        .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
+                .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
+                .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
+                .raceWith(Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean() && swerve.insideOwnWing()))
 
-        return Commands.defer(() -> 
-            Commands.either(
-                shootAndMoveToNextNote,
-                skipNoteCommand,
-                hasPieceSupplier), 
-            commandGroup.getRequirements());
+                .andThen(
+                    Commands.race(
+                        Commands.sequence(
+                            AutoBuilder.followPath(getNoteAfterShot),
+                            Commands.waitSeconds(.3)
+                        ),
+                        Commands.sequence(
+                            NamedCommands.getCommand("StopAll"),
+                            Commands.waitSeconds(1),
+                            NamedCommands.getCommand("ToIndexer")
+                        )
+                    )
+                );
+
+        Command skipNoteCommand = AutoBuilder.followPath(skipNote)
+            .raceWith(NamedCommands.getCommand("ToIndexer"));
+
+        return Commands.waitUntil(colorSensorSupplier).withTimeout(0.45).andThen(
+            Commands.defer(() -> 
+                Commands.either(
+                    shootAndMoveToNextNote,
+                    skipNoteCommand,
+                    colorSensorSupplier),
+            commandGroup.getRequirements()));
     }
 
     /**
      * Uses Pathplanner's pathfinding algorithm to go to the closest shooting position 
-     * from the swerve subsystem's curent position
+     * from the swerve subsystem's current position
      * 
      * @param swerve  The swerve subsystem to use.
      * @return  The command that will pathfind to the shooting pose
@@ -258,10 +306,17 @@ public class PathPlannerStorage implements Logged {
     public Command pathfindToShoot() {
         return 
             AutoBuilder.pathfindToPose(
-                PoseCalculations.getClosestShootingPose(swerve.getPose()), 
+                PoseCalculations.getBestShootingPose(swerve.getPose()), 
                 PATH_CONSTRAINTS,
                 0)
-            .andThen(NamedCommands.getCommand("ShootInstantly"));
+            .raceWith(
+                Commands.waitSeconds(1.5)
+                .andThen(
+                    Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
+                ).alongWith(
+                    NamedCommands.getCommand("PrepareShooter" + PoseCalculations.getBestShootingPoseString(swerve.getPose()))
+                )
+        );
     }
 
     /**
@@ -281,23 +336,30 @@ public class PathPlannerStorage implements Logged {
             NOTE_POSES.get(index).getY());
 
         return 
-            // Race the path and vision
-            // once we catch sight of a note, we can go straight to it.
-            Commands.race(
-                AutoBuilder.pathfindToPose(
-                    new Pose2d(
-                        searchSpot,
-                        // Angle the robot slightly towards the note
-                        Rotation2d.fromDegrees(
-                            Robot.isRedAlliance() ^ goingDown 
-                                ? -CameraConstants.LL2_HORIZONTAL_FOV/4.0 
-                                : CameraConstants.LL2_HORIZONTAL_FOV/4.0
-                        ).plus(Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI))),
-                    PATH_CONSTRAINTS,
-                    1
-                ),
-                Commands.waitUntil(() -> limelight.noteInVision(limelight.getResults()))
+            Commands.race(AutoBuilder.pathfindToPose(
+                new Pose2d(
+                    NOTE_POSES.get(index).getX() + 
+                        (Robot.isRedAlliance() 
+                        ? AutoConstants.PIECE_SEARCH_OFFSET_METERS
+                        : -AutoConstants.PIECE_SEARCH_OFFSET_METERS), 
+                    NOTE_POSES.get(index).getY(), 
+                    Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)),
+                PATH_CONSTRAINTS,
+                0),
+                Commands.waitUntil(this::reasonableNoteInVision)
             );
+    }
+
+    private boolean reasonableNoteInVision() {
+        Translation2d noteTranslation = limelight.getNotePose2d().getTranslation();
+        double x_cushon = Units.inchesToMeters(40);
+        double y_cushon = Units.inchesToMeters(12);
+        return 
+            limelight.noteInVision(limelight.getResults())
+            && ((Robot.isBlueAlliance() && noteTranslation.getX() < FieldConstants.CENTERLINE_X + x_cushon)
+                || (Robot.isRedAlliance() && noteTranslation.getX() > FieldConstants.CENTERLINE_X - x_cushon)
+            && noteTranslation.getDistance(swerve.getPose().getTranslation()) < 2.75
+            && MathUtil.clamp(noteTranslation.getY(), -y_cushon, FieldConstants.FIELD_HEIGHT_METERS+y_cushon) == noteTranslation.getY());
     }
 
     /**
@@ -309,40 +371,20 @@ public class PathPlannerStorage implements Logged {
      *                      pose without our vision
      * @return  The command that drives to a preset note position
      */
-    // public Command goToNote(Swerve swerve, IntSupplier currentIndex) {
-    //     return 
-    //         Commands.parallel(
-    //             swerve.updateChasePose(
-    //                 () -> 
-    //                     new Pose2d(
-    //                         NOTE_POSES.get(currentIndex.getAsInt()).getTranslation(),
-    //                         Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)))
-    //                 .repeatedly().until(swerve::atHDCPose),
-    //             swerve.getChaseCommand());  
-    // }
-
-    /**
-     * Uses a custom chase command to drive towards a dynamically changing note pose
-     * Updates the note pose with our limelight repeatedly until we reach it
-     * 
-     * @param swerve  The swerve subsystem to use.
-     * @param limelight The limelight subsystem to use
-     * @return  The command that holonomically drives to a note position gathered from vision
-     */
     public Command goToNote() {
-        return swerve.getChaseCommand( 
-            () ->
-                new Pose2d(
-                    limelight.getNotePose2d().getTranslation(), 
-                    Rotation2d.fromRadians(Robot.isRedAlliance() ? 0 : Math.PI)),
-            () -> 
-                colorSensorSupplier.getAsBoolean() 
-                // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
-                // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
-                // since the pose is from the center but the note is from the edge (since the intake gets it)
-                || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(20))
-                || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(20)))
-            .alongWith(NamedCommands.getCommand("ToIndexer"));
+        return 
+            
+            swerve.getChaseCommand( 
+                limelight::getNotePose2d,
+                () -> colorSensorSupplier.getAsBoolean() 
+                    // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
+                    // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
+                    // since the pose is from the center but the note is from the edge (since the intake gets it)
+                    || (Robot.isBlueAlliance() && limelight.getNotePose2d().getTranslation().getX() > FieldConstants.CENTERLINE_X + Units.inchesToMeters(40))
+                    || (Robot.isRedAlliance() && limelight.getNotePose2d().getTranslation().getX() < FieldConstants.CENTERLINE_X - Units.inchesToMeters(40)))
+            // This race will end the command if the color sensor detects a note early. 
+            // (a robot pushes the note towards us)
+            .raceWith(NamedCommands.getCommand("ToIndexer"));
     }
 
     public Pose2d getPathEndPose(PathPlannerPath path) {

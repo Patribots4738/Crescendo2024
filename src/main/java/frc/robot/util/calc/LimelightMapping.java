@@ -31,7 +31,7 @@ public class LimelightMapping extends SubsystemBase implements Logged {
     private HashMap<Integer, Pose3d> poses;
     private String limelightName;
 
-    private Pose2d currentCalibrationPose;
+    private Translation2d currentCalibrationPosition;
     private SwerveDrivePoseEstimator poseEstimator;
     Supplier<Pose2d> robotPoseSupplier;
 
@@ -39,7 +39,7 @@ public class LimelightMapping extends SubsystemBase implements Logged {
     private Pose3d[] modifiedTagPoses = new Pose3d[16];
 
     public LimelightMapping(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName) {
-        currentCalibrationPose = FieldConstants.TAG_CALIBRATION_POSE.get(0);
+        currentCalibrationPosition = FieldConstants.TAG_CALIBRATION_POSE.get(0);
         this.robotPoseSupplier = robotPoseSupplier;
         this.poseEstimator = poseEstimator;
         this.limelightName = limelightName;
@@ -58,25 +58,25 @@ public class LimelightMapping extends SubsystemBase implements Logged {
     }
 
     public void incrementCalibrationPose() {
-        int currentIndex = FieldConstants.TAG_CALIBRATION_POSE.indexOf(currentCalibrationPose);
+        int currentIndex = FieldConstants.TAG_CALIBRATION_POSE.indexOf(currentCalibrationPosition);
         // modulus wrap our index so we stay in bounds
         if (currentIndex == FieldConstants.TAG_CALIBRATION_POSE.size() - 1) {
-            currentCalibrationPose = FieldConstants.TAG_CALIBRATION_POSE.get(0);
+            currentCalibrationPosition = FieldConstants.TAG_CALIBRATION_POSE.get(0);
         } else {
-            currentCalibrationPose = FieldConstants.TAG_CALIBRATION_POSE.get(currentIndex + 1);
+            currentCalibrationPosition = FieldConstants.TAG_CALIBRATION_POSE.get(currentIndex + 1);
         }
-        System.out.println("Set calibration pose to " + FieldConstants.CALIBRATION_POSE_MAP.get(currentCalibrationPose));
+        System.out.println("Set calibration pose to " + FieldConstants.CALIBRATION_POSE_MAP.get(currentCalibrationPosition));
     }
 
     public void decrementCalibrationPose() {
-        int currentIndex = FieldConstants.TAG_CALIBRATION_POSE.indexOf(currentCalibrationPose);
+        int currentIndex = FieldConstants.TAG_CALIBRATION_POSE.indexOf(currentCalibrationPosition);
         // modulus wrap our index so we stay in bounds
         if (currentIndex == 0) {
-            currentCalibrationPose = FieldConstants.TAG_CALIBRATION_POSE.get(FieldConstants.TAG_CALIBRATION_POSE.size() - 1);
+            currentCalibrationPosition = FieldConstants.TAG_CALIBRATION_POSE.get(FieldConstants.TAG_CALIBRATION_POSE.size() - 1);
         } else {
-            currentCalibrationPose = FieldConstants.TAG_CALIBRATION_POSE.get(currentIndex - 1);
+            currentCalibrationPosition = FieldConstants.TAG_CALIBRATION_POSE.get(currentIndex - 1);
         }
-        System.out.println("Set calibration pose to " + FieldConstants.CALIBRATION_POSE_MAP.get(currentCalibrationPose));
+        System.out.println("Set calibration pose to " + FieldConstants.CALIBRATION_POSE_MAP.get(currentCalibrationPosition));
     }
 
     public Command incrementCalibrationPose(boolean increment) {
@@ -89,19 +89,19 @@ public class LimelightMapping extends SubsystemBase implements Logged {
         }).ignoringDisable(true);
     }
 
-    public Pose2d getCurrentCalibrationPose() {
-        return currentCalibrationPose;
+    public Translation2d getCurrentCalibrationPosition() {
+        return currentCalibrationPosition;
     }
 
     public void takeSnapshot() {
-        Pose2d actualRobotPose = currentCalibrationPose;
+        Translation2d actualCalibrationRobotPose = currentCalibrationPosition;
         LimelightTarget_Fiducial[] recordedPoses = LimelightHelpers.getLatestResults(limelightName).targetingResults.targets_Fiducials;
         for (int i = 0; i < recordedPoses.length; i++) {
             int fiducialID = (int) recordedPoses[i].fiducialID;
 
             Pose3d targetPose = targetPoseFieldSpace(
                 recordedPoses[i].getTargetPose_RobotSpace(), 
-                new Pose3d(actualRobotPose)
+                new Pose3d(new Pose2d(actualCalibrationRobotPose, robotPoseSupplier.get().getRotation()))
             );
 
             // Check if the value is within tolerance

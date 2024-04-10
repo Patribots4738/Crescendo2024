@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.880091849769366,
-        "y": 1.8431846942081342
+        "x": 2.739170301035638,
+        "y": 3.1367081173878657
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.804365471366255,
-        "y": 1.7485740085328627
+        "x": 3.860709117461535,
+        "y": 2.4840092979924666
       },
       "isLocked": false,
       "linkedName": "R"
     },
     {
       "anchor": {
-        "x": 5.526546655930191,
-        "y": 3.8426493874264342
+        "x": 5.645671851254118,
+        "y": 1.5627999901016596
       },
       "prevControl": {
-        "x": 4.689605974956631,
-        "y": 3.631594780920058
+        "x": 4.971234434826018,
+        "y": 1.5665677968973468
       },
       "nextControl": {
-        "x": 6.303310502667167,
-        "y": 4.038528966168802
+        "x": 6.468440081337051,
+        "y": 1.5582035195425377
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 2.436296745792339
       },
       "prevControl": {
-        "x": 7.236816743137033,
-        "y": 3.311373998634522
+        "x": 7.401523604838924,
+        "y": 2.4499188080123084
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,35 +46,17 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "ToIndexer",
-      "waypointRelativePos": 0.6,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToIndexer"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 4.5,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 139.87129378764038,
-    "rotateFast": true
+    "rotation": -169.22190068678276,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Stage",

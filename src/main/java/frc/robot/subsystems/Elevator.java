@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.TrapConstants;
+import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.Robot;
 import monologue.Logged;
@@ -25,18 +25,21 @@ public class Elevator extends SubsystemBase implements Logged {
     private double position = 0, desiredPos = 0, hitGuillotineTimestamp = 0, desiredOverridePos = 0;
 
     @Log
+    private boolean overrideMode = false;
+
+    @Log
     private boolean atDesiredPos = false, stuckOnGuillotine = false;
 
     /** Creates a new Elevator. */
     public Elevator() {
-        motor = new Neo(TrapConstants.ELEVATOR_CAN_ID, false, true);
+        motor = new Neo(ElevatorConstants.ELEVATOR_CAN_ID, false, true);
         configMotors();
     }
 
     public void configMotors() {
-        motor.setPositionConversionFactor(TrapConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
-        motor.setSmartCurrentLimit(TrapConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
-        motor.setPID(TrapConstants.ELEVATOR_PID);
+        motor.setPositionConversionFactor(ElevatorConstants.ELEVATOR_POSITION_CONVERSION_FACTOR);
+        motor.setSmartCurrentLimit(ElevatorConstants.ELEVATOR_MOTOR_CURRENT_LIMIT);
+        motor.setPID(ElevatorConstants.ELEVATOR_PID);
     }
 
     @Override
@@ -53,8 +56,8 @@ public class Elevator extends SubsystemBase implements Logged {
             hitGuillotineTimestamp = 0;
         
         updateStuck();
-        RobotContainer.components3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
-            0, 0, position * TrapConstants.TRAPPER_POSITION_MULTIPLIER, 
+        RobotContainer.components3d[NTConstants.AMPPER_INDEX] = new Pose3d(
+            0, 0, position * ElevatorConstants.AMPPER_POSITION_MULTIPLIER, 
             new Rotation3d()
         );
         RobotContainer.components3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
@@ -74,8 +77,8 @@ public class Elevator extends SubsystemBase implements Logged {
     public void setPosition(double pos) {
         pos = MathUtil.clamp(
             pos,
-            TrapConstants.ELEVATOR_BOTTOM_LIMIT,
-            TrapConstants.ELEVATOR_TOP_LIMIT);
+            ElevatorConstants.ELEVATOR_BOTTOM_LIMIT,
+            ElevatorConstants.ELEVATOR_TOP_LIMIT);
 
         if (desiredPos != pos) {
             desiredPos = pos;
@@ -85,8 +88,8 @@ public class Elevator extends SubsystemBase implements Logged {
                 0, 0, pos,
                 new Rotation3d()
             );
-            RobotContainer.desiredComponents3d[NTConstants.TRAPPER_INDEX] = new Pose3d(
-                0, 0, pos * TrapConstants.TRAPPER_POSITION_MULTIPLIER,
+            RobotContainer.desiredComponents3d[NTConstants.AMPPER_INDEX] = new Pose3d(
+                0, 0, pos * ElevatorConstants.AMPPER_POSITION_MULTIPLIER,
                 new Rotation3d()
             );
         }
@@ -111,36 +114,41 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command toBottomCommand() {
-        return setPositionCommand(TrapConstants.BOTTOM_POS);
+        return setPositionCommand(ElevatorConstants.BOTTOM_POS);
     }
 
     public Command toTopCommand() {
-        return setPositionCommand(TrapConstants.TRAP_PLACE_POS, true);
+        return setPositionCommand(ElevatorConstants.TRAP_PLACE_POS, true);
+    }
+
+    public Command toTopIshButNotFullCommand() {
+        return setPositionCommand(ElevatorConstants.DEBUG_ELEVATOR_POS, true);
     }
 
     public Command toNoteFixCommand() {
-        return setPositionCommand(TrapConstants.NOTE_FIX_POS, true);
+        return setPositionCommand(ElevatorConstants.NOTE_FIX_POS, true);
     }
 
     public Command toIndexCommand() {
-        return setPositionCommand(TrapConstants.INDEX_POS).andThen(toBottomCommand());
+        return setPositionCommand(ElevatorConstants.INDEX_POS).andThen(toBottomCommand());
     }
 
     public Command toDropCommand() {
-        return setPositionCommand(TrapConstants.DROP_POS);
+        return setPositionCommand(ElevatorConstants.DROP_POS);
     }
 
     public boolean atDesiredPosition() {
-	return MathUtil.isNear(desiredPos, position, TrapConstants.ELEVATOR_DEADBAND)
-        || MathUtil.isNear(desiredOverridePos, position, TrapConstants.ELEVATOR_DEADBAND);
+        if (overrideMode)
+            return MathUtil.isNear(desiredOverridePos, position, ElevatorConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(desiredPos, position, ElevatorConstants.ELEVATOR_DEADBAND);
     }
 
     public boolean atPosition(double position) {
-        return MathUtil.isNear(position, this.position, TrapConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(position, this.position, ElevatorConstants.ELEVATOR_DEADBAND);
     }
 
     public boolean nearGuillotine() {
-        return atPosition(TrapConstants.GUILLOTONE_POS);
+        return atPosition(ElevatorConstants.GUILLOTONE_POS);
     }
 
     public boolean getStuck() {
@@ -151,7 +159,7 @@ public class Elevator extends SubsystemBase implements Logged {
     public void updateStuck() {
         stuckOnGuillotine =  
             hitGuillotineTimestamp != 0
-            && Robot.currentTimestamp - this.hitGuillotineTimestamp >= TrapConstants.STUCK_TIME_SECONDS
+            && Robot.currentTimestamp - this.hitGuillotineTimestamp >= ElevatorConstants.STUCK_TIME_SECONDS
             && desiredPos > position
             && nearGuillotine()
             && motor.getOutputCurrent() > 35.0;
@@ -165,10 +173,12 @@ public class Elevator extends SubsystemBase implements Logged {
         return run(() -> {
             desiredOverridePos = MathUtil.clamp(
                 desiredOverridePos + doubleSupplier.getAsDouble(),
-                TrapConstants.ELEVATOR_BOTTOM_LIMIT,
-                TrapConstants.ELEVATOR_TOP_LIMIT
+                ElevatorConstants.ELEVATOR_BOTTOM_LIMIT,
+                ElevatorConstants.ELEVATOR_TOP_LIMIT
             );
             setPosition(desiredOverridePos);
-        });
+        })
+        .beforeStarting(Commands.runOnce(() -> overrideMode = true))
+        .finallyDo(() -> overrideMode = false);
     } 
 }

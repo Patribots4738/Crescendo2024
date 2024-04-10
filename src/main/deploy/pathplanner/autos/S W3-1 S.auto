@@ -2,36 +2,62 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.31,
-      "y": 4.397
+      "x": 1.29235458470917,
+      "y": 4.778983272252259
     },
-    "rotation": 142.0
+    "rotation": 151.53108100340572
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "S W3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W3 W2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W2 W1"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "S W3-1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "EnableLimelight"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootInstantlyWhenReady"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Normal",
   "choreoAuto": false
 }

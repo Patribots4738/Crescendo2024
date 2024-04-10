@@ -95,23 +95,42 @@ public class Limelight extends SubsystemBase implements Logged{
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
 
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
-
+        
         this.estimatedPose2d = estimatedRobotPose;
         RobotContainer.visionErrorPose = RobotContainer.robotPose2d.minus(estimatedRobotPose);
-
-        if (RobotContainer.enableVision && hasTarget(result)) {
-            double xyStds;
-            double radStds;
+        double xyStds;
+        double radStds;
+        if ((Robot.gameMode == GameMode.DISABLED || 
+            Robot.gameMode == GameMode.AUTONOMOUS
+                && Robot.currentTimestamp - RobotContainer.gameModeStart < 1.75)
+                && hasTarget(result)) {
+            xyStds = 0.001;
+            radStds = 0.0002;
+            
+            poseEstimator.setVisionMeasurementStdDevs(
+                VecBuilder.fill(xyStds, xyStds, radStds));
+            poseEstimator.addVisionMeasurement(estimatedRobotPose,
+                Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
+        }
+        else if (RobotContainer.enableVision && hasTarget(result)) {
             // multiple targets detected
             if (targets.length > 1) {
-                // TODO: TUNE
-                xyStds = Math.hypot(0.011, 0.028);
-                radStds = Units.degreesToRadians(3);
+                if (Robot.gameMode == GameMode.TELEOP) {
+                    // Trust the vision even MORE
+                    if (targets.length > 2) {
+                        xyStds = Math.hypot(0.002, 0.003);
+                    } else {
+                        // We can only see two tags, (still trustable)
+                        xyStds = Math.hypot(0.005, 0.008);
+                    }
+                } else {
+                    xyStds = Math.hypot(0.014, 0.016);
+                }
+                radStds = Units.degreesToRadians(2);
             }
             // 1 target with large area and close to estimated roxose
-            else if (LimelightHelpers.getTA(limelightName) > 0.175) {
-                // TODO: TUNE
-                xyStds = 0.192;
+            else if (LimelightHelpers.getTA(limelightName) > 0.14) {
+                xyStds = Math.hypot(0.015, 0.033);
                 radStds = Units.degreesToRadians(7);
             }
             // conditions don't match to add a vision measurement
@@ -162,48 +181,71 @@ public class Limelight extends SubsystemBase implements Logged{
     Pose2d noteFieldPosePlus14 = new Pose2d();
 
     public Pose2d getNotePose2d() {
-        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
-            LimelightHelpers.setPipelineIndex(limelightName, 1);
-        }
-        Results results = getResults();
-        if (noteInVision(results)) {
-            for (LimelightTarget_Detector ld : results.targets_Detector) {
-                ld.calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
-                ld.calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+        Translation2d noteTranslationFromRobot;
+        Pose2d nextNoteFieldPose = noteFieldPose;
+        if (FieldConstants.IS_SIMULATION) {
+            noteFieldPose = robotPoseSupplier.get().nearest(FieldConstants.GET_CENTERLINE_NOTES());
+            noteTranslationFromRobot = noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation();
+        } else {
+            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
+                LimelightHelpers.setPipelineIndex(limelightName, 1);
             }
 
-            Translation2d noteTranslationFromCamera = 
-                new Translation2d(
+            Results results = getResults();
+
+            if (noteInVision(results)) {
+                for (LimelightTarget_Detector ld : results.targets_Detector) {
+                    ld.calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
+                    ld.calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+                }
+
+                Translation2d noteTranslationFromCamera = new Translation2d(
                     results.targets_Detector[0].calcY,
                     -results.targets_Detector[0].calcX
                 );
 
-            Translation2d noteTranslationFromRobot = 
-                noteTranslationFromCamera
-                .plus(CameraConstants.LL2Pose.getTranslation().toTranslation2d())
-                .rotateBy(CameraConstants.LL2Pose.getRotation().toRotation2d());
-                
-            noteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
-            Rotation2d slopeAngle = new Rotation2d(noteTranslationFromRobot.getX(), noteTranslationFromRobot.getY())
-            .plus(Rotation2d.fromDegrees(180));
+                noteTranslationFromRobot = noteTranslationFromCamera
+                    .plus(CameraConstants.LL2Pose.getTranslation().toTranslation2d())
+                    .rotateBy(CameraConstants.LL2Pose.getRotation().toRotation2d());
+
+                nextNoteFieldPose = robotPoseSupplier.get().plus(new Transform2d(noteTranslationFromRobot, new Rotation2d()));
+            } else {
+                return noteFieldPosePlus14;
+            }
+        }
+
+        Rotation2d slopeAngle = new Rotation2d(
+            noteTranslationFromRobot.getX(),
+            noteTranslationFromRobot.getY()
+        ).plus(Rotation2d.fromDegrees(180));
+
+        double distanceThreshold = FieldConstants.IS_SIMULATION ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
+        if ((noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation().getNorm() > distanceThreshold)
+            || noteFieldPose.getTranslation().getDistance(nextNoteFieldPose.getTranslation()) > Units.inchesToMeters(3)) {
+
+            noteFieldPose = nextNoteFieldPose;
+            
             noteFieldPosePlus14 = noteFieldPose.plus(
                 new Transform2d(
                     new Translation2d(
-                        Units.inchesToMeters(14),
+                        Units.inchesToMeters(9.5),
                         slopeAngle.plus(Rotation2d.fromDegrees(180))
                     ),
-                    slopeAngle)
+                    slopeAngle
+                )
             );
         }
+
         return noteFieldPosePlus14;
     }
 
     public boolean noteInVision(Results results) {
-        return results.valid 
+        return (FieldConstants.IS_SIMULATION && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
+            (results.valid 
             && results.targets_Detector.length > 0 
             && LimelightHelpers.getTA(limelightName) > 0.5 
             && results.targets_Detector[0].tx != 0 
-            && results.targets_Detector[0].ty != 0;
+            && results.targets_Detector[0].ty != 0);
     }
     
     public Pose2d getPose2d() {
@@ -292,9 +334,9 @@ public class Limelight extends SubsystemBase implements Logged{
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
-        double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.175;
-        double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.13 : 0.07;
-        if (result == null || !result.valid 
+        double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
+        double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.1 : 0.05;
+        if (result == null || !result.valid
             || (LimelightHelpers.getTA(limelightName) < singleTagAmbiguityThreshold && result.targets_Fiducials.length == 1)
             || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < multiTagAmbiguityThreshold)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
@@ -348,6 +390,10 @@ public class Limelight extends SubsystemBase implements Logged{
                 Commands.runOnce(this::disableLEDS), 
                 enabled
             ).ignoringDisable(true).asProxy();
+    }
+
+    public Command setLEDState(boolean enabled) {
+        return setLEDState(() -> enabled);
     }
 
     public void enableLEDS() {

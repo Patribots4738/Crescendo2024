@@ -1,11 +1,13 @@
-[![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
+![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle)
+
 
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
 
+[![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
+
 ![Robot Image](images/robot.gif)
 
-
-<img src="https://github.com/Patribots4738/Crescendo2024/assets/148731136/1c6c852f-4c20-4b9f-b6bc-79065b717ee7" width="100%">
+<img src="images/ILUVUTERRY.png" width="100%">
 
 ____
 
@@ -33,15 +35,18 @@ Thanks for checking us out, & be sure to star this repository if you find anythi
 
 ___
 
-## ✨ Highlights ✨
+## ✨ Highlights ✨  
+  - Object detection on Limelight -- 
+  - Automatic shooter startup
+  - Shooting while driving
+  - Fully simulated robot, mechanisms, and motors
+  - Auto alignment to amp, speaker, stage, and source
+  - Color sensor oriented piece control
+  - Log replay using Advantage Scope
+  - Modular autonomous routines
+  - April Tag interpretation on Limelight --
   - Field-centric swerve drive
   - Under bumper intake
-  - April Tag interpretation & note detection using two Limelights
-  - Auto alignment to amp, speaker, chains/traps, and source
-  - Shooting into the speaker while driving
-  - Modular autonomous routines
-  - LEDs to communicate various actions
-  - Fully simulated motors
 
 ## Simulation & Testing 🪄
   > It is crucial to maintain both our robot & our code. Therefore, we always run our code in a simulation using `FRC Driver Station` / `WPILibs's Sim GUI` and `Advantage Scope` to catch breaking changes on our robot before they happen in real life. After our design team has constructed the CAD model of our robot in `Onshape`, we can export its moving parts into `Advantage Scope`. We then link the CAD and the code together to simulate a robot that moves similarly to a real one. Once our code passes this unit test (working in simulation), we can expect a much more specific result on the real robot. This process is used with most of our code and was essential for code involving critical math (i.e. auto alignment & shooting while driving).
@@ -51,7 +56,8 @@ ___
 ### <img src= "images/surelyanote.png" width="2.5%" /> PID Tuning w/ Network Tables
 > When tuning PID, shooter speeds, and pivot angle, we can change the values in Advantage Scopes network tables. This allows us to dynamically change the values without redeploying our code constantly, making tuning faster, easier, and more accurate.
   
-## Safe Spark 🛟
+### <img src= "images/surelyanote.png" width="2.5%" /> Safe Spark
+  >
   > REV's motor controllers do not always set the parameter first try, causing our motor to break randomly. To keep our motors, our matches, our ranking, and our money safe, we made a class called Safe Spark! Safe Spark constantly checks whether the motor has correctly set its parameters. If no parameters were set, it returns a REVLibError type of `kError` and tries to set the parameter again. It will repeat this until it recognizes that the parameter has been received and implemented, finally returning a REVLibError type of kOK!
 
 ##  Swerve Drive 🛞
@@ -77,14 +83,15 @@ ___
 
 
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Note Detection
-  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when to robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
+  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when the robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
 
   > Here is a GIF of Terry detecting a note and chasing it! 🦖🔎
-  > <img src= "images/dino chase.gif">
+  
+  > <img src= "images/GIF/dino chase.gif">
 
 
 ## Teleoperated 🎮
-  <img src="images/sim/betterAmp.png" width="40%" />
+  <img src="images/sim/amp.png" width="40%" />
 
 ###  <img src= "images/surelyanote.png" width="2.5%" />  Joystick Axis Remapping
  > We use Xbox controllers to control the robot. However, the range of the joystick axis from the Xbox controller is the shape of a skewed square with chamfered edges which is preferable for usage. In PatriBoxController, we remapped the range of input to a circle that is easier to use. Here's our [desmos](https://www.desmos.com/calculator/e07raajzh5) if you want to check out the math!
@@ -135,11 +142,11 @@ Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins
 > - **Auto** [`robot/util/auto`](src/main/java/frc/robot/util/auto) Folder containing the storage files for `Choreo` and `PathPlanner`.
    
 ## Controls 🎮
-[![Driver](https://github.com/Patribots4738/Crescendo2024/assets/65139378/d2d0000f-54cb-42d2-9b8a-7e635ca79c18)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
+[![Driver](/images/drivercontrols.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
 
-[![Operator](https://github.com/Patribots4738/Crescendo2024/assets/65139378/5040695f-deac-4ac9-9ad3-ca7cbfa4748b)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
+[![Operator](/images/operatorcontrols.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
 
 ## Components & Tools 🛠️
-[![Hardware](https://github.com/Patribots4738/Crescendo2024/assets/65139378/f9de2a2e-e401-4d6b-b57a-10bbf2dfd340)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)
+[![Hardware](/images/hardware.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)
   
-[![Software](https://github.com/Patribots4738/Crescendo2024/assets/148731136/058e53cd-83ff-4463-ba4f-3b58a56a3ead)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)
+[![Software](/images/software.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)

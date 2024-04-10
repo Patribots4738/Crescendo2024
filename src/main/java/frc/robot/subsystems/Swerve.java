@@ -27,6 +27,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -124,7 +125,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
         AutoBuilder.configureHolonomic(
                 this::getPose,
-                this::resetOdometry,
+                this::resetOdometryAuto,
                 this::getRobotRelativeVelocity,
                 this::drive,
                 AutoConstants.HPFC,
@@ -237,6 +238,12 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public Rotation2d getGyroRotation2d() {
         return this.gyroRotation2d;
+    }
+
+    public boolean insideOwnWing() {
+        return Robot.isBlueAlliance() 
+            ? getPose().getX() < FieldConstants.BLUE_WING_X 
+            : getPose().getX() > FieldConstants.RED_WING_X;
     }
 
     public SwerveDrivePoseEstimator getPoseEstimator() {
@@ -389,12 +396,19 @@ public class Swerve extends SubsystemBase implements Logged {
                 pose);
     }
 
+    private void resetOdometryAuto(Pose2d pose) {
+        if (getPose().getTranslation().getNorm() > 1 && DriverStation.isFMSAttached()) {
+            return;
+        }
+        resetOdometry(pose);
+    }
+
     public Command resetOdometryCommand(Supplier<Pose2d> pose) {
         return runOnce(() -> resetOdometry(pose.get())).ignoringDisable(true);
     }
 
     public Command resetPositionCommand(Supplier<Translation2d> pose) {
-        return runOnce(() -> resetOdometry(new Pose2d(pose.get(), getGyroRotation2d()))).ignoringDisable(true);
+        return runOnce(() -> resetOdometry(new Pose2d(pose.get(), getPose().getRotation()))).ignoringDisable(true);
     }
 
     public SwerveModuleState[] getModuleStates() {
@@ -472,6 +486,10 @@ public class Swerve extends SubsystemBase implements Logged {
         return new ChasePose(this, desiredPose, cancelSupplier);
     }
 
+    public Command getChaseCommand(Supplier<Pose2d> desiredPose) {
+        return new ChasePose(this, desiredPose, () -> false);
+    }
+
     public Command getScanCommand() {
         return new ChasePose(this,
                 () -> new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Robot.isRedAlliance() ? 0 : 180))
@@ -495,7 +513,7 @@ public class Swerve extends SubsystemBase implements Logged {
     public void reconfigureAutoBuilder() {
         AutoBuilder.configureHolonomic(
                 this::getPose,
-                this::resetOdometry,
+                this::resetOdometryAuto,
                 this::getRobotRelativeVelocity,
                 this::drive,
                 AutoConstants.HPFC,
@@ -517,6 +535,10 @@ public class Swerve extends SubsystemBase implements Logged {
 
     public boolean atHDCPose() {
         return atPose(desiredHDCPose);
+    }
+
+    public boolean atHDCAngle() {
+        return MathUtil.isNear(desiredHDCPose.getRotation().getRadians(), getPose().getRotation().getRadians(), AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
     }
 
     public boolean isAlignedToAmp() {

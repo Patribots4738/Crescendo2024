@@ -112,6 +112,13 @@ public class NTPIDTuner extends Command {
         }
     }
 
+    /**
+     * Updates the PID values of the motors, which is called by {@link #updateValues()}.
+     * 
+     * @param motorList the list of motors to update
+     * @param name      the name of the PID value to update
+     * @param NTValue   the new value to set
+     */
     private void updateController(List<Neo> motorList, String name, double NTValue) {
         // Find out if it was P, I, D, FF, or IZone and update the value
         for (Neo motor : motorList) {

@@ -2,48 +2,113 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7412377646703784,
-      "y": 4.3334957369796125
+      "x": 1.29235458470917,
+      "y": 4.778983272252259
     },
-    "rotation": 119.91938193435101
+    "rotation": 151.53108100340572
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "S W3"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootWhenReady"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "S W3-1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "EnableLimelight"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootInstantlyWhenReady"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "W3 W2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W2 W1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "W1 C1"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "W1 C1"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.3
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StopAll"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ToIndexer"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "C1toC4"
+            "name": "C1toC5nonOBJ"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Normal",
   "choreoAuto": false
 }

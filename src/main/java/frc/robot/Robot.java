@@ -6,6 +6,7 @@ import org.littletonrobotics.urcl.URCL;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.NeoPhysicsSim;
@@ -55,7 +55,8 @@ public class Robot extends TimedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
-        URCL.start(NeoMotorConstants.CAN_ID_MAP);
+        // Remove if not at comp:
+        RobotController.setBrownoutVoltage(8.0);
     }
 
     /**
@@ -67,12 +68,26 @@ public class Robot extends TimedRobot {
      * and
      * SmartDashboard integrated updating.
      */
+    private boolean updatedAlready = false;
+    private boolean updateTimer = false;
+    private boolean startedURCL = false;
     @Override
     public void robotPeriodic() {
         // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-        Monologue.updateAll();
+        if (gameMode != GameMode.DISABLED) {
+            Monologue.updateAll();
+        }
+        else {
+            updateTimer = (int) (Robot.currentTimestamp / 10) % 2 == 0;
+            if (updateTimer && !updatedAlready) {
+                updatedAlready = true;
+                Monologue.updateAll();
+            } else if (!updateTimer) {
+                updatedAlready = false;
+            }
+        }
         CommandScheduler.getInstance().run();
     }
 
@@ -102,6 +117,11 @@ public class Robot extends TimedRobot {
     @Override   
     public void autonomousInit() {
         // Update "constants"
+        Monologue.updateAll();
+        if (!startedURCL) {
+            URCL.start(NeoMotorConstants.CAN_ID_MAP);
+            startedURCL = true;
+        }
         DriveConstants.MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
         Robot.gameMode = GameMode.AUTONOMOUS;
         robotContainer.onEnabled();

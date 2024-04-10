@@ -1,6 +1,10 @@
 package frc.robot.util.custom.geometry.scale;
 
-public class Scale3d implements Scale<Scale3d>{
+/**
+ * This class is used to represent a 3D scale.
+ * Primarily, for FMAPs with april tags.
+ */
+public class Scale3d {
     public double x;
     public double y;
     public double z;

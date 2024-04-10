@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
+import monologue.Annotations.Log;
 
 public class PoseCalculations implements Logged {
 
@@ -40,15 +41,41 @@ public class PoseCalculations implements Logged {
         return position.nearest(FieldConstants.GET_CHAIN_POSITIONS());
     }
 
-    public static Pose2d getClosestShootingPose(Pose2d position) {
-        return position.nearest(FieldConstants.GET_SHOOTING_POSITIONS());
+    @Log
+    private static Pose2d closestShootingPose;
+
+    @Log
+    public static Pose2d getBestShootingPose(Pose2d position) {
+        double yValue = position.getY();
+        if (yValue > 5)
+            // L
+            return FieldConstants.GET_SHOOTING_POSITIONS().get(0);
+        if (yValue > 1.8) 
+            // M
+            return FieldConstants.GET_SHOOTING_POSITIONS().get(2);
+        // R
+        return FieldConstants.GET_SHOOTING_POSITIONS().get(1);
+    }
+
+    public static String getBestShootingPoseString(Pose2d position) {
+        closestShootingPose = getBestShootingPose(position);
+        if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(0)))
+            return "L";
+
+        if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(1)))
+            return "R";
+
+        if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(2)))
+            return "M";
+        
+        return "if you managed to get this to run you deserve a cookie... wait.. no. i want that cookie.";
     }
 
     /**
      * Given an intercept of the chain, return the height of the chain at that
      * location.
      * 
-     * @param x The posision along the X axis of the chain
+     * @param x The position along the X axis of the chain
      *          as seen in https://www.desmos.com/calculator/84ioficbl2
      *          For some reason, that desmos breaks on chrome on my home computer
      *          please send help... i used edge to make it :(
@@ -57,7 +84,7 @@ public class PoseCalculations implements Logged {
      */
     private static double getChainIntercept(double x) {
         // The ds here turn the integers into doubles
-        // so that integer divion does not occur.
+        // so that integer division does not occur.
         double calculation = 3d / 10d * Math.pow(x, 2) + 0.725;
         // Clamp the output to be no lower than the lowest point of the chain,
         // and no higher than the extension limit of our elevator

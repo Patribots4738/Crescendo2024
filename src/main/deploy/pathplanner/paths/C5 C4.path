@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.540572455284961,
-        "y": 1.4174735914228842
+        "x": 8.596605950210781,
+        "y": 1.2916082271134313
       },
       "isLocked": false,
       "linkedName": "C5"
@@ -20,8 +20,8 @@
         "y": 2.436296745792339
       },
       "prevControl": {
-        "x": 6.961622089296687,
-        "y": 2.608917167756354
+        "x": 8.415811441551963,
+        "y": 2.023213124440433
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,34 +30,16 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "ToIndexer",
-      "waypointRelativePos": 0.25,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToIndexer"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 4.5,
+    "maxAcceleration": 2.7,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 179.0897074780449,
+    "velocity": 0.7,
+    "rotation": -70.23496017363368,
     "rotateFast": true
   },
   "reversed": false,
@@ -66,5 +48,5 @@
     "rotation": -179.4961362150865,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
