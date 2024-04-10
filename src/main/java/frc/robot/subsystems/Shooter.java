@@ -67,10 +67,10 @@ public class Shooter extends SubsystemBase implements Logged{
         atDesiredPassRPM = 
             MathUtil.isNear( 
                 currentLeftSpeed, targetLeftSpeed,
-                ShooterConstants.PASS_RPM_DEADBAND)
+                ShooterConstants.SHOOTER_PASS_RPM_DEADBAND)
             && MathUtil.isNear(
                 currentRightSpeed, targetRightSpeed,
-                ShooterConstants.PASS_RPM_DEADBAND);
+                ShooterConstants.SHOOTER_PASS_RPM_DEADBAND);
     }
 
     /**

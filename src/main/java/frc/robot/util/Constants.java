@@ -142,9 +142,10 @@ public final class Constants {
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
-        public static final double PIVOT_DEADBAND = 1;
+        public static final double PIVOT_DEADBAND_DEGREES = 1;
+        public static final double PIVOT_PASS_DEADBAND_DEGREES = 4;
         public static final double SHOOTER_RPM_DEADBAND = 50;
-        public static final double PASS_RPM_DEADBAND = 150;
+        public static final double SHOOTER_PASS_RPM_DEADBAND = 150;
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;

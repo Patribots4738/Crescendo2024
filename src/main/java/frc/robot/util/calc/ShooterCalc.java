@@ -152,7 +152,7 @@ public class ShooterCalc implements Logged {
 
     public BooleanSupplier readyToPassSupplier() {
         return () ->
-            pivot.getAtDesiredAngle()
+            pivot.getAtDesiredPassAngle()
                 && shooter.getAtDesiredPassRPM()
                 && shooter.getAverageTargetSpeed() > 0;
     }
