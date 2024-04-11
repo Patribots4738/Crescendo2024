@@ -105,8 +105,8 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private Ampper ampper;
     private ShooterCmds shooterCmds;
-    
-    private PicoColorSensor colorSensor = new PicoColorSensor();
+    @IgnoreLogged
+    private PicoColorSensor piPico = new PicoColorSensor();
 
     @IgnoreLogged
     private PieceControl pieceControl;
@@ -201,7 +201,7 @@ public class RobotContainer implements Logged {
             elevator,
             ampper,
             shooterCmds,
-            colorSensor);
+            piPico);
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
@@ -227,7 +227,7 @@ public class RobotContainer implements Logged {
         if (FieldConstants.IS_SIMULATION) {
             autoDecisionMaker = driver::getYButton;
         } else {
-            autoDecisionMaker = colorSensor::hasNote0;
+            autoDecisionMaker = piPico::hasNoteShooter;
         }
         pathPlannerStorage = new PathPlannerStorage(autoDecisionMaker, swerve, limelight3);
         
@@ -319,7 +319,7 @@ public class RobotContainer implements Logged {
         // The reason we are checking bumpers
         // is so this doesn't happen on pieceControl::moveNote
         new Trigger(
-            () -> colorSensor.hasNote0() 
+            () -> piPico.hasNoteShooter() 
                 && (
                     // All of these buttons command intake
                     // Whether that be source or not
@@ -831,7 +831,7 @@ public class RobotContainer implements Logged {
             Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
             Monologue.logObj(limelight3g, "Robot/Limelights/limelight3g");
         }
-        // Monologue.logObj(colorSensor, "Robot/ColorSensors/colorSensor");
+        Monologue.logObj(piPico, "Robot/ColorSensors/");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");

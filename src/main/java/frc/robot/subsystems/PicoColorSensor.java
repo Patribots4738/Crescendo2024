@@ -13,8 +13,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.util.Constants.ColorSensorConstants;
 import monologue.Annotations.Log;
+import monologue.Logged;
 
-public class PicoColorSensor implements AutoCloseable {
+public class PicoColorSensor implements AutoCloseable, Logged {
     public static class RawColor {
         public RawColor(int r, int g, int b, int _ir) {
             red = r;
@@ -79,27 +80,35 @@ public class PicoColorSensor implements AutoCloseable {
     }
 
     private final AtomicBoolean debugPrints = new AtomicBoolean();
-    private boolean hasColor0;
-    private boolean hasColor1;
-    private int prox0;
-    private int prox1;
-    private final RawColor color0 = new RawColor();
-    private final RawColor color1 = new RawColor();
+    @Log
+    private boolean hasColorElevator;
+    @Log
+    private boolean hasColorShooter;
+    private int proxElevator;
+    private int proximityShooter;
+    private final RawColor colorElevator = new RawColor();
+    private final RawColor colorShooter = new RawColor();
     private double lastReadTime;
     private final ReentrantLock threadLock = new ReentrantLock();
     private final Thread readThread;
     private final AtomicBoolean threadRunning = new AtomicBoolean(true);
 
-    private Color detectedColor0 = new Color(0.0, 0.0, 0.0);
-    private Color detectedColor1 = new Color(0.0, 0.0, 0.0);
-    private String color0String;
-    private String color1String;
-    private boolean hasNote0 = false;
-    private boolean hasNote1 = false;
-    private ColorMatchResult match0 = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColor0);
-    private ColorMatchResult match1 = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColor1);
-    private String matchString0;
-    private String matchString1;
+    private Color detectedColorElevator = new Color(0.0, 0.0, 0.0);
+    private Color detectedColorShooter = new Color(0.0, 0.0, 0.0);
+    @Log
+    private String elevatorColorString;
+    @Log
+    private String shooterColorString;
+    @Log
+    private boolean hasNoteElevator = false;
+    @Log
+    private boolean hasNoteShooter = false;
+    private ColorMatchResult elevatorMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColorElevator);
+    private ColorMatchResult shooterMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColorShooter);
+    @Log
+    private String matchStringElevator;
+    @Log
+    private String matchStringShooter;
 
     private void threadMain() {
         // Using JNI for a non allocating read
@@ -120,8 +129,8 @@ public class PicoColorSensor implements AutoCloseable {
         charSeq.data = buffer;
         IntRef lastComma = new IntRef();
 
-        RawColor color0 = new RawColor();
-        RawColor color1 = new RawColor();
+        RawColor colorElevator = new RawColor();
+        RawColor colorShooter = new RawColor();
 
         while (threadRunning.get()) {
 
@@ -129,8 +138,8 @@ public class PicoColorSensor implements AutoCloseable {
             if (read <= 0) {
                 try {
                     threadLock.lock();
-                    this.hasColor0 = false;
-                    this.hasColor1 = false;
+                    this.hasColorElevator = false;
+                    this.hasColorShooter = false;
                 } finally {
                     threadLock.unlock();
                 }
@@ -156,18 +165,18 @@ public class PicoColorSensor implements AutoCloseable {
 
             lastComma.value = -1;
 
-            boolean hasColor0 = parseIntFromIndex(charSeq, read, lastComma) != 0;
-            boolean hasColor1 = parseIntFromIndex(charSeq, read, lastComma) != 0;
-            color0.red = parseIntFromIndex(charSeq, read, lastComma);
-            color0.green = parseIntFromIndex(charSeq, read, lastComma);
-            color0.blue = parseIntFromIndex(charSeq, read, lastComma);
-            color0.ir = parseIntFromIndex(charSeq, read, lastComma);
-            int prox0 = parseIntFromIndex(charSeq, read, lastComma);
-            color1.red = parseIntFromIndex(charSeq, read, lastComma);
-            color1.green = parseIntFromIndex(charSeq, read, lastComma);
-            color1.blue = parseIntFromIndex(charSeq, read, lastComma);
-            color1.ir = parseIntFromIndex(charSeq, read, lastComma);
-            int prox1 = parseIntFromIndex(charSeq, read, lastComma);
+            boolean hasColorElevator = parseIntFromIndex(charSeq, read, lastComma) != 0;
+            boolean hasColorShooter = parseIntFromIndex(charSeq, read, lastComma) != 0;
+            colorElevator.red = parseIntFromIndex(charSeq, read, lastComma);
+            colorElevator.green = parseIntFromIndex(charSeq, read, lastComma);
+            colorElevator.blue = parseIntFromIndex(charSeq, read, lastComma);
+            colorElevator.ir = parseIntFromIndex(charSeq, read, lastComma);
+            int proxElevator = parseIntFromIndex(charSeq, read, lastComma);
+            colorShooter.red = parseIntFromIndex(charSeq, read, lastComma);
+            colorShooter.green = parseIntFromIndex(charSeq, read, lastComma);
+            colorShooter.blue = parseIntFromIndex(charSeq, read, lastComma);
+            colorShooter.ir = parseIntFromIndex(charSeq, read, lastComma);
+            int proxShooter = parseIntFromIndex(charSeq, read, lastComma);
 
             double ts = Timer.getFPGATimestamp();
 
@@ -175,45 +184,45 @@ public class PicoColorSensor implements AutoCloseable {
                 threadLock.lock();
                 
                 this.lastReadTime = ts;
-                this.hasColor0 = hasColor0;
-                this.hasColor1 = hasColor1;
+                this.hasColorElevator = hasColorElevator;
+                this.hasColorShooter = hasColorShooter;
 
-                if (hasColor0) {
-                    this.color0.red = color0.red;
-                    this.color0.green = color0.green;
-                    this.color0.blue = color0.blue;
-                    this.color0.ir = color0.ir;
-                    this.prox0 = prox0;
+                if (hasColorElevator) {
+                    this.colorElevator.red = colorElevator.red;
+                    this.colorElevator.green = colorElevator.green;
+                    this.colorElevator.blue = colorElevator.blue;
+                    this.colorElevator.ir = colorElevator.ir;
+                    this.proxElevator = proxElevator;
 
-                    this.detectedColor0 = new Color(this.color0.red, this.color0.green, this.color0.blue);
-                    this.match0 = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColor0);
-                    this.color0String = detectedColor0.toString();
+                    this.detectedColorElevator = new Color(this.colorElevator.red, this.colorElevator.green, this.colorElevator.blue);
+                    this.elevatorMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColorElevator);
+                    this.elevatorColorString = detectedColorElevator.toString();
 
-                    if (this.match0.color == ColorSensorConstants.NOTE_ORANGE) {
-                        this.matchString0 = "Note";
-                        this.hasNote0 = true;
+                    if (this.elevatorMatch.color == ColorSensorConstants.NOTE_ORANGE) {
+                        this.matchStringElevator = "Note";
+                        this.hasNoteElevator = true;
                     } else {
-                        this.matchString0 = "Surely not a note";
-                        this.hasNote0 = false;
+                        this.matchStringElevator = "Surely not a note";
+                        this.hasNoteElevator = false;
                     }
                 }
-                if (hasColor1) {
-                    this.color1.red = color1.red;
-                    this.color1.green = color1.green;
-                    this.color1.blue = color1.blue;
-                    this.color1.ir = color1.ir;
-                    this.prox1 = prox1;
+                if (hasColorShooter) {
+                    this.colorShooter.red = colorShooter.red;
+                    this.colorShooter.green = colorShooter.green;
+                    this.colorShooter.blue = colorShooter.blue;
+                    this.colorShooter.ir = colorShooter.ir;
+                    this.proximityShooter = proxShooter;
 
-                    this.detectedColor1 = new Color(this.color1.red, this.color1.green, this.color1.blue);
-                    this.match1 = ColorSensorConstants.COLOR_MATCH.matchClosestColor(this.detectedColor1);
-                    this.color1String = detectedColor1.toString();
+                    this.detectedColorShooter = new Color(this.colorShooter.red, this.colorShooter.green, this.colorShooter.blue);
+                    this.shooterMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(this.detectedColorShooter);
+                    this.shooterColorString = detectedColorShooter.toString();
 
-                    if (this.match1.color == ColorSensorConstants.NOTE_ORANGE) {
-                        this.matchString1 = "Note";
-                        this.hasNote1 = true;
+                    if (this.shooterMatch.color == ColorSensorConstants.NOTE_ORANGE) {
+                        this.matchStringShooter = "Note";
+                        this.hasNoteShooter = true;
                     } else {
-                        this.matchString1 = "Surely not a note";
-                        this.hasNote1 = false;
+                        this.matchStringShooter = "Surely not a note";
+                        this.hasNoteShooter = false;
                     }
 
                 }
@@ -231,97 +240,99 @@ public class PicoColorSensor implements AutoCloseable {
         readThread.start();
     }
 
-    public boolean isSensor0Connected() {
+    @Log
+    public boolean elevatorSensorConnected() {
         try {
             threadLock.lock();
-            return hasColor0;
+            return hasColorElevator;
         } finally {
             threadLock.unlock();
         }
     }
 
-    public boolean isSensor1Connected() {
+    @Log
+    public boolean shooterSensorConnected() {
         try {
             threadLock.lock();
-            return hasColor1;
+            return hasColorShooter;
         } finally {
             threadLock.unlock();
         }
     }
 
-    public RawColor getRawColor0() {
+    public RawColor getRawColorElevator() {
         try {
             threadLock.lock();
-            return new RawColor(color0.red, color0.green, color0.blue, color0.ir);
+            return new RawColor(colorElevator.red, colorElevator.green, colorElevator.blue, colorElevator.ir);
         } finally {
             threadLock.unlock();
         }
     }
 
-    public void getRawColor0(RawColor rawColor) {
+    public void getRawColorElevator(RawColor rawColor) {
         try {
             threadLock.lock();
-            rawColor.red = color0.red;
-            rawColor.green = color0.green;
-            rawColor.blue = color0.blue;
-            rawColor.ir = color0.ir;
+            rawColor.red = colorElevator.red;
+            rawColor.green = colorElevator.green;
+            rawColor.blue = colorElevator.blue;
+            rawColor.ir = colorElevator.ir;
         } finally {
             threadLock.unlock();
         }
     }
 
-    public int getProximity0() {
+    public int getProximityElevator() {
         try {
             threadLock.lock();
-            return prox0;
+            return proxElevator;
         } finally {
             threadLock.unlock();
         }
     }
 
-    public boolean hasNote0() {
+    public boolean hasNoteElevator() {
         try {
             threadLock.lock();
-            return this.hasNote0;
+            return this.hasNoteElevator;
         } finally {
             threadLock.unlock();
         }
     }
 
-    public RawColor getRawColor1() {
+    public RawColor getRawColorShooter() {
         try {
             threadLock.lock();
-            return new RawColor(color1.red, color1.green, color1.blue, color1.ir);
+            return new RawColor(colorShooter.red, colorShooter.green, colorShooter.blue, colorShooter.ir);
         } finally {
             threadLock.unlock();
         }
     }
 
-    public void getRawColor1(RawColor rawColor) {
+    public void getRawColorShooter(RawColor rawColor) {
         try {
             threadLock.lock();
-            rawColor.red = color1.red;
-            rawColor.green = color1.green;
-            rawColor.blue = color1.blue;
-            rawColor.ir = color1.ir;
+            rawColor.red = colorShooter.red;
+            rawColor.green = colorShooter.green;
+            rawColor.blue = colorShooter.blue;
+            rawColor.ir = colorShooter.ir;
         } finally {
             threadLock.unlock();
         }
     }
 
-    public int getProximity1() {
+    public int getProximityShooter() {
         try {
             threadLock.lock();
-            return prox1;
+            return proximityShooter;
         } finally {
             threadLock.unlock();
         }
     }
 
-    public boolean hasNote1() {
+    public boolean hasNoteShooter() {
         try {
             threadLock.lock();
-            return this.hasNote1;
+            return this.hasNoteShooter;
         } finally {
             threadLock.unlock();
         }
