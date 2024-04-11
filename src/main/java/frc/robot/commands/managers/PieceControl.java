@@ -17,10 +17,11 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
-import frc.robot.subsystems.ColorSensor;
+import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -46,7 +47,7 @@ public class PieceControl implements Logged {
     private ShooterCmds shooterCmds;
     
 
-    private ColorSensor colorSensor;
+    private PicoColorSensor colorSensor;
 
     @Log
     private boolean shooterMode = false;
@@ -66,7 +67,7 @@ public class PieceControl implements Logged {
             Elevator elevator,
             Ampper ampper,
             ShooterCmds shooterCmds,
-            ColorSensor colorSensor) {
+            PicoColorSensor colorSensor) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
@@ -133,7 +134,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !colorSensor.hasNote0()),
                 stopIntakeAndIndexer());
     }
 
@@ -148,7 +149,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote() || FieldConstants.IS_SIMULATION),
+                Commands.waitUntil(() -> !colorSensor.hasNote0() || FieldConstants.IS_SIMULATION),
                 stopIntakeAndIndexer());
     }
 
@@ -161,7 +162,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             ampper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(colorSensor::hasNote0),
             stopIntakeAndIndexer(),
             indexer.toElevatorSlow(),
             ampper.outtakeSlow(),
@@ -192,7 +193,7 @@ public class PieceControl implements Logged {
             indexer.toShooter(),
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(500, 500, 0))
         ).andThen(
-            Commands.waitUntil(() -> !colorSensor.hasNote()),
+            Commands.waitUntil(() -> !colorSensor.hasNote0()),
             stopAllMotors()
         );
     }
@@ -207,7 +208,7 @@ public class PieceControl implements Logged {
                     )
                 ),
             intakeUntilNote(), 
-            colorSensor::hasNote);
+            colorSensor::hasNote0);
     }
 
     public Command noteToIndexer() {
@@ -215,7 +216,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             ampper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(colorSensor::hasNote0),
             stopIntakeAndIndexer()
         );
     }
@@ -228,7 +229,7 @@ public class PieceControl implements Logged {
             intake.inCommandSlow(),
             Commands.either(
                 Commands.waitSeconds(.1),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !colorSensor.hasNote0()),
                 () -> FieldConstants.IS_SIMULATION),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
@@ -377,7 +378,7 @@ public class PieceControl implements Logged {
             shooterCmds.sourceIntakeCommand(),
             indexer.toElevator(),
             ampper.outtake(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(colorSensor::hasNote0),
             Commands.waitSeconds(0.1),
             shooterCmds.stopShooter(),
             stopIntakeAndIndexer(),
@@ -451,7 +452,7 @@ public class PieceControl implements Logged {
             ),
             shooterCmds.stopShooter(),
             () -> 
-                (((colorSensor.hasNote() 
+                (((colorSensor.hasNote0() 
                         && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
                     || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean() && elevator.getDesiredPosition() <= 0.1))
                 
