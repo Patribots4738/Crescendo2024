@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "FullPowerPreload"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [

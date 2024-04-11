@@ -16,16 +16,9 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootInstantlyWhenReady"
-                      }
-                    }
-                  ]
+                  "name": "FullPowerPreload"
                 }
               },
               {

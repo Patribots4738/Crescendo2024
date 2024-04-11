@@ -132,4 +132,12 @@ public class Shooter extends SubsystemBase implements Logged{
     public double getAverageTargetSpeed() {
         return (targetLeftSpeed + targetRightSpeed) / 2.0;
     }
+
+    public Command fullPower(double desiredSpeed) {
+        return runOnce(() -> {
+            leftMotor.set(1);
+            rightMotor.set(1);
+        }).until(() -> getAverageSpeed() > desiredSpeed)
+        .andThen(setSpeedCommand(desiredSpeed));
+    }
 }
