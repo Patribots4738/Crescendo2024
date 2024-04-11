@@ -12,19 +12,19 @@
     "data": {
       "commands": [
         {
-          "type": "deadline",
+          "type": "race",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "FullPowerPreload"
+                  "name": "PreparePivot"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "PrepareSWD"
+                  "name": "FullPowerPreload"
                 }
               }
             ]
