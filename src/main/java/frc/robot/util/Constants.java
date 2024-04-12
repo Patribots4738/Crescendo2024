@@ -50,7 +50,8 @@ public final class Constants {
         // the robot, rather the allowed maximum speeds
         public static double MAX_SPEED_METERS_PER_SECOND = AutoConstants.MAX_SPEED_METERS_PER_SECOND;
 
-        public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = Units.degreesToRadians(1137.21); // radians per second
+        public static final double MAX_ANGULAR_SPEED_RADS_PER_SECOND = Units.degreesToRadians(1137.21); // radians per
+                                                                                                        // second
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.7;
 
@@ -65,21 +66,24 @@ public final class Constants {
         public static final double BUMPER_LENGTH_METERS = Units.inchesToMeters(2.75);
 
         // Front positive, left positive
-        public static final Translation2d FRONT_LEFT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2);
-        public static final Translation2d FRONT_RIGHT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2);
-        public static final Translation2d REAR_LEFT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2);
-        public static final Translation2d REAR_RIGHT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+        public static final Translation2d FRONT_LEFT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2,
+                TRACK_WIDTH / 2);
+        public static final Translation2d FRONT_RIGHT_WHEEL_POSITION = new Translation2d(WHEEL_BASE / 2,
+                -TRACK_WIDTH / 2);
+        public static final Translation2d REAR_LEFT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2,
+                TRACK_WIDTH / 2);
+        public static final Translation2d REAR_RIGHT_WHEEL_POSITION = new Translation2d(-WHEEL_BASE / 2,
+                -TRACK_WIDTH / 2);
 
         public static final Translation2d[] WHEEL_POSITION_ARRAY = new Translation2d[] {
-            FRONT_LEFT_WHEEL_POSITION,
-            FRONT_RIGHT_WHEEL_POSITION,
-            REAR_LEFT_WHEEL_POSITION,
-            REAR_RIGHT_WHEEL_POSITION
+                FRONT_LEFT_WHEEL_POSITION,
+                FRONT_RIGHT_WHEEL_POSITION,
+                REAR_LEFT_WHEEL_POSITION,
+                REAR_RIGHT_WHEEL_POSITION
         };
 
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                WHEEL_POSITION_ARRAY
-        );
+                WHEEL_POSITION_ARRAY);
 
         // Angular offsets of the modules relative to the chassis in radians
         // add 90 degrees to change the X and Y axis
@@ -123,17 +127,15 @@ public final class Constants {
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
 
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
-            0.002,
-            0,
-            0.006,
-            0.0001762
-        );
+                0.002,
+                0,
+                0.006,
+                0.0001762);
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
-            0.07,
-            0,
-            0.0083
-        );
+                0.07,
+                0,
+                0.0083);
 
         public static final int SHOOTER_CURRENT_LIMIT = 60;
         public static final int PIVOT_CURRENT_LIMIT = 20;
@@ -149,11 +151,15 @@ public final class Constants {
 
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
 
+        // This mega decimal number was gotten from REV hardware client,
+        // and we zeroed the pivot at its minimum angle
+        public static final double ABSOLUTE_ENCODER_ZERO_OFFSET = 128.2069087 - PIVOT_LOWER_LIMIT_DEGREES;
+
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
         public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
 
         public static final double DEFAULT_RPM = 2500;
-        
+
         public static final double SHOOTER_PASS_SECONDS = 2;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
@@ -173,7 +179,7 @@ public final class Constants {
                 // put(9, SpeedAngleTriplet.of(2465.0, 2465.0, 40.5));
                 // put(10, SpeedAngleTriplet.of(2633.0, 2633.0, 38.1));
                 // put(11, SpeedAngleTriplet.of(2795.0, 2795.0, 35.8));
-                // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
+                // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3));
                 // put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
                 // put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
                 // put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
@@ -230,16 +236,21 @@ public final class Constants {
 
         public static final InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(),
-                SpeedAngleTriplet.getInterpolator()) {{
-            for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
-                put(entry.getKey().doubleValue(), entry.getValue());
+                SpeedAngleTriplet.getInterpolator()) {
+            {
+                for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP
+                        .entrySet()) {
+                    put(entry.getKey().doubleValue(), entry.getValue());
+                }
             }
-        }};
+        };
 
         public static final double SHOOTER_WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
         public static final double GRAVITY = 9.81;
-        public static final double SPEAKER_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
-        public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.PASS_HEIGHT_METERS);
+        public static final double SPEAKER_V0Z = Math
+                .sqrt(ShooterConstants.GRAVITY * 2 * FieldConstants.SPEAKER_HEIGHT_METERS);
+        public static final double PASS_V0Z = Math
+                .sqrt(ShooterConstants.GRAVITY * 2 * FieldConstants.PASS_HEIGHT_METERS);
 
     }
 
@@ -253,10 +264,10 @@ public final class Constants {
         public static final int AMPPER_CURRENT_LIMIT = 15;
         public static final boolean AMPPER_INVERTION = true;
 
-        private static final double GEAR_RATIO = 16/Units.inchesToMeters(5.5);
-        private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19)*2.0;
+        private static final double GEAR_RATIO = 16 / Units.inchesToMeters(5.5);
+        private static final double ELEVATOR_HEIGHT = Units.inchesToMeters(19) * 2.0;
 
-        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 1.0/(GEAR_RATIO*ELEVATOR_HEIGHT);
+        public static final double ELEVATOR_POSITION_CONVERSION_FACTOR = 1.0 / 1.0 / (GEAR_RATIO * ELEVATOR_HEIGHT);
         public static final int ELEVATOR_MOTOR_CURRENT_LIMIT = 40; // amps
 
         public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
@@ -301,24 +312,24 @@ public final class Constants {
 
     public static final class ClimbConstants {
 
-        public static final int  LEFT_CLIMB_CAN_ID = 16;
+        public static final int LEFT_CLIMB_CAN_ID = 16;
         public static final int RIGHT_CLIMB_CAN_ID = 17;
 
-        private static final double GEAR_RATIO = 16.0/Units.inchesToMeters(3.0);
-        private static final double CLIMB_HEIGHT = Units.inchesToMeters(20)*2.0;
-        
-        public static final double CLIMB_POSITION_CONVERSION_FACTOR = 1.0/(GEAR_RATIO*CLIMB_HEIGHT);
+        private static final double GEAR_RATIO = 16.0 / Units.inchesToMeters(3.0);
+        private static final double CLIMB_HEIGHT = Units.inchesToMeters(20) * 2.0;
+
+        public static final double CLIMB_POSITION_CONVERSION_FACTOR = 1.0 / (GEAR_RATIO * CLIMB_HEIGHT);
         public static final int CLIMB_CURRENT_LIMIT = 40;
 
         public static final PatrIDConstants CLIMB_PID = new PatrIDConstants(5, 0, 0);
 
         public static final double EXTENSION_LIMIT_METERS = Units.feetToMeters(3.65);
-        
+
         public static final double TOP_LIMIT = 0.517;
         public static final double BOTTOM_LIMIT = 0.0;
 
         public static final double CLIMB_DEADBAND = 0.002;
-        
+
         public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
     }
 
@@ -337,16 +348,20 @@ public final class Constants {
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
+        public static final double dt = 0.02; // s
+        public static final double MAX_STEERING_VELOCITY_ERROR = Math.toRadians(2.0); // rad/s
+        public static final double MAX_ACCELERATION_ERROR = 0.01; // m/s^2
+
         /*
          * XY:
-         *  P: 5.2
-         *  I: 0.125
-         *  D: 0.0125
+         * P: 5.2
+         * I: 0.125
+         * D: 0.0125
          * 
          * Theta:
-         *   P: 1.3325
-         *   I: 1 (izone on 20 degrees)
-         *   D: 0.0375
+         * P: 1.3325
+         * I: 1 (izone on 20 degrees)
+         * D: 0.0375
          */
         public static final double XY_CORRECTION_P = 4;
         public static final double XY_CORRECTION_I = 0.0125;
@@ -366,15 +381,16 @@ public final class Constants {
         public static final boolean USE_OBJECT_DETECTION = true;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
-            AutoConstants.ROTATION_CORRECTION_P,
-            AutoConstants.ROTATION_CORRECTION_I,
-            AutoConstants.ROTATION_CORRECTION_D,
-            new TrapezoidProfile.Constraints(
-                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                    AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)) 
-            {{
+                AutoConstants.ROTATION_CORRECTION_P,
+                AutoConstants.ROTATION_CORRECTION_I,
+                AutoConstants.ROTATION_CORRECTION_D,
+                new TrapezoidProfile.Constraints(
+                        AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                        AutoConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED)) {
+            {
                 setIZone(Units.degreesToRadians(45));
-            }};
+            }
+        };
 
         // Constraint for the motion-profiled robot angle controller
         public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
@@ -383,24 +399,23 @@ public final class Constants {
         public static HolonomicDriveController HDC = new HolonomicDriveController(
                 XY_PID,
                 XY_PID,
-                THETA_PID
-            );
+                THETA_PID);
 
         public static HolonomicPathFollowerConfig HPFC = new HolonomicPathFollowerConfig(
-            new PIDConstants(
-                AutoConstants.XY_CORRECTION_P,
-                AutoConstants.XY_CORRECTION_I,
-                AutoConstants.XY_CORRECTION_D),
-            new PIDConstants(
-                    AutoConstants.ROTATION_CORRECTION_P,
-                    AutoConstants.ROTATION_CORRECTION_I,
-                    AutoConstants.ROTATION_CORRECTION_D,
-                    Units.degreesToRadians(45)),
-            MAX_SPEED_METERS_PER_SECOND,
-            Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH)/2.0,
-            new ReplanningConfig());
+                new PIDConstants(
+                        AutoConstants.XY_CORRECTION_P,
+                        AutoConstants.XY_CORRECTION_I,
+                        AutoConstants.XY_CORRECTION_D),
+                new PIDConstants(
+                        AutoConstants.ROTATION_CORRECTION_P,
+                        AutoConstants.ROTATION_CORRECTION_I,
+                        AutoConstants.ROTATION_CORRECTION_D,
+                        Units.degreesToRadians(45)),
+                MAX_SPEED_METERS_PER_SECOND,
+                Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
+                new ReplanningConfig());
 
-        // In choreo, there is one path, "C1-5S", 
+        // In choreo, there is one path, "C1-5S",
         // that shoots every piece.
         // There is a setting that splits the trajectories
         // by each stop point, and the auto generated
@@ -409,10 +424,10 @@ public final class Constants {
         private static final String PATH_EXTENSION = ".";
 
         public static final String SHOOTING_DOWN_PATH_NAME = "C1-5S" + PATH_EXTENSION;
-        public static final String SHOOTING_UP_PATH_NAME   = "C5-1S" + PATH_EXTENSION;
+        public static final String SHOOTING_UP_PATH_NAME = "C5-1S" + PATH_EXTENSION;
 
-        public static final String SKIPPING_DOWN_PATH_NAME = "C1-5"  + PATH_EXTENSION;
-        public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
+        public static final String SKIPPING_DOWN_PATH_NAME = "C1-5" + PATH_EXTENSION;
+        public static final String SKIPPING_UP_PATH_NAME = "C5-1" + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
             // "S C5-4 S OBJ",
@@ -437,23 +452,25 @@ public final class Constants {
 
         public static final I2C.Port I2C_PORT = I2C.Port.kMXP;
         public static final Color NOTE_ORANGE = new Color(0.957, 0.282, 0.086);
-        public static final ColorMatch COLOR_MATCH = new ColorMatch() 
-        {{
-            // BLACK
-            addColorMatch(Color.kBlack);
-            // NEW COMP READY NOTE ORANGE
-            addColorMatch(NOTE_ORANGE);
-            addColorMatch(Color.kWhite);
-        }};
+        public static final ColorMatch COLOR_MATCH = new ColorMatch() {
+            {
+                // BLACK
+                addColorMatch(Color.kBlack);
+                // NEW COMP READY NOTE ORANGE
+                addColorMatch(NOTE_ORANGE);
+                addColorMatch(Color.kWhite);
+            }
+        };
 
     }
+
     public static final class ModuleConstants {
 
         // https://www.revrobotics.com/rev-21-3005/
         private enum SwerveGearing {
-            LOW         (12, 22, 4.12, 4.92),
-            MEDIUM      (13, 22, 4.46, 5.33),
-            HIGH        (14, 22, 4.8, 5.5/*5.74*/),
+            LOW(12, 22, 4.12, 4.92),
+            MEDIUM(13, 22, 4.46, 5.33),
+            HIGH(14, 22, 4.8, 5.5/* 5.74 */),
 
             EXTRA_HIGH_1(14, 21, 5.03, 6.01),
             EXTRA_HIGH_2(14, 20, 5.28, 6.32),
@@ -461,18 +478,16 @@ public final class Constants {
             EXTRA_HIGH_4(16, 20, 6.04, 7.22),
             EXTRA_HIGH_5(16, 19, 6.36, 7.60);
 
-            private final double 
-                pinionTeeth, 
-                spurTeeth, 
-                maxSpeedNeo,
-                maxSpeedVortex;
+            private final double pinionTeeth,
+                    spurTeeth,
+                    maxSpeedNeo,
+                    maxSpeedVortex;
 
             SwerveGearing(
-                int pinionTeeth, 
-                int spurTeeth, 
-                double maxSpeedNeo,
-                double maxSpeedVortex)
-            {
+                    int pinionTeeth,
+                    int spurTeeth,
+                    double maxSpeedNeo,
+                    double maxSpeedVortex) {
                 this.pinionTeeth = pinionTeeth;
                 this.spurTeeth = spurTeeth;
                 this.maxSpeedNeo = maxSpeedNeo;
@@ -492,7 +507,8 @@ public final class Constants {
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.468519624221792*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
-        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
+        public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth)
+                / (CURRENT_GEARING.pinionTeeth * 15.0);
         public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
                 * WHEEL_CIRCUMFERENCE_METERS)
                 / DRIVING_MOTOR_REDUCTION;
@@ -515,13 +531,12 @@ public final class Constants {
         public static final double DRIVING_MIN_OUTPUT = -1;
         public static final double DRIVING_MAX_OUTPUT = 1;
         public static final PatrIDConstants DRIVING_PID = new PatrIDConstants(
-            DRIVING_P,
-            DRIVING_I,
-            DRIVING_D,
-            DRIVING_FF,
-            DRIVING_MIN_OUTPUT,
-            DRIVING_MAX_OUTPUT
-        );
+                DRIVING_P,
+                DRIVING_I,
+                DRIVING_D,
+                DRIVING_FF,
+                DRIVING_MIN_OUTPUT,
+                DRIVING_MAX_OUTPUT);
 
         public static final double TURNING_P = Robot.isSimulation() ? 0.5 : 1.5;
         public static final double TURNING_I = 0;
@@ -530,13 +545,12 @@ public final class Constants {
         public static final double TURNING_MIN_OUTPUT = -1;
         public static final double TURNING_MAX_OUTPUT = 1;
         public static final PatrIDConstants TURNING_PID = new PatrIDConstants(
-            TURNING_P,
-            TURNING_I,
-            TURNING_D,
-            TURNING_FF,
-            TURNING_MIN_OUTPUT,
-            TURNING_MAX_OUTPUT
-        );
+                TURNING_P,
+                TURNING_I,
+                TURNING_D,
+                TURNING_FF,
+                TURNING_MIN_OUTPUT,
+                TURNING_MAX_OUTPUT);
 
         public static final int NEO_CURRENT_LIMIT = 50; // amps
         public static final int VORTEX_CURRENT_LIMIT = 80; // amps
@@ -574,8 +588,7 @@ public final class Constants {
 
         public static final Pair<Integer, Integer> LEFT_WHEEL_LED_RANGE = new Pair<Integer, Integer>(
                 0,
-                10
-        );
+                10);
 
         public static final int NORTH = 0;
         public static final int NORTHEAST = 1;
@@ -586,17 +599,18 @@ public final class Constants {
         public static final int WEST = 6;
         public static final int NORTHWEST = 7;
 
-        public static final HashMap<Integer, Pair<Integer, Integer>> ARROW_MAP = new HashMap<Integer, Pair<Integer, Integer>>() 
-        {{
-            put(NORTH, Pair.of(1, 2));
-            put(NORTHEAST, Pair.of(3, 4));
-            put(EAST, Pair.of(5, 6));
-            put(SOUTHEAST, Pair.of(7, 8));
-            put(SOUTHWEST, Pair.of(9, 10));
-            put(SOUTH, Pair.of(11, 12));
-            put(WEST, Pair.of(13, 14));
-            put(NORTHWEST, Pair.of(15, 16));
-        }};
+        public static final HashMap<Integer, Pair<Integer, Integer>> ARROW_MAP = new HashMap<Integer, Pair<Integer, Integer>>() {
+            {
+                put(NORTH, Pair.of(1, 2));
+                put(NORTHEAST, Pair.of(3, 4));
+                put(EAST, Pair.of(5, 6));
+                put(SOUTHEAST, Pair.of(7, 8));
+                put(SOUTHWEST, Pair.of(9, 10));
+                put(SOUTH, Pair.of(11, 12));
+                put(WEST, Pair.of(13, 14));
+                put(NORTHWEST, Pair.of(15, 16));
+            }
+        };
 
     }   
 
@@ -714,40 +728,45 @@ public final class Constants {
         //      1      4
         //  0              3
         // @formatter:on
-        public static final List<Pose2d> CHAIN_POSITIONS = new ArrayList<Pose2d>() {{
-            // All points are in meters and radians
-            // All relative to the blue origin
-            // Blue Stage
-            Pose2d bluePose1 = new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(-120));
-            Pose2d bluePose2 = new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0));
-            Pose2d bluePose3 = new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120));
-            add(bluePose1);
-            add(bluePose2);
-            add(bluePose3);
+        public static final List<Pose2d> CHAIN_POSITIONS = new ArrayList<Pose2d>() {
+            {
+                // All points are in meters and radians
+                // All relative to the blue origin
+                // Blue Stage
+                Pose2d bluePose1 = new Pose2d(4.37, 3.201, Rotation2d.fromDegrees(-120));
+                Pose2d bluePose2 = new Pose2d(5.875, 4.168, Rotation2d.fromDegrees(0));
+                Pose2d bluePose3 = new Pose2d(4.353, 4.938, Rotation2d.fromDegrees(120));
+                add(bluePose1);
+                add(bluePose2);
+                add(bluePose3);
 
-            // Red Stage
-            add(GeometryUtil.flipFieldPose(bluePose1));
-            add(GeometryUtil.flipFieldPose(bluePose2));
-            add(GeometryUtil.flipFieldPose(bluePose3));
-        }};
+                // Red Stage
+                add(GeometryUtil.flipFieldPose(bluePose1));
+                add(GeometryUtil.flipFieldPose(bluePose2));
+                add(GeometryUtil.flipFieldPose(bluePose3));
+            }
+        };
 
-        public static final List<Pose2d> STAGE_POSITIONS = new ArrayList<Pose2d>() {{
-            // All points are in meters and radians
-            // All relative to the blue origin
-            // Blue Stage
-            Pose2d blueStage = new Pose2d(4.897, 4.064, new Rotation2d());
-            add(blueStage);
+        public static final List<Pose2d> STAGE_POSITIONS = new ArrayList<Pose2d>() {
+            {
+                // All points are in meters and radians
+                // All relative to the blue origin
+                // Blue Stage
+                Pose2d blueStage = new Pose2d(4.897, 4.064, new Rotation2d());
+                add(blueStage);
 
-            // Red Stage
-            add(GeometryUtil.flipFieldPose(blueStage));
-        }};
+                // Red Stage
+                add(GeometryUtil.flipFieldPose(blueStage));
+            }
+        };
 
-        public static final List<Pose2d> SOURCE_POSITIONS = new ArrayList<Pose2d>() {{
-            // All points are in meters and radians
-            // All relative to the blue origin
-            // Blue Source
-            Pose2d blueSource = new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120));
-            add(blueSource);
+        public static final List<Pose2d> SOURCE_POSITIONS = new ArrayList<Pose2d>() {
+            {
+                // All points are in meters and radians
+                // All relative to the blue origin
+                // Blue Source
+                Pose2d blueSource = new Pose2d(15.452, 0.971, Rotation2d.fromDegrees(120));
+                add(blueSource);
 
             // Red Source
             add(GeometryUtil.flipFieldPose(blueSource));
@@ -764,22 +783,30 @@ public final class Constants {
             add(GeometryUtil.flipFieldPose(blueSubwoofer));
         }};
 
-        public static final List<Pose3d> CHAIN_POSE3DS = new ArrayList<Pose3d>() {{
-            // All points are in meters and radians
-            // All relative to the blue origin
-            // Blue Chain
-            Pose3d blueChain1 = new Pose3d(CHAIN_POSITIONS.get(0)).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
-            Pose3d blueChain2 = new Pose3d(CHAIN_POSITIONS.get(1)).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
-            Pose3d blueChain3 = new Pose3d(CHAIN_POSITIONS.get(2)).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
-            add(blueChain1);
-            add(blueChain2);
-            add(blueChain3);
+        public static final List<Pose3d> CHAIN_POSE3DS = new ArrayList<Pose3d>() {
+            {
+                // All points are in meters and radians
+                // All relative to the blue origin
+                // Blue Chain
+                Pose3d blueChain1 = new Pose3d(CHAIN_POSITIONS.get(0))
+                        .plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
+                Pose3d blueChain2 = new Pose3d(CHAIN_POSITIONS.get(1))
+                        .plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
+                Pose3d blueChain3 = new Pose3d(CHAIN_POSITIONS.get(2))
+                        .plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d()));
+                add(blueChain1);
+                add(blueChain2);
+                add(blueChain3);
 
-            // Red Chain
-            add(new Pose3d(GeometryUtil.flipFieldPose(blueChain1.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
-            add(new Pose3d(GeometryUtil.flipFieldPose(blueChain2.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
-            add(new Pose3d(GeometryUtil.flipFieldPose(blueChain3.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
-        }};
+                // Red Chain
+                add(new Pose3d(GeometryUtil.flipFieldPose(blueChain1.toPose2d()))
+                        .plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
+                add(new Pose3d(GeometryUtil.flipFieldPose(blueChain2.toPose2d()))
+                        .plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
+                add(new Pose3d(GeometryUtil.flipFieldPose(blueChain3.toPose2d()))
+                        .plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
+            }
+        };
 
         // Speaker Positions: Blue alliance left
         // @formatter:off
@@ -809,9 +836,10 @@ public final class Constants {
         
         public static final List<Pose2d> PASS_APEX_POSITIONS = new ArrayList<Pose2d>() {{
 
-            // I swear bulldogs and hawaiin kids just had to get in here somehow
-            Pose2d bluePose = new Pose2d(4.581, 4.359, Rotation2d.fromDegrees(0));
-            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
+                // I swear bulldogs and hawaiin kids just had to get in here somehow
+                Pose2d bluePose = new Pose2d(4.581, 4.359, Rotation2d.fromDegrees(0));
+                Pose2d redPose = GeometryUtil.flipFieldPose(bluePose)
+                        .plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
 
             add(bluePose);
             add(redPose);
@@ -829,8 +857,8 @@ public final class Constants {
 
         private static int getAllianceIndex(Alliance defaultAlliance) {
             return defaultAlliance == Alliance.Blue
-                ? (Robot.isRedAlliance() ? 1 : 0) 
-                : (Robot.isBlueAlliance() ? 1 : 0);
+                    ? (Robot.isRedAlliance() ? 1 : 0)
+                    : (Robot.isBlueAlliance() ? 1 : 0);
         }
 
         public static Pose2d GET_SPEAKER_POSITION() {
@@ -893,19 +921,24 @@ public final class Constants {
 
         static {
             for (int i = 0; i < SPIKE_TRANSLATIONS_BLUE.length; i++) {
-                SPIKE_TRANSLATIONS_BLUE[i] = new Translation3d(SPIKE_X, SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y), NOTE_Z);
-                SPIKE_TRANSLATIONS_RED[i] = new Translation3d(FIELD_WIDTH_METERS - SPIKE_X, SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y), NOTE_Z);
+                SPIKE_TRANSLATIONS_BLUE[i] = new Translation3d(SPIKE_X, SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y),
+                        NOTE_Z);
+                SPIKE_TRANSLATIONS_RED[i] = new Translation3d(FIELD_WIDTH_METERS - SPIKE_X,
+                        SPIKE_FIRST_Y + (i * SPIKE_SEPARATION_Y), NOTE_Z);
             }
             for (int i = 0; i < CENTERLINE_TRANSLATIONS.length; i++) {
-                CENTERLINE_TRANSLATIONS[i] =
-                        new Translation3d(CENTERLINE_X, CENTERLINE_FIRST_Y + (i * CENTERLINE_SEPARATION_Y), NOTE_Z);
+                CENTERLINE_TRANSLATIONS[i] = new Translation3d(CENTERLINE_X,
+                        CENTERLINE_FIRST_Y + (i * CENTERLINE_SEPARATION_Y), NOTE_Z);
             }
             System.arraycopy(SPIKE_TRANSLATIONS_BLUE, 0, NOTE_TRANSLATIONS, 0, SPIKE_TRANSLATIONS_BLUE.length);
-            System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length, SPIKE_TRANSLATIONS_RED.length);
-            System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
+            System.arraycopy(SPIKE_TRANSLATIONS_RED, 0, NOTE_TRANSLATIONS, SPIKE_TRANSLATIONS_BLUE.length,
+                    SPIKE_TRANSLATIONS_RED.length);
+            System.arraycopy(CENTERLINE_TRANSLATIONS, 0, NOTE_TRANSLATIONS,
+                    SPIKE_TRANSLATIONS_BLUE.length + SPIKE_TRANSLATIONS_RED.length, CENTERLINE_TRANSLATIONS.length);
             for (int i = 0; i < NOTE_TRANSLATIONS.length; i++) {
                 Translation3d noteTranslation3d = NOTE_TRANSLATIONS[i];
-                HIGH_NOTE_TRANSLATIONS[i] = new Translation3d(noteTranslation3d.getX(), noteTranslation3d.getY(), noteTranslation3d.getZ() - 0.1);
+                HIGH_NOTE_TRANSLATIONS[i] = new Translation3d(noteTranslation3d.getX(), noteTranslation3d.getY(),
+                        noteTranslation3d.getZ() - 0.1);
             }
         }
 
@@ -961,18 +994,19 @@ public final class Constants {
             Translation2d W2_RED = GeometryUtil.flipFieldPosition(W2_BLUE);
             Translation2d W3_RED = GeometryUtil.flipFieldPosition(W3_BLUE);
 
-            put(W1_BLUE, "W1_BLUE");
-            put(W2_BLUE, "W2_BLUE");
-            put(W3_BLUE, "W3_BLUE");
-            put(C1, "C1");
-            put(C2, "C2");
-            put(C3, "C3");
-            put(C4, "C4");
-            put(C5, "C5");
-            put(W1_RED, "W1_RED");
-            put(W2_RED, "W2_RED");
-            put(W3_RED, "W3_RED");
-        }};
+                put(W1_BLUE, "W1_BLUE");
+                put(W2_BLUE, "W2_BLUE");
+                put(W3_BLUE, "W3_BLUE");
+                put(C1, "C1");
+                put(C2, "C2");
+                put(C3, "C3");
+                put(C4, "C4");
+                put(C5, "C5");
+                put(W1_RED, "W1_RED");
+                put(W2_RED, "W2_RED");
+                put(W3_RED, "W3_RED");
+            }
+        };
 
         // 12.4ft from the speaker
         public static final Translation2d PODIUM_SHOT_SPOT = new Translation2d(2.55, 4.19);
@@ -1011,7 +1045,8 @@ public final class Constants {
             add(GeometryUtil.flipFieldPose(W3_POSE2D));
         }};
 
-        // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
+        // Within a range of the [red
+        // circle](https://www.desmos.com/calculator/cu3ocssv5d)
         public static final double AUTOMATIC_SHOOTER_DISTANCE_RADIUS = 8.5;
 
         public static List<Pose2d> GET_SHOOTING_POSITIONS() {
@@ -1024,7 +1059,7 @@ public final class Constants {
             for (int i = CENTERLINE_TRANSLATIONS.length - 1; i >= 0; i--) {
                 notePoses.add(
                     new Pose2d(
-                        CENTERLINE_TRANSLATIONS[i].toTranslation2d(), 
+                        CENTERLINE_TRANSLATIONS[i].toTranslation2d(),
                         new Rotation2d()));
             }
             return notePoses;
@@ -1047,17 +1082,21 @@ public final class Constants {
          * Things to do when we are in field calibration
          * First off: Take snapshots at W2 (both alliances), and C3
          * 
-         * Then, attempt to quickly make the fmap and verify the accuracy using a hotspot
-         * (look up "april tag map builder limelight") or visit https://tools.limelightvision.io/map-builder
-         * Then, go back and take another shot from either W1 or W3 to verify the accuracy
+         * Then, attempt to quickly make the fmap and verify the accuracy using a
+         * hotspot
+         * (look up "april tag map builder limelight") or visit
+         * https://tools.limelightvision.io/map-builder
+         * Then, go back and take another shot from either W1 or W3 to verify the
+         * accuracy
          * 
          * Finally, move the robot around and see if the vision helps us out...
-         * Power cycle the limelight to force megatag to stop giving us outdated readings
+         * Power cycle the limelight to force megatag to stop giving us outdated
+         * readings
          * 
          * Make sure to bring:
-         *   Tape measure to verify the accuracy (Sub is 36 in out from field wall)
-         *   Square (to make sure the robot is perfectly in the center of the spike mark)
-         *   Phone for hotspot i suppose
+         * Tape measure to verify the accuracy (Sub is 36 in out from field wall)
+         * Square (to make sure the robot is perfectly in the center of the spike mark)
+         * Phone for hotspot i suppose
          */
         public static final boolean FIELD_CALIBRATION_MODE = false;
 
@@ -1068,15 +1107,13 @@ public final class Constants {
 
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
-        public static final Pose3d LL3Pose = 
-            new Pose3d(
+        public static final Pose3d LL3Pose = new Pose3d(
                 // forward positive, right positive, up positive
                 0.204,
                 -0.234,
                 0.651,
                 new Rotation3d(0, Units.degreesToRadians(13), 0));
-        public static final Pose3d LL2Pose =
-            new Pose3d(
+        public static final Pose3d LL2Pose = new Pose3d(
                 // forward positive, right positive, up positive
                 -0.272724,
                 -0.311903,
@@ -1085,9 +1122,9 @@ public final class Constants {
                 // it is negative because it points down
                 new Rotation3d(0, Units.degreesToRadians(-11), Units.degreesToRadians(180)));
 
-        public static final Pose3d[] cameras = new Pose3d[] {LL3Pose, LL2Pose};
+        public static final Pose3d[] cameras = new Pose3d[] { LL3Pose, LL2Pose };
     }
-    
+
     public static final class NTConstants {
         public static final int PIVOT_INDEX = 0;
         public static final int AMPPER_INDEX = 1;
@@ -1108,12 +1145,12 @@ public final class Constants {
             put("noteToShoot2", 0.3);
             put("noteToShoot3", 0.0);
 
-            put("intakeToTrap1", 0.2);
-            put("intakeToTrap2", 0.0);
+                put("intakeToTrap1", 0.2);
+                put("intakeToTrap2", 0.0);
 
-            put("noteToIndexer1", 0.2);
-            put("noteToIndexer2", 0.07);
-            put("noteToIndexer3", 0.0);
+                put("noteToIndexer1", 0.2);
+                put("noteToIndexer2", 0.07);
+                put("noteToIndexer3", 0.0);
 
             put("noteToTrap1", 0.15);
             put("noteToTrap2", 0.254);

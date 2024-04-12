@@ -75,6 +75,8 @@ public class Drive extends Command {
             swerve.setWheelsX();
         }
         else {
+            Swerve.desiredChassisSpeeds = new ChassisSpeeds(x, y, rotation);
+
             swerve.drive(
                 x * DriveConstants.MAX_SPEED_METERS_PER_SECOND * driveMultiplier,
                 y * DriveConstants.MAX_SPEED_METERS_PER_SECOND * driveMultiplier,

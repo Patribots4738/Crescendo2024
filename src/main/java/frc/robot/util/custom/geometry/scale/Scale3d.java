@@ -1,8 +1,8 @@
-package frc.robot.util.custom;
+package frc.robot.util.custom.geometry.scale;
 
 /**
- * This class is used to represent a 3D scale.
- * Primarily, for FMAPs with april tags.
+ * This class is used to represent a 3D scale. Primarily, for FMAPs with april
+ * tags.
  */
 public class Scale3d {
     public double x;
