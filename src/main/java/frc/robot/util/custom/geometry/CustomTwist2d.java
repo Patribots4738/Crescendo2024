@@ -2,6 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+/**
+ * This file is a modification of the current Twist2d class made by WPILib.
+ */
+
 package frc.robot.util.custom.geometry;
 
 import edu.wpi.first.math.geometry.proto.Twist2dProto;

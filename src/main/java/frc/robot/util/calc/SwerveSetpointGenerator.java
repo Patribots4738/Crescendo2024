@@ -1,3 +1,8 @@
+/**
+ * This file was heavily "inspired" by the teams: 254 and 6328
+ * The setpoint generator generates setpoints for the swerve that are kinematically feasible
+ */
+
 package frc.robot.util.calc;
 
 import java.util.ArrayList;

@@ -1,3 +1,7 @@
+/**
+ * This file was inspired by team 254 inside of their Util class
+ */
+
 package frc.robot.util.custom.geometry;
 
 public class Epsilon {
