@@ -5,7 +5,7 @@
       "x": 1.2698318789694694,
       "y": 3.0612493923756046
     },
-    "rotation": 117.98745319075599
+    "rotation": 116.80464903166519
   },
   "command": {
     "type": "sequential",
@@ -35,9 +35,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "PrepareSWD"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "BoostShooterR"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "PrepareSWD"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -54,7 +67,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S C5"
+                        "pathName": "R C5"
                       }
                     },
                     {
@@ -97,7 +110,13 @@
         {
           "type": "named",
           "data": {
-            "name": "C5toC1nonOBJ"
+            "name": "C5toC3nonOBJ"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C3toC5nonOBJ"
           }
         }
       ]
