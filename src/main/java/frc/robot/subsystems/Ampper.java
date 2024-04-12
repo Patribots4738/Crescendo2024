@@ -50,7 +50,7 @@ public class Ampper extends SubsystemBase implements Logged {
     public Command outtakeSlow(double seconds) {
         return 
             Commands.sequence(
-                intakeSlow(),
+                outtakeSlow(),
                 Commands.waitSeconds(seconds),
                 stopCommand());
     }

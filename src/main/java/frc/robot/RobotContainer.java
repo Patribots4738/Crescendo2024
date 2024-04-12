@@ -505,7 +505,7 @@ public class RobotContainer implements Logged {
         // Quick uppies for double amping
         controller.leftBumper().and(() -> true)
             .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
-            .onFalse(pieceControl.stopIntakeAndIndexer().andThen(pieceControl.doubleAmpElevatorEnd()));
+            .onFalse(ampper.outtakeSlow(.3).andThen(pieceControl.stopIntakeAndIndexer(),pieceControl.doubleAmpElevatorEnd()));
 
         // controller.leftBumper()
         //     .onTrue(elevator.toTopIshButNotFullCommand())
