@@ -137,6 +137,14 @@ public class ShooterCmds {
             }, pivot, shooter);
     }
 
+    public Command preparePivotCommandAuto(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.run(
+            () -> {
+                desiredTriplet = shooterCalc.calculateSWDTripletAuto(robotPose.get(), speeds.get());
+                pivot.setAngle(desiredTriplet.getAngle());
+            }, pivot);
+    }
+
     public Command prepareStillSpeakerCommand(Supplier<Pose2d> robotPose) {
         return prepareSWDCommand(robotPose, () -> new ChassisSpeeds());
     }
