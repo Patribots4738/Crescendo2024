@@ -12,22 +12,9 @@
     "data": {
       "commands": [
         {
-          "type": "race",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "FullPowerPreload"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PreparePivot"
-                }
-              }
-            ]
+            "name": "FullPowerPreload"
           }
         },
         {
