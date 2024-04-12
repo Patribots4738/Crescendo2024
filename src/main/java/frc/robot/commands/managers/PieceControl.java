@@ -257,6 +257,10 @@ public class PieceControl implements Logged {
         );
     }
 
+    public Command noteToTrap3() {
+        return Commands.either(noteToTrap2(), noteToTrap(), () -> piPico.shooterSensorConnected() && piPico.elevatorSensorConnected());
+    }
+
     public Command ejectNote() {
         //outtakes the note
         return Commands.sequence(
