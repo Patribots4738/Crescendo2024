@@ -208,6 +208,9 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                         hadNoteElevatorLastLoop = hasNoteElevator;
                         this.hasNoteElevator = false;
                     }
+                } else {
+                    this.hasNoteElevator = false;
+                    this.proximityElevator = 0;
                 }
                 if (hasColorShooter) {
                     this.colorShooter.red = colorShooter.red;
@@ -229,6 +232,9 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                         this.hasNoteShooter = false;
                     }
 
+                } else {
+                    this.hasNoteShooter = false;
+                    this.proximityShooter = 0;
                 }
             } finally {
                 threadLock.unlock();
