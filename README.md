@@ -7,7 +7,7 @@
 
 ![Robot Image](images/robot.gif)
 
-<img src="images/ILUVUTERRY.png" width="85%">
+<img src="images/ILUVUTERRY.png" width="100%">
 
 ____
 
