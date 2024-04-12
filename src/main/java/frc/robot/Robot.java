@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
         // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-        if (gameMode != GameMode.DISABLED) {
+        if (gameMode != GameMode.DISABLED || true) {
             Monologue.updateAll();
         }
         else {

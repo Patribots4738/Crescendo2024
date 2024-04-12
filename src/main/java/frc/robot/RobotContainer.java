@@ -106,7 +106,7 @@ public class RobotContainer implements Logged {
     private Ampper ampper;
     private ShooterCmds shooterCmds;
     @IgnoreLogged
-    private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
+    private PicoColorSensor piPico = new PicoColorSensor();
 
     @IgnoreLogged
     private PieceControl pieceControl;
@@ -201,7 +201,7 @@ public class RobotContainer implements Logged {
             elevator,
             ampper,
             shooterCmds,
-            colorSensor);
+            piPico);
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
@@ -227,7 +227,7 @@ public class RobotContainer implements Logged {
         if (FieldConstants.IS_SIMULATION) {
             autoDecisionMaker = driver::getYButton;
         } else {
-            autoDecisionMaker = colorSensor::hasNote;
+            autoDecisionMaker = piPico::hasNoteShooter;
         }
         pathPlannerStorage = new PathPlannerStorage(autoDecisionMaker, swerve, limelight3);
         
@@ -319,7 +319,7 @@ public class RobotContainer implements Logged {
         // The reason we are checking bumpers
         // is so this doesn't happen on pieceControl::moveNote
         new Trigger(
-            () -> colorSensor.hasNote() 
+            () -> piPico.hasNoteShooter() 
                 && (
                     // All of these buttons command intake
                     // Whether that be source or not
@@ -490,7 +490,7 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
 
         controller.b()
-            .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
+            .onTrue(pieceControl.noteToTrap2().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
 
         // If this is nice to work with, then we keep it. If not... bye bye!
         new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS 
@@ -831,7 +831,7 @@ public class RobotContainer implements Logged {
             Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
             Monologue.logObj(limelight3g, "Robot/Limelights/limelight3g");
         }
-        Monologue.logObj(colorSensor, "Robot/ColorSensors/colorSensor");
+        Monologue.logObj(piPico, "Robot/ColorSensors");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");

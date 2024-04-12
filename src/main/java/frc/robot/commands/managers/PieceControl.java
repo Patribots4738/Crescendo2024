@@ -17,10 +17,11 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
-import frc.robot.subsystems.ColorSensor;
+import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -44,9 +45,8 @@ public class PieceControl implements Logged {
     private Ampper ampper;
     @IgnoreLogged
     private ShooterCmds shooterCmds;
-    
-
-    private ColorSensor colorSensor;
+    @IgnoreLogged
+    private PicoColorSensor piPico;
 
     @Log
     private boolean shooterMode = false;
@@ -66,13 +66,13 @@ public class PieceControl implements Logged {
             Elevator elevator,
             Ampper ampper,
             ShooterCmds shooterCmds,
-            ColorSensor colorSensor) {
+            PicoColorSensor piPico) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.ampper = ampper;
         this.shooterCmds = shooterCmds;
-        this.colorSensor = colorSensor;
+        this.piPico = piPico;
     }
 
     public Command stopAllMotors() {
@@ -133,7 +133,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
                 stopIntakeAndIndexer());
     }
 
@@ -148,7 +148,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote() || FieldConstants.IS_SIMULATION),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter() || FieldConstants.IS_SIMULATION),
                 stopIntakeAndIndexer());
     }
 
@@ -161,7 +161,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             ampper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(piPico::hasNoteShooter),
             stopIntakeAndIndexer(),
             indexer.toElevatorSlow(),
             ampper.outtakeSlow(),
@@ -192,7 +192,7 @@ public class PieceControl implements Logged {
             indexer.toShooter(),
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(500, 500, 0))
         ).andThen(
-            Commands.waitUntil(() -> !colorSensor.hasNote()),
+            Commands.waitUntil(() -> !piPico.hasNoteShooter()),
             stopAllMotors()
         );
     }
@@ -207,7 +207,7 @@ public class PieceControl implements Logged {
                     )
                 ),
             intakeUntilNote(), 
-            colorSensor::hasNote);
+            piPico::hasNoteShooter);
     }
 
     public Command noteToIndexer() {
@@ -215,7 +215,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             ampper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(piPico::hasNoteShooter),
             stopIntakeAndIndexer()
         );
     }
@@ -228,12 +228,50 @@ public class PieceControl implements Logged {
             intake.inCommandSlow(),
             Commands.either(
                 Commands.waitSeconds(.1),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
                 () -> FieldConstants.IS_SIMULATION),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             ampper.outtakeSlow(),
             NT.getWaitCommand("noteToTrap2"), // 0.5
+            stopIntakeAndIndexer()
+        );
+    }
+
+    public Command noteToTrap2() {
+        return Commands.sequence(
+            ampper.setSpeedCommand(-.7),
+            shooterCmds.stowPivot(),
+            indexer.setPercentCommand(.7),   
+            intake.inCommandSlow(),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
+                () -> FieldConstants.IS_SIMULATION),
+            Commands.waitSeconds(.1),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> piPico.fallingEdgeHasNoteElevator()),
+                () -> FieldConstants.IS_SIMULATION).withTimeout(.254), 
+            stopIntakeAndIndexer()
+        );
+    }
+
+    public Command noteToTrap3() {
+        return Commands.sequence(
+            ampper.outtake(),
+            shooterCmds.stowPivot(),
+            indexer.toElevator(),   
+            intake.inCommandSlow(),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
+                () -> FieldConstants.IS_SIMULATION),
+            Commands.waitSeconds(.1),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> piPico.fallingEdgeHasNoteElevator()),
+                () -> FieldConstants.IS_SIMULATION),
             stopIntakeAndIndexer()
         );
     }
@@ -377,7 +415,7 @@ public class PieceControl implements Logged {
             shooterCmds.sourceIntakeCommand(),
             indexer.toElevator(),
             ampper.outtake(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(piPico::hasNoteShooter),
             Commands.waitSeconds(0.1),
             shooterCmds.stopShooter(),
             stopIntakeAndIndexer(),
@@ -451,7 +489,7 @@ public class PieceControl implements Logged {
             ),
             shooterCmds.stopShooter(),
             () -> 
-                (((colorSensor.hasNote() 
+                (((piPico.hasNoteShooter() 
                         && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
                     || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean() && elevator.getDesiredPosition() <= 0.1))
                 
