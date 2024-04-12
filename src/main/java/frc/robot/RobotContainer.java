@@ -111,6 +111,7 @@ public class RobotContainer implements Logged {
     @IgnoreLogged
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
+    private boolean fieldRelativeToggle = true;
     private final BooleanSupplier robotRelativeSupplier;
     
     @Log
@@ -205,7 +206,10 @@ public class RobotContainer implements Logged {
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
-        robotRelativeSupplier = () -> !driver.getYButton();
+        driver.back().toggleOnTrue(
+            Commands.runOnce(() -> fieldRelativeToggle = !fieldRelativeToggle)
+        );
+        robotRelativeSupplier = () -> fieldRelativeToggle;
 
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -404,7 +408,7 @@ public class RobotContainer implements Logged {
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing AWAY FROM the driver station
-        controller.back()
+        controller.start()
             .onTrue(Commands.runOnce(() -> 
                 swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve
             ));
@@ -413,10 +417,10 @@ public class RobotContainer implements Logged {
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
         // TODO: for testing reset odometry to speaker
-        controller.start()
-            .onTrue(Commands.runOnce(() -> 
-                swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION().plus(new Transform2d(0,0, Rotation2d.fromDegrees(180)))), swerve
-            ));
+        // controller.start()
+        //     .onTrue(Commands.runOnce(() -> 
+        //         swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION().plus(new Transform2d(0,0, Rotation2d.fromDegrees(180)))), swerve
+        //     ));
 
 
         // Speaker / Source / Chain rotational alignment
@@ -503,7 +507,7 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         
         // Quick uppies for double amping
-        controller.leftBumper().and(() -> true)
+        controller.y()
             .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
             .onFalse(ampper.outtakeSlow(.3).andThen(pieceControl.stopIntakeAndIndexer(),pieceControl.doubleAmpElevatorEnd()));
 
@@ -511,10 +515,10 @@ public class RobotContainer implements Logged {
         //     .onTrue(elevator.toTopIshButNotFullCommand())
         //     .onFalse(elevator.toBottomCommand());
 
-        // controller.leftBumper()
-        //     .whileTrue(pieceControl.intakeAuto())
-        //     .negate().and(driver.leftTrigger().negate())
-        //     .onTrue(pieceControl.stopIntakeAndIndexer());
+        controller.leftBumper()
+            .whileTrue(pieceControl.intakeAuto())
+            .negate().and(driver.leftTrigger().negate())
+            .onTrue(pieceControl.stopIntakeAndIndexer());
 
     }
 
