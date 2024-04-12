@@ -29,6 +29,9 @@ public class Shooter extends SubsystemBase implements Logged{
     @Log
     private boolean atDesiredRPM = false;
 
+    @Log
+    private boolean atDesiredPassRPM = false;
+
     public Shooter() {
 
         leftMotor = new Neo(ShooterConstants.LEFT_SHOOTER_CAN_ID, true, true);
@@ -60,6 +63,14 @@ public class Shooter extends SubsystemBase implements Logged{
             && MathUtil.isNear(
                 currentRightSpeed, targetRightSpeed,
                 ShooterConstants.SHOOTER_RPM_DEADBAND);
+
+        atDesiredPassRPM = 
+            MathUtil.isNear( 
+                currentLeftSpeed, targetLeftSpeed,
+                ShooterConstants.SHOOTER_PASS_RPM_DEADBAND)
+            && MathUtil.isNear(
+                currentRightSpeed, targetRightSpeed,
+                ShooterConstants.SHOOTER_PASS_RPM_DEADBAND);
     }
 
     /**
@@ -123,6 +134,10 @@ public class Shooter extends SubsystemBase implements Logged{
     
     public boolean getAtDesiredRPM() {
         return atDesiredRPM;
+    }
+
+    public boolean getAtDesiredPassRPM() {
+        return atDesiredPassRPM;
     }
 
     public Pair<Double, Double> getDesiredSpeeds() {

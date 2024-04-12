@@ -51,6 +51,7 @@ import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.LimelightMapping;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
@@ -433,7 +434,7 @@ public class RobotContainer implements Logged {
                         // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::closeToSpeaker)
+                        PoseCalculations::closeToSpeaker)
                     ).finallyDo(
                         () -> 
                             limelight3g.setLEDState(() -> false)

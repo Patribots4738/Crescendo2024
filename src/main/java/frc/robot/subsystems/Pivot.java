@@ -24,6 +24,9 @@ public class Pivot extends SubsystemBase implements Logged {
 	@Log
 	private boolean atDesiredAngle = false;
 
+    @Log
+	private boolean atDesiredPassAngle = false;
+
 	public Pivot() {
 		motor = new Neo(
             ShooterConstants.SHOOTER_PIVOT_CAN_ID,
@@ -48,7 +51,10 @@ public class Pivot extends SubsystemBase implements Logged {
         realAngle = getAngle();
 
 		atDesiredAngle = 
-            MathUtil.isNear(realAngle, desiredAngle, ShooterConstants.PIVOT_DEADBAND);
+            MathUtil.isNear(realAngle, desiredAngle, ShooterConstants.PIVOT_DEADBAND_DEGREES);
+
+        atDesiredPassAngle = 
+            MathUtil.isNear(realAngle, desiredAngle, ShooterConstants.PIVOT_PASS_DEADBAND_DEGREES);
 
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -110,4 +116,8 @@ public class Pivot extends SubsystemBase implements Logged {
 	public boolean getAtDesiredAngle() {
 		return atDesiredAngle;
 	}
+
+    public boolean getAtDesiredPassAngle() {
+        return atDesiredPassAngle;
+    }
 }

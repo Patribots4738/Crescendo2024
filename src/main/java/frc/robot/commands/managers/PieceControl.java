@@ -25,6 +25,7 @@ import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
@@ -99,8 +100,15 @@ public class PieceControl implements Logged {
 
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier atDesiredAngle) {
-        return Commands.waitUntil(() -> shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() && atDesiredAngle.getAsBoolean())
-                .andThen(noteToShoot(poseSupplier, speedSupplier));
+        return
+            Commands.waitUntil(() -> 
+                    (PoseCalculations.closeToSpeaker()
+                        ? shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() 
+                        : shooterCmds.shooterCalc.readyToPassSupplier().getAsBoolean())
+                    && atDesiredAngle.getAsBoolean()
+                )
+            .andThen(noteToShoot(poseSupplier, speedSupplier));
+                
     }
 
     public Command shootPreload() {

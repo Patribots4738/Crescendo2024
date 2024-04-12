@@ -177,7 +177,7 @@ public class AlignmentCalc {
 
     public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose()));
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToPass(swerve.getPose(), swerve.getRobotRelativeVelocity()));
     }
 
     /**
@@ -277,19 +277,4 @@ public class AlignmentCalc {
         return () -> getTrapControllerSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
-    /**
-     * Detects if the robot is on the opposite side of the field.
-     * Uses the robot's x position to determine if it has crossed the centerline.
-     * 
-     * @return true if the robot is on the opposite side of the field
-     */
-    public boolean onOppositeSide() {
-        return Robot.isRedAlliance() 
-            ? swerve.getPose().getX() < FieldConstants.BLUE_WING_X 
-            : swerve.getPose().getX() > FieldConstants.RED_WING_X;
-    }
-
-    public boolean closeToSpeaker() {
-        return RobotContainer.distanceToSpeakerMeters < 7.3;
-    }
 }
