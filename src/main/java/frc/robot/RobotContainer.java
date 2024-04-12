@@ -792,11 +792,15 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("DisableLimelight", disableVision());
         NamedCommands.registerCommand("EnableLimelight", enableVision());
-        NamedCommands.registerCommand("FullPowerPreload", shooter.fullPower(1678)
-            .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
-            .andThen(pieceControl.intakeAuto()
-            .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
-            .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
+        NamedCommands.registerCommand("FullPowerPreload", 
+            shooter.fullPower(1678)
+                .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
+                .andThen(pieceControl.intakeAuto()
+                    .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
+                .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
+        NamedCommands.registerCommand("BoostShooterR",
+            shooter.fullPower(3500)
+            .raceWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
         registerPathToPathCommands();
     }
 
