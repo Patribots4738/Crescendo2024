@@ -117,27 +117,26 @@ Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins
  
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Subsystems
   > [`robot/subsystems`](src/main/java/frc/robot/subsystems) Folder containing class files for each subsystem on the robot.
-  > - **Intake** [`robot/subsystems/intake`](src/main/java/frc/robot/subsystems/intake) An under-the-bumper intake run by a `Neo 550`.
-  > - **Swerve** [`robot/subsystems/swerve`](src/main/java/frc/robot/subsystems/swerve) Drivetrain with four swerve modules using 4 `Neo Vortex`s and 4 `Neo 550`s.
-  > - **Shooter** [`robot/subsystems/shooter`](src/main/java/frc/robot/subsystems/shooter) A shooter that uses 2 `Neo Vortexs` & pivot which uses 1 `Neo 550` with an absolute encoder.
-  > - **Elevator** [`robot/subsystems/elevator`](src/main/java/frc/robot/subsystems/elevator) Elevator for amp & trap placement which uses 1 `Neo v1.1`.
-  > - **Indexer** [`robot/subsystems/indexer`](src/main/java/frc/robot/subsystems/indexer) The Indexer between intake & shooter which uses a `Neo 550`.
-  > - **Climb** [`robot/subsystems/climb`](src/main/java/frc/robot/subsystems/climb) Two independently driven climbs that conform to the curve of the unoccupied chain on stage to keep the robot level with the ground. Uses one `Neo Vortex` each.
-  > - **LEDS** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/leds) Our `WS2812B` LED strip.
-  > - **Limelight** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/limelight) Interaction between the `Limelight` (2 and 3) and the robot.
+  > - **Intake** [`robot/subsystems/intake`](src/main/java/frc/robot/subsystems/intake.java) An under-the-bumper intake run by a `Neo 550`.
+  > - **Swerve** [`robot/subsystems/swerve`](src/main/java/frc/robot/subsystems/swerve.java) Drivetrain with four swerve modules using 4 `Neo Vortex`s and 4 `Neo 550`s.
+  > - **Shooter** [`robot/subsystems/shooter`](src/main/java/frc/robot/subsystems/shooter.java) A shooter that uses 2 `Neo Vortexs` & pivot which uses 1 `Neo 550` with an absolute encoder.
+  > - **Elevator** [`robot/subsystems/elevator`](src/main/java/frc/robot/subsystems/elevator.java) Elevator for amp & trap placement which uses 1 `Neo v1.1`.
+  > - **Indexer** [`robot/subsystems/indexer`](src/main/java/frc/robot/subsystems/indexer.java) The Indexer between intake & shooter which uses a `Neo 550`.
+  > - **Climb** [`robot/subsystems/climb`](src/main/java/frc/robot/subsystems/climb.java) Two independently driven climbs that conform to the curve of the unoccupied chain on stage to keep the robot level with the ground. Uses one `Neo Vortex` each.
+  > - **Limelight** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/limelight.java) Interaction between the `Limelight` (2 and 3) and the robot.
       
 
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Commands
 > [`robot/commands`](src/main/java/frc/robot/commands) Folder containing command files that control the robot.
-> - **Alignment Commands** [`robot/commands/drive/alignmentCmds`](src/main/frc/robot/commands/drive/alignmentCmds) File of commands that help auto-align the robot to be locked on a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
-> - **Network Table PID Tuner** [`robot/commands/logging/NTPIDTuner`](src/main/frc/robot/commands/logging/NTPIDTuner) Command file that allows us to alter & tune the PID values via `Advantage Scope`'s Network Tables Tuner for ease of access.
-> - **Selective Conditional Command** [`robot/commands/managers/SelectiveConditionalCommand`](src/main/frc/robot/commands/managers/SelectiveConditionalCommand) Command that is similar to `Commands.either` but instead of just checking the boolean when the Command is originally run, it constantly checks the boolean supplier and runs the correct command.
-> - **Piece Control** [`robot/commands/manager/PieceControl`](src/main/robot/commands/manager/PieceControl) Command file containing various other commands that subsystems use to manage possession over the game piece.
+> - **Alignment Commands** [`robot/commands/drive/alignmentCmds`](src/main/frc/robot/commands/drive/alignmentCmds.java) File of commands that help auto-align the robot to be locked on a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
+> - **Network Table PID Tuner** [`robot/commands/logging/NTPIDTuner`](src/main/frc/robot/commands/logging/NTPIDTuner.java) Command file that allows us to alter & tune the PID values via `Advantage Scope`'s Network Tables Tuner for ease of access.
+> - **Selective Conditional Command** [`robot/commands/managers/SelectiveConditionalCommand`](src/main/frc/robot/commands/managers/SelectiveConditionalCommand.java) Command that is similar to `Commands.either` but instead of just checking the boolean when the Command is originally run, it constantly checks the boolean supplier and runs the correct command.
+> - **Piece Control** [`robot/commands/manager/PieceControl`](src/main/robot/commands/manager/PieceControl.java) Command file containing various other commands that subsystems use to manage possession over the game piece.
 >    - **getAutomaticShooterSpeeds** This is the default command for the shooter subsystem. It brings the shooter up to speed whenever the robot is in our alliance's wing and we have note possession to make the process of intaking, indexing, and then shooting significantly faster
  
  ###  <img src= "images/surelyanote.png" width="2.5%" /> Utilities
 > [`robot/util`](src/main/java/frc/robot/util) Folder containing values, logic, and math used by other files to help them function.
-> - **Constants** [`robot/util/constants`](src/main/java/frc/robot/util/constants) contains constants used throughout the robot code to prevent a mismatch in data & hardcoding values (Ex. PIDFF values & current limits).
+> - **Constants** [`robot/util/constants`](src/main/java/frc/robot/util/constants.java) contains constants used throughout the robot code to prevent a mismatch in data & hardcoding values (Ex. PIDFF values & current limits).
 > - **Calc** [`robot/util/calc`](src/main/java/frc/robot/util/calc) contains the calculations required for pivot alinment & shooter speeds when shooting while driving.
 > - **Auto** [`robot/util/auto`](src/main/java/frc/robot/util/auto) Folder containing the storage files for `Choreo` and `PathPlanner`.
    
