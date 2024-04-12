@@ -84,7 +84,9 @@ public class PicoColorSensor implements AutoCloseable, Logged {
     private boolean hasColorElevator;
     @Log
     private boolean hasColorShooter;
-    private int proxElevator;
+    @Log
+    private int proximityElevator;
+    @Log
     private int proximityShooter;
     private final RawColor colorElevator = new RawColor();
     private final RawColor colorShooter = new RawColor();
@@ -192,17 +194,18 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                     this.colorElevator.green = colorElevator.green;
                     this.colorElevator.blue = colorElevator.blue;
                     this.colorElevator.ir = colorElevator.ir;
-                    this.proxElevator = proxElevator;
+                    this.proximityElevator = proxElevator;
 
                     this.detectedColorElevator = new Color(this.colorElevator.red, this.colorElevator.green, this.colorElevator.blue);
                     this.elevatorMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColorElevator);
                     this.elevatorColorString = detectedColorElevator.toString();
 
-                    if (this.elevatorMatch.color == ColorSensorConstants.NOTE_ORANGE) {
+                    if (this.proximityElevator > 150) {
                         this.matchStringElevator = "Note";
                         this.hasNoteElevator = true;
                     } else {
                         this.matchStringElevator = "Surely not a note";
+                        hadNoteElevatorLastLoop = hasNoteElevator;
                         this.hasNoteElevator = false;
                     }
                 }
@@ -217,11 +220,12 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                     this.shooterMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(this.detectedColorShooter);
                     this.shooterColorString = detectedColorShooter.toString();
 
-                    if (this.shooterMatch.color == ColorSensorConstants.NOTE_ORANGE) {
+                    if (this.proximityShooter > 150) {
                         this.matchStringShooter = "Note";
                         this.hasNoteShooter = true;
                     } else {
                         this.matchStringShooter = "Surely not a note";
+                        hadNoteShooterLastLoop = hasNoteShooter;
                         this.hasNoteShooter = false;
                     }
 
@@ -284,7 +288,7 @@ public class PicoColorSensor implements AutoCloseable, Logged {
     public int getProximityElevator() {
         try {
             threadLock.lock();
-            return proxElevator;
+            return proximityElevator;
         } finally {
             threadLock.unlock();
         }
@@ -297,6 +301,16 @@ public class PicoColorSensor implements AutoCloseable, Logged {
         } finally {
             threadLock.unlock();
         }
+    }
+
+    private boolean hadNoteElevatorLastLoop = false;
+    private boolean hadNoteShooterLastLoop = false;
+    public boolean fallingEdgeHasNoteElevator() {
+        return hadNoteElevatorLastLoop;
+    }
+
+    public boolean fallingEdgeHasNoteShooter() {
+        return hadNoteShooterLastLoop;
     }
 
     public RawColor getRawColorShooter() {

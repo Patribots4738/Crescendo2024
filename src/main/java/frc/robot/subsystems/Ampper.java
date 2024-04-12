@@ -94,6 +94,10 @@ public class Ampper extends SubsystemBase implements Logged {
             () -> desiredSpeed == 0);
     }
 
+    public Command setSpeedCommand(double speed) {
+        return runOnce(() -> setSpeed(speed));
+    }
+
     public Command setCoastMode() {
         return Commands.runOnce(() -> motor.setCoastMode()).ignoringDisable(true);
     }
