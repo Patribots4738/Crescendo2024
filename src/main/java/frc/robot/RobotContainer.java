@@ -227,13 +227,11 @@ public class RobotContainer implements Logged {
             )
         );
 
-        BooleanSupplier autoDecisionMaker;
         if (FieldConstants.IS_SIMULATION) {
-            autoDecisionMaker = driver::getYButton;
+            pathPlannerStorage = new PathPlannerStorage(driver::getYButton, swerve, limelight3);
         } else {
-            autoDecisionMaker = piPico::hasNoteShooter;
+            pathPlannerStorage = new PathPlannerStorage(piPico::hasNoteShooter, piPico::hasNoteElevator, swerve, limelight3);
         }
-        pathPlannerStorage = new PathPlannerStorage(autoDecisionMaker, swerve, limelight3);
         
         initializeComponents();
         prepareNamedCommands();
