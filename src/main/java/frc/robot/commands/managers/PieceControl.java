@@ -257,25 +257,6 @@ public class PieceControl implements Logged {
         );
     }
 
-    public Command noteToTrap3() {
-        return Commands.sequence(
-            ampper.outtake(),
-            shooterCmds.stowPivot(),
-            indexer.toElevator(),   
-            intake.inCommandSlow(),
-            Commands.either(
-                Commands.waitSeconds(.1),
-                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
-                () -> FieldConstants.IS_SIMULATION),
-            Commands.waitSeconds(.1),
-            Commands.either(
-                Commands.waitSeconds(.1),
-                Commands.waitUntil(() -> piPico.fallingEdgeHasNoteElevator()),
-                () -> FieldConstants.IS_SIMULATION),
-            stopIntakeAndIndexer()
-        );
-    }
-
     public Command ejectNote() {
         //outtakes the note
         return Commands.sequence(
