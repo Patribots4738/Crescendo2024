@@ -224,7 +224,10 @@ public class RobotContainer implements Logged {
         shooter.setDefaultCommand(
             pieceControl.getAutomaticShooterSpeeds(
                 swerve::getPose,
-                () -> driver.getLeftTrigger() || (!OIConstants.SINGLE_DRIVER_MODE && operator.getLeftBumper())    
+                () -> driver.getLeftTrigger() 
+                || driver.getLeftBumper() 
+                || (!OIConstants.SINGLE_DRIVER_MODE 
+                    && operator.getLeftBumper())
             )
         );
 

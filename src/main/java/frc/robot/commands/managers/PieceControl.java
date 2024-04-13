@@ -21,7 +21,6 @@ import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
@@ -476,20 +475,32 @@ public class PieceControl implements Logged {
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
     public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, BooleanSupplier intaking) {
         return new ActiveConditionalCommand(
-            Commands.runOnce(
-                () -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
+            Commands.run(
+                () -> 
+                    shooterCmds.setSpeeds(
+                        (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
+                            && Robot.gameMode == GameMode.TELEOP 
+                            && DriverStation.isFMSAttached())
+                        ? shooterCmds.shooterCalc.calculatePassTriplet(
+                            robotPose.get()
+                        ).getSpeeds()
+                        : shooterCmds.shooterCalc.calculateSpeakerTriplet(
+                            robotPose.get().getTranslation()
+                        ).getSpeeds()
+                    ),
                 shooterCmds.getShooter()
             ),
             shooterCmds.stopShooter(),
             () -> 
-                (((piPico.hasNoteShooter() 
+                (((piPico.hasNoteShooter() || piPico.hasNoteElevator()
                         && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean() && elevator.getDesiredPosition() <= 0.1))
+                    || (RobotContainer.distanceToSpeakerMeters < 3.4 
+                        && intaking.getAsBoolean() 
+                        && elevator.getDesiredPosition() < ElevatorConstants.NOTE_FIX_POS))
                 
-                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 
+                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
                     && Robot.gameMode == GameMode.TELEOP 
-                    && DriverStation.isFMSAttached()))
-                && RobotController.getBatteryVoltage() > 10)
+                    && DriverStation.isFMSAttached())))
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 
