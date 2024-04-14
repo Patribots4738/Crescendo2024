@@ -9,11 +9,13 @@ import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
 import frc.robot.util.Constants.ColorSensorConstants;
 import monologue.Annotations.Log;
 import monologue.Logged;
+
 
 public class PicoColorSensor implements AutoCloseable, Logged {
     public static class RawColor {
@@ -111,6 +113,8 @@ public class PicoColorSensor implements AutoCloseable, Logged {
     private String matchStringElevator;
     @Log
     private String matchStringShooter;
+    private DigitalOutput powerToPico;
+    private double disabledTimestamp = 0;
 
     private void threadMain() {
         // Using JNI for a non allocating read
@@ -211,6 +215,10 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                 } else {
                     this.hasNoteElevator = false;
                     this.proximityElevator = 0;
+                    if (Robot.currentTimestamp - disabledTimestamp > .2) {
+                        disabledTimestamp = Robot.currentTimestamp;
+                        // powerToPico.set(!powerToPico.get());
+                    }
                 }
                 if (hasColorShooter) {
                     this.colorShooter.red = colorShooter.red;
@@ -235,6 +243,10 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                 } else {
                     this.hasNoteShooter = false;
                     this.proximityShooter = 0;
+                    if (Robot.currentTimestamp - disabledTimestamp > .2) {
+                        disabledTimestamp = Robot.currentTimestamp;
+                        // powerToPico.set(!powerToPico.get());
+                    }
                 }
             } finally {
                 threadLock.unlock();
@@ -245,6 +257,8 @@ public class PicoColorSensor implements AutoCloseable, Logged {
     }
 
     public PicoColorSensor() {
+        // powerToPico = new DigitalOutput(10);
+        // powerToPico.set(true);
         readThread = new Thread(this::threadMain);
         readThread.setName("PicoColorSensorThread");
         readThread.start();

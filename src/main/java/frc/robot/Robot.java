@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.littletonrobotics.urcl.URCL;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -71,8 +72,12 @@ public class Robot extends TimedRobot {
     private boolean updatedAlready = false;
     private boolean updateTimer = false;
     private boolean startedURCL = false;
+
+    private DigitalOutput dio10 = new DigitalOutput(10);
     @Override
     public void robotPeriodic() {
+        dio10.set(true);
+        System.out.println(dio10.get());
         // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();

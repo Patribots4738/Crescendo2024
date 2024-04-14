@@ -31,6 +31,6 @@ public final class Main {
         System.out.println("|   / // /_  / /   /_ <  / __  |");
         System.out.println("|  /__  __/ / /  ___/ / / /_/ /");
         System.out.println("|    /_/   /_/  /____/  \\____/\n");
-        RobotBase.startRobot(Robot::new);
+        RobotBase.startRobot(Robot2::new);
     }
 }
