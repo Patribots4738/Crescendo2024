@@ -12,12 +12,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "FullPowerPreload"
-          }
-        },
-        {
           "type": "deadline",
           "data": {
             "commands": [
@@ -36,14 +30,40 @@
                       "data": {
                         "name": "EnableLimelight"
                       }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "FullPowerPreload"
+                      }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootInstantlyWhenReady"
+                        "name": "PrepareSWD"
                       }
                     }
                   ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootInstantlyWhenReady"
                 }
               },
               {
