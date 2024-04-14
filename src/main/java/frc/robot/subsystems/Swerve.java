@@ -180,16 +180,22 @@ public class Swerve extends SubsystemBase implements Logged {
             RobotContainer.robotPose2d = currentPose;
         }
 
+        double pitch = gyro.getPitch().refresh().getValue();
+        double roll = gyro.getRoll().refresh().getValue();
+
         RobotContainer.robotPose3d = new Pose3d(
                 new Translation3d(
                         currentPose.getX(),
                         currentPose.getY(),
                         Math.hypot(
-                                Rotation2d.fromDegrees(gyro.getRoll().refresh().getValue()).getSin()
+                                Rotation2d.fromDegrees(roll).getSin()
                                         * DriveConstants.ROBOT_LENGTH_METERS / 2.0,
-                                Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
+                                Rotation2d.fromDegrees(pitch).getSin() *
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
-                new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
+                new Rotation3d(
+                    Units.degreesToRadians(-roll), 
+                    Units.degreesToRadians(-pitch+180), 
+                    currentPose.getRotation().getRadians()+Math.PI));
 
         RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
 
