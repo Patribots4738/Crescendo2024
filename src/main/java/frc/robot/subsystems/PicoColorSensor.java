@@ -9,8 +9,8 @@ import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.Robot;
 import frc.robot.util.Constants.ColorSensorConstants;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -167,20 +167,20 @@ public class PicoColorSensor implements AutoCloseable, Logged {
 
             lastComma.value = -1;
 
-            boolean hasColorElevator = parseIntFromIndex(charSeq, read, lastComma) != 0;
             boolean hasColorShooter = parseIntFromIndex(charSeq, read, lastComma) != 0;
-            colorElevator.red = parseIntFromIndex(charSeq, read, lastComma);
-            colorElevator.green = parseIntFromIndex(charSeq, read, lastComma);
-            colorElevator.blue = parseIntFromIndex(charSeq, read, lastComma);
-            colorElevator.ir = parseIntFromIndex(charSeq, read, lastComma);
-            int proxElevator = parseIntFromIndex(charSeq, read, lastComma);
+            boolean hasColorElevator = parseIntFromIndex(charSeq, read, lastComma) != 0;
             colorShooter.red = parseIntFromIndex(charSeq, read, lastComma);
             colorShooter.green = parseIntFromIndex(charSeq, read, lastComma);
             colorShooter.blue = parseIntFromIndex(charSeq, read, lastComma);
             colorShooter.ir = parseIntFromIndex(charSeq, read, lastComma);
             int proxShooter = parseIntFromIndex(charSeq, read, lastComma);
+            colorElevator.red = parseIntFromIndex(charSeq, read, lastComma);
+            colorElevator.green = parseIntFromIndex(charSeq, read, lastComma);
+            colorElevator.blue = parseIntFromIndex(charSeq, read, lastComma);
+            colorElevator.ir = parseIntFromIndex(charSeq, read, lastComma);
+            int proxElevator = parseIntFromIndex(charSeq, read, lastComma);
 
-            double ts = Timer.getFPGATimestamp();
+            double ts = Robot.currentTimestamp;
 
             try {
                 threadLock.lock();
