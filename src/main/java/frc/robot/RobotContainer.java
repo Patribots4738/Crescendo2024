@@ -799,7 +799,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("DisableLimelight", disableVision());
         NamedCommands.registerCommand("EnableLimelight", enableVision());
         NamedCommands.registerCommand("FullPowerPreload", 
-            shooter.fullPower(1678)
+            shooter.fullPower(2100)
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(pieceControl.intakeAuto()
                     .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
