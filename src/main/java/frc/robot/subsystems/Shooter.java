@@ -150,8 +150,8 @@ public class Shooter extends SubsystemBase implements Logged{
 
     public Command fullPower(double desiredSpeed) {
         return run(() -> {
-            leftMotor.setVoltage(12);
-            rightMotor.setVoltage(12);
+            leftMotor.set(1);
+            rightMotor.set(1);
         }).until(() -> getAverageSpeed() > desiredSpeed)
         .andThen(setSpeedCommand(desiredSpeed));
     }
