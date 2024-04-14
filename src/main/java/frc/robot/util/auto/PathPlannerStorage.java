@@ -297,7 +297,7 @@ public class PathPlannerStorage implements Logged {
         Command skipNoteCommand = AutoBuilder.followPath(skipNote)
             .raceWith(NamedCommands.getCommand("ToIndexer"));
 
-        return Commands.waitUntil(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()).withTimeout(0.4).andThen(
+        return Commands.waitUntil(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()).withTimeout(0.2).andThen(
             Commands.defer(() -> 
                 Commands.either(
                     shootAndMoveToNextNote,
