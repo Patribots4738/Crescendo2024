@@ -1,11 +1,20 @@
 ![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle)
 
+<details>
+  <summary>Photo Gallery 📷🦖</summary>
+  <img src="images/terry/IMG_0010.jpg"/>
+  <img src="images/terry/IMG_0298.jpg"/>
+  <img src="images/terry/IMG_0308.jpg"/>
+  <img src="images/terry/IMG_1836.jpg"/>
+  <img src="images/terry/IMG_3623.jpg"/>
+  <img src="images/terry/IMG_3624.jpg"/>
+  <img src="images/terry/IMG_3625.jpg"/>
+  <img src="images/terry/thumbnail_IMG_3626.jpg"/>
+</details>
 
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
 
 [![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
-
-![Robot Image](images/robot.gif)
 
 <img src="images/ILUVUTERRY.png" width="100%">
 
@@ -83,7 +92,7 @@ ___
 
 
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Note Detection
-  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when the robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
+  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we detected notes from ~13 feet away at SDR and Bayou regional. Note detection was incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This was especially useful when the robot is at the center line where path generation without vision became inaccurate, preventing notes from bumping off of a swerve module. Additionally, we could skip over a spike if no note was detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
 
   > Here is a GIF of Terry detecting a note and chasing it! 🦖🔎
   
@@ -143,8 +152,6 @@ Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins
    
 ## Controls 🎮
 [![Driver](/images/drivercontrols.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
-
-[![Operator](/images/operatorcontrols.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
 
 ## Components & Tools 🛠️
 [![Hardware](/images/hardware.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)
