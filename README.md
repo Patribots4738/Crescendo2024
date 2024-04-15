@@ -1,12 +1,8 @@
 ![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle) |
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
 
-<img src="images\GIF\photoSlideshow.gif"/>
+<img src="images\GIF\photoSlideshow.gif" height="225rem"/> <a href="https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf"><img src="https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png" height="225rem"/>
 
-
-[![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
-
-<img src="images/ILUVUTERRY.png" width="%">
 
 ____
 
@@ -30,6 +26,7 @@ We are a team of students, for students, and we are proud to be a part of the _F
 Thanks for checking us out, & be sure to star this repository if you find anything helpful or interesting!
 
 ### [See how we did!](https://www.statbotics.io/team/4738)
+<img src="images/ILUVUTERRY.png" width="%">
 
 
 ___
