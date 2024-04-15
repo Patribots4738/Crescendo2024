@@ -1,22 +1,12 @@
-![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle)
-
-<details>
-  <summary>Photo Gallery 📷🦖</summary>
-  <img src="images/terry/IMG_0010.jpg"/>
-  <img src="images/terry/IMG_0298.jpg"/>
-  <img src="images/terry/IMG_0308.jpg"/>
-  <img src="images/terry/IMG_1836.jpg"/>
-  <img src="images/terry/IMG_3623.jpg"/>
-  <img src="images/terry/IMG_3624.jpg"/>
-  <img src="images/terry/IMG_3625.jpg"/>
-  <img src="images/terry/thumbnail_IMG_3626.jpg"/>
-</details>
-
+![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle) |
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
+
+<img src="images\GIF\photoSlideshow.gif"/>
+
 
 [![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
 
-<img src="images/ILUVUTERRY.png" width="100%">
+<img src="images/ILUVUTERRY.png" width="%">
 
 ____
 
