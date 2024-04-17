@@ -107,7 +107,7 @@ public class RobotContainer implements Logged {
     private Ampper ampper;
     private ShooterCmds shooterCmds;
     @IgnoreLogged
-    private PicoColorSensor piPico = new PicoColorSensor();
+    private PicoColorSensor piPico;
 
     @IgnoreLogged
     private PieceControl pieceControl;
@@ -154,7 +154,9 @@ public class RobotContainer implements Logged {
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         
         pdh = new PowerDistribution(30, ModuleType.kRev);
-        pdh.setSwitchableChannel(false); 
+        pdh.setSwitchableChannel(false);
+
+        piPico = new PicoColorSensor(operator.a());
 
         intake = new Intake();
         climb = new Climb();
@@ -177,7 +179,6 @@ public class RobotContainer implements Logged {
 
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
-
         shooter = new Shooter();
         elevator = new Elevator();
         ampper = new Ampper();

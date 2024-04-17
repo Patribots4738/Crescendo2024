@@ -3,16 +3,16 @@ package frc.robot.subsystems;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-
 import com.revrobotics.ColorMatchResult;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.util.Constants.ColorSensorConstants;
+import frc.robot.util.custom.TransistorPower;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
@@ -113,7 +113,7 @@ public class PicoColorSensor implements AutoCloseable, Logged {
     private String matchStringElevator;
     @Log
     private String matchStringShooter;
-    private DigitalOutput powerToPico;
+    private TransistorPower powerToPico;
     private double disabledTimestamp = 0;
 
     private void threadMain() {
@@ -217,7 +217,7 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                     this.proximityElevator = 0;
                     if (Robot.currentTimestamp - disabledTimestamp > .2) {
                         disabledTimestamp = Robot.currentTimestamp;
-                        // powerToPico.set(!powerToPico.get());
+                        // powerToPico.getPowerCycleCommand().schedule();
                     }
                 }
                 if (hasColorShooter) {
@@ -245,7 +245,7 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                     this.proximityShooter = 0;
                     if (Robot.currentTimestamp - disabledTimestamp > .2) {
                         disabledTimestamp = Robot.currentTimestamp;
-                        // powerToPico.set(!powerToPico.get());
+                        // powerToPico.getPowerCycleCommand().schedule();
                     }
                 }
             } finally {
@@ -256,9 +256,10 @@ public class PicoColorSensor implements AutoCloseable, Logged {
         SerialPortJNI.serialClose(port);
     }
 
-    public PicoColorSensor() {
-        // powerToPico = new DigitalOutput(10);
-        // powerToPico.set(true);
+    public PicoColorSensor(Trigger reset) {
+        powerToPico = new TransistorPower(0);
+        powerToPico.set(true);
+        reset.onTrue(powerToPico.getPowerCycleCommand());
         readThread = new Thread(this::threadMain);
         readThread.setName("PicoColorSensorThread");
         readThread.start();
