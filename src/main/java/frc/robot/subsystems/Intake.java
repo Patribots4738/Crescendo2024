@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.IntakeConstants;
@@ -47,6 +48,13 @@ public class Intake extends SubsystemBase implements Logged {
 
     public Command inCommand() {
         return setPercentCommand(IntakeConstants.INTAKE_PERCENT);
+    }
+
+    public Command inCommandFor(double seconds) {
+        return setPercentCommand(IntakeConstants.INTAKE_PERCENT)
+            .andThen(
+                Commands.waitSeconds(seconds),
+                stopCommand());
     }
 
     public Command inCommandSlow() {

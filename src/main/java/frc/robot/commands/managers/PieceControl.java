@@ -189,7 +189,11 @@ public class PieceControl implements Logged {
     }
 
     public Command doubleAmpElevatorEnd() {
-        return Commands.either(elevatorToTop().deadlineWith(intake.inCommand()).andThen(intake.stopCommand()), elevatorToBottom(), this::doubleAmpTimerReady);
+        return Commands.either(elevatorUpWhileIntaking(), elevatorToBottom(), this::doubleAmpTimerReady);
+    }
+
+    public Command elevatorUpWhileIntaking() {
+        return elevator.toTopCommand().deadlineWith(intake.inCommandFor(.5)).andThen(intake.stopCommand());
     }
 
     public Command blepNote() {
@@ -500,7 +504,9 @@ public class PieceControl implements Logged {
                 
                 || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
                     && Robot.gameMode == GameMode.TELEOP 
-                    && DriverStation.isFMSAttached())))
+                    && DriverStation.isFMSAttached())
+                
+                && piPico.shooterSensorConnected()))
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 

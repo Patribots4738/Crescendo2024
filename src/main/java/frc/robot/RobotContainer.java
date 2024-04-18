@@ -42,7 +42,6 @@ import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
-import frc.robot.util.Constants.ColorSensorConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -233,7 +232,7 @@ public class RobotContainer implements Logged {
         );
 
         if (FieldConstants.IS_SIMULATION) {
-            pathPlannerStorage = new PathPlannerStorage(driver::getYButton, swerve, limelight3);
+            pathPlannerStorage = new PathPlannerStorage(operator::getYButton, swerve, limelight3);
         } else {
             pathPlannerStorage = new PathPlannerStorage(piPico::hasNoteShooter, piPico::hasNoteElevator, swerve, limelight3);
         }
@@ -499,7 +498,7 @@ public class RobotContainer implements Logged {
         controller.b()
             .onTrue(pieceControl.noteToTrap3()
                 .andThen(
-                    elevator.toTopCommand().deadlineWith(intake.inCommand()).andThen(intake.stopCommand()), 
+                    pieceControl.elevatorUpWhileIntaking(), 
                     pieceControl.prepPiece()));
 
         // If this is nice to work with, then we keep it. If not... bye bye!
