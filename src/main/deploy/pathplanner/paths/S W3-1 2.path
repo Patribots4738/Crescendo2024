@@ -80,7 +80,7 @@
   "constraintZones": [
     {
       "name": "Slow Preload",
-      "minWaypointRelativePos": 0.5,
+      "minWaypointRelativePos": 0.44999999999999996,
       "maxWaypointRelativePos": 0.5499999999999999,
       "constraints": {
         "maxVelocity": 0.25,
@@ -121,7 +121,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -153.49329481040462,
+    "rotation": -151.3390060558512,
     "rotateFast": false
   },
   "reversed": false,
