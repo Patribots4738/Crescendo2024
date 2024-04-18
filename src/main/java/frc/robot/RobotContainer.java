@@ -497,7 +497,10 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
 
         controller.b()
-            .onTrue(pieceControl.noteToTrap3().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
+            .onTrue(pieceControl.noteToTrap3()
+                .andThen(
+                    elevator.toTopCommand().deadlineWith(intake.inCommand()).andThen(intake.stopCommand()), 
+                    pieceControl.prepPiece()));
 
         // If this is nice to work with, then we keep it. If not... bye bye!
         new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS 

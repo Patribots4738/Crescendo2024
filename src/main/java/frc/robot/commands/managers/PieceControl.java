@@ -189,7 +189,7 @@ public class PieceControl implements Logged {
     }
 
     public Command doubleAmpElevatorEnd() {
-        return Commands.either(elevatorToTop(), elevatorToBottom(), this::doubleAmpTimerReady);
+        return Commands.either(elevatorToTop().deadlineWith(intake.inCommand()).andThen(intake.stopCommand()), elevatorToBottom(), this::doubleAmpTimerReady);
     }
 
     public Command blepNote() {
