@@ -28,7 +28,7 @@ public class TransistorPower extends AnalogOutput {
 
     public Command getPowerCycleCommand() {
         return Commands.runOnce(() -> set(false))
-                    .andThen(Commands.waitSeconds(.5), 
+                    .andThen(Commands.waitSeconds(1), 
                     Commands.runOnce(() -> set(true))).ignoringDisable(true);
     }
 
