@@ -73,15 +73,12 @@ public class Robot extends TimedRobot {
     private boolean updateTimer = false;
     private boolean startedURCL = false;
 
-    private DigitalOutput dio10 = new DigitalOutput(10);
     @Override
     public void robotPeriodic() {
-        dio10.set(true);
-        System.out.println(dio10.get());
         // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-        if (gameMode != GameMode.DISABLED || true) {
+        if (gameMode != GameMode.DISABLED) {
             Monologue.updateAll();
         }
         else {
