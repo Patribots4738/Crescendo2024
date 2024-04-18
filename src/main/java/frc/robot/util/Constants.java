@@ -123,6 +123,7 @@ public final class Constants {
         public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1.0;
         // degrees
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
+        public static final double PIVOT_ZERO_OFFSET = 51.2235296;
 
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
@@ -223,9 +224,9 @@ public final class Constants {
                 put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
                 put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
                 put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 33.3));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 30.9));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 31.8));
                 // Future note, 13.2ft is a common shot which should have its own calibration point
-                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 29.4));
+                put(14, SpeedAngleTriplet.of(4214.0, 3755.0, 30.9)); 
                 put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 28));
                 put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 26.7));
                 
@@ -606,7 +607,7 @@ public final class Constants {
     }   
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = false;
+        public static final boolean SAFE_SPARK_MODE = true;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
