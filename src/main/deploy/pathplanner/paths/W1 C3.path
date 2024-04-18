@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6634439226325264,
-        "y": 5.727585355879932
+        "x": 3.539722256749478,
+        "y": 5.662085650412435
       },
       "isLocked": false,
       "linkedName": "W1"
@@ -20,12 +20,12 @@
         "y": 4.570423892620835
       },
       "prevControl": {
-        "x": 3.717533301701895,
-        "y": 5.278291943942463
+        "x": 3.579300729111895,
+        "y": 5.089617421862554
       },
       "nextControl": {
-        "x": 5.133548423125215,
-        "y": 3.9736487983614266
+        "x": 5.28638106921604,
+        "y": 4.111925954348362
       },
       "isLocked": false,
       "linkedName": null
@@ -51,7 +51,19 @@
       "rotateFast": false
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Easy there cowboy",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.85,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 2.7,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
@@ -61,13 +73,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.09166216609205,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Wings",
   "previewStartingState": {
-    "rotation": 179.01223960036023,
+    "rotation": -148.47050160124863,
     "velocity": 0
   },
   "useDefaultConstraints": true
