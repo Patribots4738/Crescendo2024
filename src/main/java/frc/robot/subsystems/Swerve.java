@@ -183,6 +183,16 @@ public class Swerve extends SubsystemBase implements Logged {
         double pitch = gyro.getPitch().refresh().getValue();
         double roll = gyro.getRoll().refresh().getValue();
 
+        Rotation3d rotation3d = FieldConstants.IS_SIMULATION 
+            ?  new Rotation3d(
+                Units.degreesToRadians(0), 
+                Units.degreesToRadians(0), 
+                currentPose.getRotation().getRadians())
+            :  new Rotation3d(
+                Units.degreesToRadians(-roll), 
+                Units.degreesToRadians(-pitch+180), 
+                currentPose.getRotation().getRadians()+Math.PI);
+
         RobotContainer.robotPose3d = new Pose3d(
                 new Translation3d(
                         currentPose.getX(),
@@ -192,10 +202,7 @@ public class Swerve extends SubsystemBase implements Logged {
                                         * DriveConstants.ROBOT_LENGTH_METERS / 2.0,
                                 Rotation2d.fromDegrees(pitch).getSin() *
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
-                new Rotation3d(
-                    Units.degreesToRadians(-roll), 
-                    Units.degreesToRadians(-pitch+180), 
-                    currentPose.getRotation().getRadians()+Math.PI));
+               rotation3d);
 
         RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
 

@@ -763,7 +763,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("ToIndexer",
             Commands.either(
                 pieceControl.intakeUntilNote(),
-                Commands.waitUntil(driver::getYButton),
+                Commands.waitUntil(operator::getYButton),
                 () -> !FieldConstants.IS_SIMULATION
             )
         );
@@ -774,7 +774,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("ShootInstantly", 
             Commands.either(
                 pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
-                Commands.waitUntil(() -> !driver.getYButton()), 
+                Commands.waitUntil(() -> !operator.getYButton()), 
                 () -> !FieldConstants.IS_SIMULATION
             )
         );
@@ -784,7 +784,7 @@ public class RobotContainer implements Logged {
                 .andThen(
                     Commands.either(
                         pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity),
-                        Commands.waitUntil(() -> !driver.getYButton()), 
+                        Commands.waitUntil(() -> !operator.getYButton()), 
                         () -> !FieldConstants.IS_SIMULATION
                     )
                 )
@@ -802,7 +802,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("DisableLimelight", disableVision());
         NamedCommands.registerCommand("EnableLimelight", enableVision());
         NamedCommands.registerCommand("FullPowerPreload", 
-            shooter.fullPower(2100)
+            shooter.fullPower(1678)
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(pieceControl.intakeAuto()
                     .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
