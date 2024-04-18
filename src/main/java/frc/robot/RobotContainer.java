@@ -156,7 +156,7 @@ public class RobotContainer implements Logged {
         pdh = new PowerDistribution(30, ModuleType.kRev);
         pdh.setSwitchableChannel(false);
 
-        piPico = new PicoColorSensor(operator.a());
+        piPico = new PicoColorSensor();
 
         intake = new Intake();
         climb = new Climb();

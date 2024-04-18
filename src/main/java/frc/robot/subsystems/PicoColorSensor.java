@@ -215,9 +215,9 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                 } else {
                     this.hasNoteElevator = false;
                     this.proximityElevator = 0;
-                    if (Robot.currentTimestamp - disabledTimestamp > .2) {
+                    if (Robot.currentTimestamp - disabledTimestamp > 3) {
                         disabledTimestamp = Robot.currentTimestamp;
-                        // powerToPico.getPowerCycleCommand().schedule();
+                        powerToPico.getPowerCycleCommand().schedule();
                     }
                 }
                 if (hasColorShooter) {
@@ -243,9 +243,9 @@ public class PicoColorSensor implements AutoCloseable, Logged {
                 } else {
                     this.hasNoteShooter = false;
                     this.proximityShooter = 0;
-                    if (Robot.currentTimestamp - disabledTimestamp > .2) {
+                    if (Robot.currentTimestamp - disabledTimestamp > 3) {
                         disabledTimestamp = Robot.currentTimestamp;
-                        // powerToPico.getPowerCycleCommand().schedule();
+                        powerToPico.getPowerCycleCommand().schedule();
                     }
                 }
             } finally {
@@ -256,10 +256,9 @@ public class PicoColorSensor implements AutoCloseable, Logged {
         SerialPortJNI.serialClose(port);
     }
 
-    public PicoColorSensor(Trigger reset) {
+    public PicoColorSensor() {
         powerToPico = new TransistorPower(0);
         powerToPico.set(true);
-        reset.onTrue(powerToPico.getPowerCycleCommand());
         readThread = new Thread(this::threadMain);
         readThread.setName("PicoColorSensorThread");
         readThread.start();
