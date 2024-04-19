@@ -280,7 +280,8 @@ public class RobotContainer implements Logged {
         // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
         // for more information 
         // configureHDCBindings(driver);
-        configureCalibrationBindings(driver);
+        configureCalibrationBindings(operator, testButtonBindingLoop);
+        // configureCalibrationBindings(operator, CommandScheduler.getInstance().getDefaultButtonLoop());
     }
     
     private void configureTimedEvents() {
@@ -608,46 +609,46 @@ public class RobotContainer implements Logged {
 
     }
 
-    private void configureCalibrationBindings(PatriBoxController controller) {
-        controller.leftBumper(testButtonBindingLoop)
+    private void configureCalibrationBindings(PatriBoxController controller, EventLoop eventLoop) {
+        controller.leftBumper(eventLoop)
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
-        controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
-        controller.rightTrigger(0.5, testButtonBindingLoop)
+        controller.rightBumper(eventLoop).onTrue(calibrationControl.updateMotorsCommand());
+        controller.rightTrigger(0.5, eventLoop)
             .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity, () -> true));
 
-        controller.leftY(0.3, testButtonBindingLoop)
+        controller.leftY(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
-        controller.rightY(0.3, testButtonBindingLoop)
+        controller.rightY(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementAngle(() -> controller.getRightY()));
 
-        controller.leftX(0.3, testButtonBindingLoop)
+        controller.leftX(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
-        controller.rightX(0.3, testButtonBindingLoop)
+        controller.rightX(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
 
-        controller.back(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(-1));
-        controller.start(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(1));
+        controller.back(eventLoop).onTrue(calibrationControl.incrementDistance(-1));
+        controller.start(eventLoop).onTrue(calibrationControl.incrementDistance(1));
 
-        controller.a(testButtonBindingLoop).onTrue(calibrationControl.logTriplet());
+        controller.a(eventLoop).onTrue(calibrationControl.logTriplet());
 
-        controller.x(testButtonBindingLoop).onTrue(calibrationControl.toggleLeftLock());
-        controller.b(testButtonBindingLoop).onTrue(calibrationControl.toggleRightLock());
-        controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
+        // controller.x(eventLoop).onTrue(calibrationControl.toggleLeftLock());
+        // controller.b(eventLoop).onTrue(calibrationControl.toggleRightLock());
+        // controller.y(eventLoop).onTrue(calibrationControl.togglePivotLock());
 
-        controller.pov(0, 270, testButtonBindingLoop)
+        controller.pov(0, 270, eventLoop)
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity)
                 .alongWith(Commands.run(swerve::setWheelsX)))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
-        controller.pov(0, 90, testButtonBindingLoop)
+        controller.pov(0, 90, eventLoop)
             .onTrue(pieceControl.ejectNote());
 
-        controller.pov(0, 0, testButtonBindingLoop)
+        controller.pov(0, 0, eventLoop)
             .whileTrue(pieceControl.sourceShooterIntake())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
-        controller.pov(0, 180, testButtonBindingLoop)
-            .onTrue(calibrationControl.copyCalcTriplet());
+        controller.pov(0, 180, eventLoop)
+            .onTrue(calibrationControl.copyCalcTriplet(swerve::getPose));
     }
     
     private void configureHDCBindings(PatriBoxController controller) {
@@ -751,9 +752,9 @@ public class RobotContainer implements Logged {
                     Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
                     new ReplanningConfig());
             
-            swerve.reconfigureAutoBuilder();
-            fixPathPlannerCommands();
-            System.out.println("Reconfigured HPFC");
+            // swerve.reconfigureAutoBuilder();
+            // fixPathPlannerCommands();
+            // System.out.println("Reconfigured HPFC");
         }
     }
 
@@ -807,8 +808,20 @@ public class RobotContainer implements Logged {
                 .andThen(pieceControl.intakeAuto()
                     .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
+
+        NamedCommands.registerCommand("FullPowerPreload2",
+            shooter.fullPower(2200)
+                .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
+                .andThen(
+                    Commands.either(
+                        pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
+                        Commands.waitUntil(() -> !operator.getYButton()), 
+                        () -> !FieldConstants.IS_SIMULATION
+                    )
+                )
+                .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
         NamedCommands.registerCommand("BoostShooterR",
-            shooter.fullPower(3500)
+            shooter.fullPower(2500)
             .raceWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
         registerPathToPathCommands();
     }
