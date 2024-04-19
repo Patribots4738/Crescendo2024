@@ -1,10 +1,14 @@
 package frc.robot.commands.managers;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -28,13 +32,14 @@ public class CalibrationControl implements Logged {
         this.shooterCmds = shooterCmds;
     }   
 
-    public Command copyCalcTriplet() {
+    public Command copyCalcTriplet(Supplier<Pose2d> poseSupplier) {
         return Commands.runOnce(() -> {
-            SpeedAngleTriplet triplet = shooterCmds.getTriplet();
+            SpeedAngleTriplet triplet = shooterCmds.shooterCalc.calculateSpeakerTriplet(poseSupplier.get().getTranslation());
             desiredTriplet = triplet;
             leftSpeed = triplet.getLeftSpeed();
             rightSpeed = triplet.getRightSpeed();
             angle = triplet.getAngle();
+            System.out.println("Copied triplet for " + Math.round(Units.metersToFeet(poseSupplier.get().getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION()))) + " ft");
             logSpeeds();
             logAngle();
         });
