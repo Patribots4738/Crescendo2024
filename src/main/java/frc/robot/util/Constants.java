@@ -223,11 +223,11 @@ public final class Constants {
                 put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
                 put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
                 put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
-                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 33.3));
+                put(12, SpeedAngleTriplet.of(3947.0, 3580.0, 33.8));
                 put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 31.8));
                 // Future note, 13.2ft is a common shot which should have its own calibration point
                 put(14, SpeedAngleTriplet.of(4214.0, 3755.0, 30.9)); 
-                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 28));
+                put(15, SpeedAngleTriplet.of(4515.0, 4043.0, 30.9));
                 put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 26.7));
                 
             }
@@ -338,7 +338,7 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(792.90);
 
         public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(1);
-        public static final double AUTO_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(3);
+        public static final double AUTO_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(2);
         public static final double PASS_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(10);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);

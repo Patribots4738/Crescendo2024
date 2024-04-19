@@ -335,10 +335,9 @@ public class Limelight extends SubsystemBase implements Logged{
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
 
         double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
-        double multiTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.1 : 0.05;
         if (result == null || !result.valid
             || (LimelightHelpers.getTA(limelightName) < singleTagAmbiguityThreshold && result.targets_Fiducials.length == 1)
-            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < multiTagAmbiguityThreshold)
+            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.05)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
             || Double.isNaN(estimatedRobotPose.getX()) 
             || Double.isNaN(estimatedRobotPose.getY()) 
