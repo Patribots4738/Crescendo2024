@@ -36,12 +36,12 @@
         "y": 5.35
       },
       "prevControl": {
-        "x": 1.5209812202559552,
-        "y": 5.198958297135057
+        "x": 1.5110766903129929,
+        "y": 5.274190671183922
       },
       "nextControl": {
-        "x": 3.0439820031055644,
-        "y": 5.4675044267915585
+        "x": 3.051687332769572,
+        "y": 5.408976637306263
       },
       "isLocked": false,
       "linkedName": null
@@ -79,7 +79,7 @@
   ],
   "constraintZones": [
     {
-      "name": "Slow w2",
+      "name": "Slow w2 shot",
       "minWaypointRelativePos": 2.3000000000000003,
       "maxWaypointRelativePos": 2.65,
       "constraints": {
@@ -90,12 +90,23 @@
       }
     },
     {
-      "name": "Slow w3",
+      "name": "Slow w3 lineup",
       "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 0.5499999999999999,
       "constraints": {
         "maxVelocity": 5.0,
         "maxAcceleration": 3.0,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    },
+    {
+      "name": "Slow w2 lineup",
+      "minWaypointRelativePos": 1.2000000000000002,
+      "maxWaypointRelativePos": 1.75,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 1.5,
         "maxAngularVelocity": 1137.21,
         "maxAngularAcceleration": 1492.9
       }
