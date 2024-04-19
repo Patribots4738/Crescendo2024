@@ -57,13 +57,13 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "W1"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7,
-      "rotationDegrees": 179.78434028883294,
+      "rotationDegrees": 146.64239816427872,
       "rotateFast": false
     },
     {
