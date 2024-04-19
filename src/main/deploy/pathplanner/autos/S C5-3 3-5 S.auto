@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2422530556147342,
-      "y": 7.161301131112901
+      "x": 0.701401686491316,
+      "y": 4.439424481685842
     },
-    "rotation": -124.91237183543709
+    "rotation": 120.60276179805513
   },
   "command": {
     "type": "sequential",
@@ -28,7 +28,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S C1"
+                        "pathName": "S C5 2"
                       }
                     },
                     {
@@ -71,7 +71,13 @@
         {
           "type": "named",
           "data": {
-            "name": "C1toC5nonOBJ"
+            "name": "C5toC3nonOBJ"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C3toC5nonOBJ"
           }
         }
       ]
