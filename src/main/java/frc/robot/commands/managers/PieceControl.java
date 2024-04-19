@@ -130,20 +130,6 @@ public class PieceControl implements Logged {
                 stopIntakeAndIndexer());
     }
 
-    public Command noteToShootUsingSensor(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        // this should be ran while we are aiming with pivot and shooter already
-        // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from ampper into indexer and then into 
-        // shooter before stopping ampper and indexer
-        return Commands.sequence(
-                intake.inCommand(),
-                ampper.intake(),
-                indexer.toShooter(),
-                shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
-                stopIntakeAndIndexer());
-    }
-
     public Command noteToShootUsingSensorWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
@@ -151,6 +137,15 @@ public class PieceControl implements Logged {
         // shooter before stopping ampper and indexer
         return Commands.sequence(
                 Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()),
+                noteToShootUsingSensor(poseSupplier, speedSupplier));
+    }
+
+    public Command noteToShootUsingSensor(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
+        return Commands.sequence(
                 intake.inCommand(),
                 ampper.intake(),
                 indexer.toShooter(),
