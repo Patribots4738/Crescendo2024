@@ -820,6 +820,18 @@ public class RobotContainer implements Logged {
                     )
                 )
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
+
+        NamedCommands.registerCommand("FullPowerPreload3",
+            shooter.fullPower(1678)
+                .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
+                .andThen(
+                    Commands.either(
+                        pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
+                        Commands.waitUntil(() -> !operator.getYButton()), 
+                        () -> !FieldConstants.IS_SIMULATION
+                    )
+                )
+                .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
         NamedCommands.registerCommand("BoostShooterR",
             shooter.fullPower(2500)
             .raceWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
