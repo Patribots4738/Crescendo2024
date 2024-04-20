@@ -422,6 +422,7 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             // "S C5-4 S OBJ",
+            "8044 W3 C3",
             "S C5-1 S",
             "S C5-3 3-5 S",
             // "S W3-1 S",
@@ -613,13 +614,12 @@ public final class Constants {
     }   
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = true;
+        public static final boolean SAFE_SPARK_MODE = false;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
         public static final int MAX_PERIODIC_STATUS_TIME_MS = 32766;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 15;
-
         // This gets filled out as motors are created on the robot
         public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
 
