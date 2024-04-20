@@ -176,7 +176,7 @@ public class PieceControl implements Logged {
 
     public Command intakeForDoubleAmp() {
         return Commands.sequence(
-            intake.inCommandSlow(.675),
+            intake.inCommandSlow(.85),
             ampper.intakeSlow(),
             indexer.stopCommand(),
             Commands.runOnce(this::restartDoubleAmpTimer)
