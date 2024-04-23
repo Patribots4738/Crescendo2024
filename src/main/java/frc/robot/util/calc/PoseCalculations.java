@@ -3,6 +3,8 @@ package frc.robot.util.calc;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
@@ -91,4 +93,20 @@ public class PoseCalculations implements Logged {
         return MathUtil.clamp(calculation, 0.725, ClimbConstants.EXTENSION_LIMIT_METERS);
     }
 
+    /**
+     * Detects if the robot is on the opposite side of the field.
+     * Uses the robot's x position to determine if it has crossed the centerline.
+     * 
+     * @return true if the robot is on the opposite side of the field
+     */
+    public static boolean onOppositeSide(double xPosition) {
+        return Robot.isRedAlliance() 
+            ? xPosition < FieldConstants.BLUE_WING_X 
+            : xPosition > FieldConstants.RED_WING_X;
+    }
+
+    // Note: this method uses a static variable rather than a parameter
+    public static boolean closeToSpeaker() {
+        return RobotContainer.distanceToSpeakerMeters < 7.3;
+    }
 }

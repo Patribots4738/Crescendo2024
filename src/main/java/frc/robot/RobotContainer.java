@@ -42,7 +42,6 @@ import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
-import frc.robot.util.Constants.ColorSensorConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -51,6 +50,7 @@ import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.LimelightMapping;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
@@ -106,11 +106,12 @@ public class RobotContainer implements Logged {
     private Ampper ampper;
     private ShooterCmds shooterCmds;
     @IgnoreLogged
-    private ColorSensor colorSensor = new ColorSensor(ColorSensorConstants.I2C_PORT);
+    private PicoColorSensor piPico;
 
     @IgnoreLogged
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
+    private boolean fieldRelativeToggle = true;
     private final BooleanSupplier robotRelativeSupplier;
     
     @Log
@@ -152,7 +153,9 @@ public class RobotContainer implements Logged {
         operator = new PatriBoxController(OIConstants.OPERATOR_CONTROLLER_PORT, OIConstants.OPERATOR_DEADBAND);
         
         pdh = new PowerDistribution(30, ModuleType.kRev);
-        pdh.setSwitchableChannel(false); 
+        pdh.setSwitchableChannel(false);
+
+        piPico = new PicoColorSensor();
 
         intake = new Intake();
         climb = new Climb();
@@ -175,7 +178,6 @@ public class RobotContainer implements Logged {
 
         ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
-
         shooter = new Shooter();
         elevator = new Elevator();
         ampper = new Ampper();
@@ -201,11 +203,14 @@ public class RobotContainer implements Logged {
             elevator,
             ampper,
             shooterCmds,
-            colorSensor);
+            piPico);
 
         calibrationControl = new CalibrationControl(shooterCmds);
 
-        robotRelativeSupplier = () -> !driver.getYButton();
+        driver.back().toggleOnTrue(
+            Commands.runOnce(() -> fieldRelativeToggle = !fieldRelativeToggle)
+        );
+        robotRelativeSupplier = () -> fieldRelativeToggle;
 
         swerve.setDefaultCommand(new Drive(
             swerve,
@@ -219,17 +224,18 @@ public class RobotContainer implements Logged {
         shooter.setDefaultCommand(
             pieceControl.getAutomaticShooterSpeeds(
                 swerve::getPose,
-                () -> driver.getLeftTrigger() || (!OIConstants.SINGLE_DRIVER_MODE && operator.getLeftBumper())    
+                () -> driver.getLeftTrigger() 
+                || driver.getLeftBumper() 
+                || (!OIConstants.SINGLE_DRIVER_MODE 
+                    && operator.getLeftBumper())
             )
         );
 
-        BooleanSupplier autoDecisionMaker;
         if (FieldConstants.IS_SIMULATION) {
-            autoDecisionMaker = driver::getYButton;
+            pathPlannerStorage = new PathPlannerStorage(operator::getYButton, swerve, limelight3);
         } else {
-            autoDecisionMaker = colorSensor::hasNote;
+            pathPlannerStorage = new PathPlannerStorage(piPico::hasNoteShooter, piPico::hasNoteElevator, swerve, limelight3);
         }
-        pathPlannerStorage = new PathPlannerStorage(autoDecisionMaker, swerve, limelight3);
         
         initializeComponents();
         prepareNamedCommands();
@@ -274,7 +280,8 @@ public class RobotContainer implements Logged {
         // See https://docs.wpilib.org/en/stable/docs/software/convenience-features/event-based.html
         // for more information 
         // configureHDCBindings(driver);
-        configureCalibrationBindings(driver);
+        configureCalibrationBindings(operator, testButtonBindingLoop);
+        // configureCalibrationBindings(operator, CommandScheduler.getInstance().getDefaultButtonLoop());
     }
     
     private void configureTimedEvents() {
@@ -319,7 +326,7 @@ public class RobotContainer implements Logged {
         // The reason we are checking bumpers
         // is so this doesn't happen on pieceControl::moveNote
         new Trigger(
-            () -> colorSensor.hasNote() 
+            () -> piPico.hasNoteShooter() 
                 && (
                     // All of these buttons command intake
                     // Whether that be source or not
@@ -404,7 +411,7 @@ public class RobotContainer implements Logged {
         // Upon hitting start or back,
         // reset the orientation of the robot
         // to be facing AWAY FROM the driver station
-        controller.back()
+        controller.start()
             .onTrue(Commands.runOnce(() -> 
                 swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve
             ));
@@ -413,10 +420,10 @@ public class RobotContainer implements Logged {
         // reset the orientation of the robot
         // to be facing TOWARDS the driver station
         // TODO: for testing reset odometry to speaker
-        controller.start()
-            .onTrue(Commands.runOnce(() -> 
-                swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION().plus(new Transform2d(0,0, Rotation2d.fromDegrees(180)))), swerve
-            ));
+        // controller.start()
+        //     .onTrue(Commands.runOnce(() -> 
+        //         swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION().plus(new Transform2d(0,0, Rotation2d.fromDegrees(180)))), swerve
+        //     ));
 
 
         // Speaker / Source / Chain rotational alignment
@@ -431,7 +438,7 @@ public class RobotContainer implements Logged {
                         // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.alignmentCalc::closeToSpeaker)
+                        PoseCalculations::closeToSpeaker)
                     ).finallyDo(
                         () -> 
                             limelight3g.setLEDState(() -> false)
@@ -490,7 +497,10 @@ public class RobotContainer implements Logged {
             .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
 
         controller.b()
-            .onTrue(pieceControl.noteToTrap().andThen(elevator.toTopCommand()).andThen(pieceControl.prepPiece()));
+            .onTrue(pieceControl.noteToTrap3()
+                .andThen(
+                    pieceControl.elevatorUpWhileIntaking(), 
+                    pieceControl.prepPiece()));
 
         // If this is nice to work with, then we keep it. If not... bye bye!
         new Trigger(() -> elevator.getDesiredPosition() == ElevatorConstants.TRAP_PLACE_POS 
@@ -503,9 +513,9 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(shooterCmds.prepareSubwooferCommand().withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         
         // Quick uppies for double amping
-        // controller.leftBumper()
-        //     .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
-        //     .onFalse(pieceControl.stopIntakeAndIndexer().andThen(pieceControl.doubleAmpElevatorEnd()));
+        controller.y()
+            .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
+            .onFalse(ampper.outtakeSlow(.3).andThen(pieceControl.stopIntakeAndIndexer(),pieceControl.doubleAmpElevatorEnd()));
 
         // controller.leftBumper()
         //     .onTrue(elevator.toTopIshButNotFullCommand())
@@ -599,46 +609,46 @@ public class RobotContainer implements Logged {
 
     }
 
-    private void configureCalibrationBindings(PatriBoxController controller) {
-        controller.leftBumper(testButtonBindingLoop)
+    private void configureCalibrationBindings(PatriBoxController controller, EventLoop eventLoop) {
+        controller.leftBumper(eventLoop)
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
-        controller.rightBumper(testButtonBindingLoop).onTrue(calibrationControl.updateMotorsCommand());
-        controller.rightTrigger(0.5, testButtonBindingLoop)
+        controller.rightBumper(eventLoop).onTrue(calibrationControl.updateMotorsCommand());
+        controller.rightTrigger(0.5, eventLoop)
             .onTrue(pieceControl.shootWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity, () -> true));
 
-        controller.leftY(0.3, testButtonBindingLoop)
+        controller.leftY(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementSpeeds(() -> (int) (controller.getLeftY() * 5)));
-        controller.rightY(0.3, testButtonBindingLoop)
+        controller.rightY(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementAngle(() -> controller.getRightY()));
 
-        controller.leftX(0.3, testButtonBindingLoop)
+        controller.leftX(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementLeftSpeed(() -> (int) (controller.getLeftX() * 5)));
-        controller.rightX(0.3, testButtonBindingLoop)
+        controller.rightX(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
 
-        controller.back(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(-1));
-        controller.start(testButtonBindingLoop).onTrue(calibrationControl.incrementDistance(1));
+        controller.back(eventLoop).onTrue(calibrationControl.incrementDistance(-1));
+        controller.start(eventLoop).onTrue(calibrationControl.incrementDistance(1));
 
-        controller.a(testButtonBindingLoop).onTrue(calibrationControl.logTriplet());
+        controller.a(eventLoop).onTrue(calibrationControl.logTriplet());
 
-        controller.x(testButtonBindingLoop).onTrue(calibrationControl.toggleLeftLock());
-        controller.b(testButtonBindingLoop).onTrue(calibrationControl.toggleRightLock());
-        controller.y(testButtonBindingLoop).onTrue(calibrationControl.togglePivotLock());
+        // controller.x(eventLoop).onTrue(calibrationControl.toggleLeftLock());
+        // controller.b(eventLoop).onTrue(calibrationControl.toggleRightLock());
+        // controller.y(eventLoop).onTrue(calibrationControl.togglePivotLock());
 
-        controller.pov(0, 270, testButtonBindingLoop)
+        controller.pov(0, 270, eventLoop)
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity)
                 .alongWith(Commands.run(swerve::setWheelsX)))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
-        controller.pov(0, 90, testButtonBindingLoop)
+        controller.pov(0, 90, eventLoop)
             .onTrue(pieceControl.ejectNote());
 
-        controller.pov(0, 0, testButtonBindingLoop)
+        controller.pov(0, 0, eventLoop)
             .whileTrue(pieceControl.sourceShooterIntake())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
-        controller.pov(0, 180, testButtonBindingLoop)
-            .onTrue(calibrationControl.copyCalcTriplet());
+        controller.pov(0, 180, eventLoop)
+            .onTrue(calibrationControl.copyCalcTriplet(swerve::getPose));
     }
     
     private void configureHDCBindings(PatriBoxController controller) {
@@ -742,9 +752,9 @@ public class RobotContainer implements Logged {
                     Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
                     new ReplanningConfig());
             
-            swerve.reconfigureAutoBuilder();
-            fixPathPlannerCommands();
-            System.out.println("Reconfigured HPFC");
+            // swerve.reconfigureAutoBuilder();
+            // fixPathPlannerCommands();
+            // System.out.println("Reconfigured HPFC");
         }
     }
 
@@ -754,7 +764,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("ToIndexer",
             Commands.either(
                 pieceControl.intakeUntilNote(),
-                Commands.waitUntil(driver::getYButton),
+                Commands.waitUntil(operator::getYButton),
                 () -> !FieldConstants.IS_SIMULATION
             )
         );
@@ -765,7 +775,7 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("ShootInstantly", 
             Commands.either(
                 pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
-                Commands.waitUntil(() -> !driver.getYButton()), 
+                Commands.waitUntil(() -> !operator.getYButton()), 
                 () -> !FieldConstants.IS_SIMULATION
             )
         );
@@ -775,7 +785,7 @@ public class RobotContainer implements Logged {
                 .andThen(
                     Commands.either(
                         pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity),
-                        Commands.waitUntil(() -> !driver.getYButton()), 
+                        Commands.waitUntil(() -> !operator.getYButton()), 
                         () -> !FieldConstants.IS_SIMULATION
                     )
                 )
@@ -792,6 +802,39 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("PrepareSWD", shooterCmds.prepareSWDCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity));
         NamedCommands.registerCommand("DisableLimelight", disableVision());
         NamedCommands.registerCommand("EnableLimelight", enableVision());
+        NamedCommands.registerCommand("FullPowerPreload", 
+            shooter.fullPower(1678)
+                .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
+                .andThen(pieceControl.intakeAuto()
+                    .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
+                .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
+
+        NamedCommands.registerCommand("FullPowerPreload2",
+            shooter.fullPower(2200)
+                .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
+                .andThen(
+                    Commands.either(
+                        pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
+                        Commands.waitUntil(() -> !operator.getYButton()), 
+                        () -> !FieldConstants.IS_SIMULATION
+                    )
+                )
+                .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
+
+        NamedCommands.registerCommand("FullPowerPreload3",
+            shooter.fullPower(1678)
+                .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
+                .andThen(
+                    Commands.either(
+                        pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
+                        Commands.waitUntil(() -> !operator.getYButton()), 
+                        () -> !FieldConstants.IS_SIMULATION
+                    )
+                )
+                .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
+        NamedCommands.registerCommand("BoostShooterR",
+            shooter.fullPower(2500)
+            .raceWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
         registerPathToPathCommands();
     }
 
@@ -831,7 +874,7 @@ public class RobotContainer implements Logged {
             Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
             Monologue.logObj(limelight3g, "Robot/Limelights/limelight3g");
         }
-        Monologue.logObj(colorSensor, "Robot/ColorSensors/colorSensor");
+        Monologue.logObj(piPico, "Robot/ColorSensors");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");

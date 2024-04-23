@@ -40,6 +40,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.rev.MAXSwerveModule;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -179,16 +180,29 @@ public class Swerve extends SubsystemBase implements Logged {
             RobotContainer.robotPose2d = currentPose;
         }
 
+        double pitch = gyro.getPitch().refresh().getValue();
+        double roll = gyro.getRoll().refresh().getValue();
+
+        Rotation3d rotation3d = FieldConstants.IS_SIMULATION 
+            ?  new Rotation3d(
+                Units.degreesToRadians(0), 
+                Units.degreesToRadians(0), 
+                currentPose.getRotation().getRadians())
+            :  new Rotation3d(
+                Units.degreesToRadians(-roll), 
+                Units.degreesToRadians(-pitch+180), 
+                currentPose.getRotation().getRadians()+Math.PI);
+
         RobotContainer.robotPose3d = new Pose3d(
                 new Translation3d(
                         currentPose.getX(),
                         currentPose.getY(),
                         Math.hypot(
-                                Rotation2d.fromDegrees(gyro.getRoll().refresh().getValue()).getSin()
+                                Rotation2d.fromDegrees(roll).getSin()
                                         * DriveConstants.ROBOT_LENGTH_METERS / 2.0,
-                                Rotation2d.fromDegrees(gyro.getPitch().refresh().getValue()).getSin() *
+                                Rotation2d.fromDegrees(pitch).getSin() *
                                         DriveConstants.ROBOT_LENGTH_METERS / 2.0)),
-                new Rotation3d(0, 0, currentPose.getRotation().getRadians()));
+               rotation3d);
 
         RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
 
@@ -452,7 +466,7 @@ public class Swerve extends SubsystemBase implements Logged {
 		double distance = currentPose.relativeTo(position).getTranslation().getNorm();
         return 
             MathUtil.isNear(0, distance, AutoConstants.AUTO_POSITION_TOLERANCE_METERS)
-            && MathUtil.isNear(0, angleDiff, AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
+            && MathUtil.isNear(0, angleDiff, AutoConstants.AUTO_ROTATION_TOLERANCE_RADIANS);
     }
 
     public boolean atHDCPose() {
@@ -460,7 +474,12 @@ public class Swerve extends SubsystemBase implements Logged {
     }
 
     public boolean atHDCAngle() {
-        return MathUtil.isNear(desiredHDCPose.getRotation().getRadians(), getPose().getRotation().getRadians(), AutoConstants.AUTO_POSITION_TOLERANCE_RADIANS);
+        return MathUtil.isNear(
+            desiredHDCPose.getRotation().getRadians(), 
+            getPose().getRotation().getRadians(), 
+            PoseCalculations.closeToSpeaker()
+                ? AutoConstants.AUTO_ROTATION_TOLERANCE_RADIANS
+                : AutoConstants.PASS_ROTATION_TOLERANCE_RADIANS);
     }
 
     public boolean isAlignedToAmp() {

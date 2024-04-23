@@ -17,13 +17,14 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
-import frc.robot.subsystems.ColorSensor;
+import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
@@ -44,9 +45,8 @@ public class PieceControl implements Logged {
     private Ampper ampper;
     @IgnoreLogged
     private ShooterCmds shooterCmds;
-    
-
-    private ColorSensor colorSensor;
+    @IgnoreLogged
+    private PicoColorSensor piPico;
 
     @Log
     private boolean shooterMode = false;
@@ -66,13 +66,13 @@ public class PieceControl implements Logged {
             Elevator elevator,
             Ampper ampper,
             ShooterCmds shooterCmds,
-            ColorSensor colorSensor) {
+            PicoColorSensor piPico) {
         this.intake = intake;
         this.indexer = indexer;
         this.elevator = elevator;
         this.ampper = ampper;
         this.shooterCmds = shooterCmds;
-        this.colorSensor = colorSensor;
+        this.piPico = piPico;
     }
 
     public Command stopAllMotors() {
@@ -99,8 +99,15 @@ public class PieceControl implements Logged {
 
     // TODO: only run angle reset when we are not using prepareSWDCommand
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier atDesiredAngle) {
-        return Commands.waitUntil(() -> shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() && atDesiredAngle.getAsBoolean())
-                .andThen(noteToShoot(poseSupplier, speedSupplier));
+        return
+            Commands.waitUntil(() -> 
+                    (PoseCalculations.closeToSpeaker()
+                        ? shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() 
+                        : shooterCmds.shooterCalc.readyToPassSupplier().getAsBoolean())
+                    && atDesiredAngle.getAsBoolean()
+                )
+            .andThen(noteToShoot(poseSupplier, speedSupplier));
+                
     }
 
     public Command shootPreload() {
@@ -123,6 +130,16 @@ public class PieceControl implements Logged {
                 stopIntakeAndIndexer());
     }
 
+    public Command noteToShootUsingSensorWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
+        return Commands.sequence(
+                Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()),
+                noteToShootUsingSensor(poseSupplier, speedSupplier));
+    }
+
     public Command noteToShootUsingSensor(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
@@ -133,22 +150,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
-                stopIntakeAndIndexer());
-    }
-
-    public Command noteToShootUsingSensorWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
-        // this should be ran while we are aiming with pivot and shooter already
-        // start running indexer so it gets up to speed and wait until shooter is at desired 
-        // rotation and speed before sending note from ampper into indexer and then into 
-        // shooter before stopping ampper and indexer
-        return Commands.sequence(
-                Commands.waitUntil(shooterCmds.shooterCalc.readyToShootSupplier()),
-                intake.inCommand(),
-                ampper.intake(),
-                indexer.toShooter(),
-                shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !colorSensor.hasNote() || FieldConstants.IS_SIMULATION),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter() || FieldConstants.IS_SIMULATION),
                 stopIntakeAndIndexer());
     }
 
@@ -161,7 +163,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             ampper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(piPico::hasNoteShooter),
             stopIntakeAndIndexer(),
             indexer.toElevatorSlow(),
             ampper.outtakeSlow(),
@@ -174,15 +176,19 @@ public class PieceControl implements Logged {
 
     public Command intakeForDoubleAmp() {
         return Commands.sequence(
-            intake.inCommand(),
-            ampper.intake(),
-            indexer.toShooterSlow(),
+            intake.inCommandSlow(.85),
+            ampper.intakeSlow(),
+            indexer.stopCommand(),
             Commands.runOnce(this::restartDoubleAmpTimer)
         );
     }
 
     public Command doubleAmpElevatorEnd() {
-        return Commands.either(elevatorToTop(), elevatorToBottom(), this::doubleAmpTimerReady);
+        return Commands.either(elevatorUpWhileIntaking(), elevatorToBottom(), this::doubleAmpTimerReady);
+    }
+
+    public Command elevatorUpWhileIntaking() {
+        return elevator.toTopCommand().deadlineWith(intake.inCommandFor(.5)).andThen(intake.stopCommand());
     }
 
     public Command blepNote() {
@@ -192,7 +198,7 @@ public class PieceControl implements Logged {
             indexer.toShooter(),
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(500, 500, 0))
         ).andThen(
-            Commands.waitUntil(() -> !colorSensor.hasNote()),
+            Commands.waitUntil(() -> !piPico.hasNoteShooter()),
             stopAllMotors()
         );
     }
@@ -207,7 +213,7 @@ public class PieceControl implements Logged {
                     )
                 ),
             intakeUntilNote(), 
-            colorSensor::hasNote);
+            piPico::hasNoteShooter);
     }
 
     public Command noteToIndexer() {
@@ -215,7 +221,7 @@ public class PieceControl implements Logged {
             intake.inCommand(),
             ampper.intake(),
             indexer.toShooterSlow(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(piPico::hasNoteShooter),
             stopIntakeAndIndexer()
         );
     }
@@ -228,7 +234,7 @@ public class PieceControl implements Logged {
             intake.inCommandSlow(),
             Commands.either(
                 Commands.waitSeconds(.1),
-                Commands.waitUntil(() -> !colorSensor.hasNote()),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
                 () -> FieldConstants.IS_SIMULATION),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
@@ -236,6 +242,29 @@ public class PieceControl implements Logged {
             NT.getWaitCommand("noteToTrap2"), // 0.5
             stopIntakeAndIndexer()
         );
+    }
+
+    public Command noteToTrap2() {
+        return Commands.sequence(
+            ampper.setSpeedCommand(-.7),
+            shooterCmds.stowPivot(),
+            indexer.setPercentCommand(.7),   
+            intake.inCommandSlow(),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter()),
+                () -> FieldConstants.IS_SIMULATION),
+            Commands.waitSeconds(.1),
+            Commands.either(
+                Commands.waitSeconds(.1),
+                Commands.waitUntil(() -> piPico.fallingEdgeHasNoteElevator()),
+                () -> FieldConstants.IS_SIMULATION).withTimeout(.254), 
+            stopIntakeAndIndexer()
+        );
+    }
+
+    public Command noteToTrap3() {
+        return Commands.either(noteToTrap2(), noteToTrap(), () -> piPico.shooterSensorConnected() && piPico.elevatorSensorConnected());
     }
 
     public Command ejectNote() {
@@ -377,7 +406,7 @@ public class PieceControl implements Logged {
             shooterCmds.sourceIntakeCommand(),
             indexer.toElevator(),
             ampper.outtake(),
-            Commands.waitUntil(colorSensor::hasNote),
+            Commands.waitUntil(piPico::hasNoteShooter),
             Commands.waitSeconds(0.1),
             shooterCmds.stopShooter(),
             stopIntakeAndIndexer(),
@@ -445,20 +474,34 @@ public class PieceControl implements Logged {
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
     public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, BooleanSupplier intaking) {
         return new ActiveConditionalCommand(
-            Commands.runOnce(
-                () -> shooterCmds.setSpeeds(ShooterConstants.DEFAULT_RPM), 
+            Commands.run(
+                () -> 
+                    shooterCmds.setSpeeds(
+                        (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
+                            && Robot.gameMode == GameMode.TELEOP 
+                            && DriverStation.isFMSAttached())
+                        ? shooterCmds.shooterCalc.calculatePassTriplet(
+                            robotPose.get()
+                        ).getSpeeds()
+                        : shooterCmds.shooterCalc.calculateSpeakerTriplet(
+                            robotPose.get().getTranslation()
+                        ).getSpeeds()
+                    ),
                 shooterCmds.getShooter()
             ),
             shooterCmds.stopShooter(),
             () -> 
-                (((colorSensor.hasNote() 
+                (((piPico.hasNoteShooter() || piPico.hasNoteElevator()
                         && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-                    || (RobotContainer.distanceToSpeakerMeters < 3.4 && intaking.getAsBoolean()))
+                    || (RobotContainer.distanceToSpeakerMeters < 3.4 
+                        && intaking.getAsBoolean() 
+                        && elevator.getDesiredPosition() < ElevatorConstants.NOTE_FIX_POS))
                 
-                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7 
+                || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
                     && Robot.gameMode == GameMode.TELEOP 
-                    && DriverStation.isFMSAttached()))
-                && RobotController.getBatteryVoltage() > 10)
+                    && DriverStation.isFMSAttached())
+                
+                && piPico.shooterSensorConnected()))
             .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 

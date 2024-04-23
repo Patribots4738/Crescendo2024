@@ -43,7 +43,8 @@ import java.util.function.Consumer;
  */
 public class PathPlannerStorage implements Logged {
 
-    private final BooleanSupplier colorSensorSupplier;
+    private final BooleanSupplier shooterSensor;
+    private final BooleanSupplier elevatorSensor;
     
     @Log.NT
     private PatriSendableChooser<Command> autoChooser = new PatriSendableChooser<>();
@@ -70,8 +71,16 @@ public class PathPlannerStorage implements Logged {
      * @param hasPieceSupplier A supplier that returns whether or not the robot has a piece.
      *                         This could be a sensor, motor current, or other system.
      */
-    public PathPlannerStorage(BooleanSupplier colorSensorSupplier, Swerve swerve, Limelight limelight) {
-        this.colorSensorSupplier = colorSensorSupplier;
+    public PathPlannerStorage(BooleanSupplier shooterSensorSupplier, BooleanSupplier elevatorSensorSupplier, Swerve swerve, Limelight limelight) {
+        this.shooterSensor = shooterSensorSupplier;
+        this.elevatorSensor = elevatorSensorSupplier;
+        this.swerve = swerve;
+        this.limelight = limelight;
+    }
+
+    public PathPlannerStorage(BooleanSupplier simulatedSensorSupplier, Swerve swerve, Limelight limelight) {
+        this.shooterSensor = simulatedSensorSupplier;
+        this.elevatorSensor = simulatedSensorSupplier;
         this.swerve = swerve;
         this.limelight = limelight;
     }
@@ -202,7 +211,7 @@ public class PathPlannerStorage implements Logged {
                     goToNote()
                         .andThen(pathfindToShoot()
                             .deadlineWith(NamedCommands.getCommand("ToIndexer")
-                                .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                                .onlyIf(() -> !shooterSensor.getAsBoolean()))
                             .andThen(Commands.runOnce(swerve::stopDriving).andThen(NamedCommands.getCommand("PrepareSWD"))
                                 .raceWith(NamedCommands.getCommand("ShootInstantlyWhenReady")))
                         .andThen(pathfindToNextNote(nextIndex, goingDown))), 
@@ -216,7 +225,7 @@ public class PathPlannerStorage implements Logged {
                         goToNote(),
                         pathfindToShoot()
                             .deadlineWith(NamedCommands.getCommand("ToIndexer")
-                                .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                                .onlyIf(() -> !shooterSensor.getAsBoolean()))
                             .andThen(Commands.runOnce(swerve::stopDriving).andThen(NamedCommands.getCommand("PrepareSWD"))
                                 .raceWith(NamedCommands.getCommand("ShootInstantlyWhenReady")))
                 ), 
@@ -229,7 +238,7 @@ public class PathPlannerStorage implements Logged {
                                 goToNote(),
                                 pathfindToShoot()
                                     .deadlineWith(NamedCommands.getCommand("ToIndexer")
-                                        .onlyIf(() -> !colorSensorSupplier.getAsBoolean()))
+                                        .onlyIf(() -> !shooterSensor.getAsBoolean()))
                                     .andThen(Commands.runOnce(swerve::stopDriving).andThen(NamedCommands.getCommand("PrepareSWD"))
                                         .raceWith(NamedCommands.getCommand("ShootInstantlyWhenReady")))
                             )
@@ -251,10 +260,11 @@ public class PathPlannerStorage implements Logged {
             return Commands.defer(() ->  
                 AutoBuilder.followPath(shootNote)
                     .deadlineWith(NamedCommands.getCommand("StopIntake")
-                            .andThen(NamedCommands.getCommand("ToIndexer")
-                            .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
+                        .andThen(NamedCommands.getCommand("ToIndexer")
+                            .onlyIf(() -> !shooterSensor.getAsBoolean())))
                     .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
-                    .deadlineWith(NamedCommands.getCommand("PrepareSWD")).onlyIf(colorSensorSupplier), 
+                    .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
+                        .onlyIf(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()), 
                 commandGroup.getRequirements());
         }
 
@@ -265,10 +275,10 @@ public class PathPlannerStorage implements Logged {
             AutoBuilder.followPath(shootNote)
                 .deadlineWith(NamedCommands.getCommand("StopIntake")
                         .andThen(NamedCommands.getCommand("ToIndexer")
-                        .onlyIf(() -> !colorSensorSupplier.getAsBoolean())))
+                        .onlyIf(() -> !shooterSensor.getAsBoolean())))
                 .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
                 .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
-                .raceWith(Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean() && swerve.insideOwnWing()))
+                .raceWith(Commands.waitUntil(() -> !shooterSensor.getAsBoolean() && !elevatorSensor.getAsBoolean() && swerve.insideOwnWing()))
 
                 .andThen(
                     Commands.race(
@@ -287,12 +297,12 @@ public class PathPlannerStorage implements Logged {
         Command skipNoteCommand = AutoBuilder.followPath(skipNote)
             .raceWith(NamedCommands.getCommand("ToIndexer"));
 
-        return Commands.waitUntil(colorSensorSupplier).withTimeout(0.45).andThen(
+        return Commands.waitUntil(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()).withTimeout(0.4).andThen(
             Commands.defer(() -> 
                 Commands.either(
                     shootAndMoveToNextNote,
                     skipNoteCommand,
-                    colorSensorSupplier),
+                    () -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()),
             commandGroup.getRequirements()));
     }
 
@@ -312,7 +322,7 @@ public class PathPlannerStorage implements Logged {
             .raceWith(
                 Commands.waitSeconds(1.5)
                 .andThen(
-                    Commands.waitUntil(() -> !colorSensorSupplier.getAsBoolean())
+                    Commands.waitUntil(() -> !shooterSensor.getAsBoolean() && !elevatorSensor.getAsBoolean())
                 ).alongWith(
                     NamedCommands.getCommand("PrepareShooter" + PoseCalculations.getBestShootingPoseString(swerve.getPose()))
                 )
@@ -376,7 +386,7 @@ public class PathPlannerStorage implements Logged {
             
             swerve.getChaseCommand( 
                 limelight::getNotePose2d,
-                () -> colorSensorSupplier.getAsBoolean() 
+                () -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()
                     // Add 20 inches of cushion since we can't get penalized until we go 35 inches past the center line (bumpers fully over)
                     // Keep in mind this is the note itself being 35 inches, the robot can only go 35/2 inches
                     // since the pose is from the center but the note is from the edge (since the intake gets it)

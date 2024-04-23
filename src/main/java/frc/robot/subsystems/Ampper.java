@@ -50,7 +50,7 @@ public class Ampper extends SubsystemBase implements Logged {
     public Command outtakeSlow(double seconds) {
         return 
             Commands.sequence(
-                intakeSlow(),
+                outtakeSlow(),
                 Commands.waitSeconds(seconds),
                 stopCommand());
     }
@@ -92,6 +92,10 @@ public class Ampper extends SubsystemBase implements Logged {
             outtakeSlow(), 
             stopCommand(), 
             () -> desiredSpeed == 0);
+    }
+
+    public Command setSpeedCommand(double speed) {
+        return runOnce(() -> setSpeed(speed));
     }
 
     public Command setCoastMode() {

@@ -150,6 +150,13 @@ public class ShooterCalc implements Logged {
                 && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
     }
 
+    public BooleanSupplier readyToPassSupplier() {
+        return () ->
+            pivot.getAtDesiredPassAngle()
+                && shooter.getAtDesiredPassRPM()
+                && shooter.getAverageTargetSpeed() > 0;
+    }
+
     public SpeedAngleTriplet calculateSpeakerTriplet(Translation2d robotPose) {
         // Get our position relative to the desired field element
         // Use the distance as our key for interpolation

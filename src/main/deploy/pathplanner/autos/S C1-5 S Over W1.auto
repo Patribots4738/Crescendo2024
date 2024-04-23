@@ -5,36 +5,16 @@
       "x": 1.2422530556147342,
       "y": 7.161301131112901
     },
-    "rotation": -128.23889760719103
+    "rotation": -124.91237183543709
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "deadline",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootInstantlyWhenReady"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PrepareSWD"
-                }
-              }
-            ]
+            "name": "FullPowerPreload2"
           }
         },
         {

@@ -55,7 +55,6 @@ public class Robot extends TimedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
-        // Remove if not at comp:
         RobotController.setBrownoutVoltage(6.0);
     }
 
@@ -71,6 +70,7 @@ public class Robot extends TimedRobot {
     private boolean updatedAlready = false;
     private boolean updateTimer = false;
     private boolean startedURCL = false;
+
     @Override
     public void robotPeriodic() {
         // Set the previous to the current timestamp before it updates

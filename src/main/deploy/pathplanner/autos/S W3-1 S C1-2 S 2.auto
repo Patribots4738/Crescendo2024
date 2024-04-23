@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "FullPowerPreload"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [
@@ -19,12 +25,6 @@
                 "type": "sequential",
                 "data": {
                   "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
                     {
                       "type": "path",
                       "data": {

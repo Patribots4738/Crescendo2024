@@ -54,6 +54,8 @@ public final class Constants {
 
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.7;
 
+        public static final double PASS_ROTATION_DEADBAND = 10;
+
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
         public static final double TRACK_WIDTH = Units.inchesToMeters(25.5);
@@ -121,6 +123,7 @@ public final class Constants {
         public static final double SHOOTER_VELOCITY_CONVERSION_FACTOR = 1.0;
         // degrees
         public static final double PIVOT_POSITION_CONVERSION_FACTOR = 360;
+        public static final double PIVOT_ZERO_OFFSET = 51.2235296;
 
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
@@ -140,8 +143,10 @@ public final class Constants {
 
         public static final double SHOOTER_BACK_SPEED = -0.5;
 
-        public static final double PIVOT_DEADBAND = 1;
+        public static final double PIVOT_DEADBAND_DEGREES = 1;
+        public static final double PIVOT_PASS_DEADBAND_DEGREES = 4;
         public static final double SHOOTER_RPM_DEADBAND = 50;
+        public static final double SHOOTER_PASS_RPM_DEADBAND = 150;
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
@@ -218,11 +223,11 @@ public final class Constants {
                 put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
                 put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
                 put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
-                put(12, SpeedAngleTriplet.of(3921.0, 3558.0, 33.3));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 30.9));
+                put(12, SpeedAngleTriplet.of(3947.0, 3580.0, 33.8));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 31.8));
                 // Future note, 13.2ft is a common shot which should have its own calibration point
-                put(14, SpeedAngleTriplet.of(4190.0, 3731.0, 29.4));
-                put(15, SpeedAngleTriplet.of(4531.0, 4058.0, 28));
+                put(14, SpeedAngleTriplet.of(4214.0, 3755.0, 30.9)); 
+                put(15, SpeedAngleTriplet.of(4515.0, 4043.0, 30.9));
                 put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 26.7));
                 
             }
@@ -272,7 +277,7 @@ public final class Constants {
         public static final double DEBUG_ELEVATOR_POS = 0.47;
         // This position is not used
         public static final double AMP_PLACE_POS = 0.409;        
-        public static final double NOTE_FIX_POS = 0.129;
+        public static final double NOTE_FIX_POS = 0.036;
         public static final double INDEX_POS = 0.09;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
@@ -333,7 +338,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Units.degreesToRadians(792.90);
 
         public static final double AUTO_POSITION_TOLERANCE_METERS = Units.inchesToMeters(1);
-        public static final double AUTO_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(3);
+        public static final double AUTO_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(2);
+        public static final double PASS_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(10);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
@@ -416,12 +422,19 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             // "S C5-4 S OBJ",
+            "8044 W3 C3",
             "S C5-1 S",
+            "S C5-3 3-5 S",
+            // "S W3-1 S",
+            // "S W3-1 S 2",
             "S W3-1 S C2-5 S",
             "S W3-1 S C2-5 S 2",
-
+            
             "S W3-1 S C1-2 S",
             "S W3-1 S C1-2 S 2",
+
+            "S W3-1 S C3-5 S",
+            "S W3-1 S",
             // "S W3-1 S C2-3 S 2 OBJ",
             // "S W3-1 S C2-3 S OBJ",
             // "S W3-1 C1-3 OBJ",
@@ -489,7 +502,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.468519624221792*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4989692140582187*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
@@ -601,13 +614,12 @@ public final class Constants {
     }   
 
     public static final class NeoMotorConstants {
-        public static final boolean SAFE_SPARK_MODE = true;
+        public static final boolean SAFE_SPARK_MODE = false;
         public static final double VORTEX_FREE_SPEED_RPM = 6784;
         public static final double NEO_FREE_SPEED_RPM = 5676;
 
         public static final int MAX_PERIODIC_STATUS_TIME_MS = 32766;
         public static final int FAST_PERIODIC_STATUS_TIME_MS = 15;
-
         // This gets filled out as motors are created on the robot
         public static final HashMap<Integer, Neo> MOTOR_MAP = new HashMap<Integer, Neo>();
 
