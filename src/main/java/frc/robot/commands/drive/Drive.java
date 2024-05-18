@@ -20,7 +20,7 @@ public class Drive extends Command {
     private final DoubleSupplier rotationSupplier;
     private final BooleanSupplier fieldRelativeSupplier;
     private final BooleanSupplier shouldMirror;
-    private double driveMultiplier = 1;
+    private double driveMultiplier = 0;
 
     public Drive(
             Swerve swerve,

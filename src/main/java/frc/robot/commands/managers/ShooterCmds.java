@@ -197,11 +197,14 @@ public class ShooterCmds {
     }
 
 	public Command stowPivot() {
-        return pivot.setAngleCommand(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
+        return pivot.setAngleCommand(() -> ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
 	}
 
     public Command raisePivot() {
-        return pivot.setAngleCommand(ShooterConstants.PIVOT_RAISE_ANGLE_DEGREES);
+        return pivot.setAngleCommand(() -> ShooterConstants.PIVOT_RAISE_ANGLE_DEGREES);
 	}
-    
+
+    public Command bigShotCommand() {
+        return shooter.setSpeedCommand(Pair.of(5300d, 5300d)).andThen(Commands.waitUntil(shooter::getAtDesiredRPM));
+    }
 }

@@ -212,14 +212,14 @@ public class RobotContainer implements Logged {
         );
         robotRelativeSupplier = () -> fieldRelativeToggle;
 
-        swerve.setDefaultCommand(new Drive(
-            swerve,
-            driver::getLeftY,
-            driver::getLeftX,
-            () -> -driver.getRightX()/1.6,
-            robotRelativeSupplier,
-            () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
-        ));
+        // swerve.setDefaultCommand(new Drive(
+        //     swerve,
+        //     driver::getLeftY,
+        //     driver::getLeftX,
+        //     () -> -driver.getRightX()/1.6,
+        //     robotRelativeSupplier,
+        //     () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
+        // ));
 
         shooter.setDefaultCommand(
             pieceControl.getAutomaticShooterSpeeds(
@@ -425,29 +425,34 @@ public class RobotContainer implements Logged {
         //         swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION().plus(new Transform2d(0,0, Rotation2d.fromDegrees(180)))), swerve
         //     ));
 
+        controller.leftY().whileTrue(
+            pivot.setAngleCommand(
+                () -> (pivot.getAngle() + controller.getLeftY() * 9.0))
+        );
+
 
         // Speaker / Source / Chain rotational alignment
-        controller.rightStick()
-            .toggleOnTrue(
-                Commands.sequence(
-                    elevator.toBottomCommand(),
-                    swerve.resetHDCCommand(),
-                    limelight3g.setLEDState(() -> true),
-                    new ActiveConditionalCommand(
-                        // This runs SWD on heading control 
-                        // and shooting-while-still on shooter
-                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        PoseCalculations::closeToSpeaker)
-                    ).finallyDo(
-                        () -> 
-                            limelight3g.setLEDState(() -> false)
-                            .andThen(shooterCmds.raisePivot()
-                                .alongWith(shooterCmds.stopShooter())
-                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-                            .schedule()
-                        )
-                );
+        // controller.rightStick()
+        //     .toggleOnTrue(
+        //         Commands.sequence(
+        //             elevator.toBottomCommand(),
+        //             swerve.resetHDCCommand(),
+        //             limelight3g.setLEDState(() -> true),
+        //             new ActiveConditionalCommand(
+        //                 // This runs SWD on heading control 
+        //                 // and shooting-while-still on shooter
+        //                 alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+        //                 alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+        //                 PoseCalculations::closeToSpeaker)
+        //             ).finallyDo(
+        //                 () -> 
+        //                     limelight3g.setLEDState(() -> false)
+        //                     .andThen(shooterCmds.raisePivot()
+        //                         .alongWith(shooterCmds.stopShooter())
+        //                         .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+        //                     .schedule()
+        //                 )
+        //         );
 
 
         // Climbing controls
@@ -460,21 +465,21 @@ public class RobotContainer implements Logged {
         // Note to target will either place amp or shoot,
         // depending on if the elevator is up or not
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
-                .alongWith(driver.setRumble(() -> 0.5, 0.3))
-            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
+            .onTrue(shooter.setSpeedCommand(700));
+            pieceControl.noteToShoot(swerve::getPose, swerve::getRobotRelativeVelocity);
         
 
-        // Intake controls
+        // Intake controlsd
         // The warning of dead code only applies if we are using single driver mode
         controller.leftTrigger()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
             .negate().and(() -> OIConstants.SINGLE_DRIVER_MODE || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
       
-        controller.rightBumper()
-            .onTrue(pieceControl.ejectNote())
-            .onFalse(pieceControl.stopEjecting());
+        // controller.rightBumper()
+        //     .whileTrue(pieceControl.blepNote())
+        //     .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
+
 
         // POV left and right are uncommonly used but needed incase of emergency
         controller.povLeft()
@@ -514,8 +519,8 @@ public class RobotContainer implements Logged {
         
         // Quick uppies for double amping
         controller.y()
-            .onTrue(shooterCmds.raisePivot().alongWith(elevator.toNoteFixCommand().alongWith(pieceControl.intakeForDoubleAmp())))
-            .onFalse(ampper.outtakeSlow(.3).andThen(pieceControl.stopIntakeAndIndexer(),pieceControl.doubleAmpElevatorEnd()));
+            .onTrue(elevator.toBottomCommand());
+
 
         // controller.leftBumper()
         //     .onTrue(elevator.toTopIshButNotFullCommand())
@@ -525,6 +530,9 @@ public class RobotContainer implements Logged {
             .whileTrue(pieceControl.intakeAuto())
             .negate().and(driver.leftTrigger().negate())
             .onTrue(pieceControl.stopIntakeAndIndexer());
+
+        controller.rightBumper()
+            .onTrue(pieceControl.bigShot());
 
     }
 

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -94,8 +96,8 @@ public class Pivot extends SubsystemBase implements Logged {
 	 * 
 	 * @return The method is returning a Command object.
 	 */
-	public Command setAngleCommand(double angle) {
-		return runOnce(() -> setAngle(angle)).andThen(Commands.waitUntil(this::getAtDesiredAngle));
+	public Command setAngleCommand(DoubleSupplier angleSupplier) {
+		return run(() -> setAngle(angleSupplier.getAsDouble()));
 	}
 
 	public double getAngle() {

@@ -26,17 +26,17 @@ public class Intake extends SubsystemBase implements Logged {
     }
 
     public void setPercent(double desiredPercent) {
-        desiredPercent = 
-            MathUtil.clamp(
-                desiredPercent, 
-                IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
-                IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
+        // desiredPercent = 
+        //     MathUtil.clamp(
+        //         desiredPercent, 
+        //         IntakeConstants.INTAKE_PERCENT_LOWER_LIMIT, 
+        //         IntakeConstants.INTAKE_PERCENT_UPPER_LIMIT);
         
-        if (desiredSpeed != desiredPercent) {
-            desiredSpeed = desiredPercent;
+        // if (desiredSpeed != desiredPercent) {
+        //     desiredSpeed = desiredPercent;
             
-            motor.set(desiredSpeed);
-        }
+        //     motor.set(desiredSpeed);
+        // }
 
     }
 

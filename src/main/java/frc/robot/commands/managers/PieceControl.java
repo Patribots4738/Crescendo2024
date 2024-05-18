@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -130,6 +131,20 @@ public class PieceControl implements Logged {
                 stopIntakeAndIndexer());
     }
 
+    public Command noteToShootProxy() {
+        // this should be ran while we are aiming with pivot and shooter already
+        // start running indexer so it gets up to speed and wait until shooter is at desired 
+        // rotation and speed before sending note from ampper into indexer and then into 
+        // shooter before stopping ampper and indexer
+        return Commands.sequence(
+                intake.inCommand(),
+                ampper.intake(),
+                indexer.toShooter(),
+                NT.getWaitCommand("noteToShoot1"), // 0.7
+                NT.getWaitCommand("noteToShoot2"), // 0.4
+                stopIntakeAndIndexer());
+    }
+
     public Command noteToShootUsingSensorWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier) {
         // this should be ran while we are aiming with pivot and shooter already
         // start running indexer so it gets up to speed and wait until shooter is at desired 
@@ -193,7 +208,6 @@ public class PieceControl implements Logged {
 
     public Command blepNote() {
         return Commands.parallel(
-            intake.inCommand(),
             ampper.intake(),
             indexer.toShooter(),
             shooterCmds.setTripletCommand(new SpeedAngleTriplet(500, 500, 0))
@@ -477,15 +491,7 @@ public class PieceControl implements Logged {
             Commands.run(
                 () -> 
                     shooterCmds.setSpeeds(
-                        (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
-                            && Robot.gameMode == GameMode.TELEOP 
-                            && DriverStation.isFMSAttached())
-                        ? shooterCmds.shooterCalc.calculatePassTriplet(
-                            robotPose.get()
-                        ).getSpeeds()
-                        : shooterCmds.shooterCalc.calculateSpeakerTriplet(
-                            robotPose.get().getTranslation()
-                        ).getSpeeds()
+                        Pair.of(600.0, 600.0)
                     ),
                 shooterCmds.getShooter()
             ),
@@ -512,5 +518,9 @@ public class PieceControl implements Logged {
 
     public boolean doubleAmpTimerReady() {
         return doubleAmpTimer.get() > 0.35;
+    }
+
+    public Command bigShot() {
+        return shooterCmds.bigShotCommand().andThen(noteToShootProxy());
     }
 }
