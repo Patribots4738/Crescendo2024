@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +13,6 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.rev.Neo;
 import monologue.Logged;
 import monologue.Annotations.Log;

@@ -9,7 +9,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.util.Constants.ColorSensorConstants;
 import frc.robot.util.custom.TransistorPower;
@@ -139,7 +138,7 @@ public class PicoColorSensor implements AutoCloseable, Logged {
         RawColor colorShooter = new RawColor();
 
         while (threadRunning.get()) {
-
+            
             int read = SerialPortJNI.serialRead(port, buffer, buffer.length - 1);
             if (read <= 0) {
                 try {
