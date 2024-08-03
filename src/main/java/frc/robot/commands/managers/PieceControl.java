@@ -244,7 +244,7 @@ public class PieceControl implements Logged {
 
     public Command noteToTrap2() {
         return Commands.sequence(
-            ampper.setSpeedCommand(-.7),
+            ampper.setPercentCommand(-.7),
             shooterCmds.stowPivot(),
             indexer.setPercentCommand(.7),   
             intake.inCommandSlow(),

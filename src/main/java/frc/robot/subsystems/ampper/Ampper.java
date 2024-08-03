@@ -100,8 +100,8 @@ public class Ampper extends SubsystemBase implements AmpperIO {
             () -> desiredPercent == 0);
     }
 
-    public Command setSpeedCommand(double speed) {
-        return runOnce(() -> setPercent(speed));
+    public Command setPercentCommand(double percent) {
+        return runOnce(() -> setPercent(percent));
     }
 
     public Command setCoastMode() {

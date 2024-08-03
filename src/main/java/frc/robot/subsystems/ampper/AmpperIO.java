@@ -15,6 +15,4 @@ public interface AmpperIO {
 
     default void updateInputs(AmpperIOInputs inputs) {}
 
-    default void setPercent(double percent) {}
-
 }
