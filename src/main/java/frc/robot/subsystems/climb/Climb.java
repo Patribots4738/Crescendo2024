@@ -2,6 +2,8 @@ package frc.robot.subsystems.climb;
 
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -22,7 +24,11 @@ public class Climb extends SubsystemBase implements ClimbIO {
 
     private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
-    private boolean atDesiredPos = false, hooksUp = false;
+    @AutoLogOutput(key = "Climb/AtDesiredPosition")
+    private boolean atDesiredPos = false;
+    
+    @AutoLogOutput(key = "Climb/HooksUp")
+    private boolean hooksUp = false;
 
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, true);
@@ -151,6 +157,6 @@ public class Climb extends SubsystemBase implements ClimbIO {
         inputs.rightPosition = rightMotor.getPosition();
         inputs.rightTargetPosition = rightMotor.getTargetPosition();
         inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
-        
+
     }
 }
