@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.climb;
 
 import java.util.function.BooleanSupplier;
 
@@ -14,18 +14,14 @@ import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class Climb extends SubsystemBase implements Logged {
+public class Climb extends SubsystemBase implements ClimbIO {
 
     private final Neo leftMotor;
     private final Neo rightMotor;
 
-    @Log
-    private double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
+    private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
-    @Log
     private boolean atDesiredPos = false, hooksUp = false;
 
     public Climb() {
@@ -49,10 +45,8 @@ public class Climb extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        targetPosLeft = leftMotor.getTargetPosition();
-        targetPosRight = rightMotor.getTargetPosition();
-        posLeft = leftMotor.getPosition();
-        posRight = rightMotor.getPosition();
+
+        updateInputs(inputs);
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
         hooksUp = getHooksUp();
@@ -87,13 +81,13 @@ public class Climb extends SubsystemBase implements Logged {
                 ClimbConstants.BOTTOM_LIMIT,
                 ClimbConstants.TOP_LIMIT);
 
-        if (targetPosLeft != pos1) {
+        if (inputs.leftTargetPosition != pos1) {
             leftMotor.setTargetPosition(pos1);
         }
 
-        if (targetPosRight != pos2)
-
-        rightMotor.setTargetPosition(pos2);
+        if (inputs.rightTargetPosition != pos2) {
+            rightMotor.setTargetPosition(pos2);
+        }
 
         RobotContainer.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, pos1,
@@ -129,7 +123,7 @@ public class Climb extends SubsystemBase implements Logged {
         return Commands.either(
             toMiddleCommand(), 
             toTopCommand(), 
-            () -> targetPosLeft == ClimbConstants.TOP_LIMIT || targetPosRight == ClimbConstants.BOTTOM_LIMIT);
+            () -> inputs.leftTargetPosition == ClimbConstants.TOP_LIMIT || inputs.rightTargetPosition == ClimbConstants.BOTTOM_LIMIT);
     }
 
     public BooleanSupplier atDesiredPosition() {
@@ -146,5 +140,17 @@ public class Climb extends SubsystemBase implements Logged {
 
     public boolean getHooksUp() {
         return (leftMotor.getTargetPosition() > 0 || rightMotor.getTargetPosition() > 0);
+    }
+
+    public void updateInputs(ClimbIOInputsAutoLogged inputs) {
+
+        inputs.leftPosition = leftMotor.getPosition();
+        inputs.leftTargetPosition = leftMotor.getTargetPosition();
+        inputs.leftAppliedVolts = leftMotor.getAppliedOutput();
+
+        inputs.rightPosition = rightMotor.getPosition();
+        inputs.rightTargetPosition = rightMotor.getTargetPosition();
+        inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
+        
     }
 }

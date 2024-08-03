@@ -41,6 +41,7 @@ import frc.robot.leds.Strips.LedStrip;
 import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.ampper.Ampper;
+import frc.robot.subsystems.climb.Climb;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -868,7 +869,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(swerve, "Robot/Swerve");
 
         Monologue.logObj(intake, "Robot/Subsystems/intake");
-        Monologue.logObj(climb, "Robot/Subsystems/climb");
+        // Monologue.logObj(climb, "Robot/Subsystems/climb");
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
         } else {

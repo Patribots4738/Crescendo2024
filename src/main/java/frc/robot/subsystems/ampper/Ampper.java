@@ -1,7 +1,5 @@
 package frc.robot.subsystems.ampper;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -12,9 +10,6 @@ import frc.robot.util.rev.Neo;
 public class Ampper extends SubsystemBase implements AmpperIO {
     private final Neo motor;
     private final AmpperIOInputsAutoLogged inputs = new AmpperIOInputsAutoLogged();
-
-    @AutoLogOutput(key = "Ampper/Desired")
-    private double desiredPercent = 0;
 
     public Ampper() {
         motor = new Neo(ElevatorConstants.AMPPER_CAN_ID, false, ElevatorConstants.AMPPER_INVERTION);
@@ -38,9 +33,7 @@ public class Ampper extends SubsystemBase implements AmpperIO {
                 percent, 
                 ElevatorConstants.AMPPER_LOWER_PERCENT_LIMIT, 
                 ElevatorConstants.AMPPER_UPPER_PERCENT_LIMIT);
-        if (desiredPercent != percent) {
-            desiredPercent = percent;
-            
+        if (inputs.targetPercent != percent) {
             motor.set(percent);
         }
     }
@@ -97,7 +90,7 @@ public class Ampper extends SubsystemBase implements AmpperIO {
         return Commands.either(
             outtakeSlow(), 
             stopCommand(), 
-            () -> desiredPercent == 0);
+            () -> inputs.targetPercent == 0);
     }
 
     public Command setPercentCommand(double percent) {
@@ -113,6 +106,7 @@ public class Ampper extends SubsystemBase implements AmpperIO {
     }
 
     public void updateInputs(AmpperIOInputs inputs) {
+        inputs.targetPercent = motor.getTargetPercent();
         inputs.positionRotations = motor.getPosition();
         inputs.velocityRPM = motor.getVelocity();
         inputs.appliedVolts = motor.getAppliedOutput();
