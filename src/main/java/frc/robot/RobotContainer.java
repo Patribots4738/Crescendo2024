@@ -40,6 +40,7 @@ import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.Strips.LedStrip;
 import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -878,7 +879,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
-        Monologue.logObj(ampper, "Robot/Subsystems/ampper");
+        // Monologue.logObj(ampper, "Robot/Subsystems/ampper");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
         Monologue.logObj(pathPlannerStorage, "Robot");

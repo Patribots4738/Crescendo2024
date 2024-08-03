@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -56,7 +54,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
 
-        Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+        Logger.recordMetadata("ProjectName", "MyProject"); // For reference this is how we set metadata values
 
         if (isReal()) {
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
