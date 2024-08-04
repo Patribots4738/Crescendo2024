@@ -1,13 +1,16 @@
 package frc.robot.subsystems.ampper;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.rev.Neo;
+import monologue.Logged;
 
-public class Ampper extends SubsystemBase implements AmpperIO {
+public class Ampper extends SubsystemBase implements Logged, AmpperIO {
     private final Neo motor;
     private final AmpperIOInputsAutoLogged inputs = new AmpperIOInputsAutoLogged();
 
@@ -19,6 +22,10 @@ public class Ampper extends SubsystemBase implements AmpperIO {
     @Override
     public void periodic() {
         updateInputs(inputs);
+        Logger.processInputs("Ampper", inputs);
+
+        Logger.recordOutput("Ampper/Position", inputs.positionRotations);
+        Logger.recordOutput("Ampper/TargetPercent", inputs.targetPercent);
     }
  
     public Command intakeFromHandoff() {

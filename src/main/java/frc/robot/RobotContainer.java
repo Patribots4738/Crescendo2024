@@ -869,7 +869,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(swerve, "Robot/Swerve");
 
         Monologue.logObj(intake, "Robot/Subsystems/intake");
-        // Monologue.logObj(climb, "Robot/Subsystems/climb");
+        Monologue.logObj(climb, "Robot/Subsystems/climb");
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
         } else {
@@ -880,7 +880,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
         Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
-        // Monologue.logObj(ampper, "Robot/Subsystems/ampper");
+        Monologue.logObj(ampper, "Robot/Subsystems/ampper");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
         Monologue.logObj(pathPlannerStorage, "Robot");

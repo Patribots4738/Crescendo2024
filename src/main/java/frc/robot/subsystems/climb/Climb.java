@@ -3,6 +3,7 @@ package frc.robot.subsystems.climb;
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -16,18 +17,22 @@ import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.rev.Neo;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Climb extends SubsystemBase implements ClimbIO {
+public class Climb extends SubsystemBase implements Logged, ClimbIO {
 
     private final Neo leftMotor;
     private final Neo rightMotor;
 
     private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
-    @AutoLogOutput(key = "Climb/AtDesiredPosition")
+    // @AutoLogOutput(key = "Climb/AtDesiredPosition")
+    @Log
     private boolean atDesiredPos = false;
     
-    @AutoLogOutput(key = "Climb/HooksUp")
+    // @AutoLogOutput(key = "Climb/HooksUp")
+    @Log
     private boolean hooksUp = false;
 
     public Climb() {
@@ -53,6 +58,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
     public void periodic() {
 
         updateInputs(inputs);
+        Logger.processInputs("Climb", inputs);
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
         hooksUp = getHooksUp();
