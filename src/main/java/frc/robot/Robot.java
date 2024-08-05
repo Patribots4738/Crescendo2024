@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.NeoPhysicsSim;
 import monologue.Monologue;
@@ -56,17 +57,22 @@ public class Robot extends LoggedRobot {
 
         Logger.recordMetadata("ProjectName", "MyProject"); // For reference this is how we set metadata values
 
-        if (isReal()) {
-            Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-        } else {
-            // setUseTiming(false); // Run as fast as possible
-            String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-            Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil
-                .addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+        switch (StateConstants.getMode()) {
+            case REAL:
+                Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+                Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+                break;
+            case REPLAY:
+                setUseTiming(false); // Run as fast as possible
+                String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+                Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil
+                    .addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+                    break;
+            case SIM:
+                Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+                break;
         }
-
-        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         
         Logger.start(); 
 

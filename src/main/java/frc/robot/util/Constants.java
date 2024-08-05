@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,43 @@ import monologue.Logged;
  * or in a comment next to it.
  */
 public final class Constants {
+
+    public static final class StateConstants {
+
+        private static RobotType robotType = RobotType.SIMBOT;
+
+        public static RobotType getRobot() {
+            if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
+                robotType = RobotType.COMPBOT;
+            }
+            return robotType;
+        }
+
+        public static Mode getMode() {
+            return switch (robotType) {
+                case COMPBOT -> FieldConstants.IS_SIMULATION ? Mode.REPLAY : Mode.REAL;
+                case SIMBOT -> Mode.SIM;
+            };
+        }
+        
+        public enum Mode {
+            /** Running on a real robot. */
+            REAL,
+
+            /** Running a physics simulator. */
+            SIM,
+
+            /** Replaying from a log file. */
+            REPLAY
+        }
+
+        public enum RobotType {
+            COMPBOT,
+            SIMBOT
+        }
+
+    }
+
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
