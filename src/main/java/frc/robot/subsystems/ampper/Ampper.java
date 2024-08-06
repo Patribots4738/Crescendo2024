@@ -24,7 +24,7 @@ public class Ampper extends SubsystemBase implements Logged, AmpperIO {
         updateInputs(inputs);
         Logger.processInputs("Ampper", inputs);
 
-        Logger.recordOutput("Ampper/Position", inputs.positionRotations);
+        Logger.recordOutput("Ampper/VelocityRPM", inputs.velocityRPM);
         Logger.recordOutput("Ampper/TargetPercent", inputs.targetPercent);
     }
  

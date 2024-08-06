@@ -56,6 +56,12 @@ public class Climb extends SubsystemBase implements ClimbIO {
         updateInputs(inputs);
         Logger.processInputs("Climb", inputs);
 
+        Logger.recordOutput("Climb/LeftPosition", inputs.leftPositionRotations);
+        Logger.recordOutput("Climb/LeftTargetPosition", inputs.leftTargetPositionRotations);
+
+        Logger.recordOutput("Climb/RightPosition", inputs.rightPositionRotations);
+        Logger.recordOutput("Climb/RightTargetPosition", inputs.rightTargetPositionRotations);
+
         atDesiredPos = atDesiredPosition().getAsBoolean();
         hooksUp = getHooksUp();
 

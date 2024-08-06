@@ -43,6 +43,7 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.subsystems.ampper.Elevator;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.DriveConstants;

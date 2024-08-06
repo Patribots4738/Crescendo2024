@@ -22,7 +22,6 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
     
     private final Neo motor;
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-
     
     private double hitGuillotineTimestamp = 0;
 
@@ -53,6 +52,9 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
     public void periodic() {
         updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
+
+        Logger.recordOutput("Elevator/Position", inputs.positionRotations);
+        Logger.recordOutput("Elevator/TargetPosition", inputs.targetPositionRotations);
 
         atDesiredPos = atDesiredPosition();
 
