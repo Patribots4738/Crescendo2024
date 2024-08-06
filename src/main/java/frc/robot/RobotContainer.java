@@ -41,6 +41,7 @@ import frc.robot.leds.Strips.LedStrip;
 import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.ampper.Ampper;
+import frc.robot.subsystems.ampper.Elevator;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
@@ -869,7 +870,6 @@ public class RobotContainer implements Logged {
         Monologue.logObj(swerve, "Robot/Swerve");
 
         Monologue.logObj(intake, "Robot/Subsystems/intake");
-        Monologue.logObj(climb, "Robot/Subsystems/climb");
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
         } else {
@@ -878,9 +878,7 @@ public class RobotContainer implements Logged {
         }
         Monologue.logObj(piPico, "Robot/ColorSensors");
         Monologue.logObj(shooter, "Robot/Subsystems/shooter");
-        Monologue.logObj(elevator, "Robot/Subsystems/elevator");
         Monologue.logObj(pivot, "Robot/Subsystems/pivot");
-        Monologue.logObj(ampper, "Robot/Subsystems/ampper");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
         Monologue.logObj(pathPlannerStorage, "Robot");

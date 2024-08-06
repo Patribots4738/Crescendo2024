@@ -18,7 +18,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.PicoColorSensor;
 import frc.robot.subsystems.ampper.Ampper;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.ampper.Elevator;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.util.Constants.FieldConstants;
