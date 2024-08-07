@@ -55,7 +55,12 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
 
-        Logger.recordMetadata("ProjectName", "MyProject"); // For reference this is how we set metadata values
+        // Git metadata for tracking version for AKit
+        Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
 
         switch (StateConstants.getMode()) {
             case REAL:
