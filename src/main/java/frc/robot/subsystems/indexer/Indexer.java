@@ -5,12 +5,11 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.indexer.IndexerIO.IndexerIOInputs;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.SafeSpark.TelemetryPreference;
 
-public class Indexer extends SubsystemBase {
+public class Indexer extends SubsystemBase implements IndexerIO {
     private final Neo motor;
     private final IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
 
