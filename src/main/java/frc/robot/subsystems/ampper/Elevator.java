@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
         Logger.processInputs("Elevator", inputs);
 
         Logger.recordOutput("Elevator/Position", inputs.positionRotations);
-        Logger.recordOutput("Elevator/TargetPosition", inputs.targetPositionRotations);
+        Logger.recordOutput("Elevator/TargetPosition", inputs.targetPositionMeters);
 
         atDesiredPos = atDesiredPosition();
 
@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
     }
 
     public double getDesiredPosition() {
-        return inputs.targetPositionRotations;
+        return inputs.targetPositionMeters;
     }
 
     public void setPosition(double pos) {
@@ -91,7 +91,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
             ElevatorConstants.ELEVATOR_BOTTOM_LIMIT,
             ElevatorConstants.ELEVATOR_TOP_LIMIT);
 
-        if (inputs.targetPositionRotations != pos) {
+        if (inputs.targetPositionMeters != pos) {
             motor.setTargetPosition(pos);
     
             RobotContainer.desiredComponents3d[NTConstants.ELEVATOR_INDEX] = new Pose3d(
@@ -150,7 +150,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
     public boolean atDesiredPosition() {
         if (overrideMode)
             return MathUtil.isNear(desiredOverridePos, inputs.positionRotations, ElevatorConstants.ELEVATOR_DEADBAND);
-        return MathUtil.isNear(inputs.targetPositionRotations, inputs.positionRotations, ElevatorConstants.ELEVATOR_DEADBAND);
+        return MathUtil.isNear(inputs.targetPositionMeters, inputs.positionRotations, ElevatorConstants.ELEVATOR_DEADBAND);
     }
 
     public boolean atPosition(double position) {
@@ -170,7 +170,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
         stuckOnGuillotine =  
             hitGuillotineTimestamp != 0
             && Robot.currentTimestamp - this.hitGuillotineTimestamp >= ElevatorConstants.STUCK_TIME_SECONDS
-            && inputs.targetPositionRotations > inputs.positionRotations
+            && inputs.targetPositionMeters > inputs.positionRotations
             && nearGuillotine()
             && motor.getOutputCurrent() > 35.0;
     }
@@ -194,7 +194,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
 
     public void updateInputs(ElevatorIOInputs inputs) {
         inputs.positionRotations = motor.getPosition();
-        inputs.targetPositionRotations = motor.getTargetPosition();
+        inputs.targetPositionMeters = motor.getTargetPosition();
         inputs.appliedVolts = motor.getAppliedOutput();
     }
 

@@ -1,11 +1,11 @@
-package frc.robot.subsystems.indexer;
+package frc.robot.subsystems.intake;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface IndexerIO {
-    
+public interface IntakeIO {
+
     @AutoLog
-    class IndexerIOInputs {
+    class IntakeIOInputs {
 
         public double targetPercent = 0.0;
         public double positionRotations = 0.0;
@@ -14,6 +14,6 @@ public interface IndexerIO {
 
     }
 
-    default void updateInputs(IndexerIOInputs inputs) {}
+    default void updateInputs(IntakeIOInputs inputs) {}
 
 }

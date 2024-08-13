@@ -8,7 +8,7 @@ public interface ElevatorIO {
     class ElevatorIOInputs {
 
         public double positionRotations = 0.0;
-        public double targetPositionRotations = 0.0;
+        public double targetPositionMeters = 0.0;
         public double appliedVolts = 0.0;
 
     }

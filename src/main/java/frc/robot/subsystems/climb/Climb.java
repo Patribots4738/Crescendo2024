@@ -56,21 +56,21 @@ public class Climb extends SubsystemBase implements ClimbIO {
         updateInputs(inputs);
         Logger.processInputs("Climb", inputs);
 
-        Logger.recordOutput("Climb/LeftPosition", inputs.leftPositionRotations);
-        Logger.recordOutput("Climb/LeftTargetPosition", inputs.leftTargetPositionRotations);
+        Logger.recordOutput("Climb/LeftPosition", inputs.leftPositionMeters);
+        Logger.recordOutput("Climb/LeftTargetPosition", inputs.leftTargetPositionMeters);
 
-        Logger.recordOutput("Climb/RightPosition", inputs.rightPositionRotations);
-        Logger.recordOutput("Climb/RightTargetPosition", inputs.rightTargetPositionRotations);
+        Logger.recordOutput("Climb/RightPosition", inputs.rightPositionMeters);
+        Logger.recordOutput("Climb/RightTargetPosition", inputs.rightTargetPositionMeters);
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
         hooksUp = getHooksUp();
 
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
-            0, 0, inputs.leftPositionRotations,
+            0, 0, inputs.leftPositionMeters,
             new Rotation3d()
         );
         RobotContainer.components3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
-            0, 0, inputs.rightPositionRotations,
+            0, 0, inputs.rightPositionMeters,
             new Rotation3d()
         );
     }
@@ -95,11 +95,11 @@ public class Climb extends SubsystemBase implements ClimbIO {
                 ClimbConstants.BOTTOM_LIMIT,
                 ClimbConstants.TOP_LIMIT);
 
-        if (inputs.leftTargetPositionRotations != pos1) {
+        if (inputs.leftTargetPositionMeters != pos1) {
             leftMotor.setTargetPosition(pos1);
         }
 
-        if (inputs.rightTargetPositionRotations != pos2) {
+        if (inputs.rightTargetPositionMeters != pos2) {
             rightMotor.setTargetPosition(pos2);
         }
 
@@ -137,7 +137,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
         return Commands.either(
             toMiddleCommand(), 
             toTopCommand(), 
-            () -> inputs.leftTargetPositionRotations == ClimbConstants.TOP_LIMIT || inputs.rightTargetPositionRotations == ClimbConstants.BOTTOM_LIMIT);
+            () -> inputs.leftTargetPositionMeters == ClimbConstants.TOP_LIMIT || inputs.rightTargetPositionMeters == ClimbConstants.BOTTOM_LIMIT);
     }
 
     public BooleanSupplier atDesiredPosition() {
@@ -158,12 +158,12 @@ public class Climb extends SubsystemBase implements ClimbIO {
 
     public void updateInputs(ClimbIOInputsAutoLogged inputs) {
 
-        inputs.leftPositionRotations = leftMotor.getPosition();
-        inputs.leftTargetPositionRotations = leftMotor.getTargetPosition();
+        inputs.leftPositionMeters = leftMotor.getPosition();
+        inputs.leftTargetPositionMeters = leftMotor.getTargetPosition();
         inputs.leftAppliedVolts = leftMotor.getAppliedOutput();
 
-        inputs.rightPositionRotations = rightMotor.getPosition();
-        inputs.rightTargetPositionRotations = rightMotor.getTargetPosition();
+        inputs.rightPositionMeters = rightMotor.getPosition();
+        inputs.rightTargetPositionMeters = rightMotor.getTargetPosition();
         inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
 
     }
