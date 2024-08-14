@@ -54,13 +54,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
     public void periodic() {
 
         updateInputs(inputs);
-        Logger.processInputs("Climb", inputs);
-
-        Logger.recordOutput("Climb/LeftPosition", inputs.leftPositionMeters);
-        Logger.recordOutput("Climb/LeftTargetPosition", inputs.leftTargetPositionMeters);
-
-        Logger.recordOutput("Climb/RightPosition", inputs.rightPositionMeters);
-        Logger.recordOutput("Climb/RightTargetPosition", inputs.rightTargetPositionMeters);
+        Logger.processInputs("SubsystemInputs/Climb", inputs);
 
         atDesiredPos = atDesiredPosition().getAsBoolean();
         hooksUp = getHooksUp();
@@ -144,16 +138,16 @@ public class Climb extends SubsystemBase implements ClimbIO {
 		return () -> (
             MathUtil.applyDeadband(
 				Math.abs(
-						leftMotor.getPosition() - leftMotor.getTargetPosition()),
+						inputs.leftPositionMeters - inputs.leftTargetPositionMeters),
 				ClimbConstants.CLIMB_DEADBAND) == 0 &&
             MathUtil.applyDeadband(
 				Math.abs(
-						rightMotor.getPosition() - rightMotor.getTargetPosition()),
+						inputs.rightPositionMeters - inputs.rightTargetPositionMeters),
 				ClimbConstants.CLIMB_DEADBAND) == 0);
 	}
 
     public boolean getHooksUp() {
-        return (leftMotor.getTargetPosition() > 0 || rightMotor.getTargetPosition() > 0);
+        return (inputs.leftTargetPositionMeters > 0 || inputs.rightTargetPositionMeters > 0);
     }
 
     public void updateInputs(ClimbIOInputsAutoLogged inputs) {
@@ -161,10 +155,12 @@ public class Climb extends SubsystemBase implements ClimbIO {
         inputs.leftPositionMeters = leftMotor.getPosition();
         inputs.leftTargetPositionMeters = leftMotor.getTargetPosition();
         inputs.leftAppliedVolts = leftMotor.getAppliedOutput();
+        inputs.leftOutputCurrentAmps = leftMotor.getOutputCurrent();
 
         inputs.rightPositionMeters = rightMotor.getPosition();
         inputs.rightTargetPositionMeters = rightMotor.getTargetPosition();
         inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
+        inputs.rightOutputCurrentAmps = rightMotor.getOutputCurrent();
 
     }
 }

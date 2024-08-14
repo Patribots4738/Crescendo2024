@@ -22,10 +22,7 @@ public class Ampper extends SubsystemBase implements Logged, AmpperIO {
     @Override
     public void periodic() {
         updateInputs(inputs);
-        Logger.processInputs("Ampper", inputs);
-
-        Logger.recordOutput("Ampper/VelocityRPM", inputs.velocityRPM);
-        Logger.recordOutput("Ampper/TargetPercent", inputs.targetPercent);
+        Logger.processInputs("SubsystemInputs/Ampper", inputs);
     }
  
     public Command intakeFromHandoff() {
@@ -117,5 +114,6 @@ public class Ampper extends SubsystemBase implements Logged, AmpperIO {
         inputs.positionRotations = motor.getPosition();
         inputs.velocityRPM = motor.getVelocity();
         inputs.appliedVolts = motor.getAppliedOutput();
+        inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
 }

@@ -10,6 +10,7 @@ public interface ElevatorIO {
         public double positionRotations = 0.0;
         public double targetPositionMeters = 0.0;
         public double appliedVolts = 0.0;
+        public double outputCurrentAmps = 0.0;
 
     }
 

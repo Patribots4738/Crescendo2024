@@ -11,6 +11,7 @@ public interface IntakeIO {
         public double positionRotations = 0.0;
         public double velocityRPM = 0.0;
         public double appliedVolts = 0.0;
+        public double outputCurrentAmps = 0.0;
 
     }
 

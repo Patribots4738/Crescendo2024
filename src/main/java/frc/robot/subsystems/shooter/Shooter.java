@@ -1,5 +1,8 @@
 package frc.robot.subsystems.shooter;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,28 +11,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class Shooter extends SubsystemBase implements Logged{
+public class Shooter extends SubsystemBase implements ShooterIO {
     /** Creates a new shooter. */
     private final Neo leftMotor;
     private final Neo rightMotor;
 
-    @Log
-    private double targetLeftSpeed = 0;
-    @Log
-    private double targetRightSpeed = 0;
+    private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    @Log
-    private double currentLeftSpeed = 0;
-    @Log
-    private double currentRightSpeed = 0;
-
-    @Log
+    @AutoLogOutput (key = "Shooter/AtDesiredRPM")
     private boolean atDesiredRPM = false;
 
-    @Log
+    @AutoLogOutput (key = "Shooter/AtDesiredPassRPM")
     private boolean atDesiredPassRPM = false;
 
     public Shooter() {
@@ -53,23 +46,23 @@ public class Shooter extends SubsystemBase implements Logged{
 
     @Override
     public void periodic() {
-        currentLeftSpeed = leftMotor.getVelocity();
-        currentRightSpeed = rightMotor.getVelocity();
+        updateInputs(inputs);
+        Logger.processInputs("SubsystemInputs/Shooter", inputs);
         
         atDesiredRPM = 
             MathUtil.isNear(
-                currentLeftSpeed, targetLeftSpeed,
+                inputs.leftVelocityRPM, inputs.leftTargetVelocityRPM,
                 ShooterConstants.SHOOTER_RPM_DEADBAND)
             && MathUtil.isNear(
-                currentRightSpeed, targetRightSpeed,
+                inputs.rightVelocityRPM, inputs.rightTargetVelocityRPM,
                 ShooterConstants.SHOOTER_RPM_DEADBAND);
 
         atDesiredPassRPM = 
             MathUtil.isNear( 
-                currentLeftSpeed, targetLeftSpeed,
+                inputs.leftVelocityRPM, inputs.leftTargetVelocityRPM,
                 ShooterConstants.SHOOTER_PASS_RPM_DEADBAND)
             && MathUtil.isNear(
-                currentRightSpeed, targetRightSpeed,
+                inputs.rightVelocityRPM, inputs.rightTargetVelocityRPM,
                 ShooterConstants.SHOOTER_PASS_RPM_DEADBAND);
     }
 
@@ -82,15 +75,11 @@ public class Shooter extends SubsystemBase implements Logged{
     public void setSpeed(double speed) {
         leftMotor.setTargetVelocity(speed);
         rightMotor.setTargetVelocity(speed);
-        targetLeftSpeed = speed;
-        targetRightSpeed = speed;
     }
 
     public void setSpeed(Pair<Double, Double> speeds) {
         leftMotor.setTargetVelocity(speeds.getFirst());
         rightMotor.setTargetVelocity(speeds.getSecond());
-        targetLeftSpeed = speeds.getFirst();
-        targetRightSpeed = speeds.getSecond();
     }
 
     /**
@@ -110,11 +99,11 @@ public class Shooter extends SubsystemBase implements Logged{
     }
 
     public Pair<Double, Double> getSpeed() {
-        return new Pair<Double, Double>(leftMotor.getVelocity(), rightMotor.getVelocity());
+        return new Pair<Double, Double>(inputs.leftVelocityRPM, inputs.rightVelocityRPM);
     }
 
     public double getAverageSpeed() {
-        return (leftMotor.getVelocity() + rightMotor.getVelocity()) / 2.0;
+        return (inputs.leftVelocityRPM + inputs.rightVelocityRPM) / 2.0;
     }
 
     /**
@@ -141,11 +130,11 @@ public class Shooter extends SubsystemBase implements Logged{
     }
 
     public Pair<Double, Double> getDesiredSpeeds() {
-        return new Pair<Double, Double>(targetLeftSpeed, targetRightSpeed);
+        return new Pair<Double, Double>(inputs.leftTargetVelocityRPM, inputs.rightTargetVelocityRPM);
     }
 
     public double getAverageTargetSpeed() {
-        return (targetLeftSpeed + targetRightSpeed) / 2.0;
+        return (inputs.leftTargetVelocityRPM + inputs.rightTargetVelocityRPM) / 2.0;
     }
 
     public Command fullPower(double desiredSpeed) {
@@ -154,5 +143,19 @@ public class Shooter extends SubsystemBase implements Logged{
             rightMotor.setVoltage(12);
         }).until(() -> getAverageSpeed() >= desiredSpeed)
         .andThen(setSpeedCommand(desiredSpeed));
+    }
+
+    public void updateInputs(ShooterIOInputs inputs) {
+        inputs.leftVelocityRPM = leftMotor.getVelocity();
+        inputs.leftTargetVelocityRPM = leftMotor.getTargetVelocity();
+        inputs.leftPositionRotations = leftMotor.getPosition();
+        inputs.leftAppliedVolts = leftMotor.getAppliedOutput();
+        inputs.leftOutputCurrentAmps = leftMotor.getOutputCurrent();
+
+        inputs.rightVelocityRPM = rightMotor.getVelocity();
+        inputs.rightTargetVelocityRPM = rightMotor.getTargetVelocity();
+        inputs.rightPositionRotations = rightMotor.getPosition();
+        inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
+        inputs.rightOutputCurrentAmps = rightMotor.getOutputCurrent();
     }
 }

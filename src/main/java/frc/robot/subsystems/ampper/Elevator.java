@@ -51,10 +51,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
     @Override
     public void periodic() {
         updateInputs(inputs);
-        Logger.processInputs("Elevator", inputs);
-
-        Logger.recordOutput("Elevator/Position", inputs.positionRotations);
-        Logger.recordOutput("Elevator/TargetPosition", inputs.targetPositionMeters);
+        Logger.processInputs("SubsystemInputs/Elevator", inputs);
 
         atDesiredPos = atDesiredPosition();
 
@@ -172,7 +169,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
             && Robot.currentTimestamp - this.hitGuillotineTimestamp >= ElevatorConstants.STUCK_TIME_SECONDS
             && inputs.targetPositionMeters > inputs.positionRotations
             && nearGuillotine()
-            && motor.getOutputCurrent() > 35.0;
+            && inputs.outputCurrentAmps > 35.0;
     }
 
     public Command resetEncoder() {
@@ -196,6 +193,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
         inputs.positionRotations = motor.getPosition();
         inputs.targetPositionMeters = motor.getTargetPosition();
         inputs.appliedVolts = motor.getAppliedOutput();
+        inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
 
 }

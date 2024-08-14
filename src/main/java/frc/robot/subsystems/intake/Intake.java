@@ -28,7 +28,7 @@ public class Intake extends SubsystemBase implements IntakeIO {
     @Override
     public void periodic() {
         updateInputs(inputs);
-        Logger.processInputs("Intake", inputs);
+        Logger.processInputs("SubsystemInputs/Intake", inputs);
     }
 
     public void setPercent(double desiredPercent) {
@@ -100,5 +100,6 @@ public class Intake extends SubsystemBase implements IntakeIO {
         inputs.velocityRPM = motor.getVelocity();
         inputs.positionRotations = motor.getPosition();
         inputs.appliedVolts = motor.getAppliedOutput();
+        inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
 }

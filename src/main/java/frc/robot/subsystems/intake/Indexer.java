@@ -5,7 +5,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.indexer.IndexerIOInputsAutoLogged;
 import frc.robot.util.Constants.IntakeConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.SafeSpark.TelemetryPreference;
@@ -23,10 +22,7 @@ public class Indexer extends SubsystemBase implements IndexerIO {
     @Override
     public void periodic() {
         updateInputs(inputs);
-        Logger.processInputs("Indexer", inputs);
-
-        Logger.recordOutput("Indexer/VelocityRPM", inputs.velocityRPM);
-        Logger.recordOutput("Indexer/TargetPercent", inputs.targetPercent);
+        Logger.processInputs("SubsystemInputs/Indexer", inputs);
     }
 
     public double getDesiredPercent() {
@@ -86,5 +82,6 @@ public class Indexer extends SubsystemBase implements IndexerIO {
         inputs.velocityRPM = motor.getVelocity();
         inputs.positionRotations = motor.getPosition();
         inputs.appliedVolts = motor.getAppliedOutput();
+        inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
 }
