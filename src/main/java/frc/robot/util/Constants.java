@@ -360,7 +360,7 @@ public final class Constants {
         public static final double TOP_LIMIT = 0.517;
         public static final double BOTTOM_LIMIT = 0.0;
 
-        public static final double CLIMB_DEADBAND = 0.002;
+        public static final double CLIMB_DEADBAND = 0.005;
         
         public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
     }

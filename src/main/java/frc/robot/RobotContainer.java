@@ -872,6 +872,7 @@ public class RobotContainer implements Logged {
         Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
 
         Monologue.logObj(swerve, "Robot/Swerve");
+    
 
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
@@ -880,7 +881,6 @@ public class RobotContainer implements Logged {
             Monologue.logObj(limelight3g, "Robot/Limelights/limelight3g");
         }
         Monologue.logObj(piPico, "Robot/ColorSensors");
-        Monologue.logObj(pivot, "Robot/Subsystems/pivot");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
         Monologue.logObj(pathPlannerStorage, "Robot");

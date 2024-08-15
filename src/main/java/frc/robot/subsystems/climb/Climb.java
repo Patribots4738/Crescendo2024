@@ -56,7 +56,15 @@ public class Climb extends SubsystemBase implements ClimbIO {
         updateInputs(inputs);
         Logger.processInputs("SubsystemInputs/Climb", inputs);
 
-        atDesiredPos = atDesiredPosition().getAsBoolean();
+        atDesiredPos = (
+            MathUtil.applyDeadband(
+				Math.abs(
+						inputs.leftPositionMeters - inputs.leftTargetPositionMeters),
+				ClimbConstants.CLIMB_DEADBAND) == 0 &&
+            MathUtil.applyDeadband(
+				Math.abs(
+						inputs.rightPositionMeters - inputs.rightTargetPositionMeters),
+				ClimbConstants.CLIMB_DEADBAND) == 0);
         hooksUp = getHooksUp();
 
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(

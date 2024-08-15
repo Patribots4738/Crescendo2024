@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -14,8 +15,6 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
 public class Pivot extends SubsystemBase implements PivotIO {
 	private Neo motor;
@@ -52,6 +51,7 @@ public class Pivot extends SubsystemBase implements PivotIO {
 	public void periodic() {
 
         updateInputs(inputs);
+        Logger.processInputs("Pivot", inputs);
 
 		atDesiredAngle = 
             MathUtil.isNear(inputs.realAngle, inputs.desiredAngle, ShooterConstants.PIVOT_DEADBAND_DEGREES);
