@@ -126,5 +126,7 @@ public class Pivot extends SubsystemBase implements PivotIO {
     public void updateInputs(PivotIOInputs inputs) {
         inputs.desiredAngle = this.getAngle();
         inputs.realAngle = this.getTargetAngle();
+        inputs.appliedVolts = motor.getAppliedOutput();
+        inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
 }

@@ -4,6 +4,8 @@
 
 package frc.robot.util.rev;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,13 +16,13 @@ import frc.robot.util.Constants.ModuleConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
 
-public class MAXSwerveModule implements Logged{
+public class MAXSwerveModule implements MAXSwerveModuleIO {
     private final Neo driveMotor;
     private final Neo turnMotor;
 
     private double chassisAngularOffset = 0;
 
-    @Log
+    @AutoLogOutput(key = "MAXSwerveModule/DesiredState")
     private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
     /**
@@ -159,4 +161,5 @@ public class MAXSwerveModule implements Logged{
         turnMotor.setSmartCurrentLimit(ModuleConstants.TURNING_MOTOR_CURRENT_LIMIT);
         setBrakeMode();
     }
+    
 }
