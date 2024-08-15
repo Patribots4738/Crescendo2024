@@ -16,7 +16,7 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
-import frc.robot.subsystems.PicoColorSensor;
+import frc.robot.subsystems.colorsensor.PicoColorSensor;
 import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.subsystems.ampper.Elevator;
 import frc.robot.subsystems.intake.Indexer;
