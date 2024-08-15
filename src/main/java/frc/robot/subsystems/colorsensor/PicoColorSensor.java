@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.colorsensor;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
