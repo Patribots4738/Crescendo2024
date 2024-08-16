@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
+import frc.robot.subsystems.vision.LimelightIO.LimelightIOInputs;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
@@ -36,11 +37,12 @@ import monologue.Logged;
 import monologue.Annotations.Log;
 
 // https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
-public class Limelight extends SubsystemBase implements Logged{
+public class Limelight extends SubsystemBase implements LimelightIO {
 
     String limelightName;
     private final Supplier<Pose2d> robotPoseSupplier;
     private final SwerveDrivePoseEstimator poseEstimator;
+
 
     @Log
     Pose3d[] visableTags;

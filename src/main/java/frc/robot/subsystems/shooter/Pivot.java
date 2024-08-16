@@ -51,7 +51,7 @@ public class Pivot extends SubsystemBase implements PivotIO {
 	public void periodic() {
 
         updateInputs(inputs);
-        Logger.processInputs("Pivot", inputs);
+        Logger.processInputs("SubsystemInputs/Pivot", inputs);
 
 		atDesiredAngle = 
             MathUtil.isNear(inputs.realAngle, inputs.desiredAngle, ShooterConstants.PIVOT_DEADBAND_DEGREES);
