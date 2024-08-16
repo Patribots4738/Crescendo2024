@@ -64,7 +64,7 @@ public class Robot extends LoggedRobot {
 
         switch (StateConstants.getMode()) {
             case REAL:
-                Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+                Logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs")); // Log to a USB stick ("/U/logs")
                 Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
                 break;
             case REPLAY:
