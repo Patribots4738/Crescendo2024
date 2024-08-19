@@ -26,15 +26,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
-import frc.robot.subsystems.vision.LimelightIO.LimelightIOInputs;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Detector;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
 // https://github.com/NAHSRobotics-Team5667/2020-FRC/blob/master/src/main/java/frc/robot/utils/LimeLight.java
 public class Limelight extends SubsystemBase implements LimelightIO {
@@ -43,24 +40,20 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     private final Supplier<Pose2d> robotPoseSupplier;
     private final SwerveDrivePoseEstimator poseEstimator;
 
+    private final LimelightIOInputsAutoLogged inputs = new LimelightIOInputsAutoLogged();
 
-    @Log
     Pose3d[] visableTags;
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
     private int pipelineIndex;
 
-    @Log
     public boolean isConnected = false;
     
-    @Log
     private Pose2d estimatedPose2d = new Pose2d();
 
-    @Log
     public long timeDifference = 999_999; // Micro Seconds = 0.999999 Seconds | So the limelight is not connected if the time difference is greater than LimelightConstants.LIMELIGHT_MAX_UPDATE_TIME
 
-    @Log
     private Pose2d notePose2d = new Pose2d();
 
     public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName, int pipelineIndex) {
@@ -76,6 +69,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
     @Override
     public void periodic() {
+        updateInputs(inputs);
         if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
@@ -92,7 +86,8 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 0) {
             LimelightHelpers.setPipelineIndex(limelightName, 0);
         }
-        Results result = getResults();
+        
+        Results result = inputs.results;
         Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
 
         LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
@@ -155,7 +150,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     }
 
     private LimelightTarget_Fiducial[] getTags() {
-        LimelightTarget_Fiducial[] fiducials = LimelightHelpers.getLatestResults(limelightName).targetingResults.targets_Fiducials;
+        LimelightTarget_Fiducial[] fiducials = inputs.results.targets_Fiducials;
         
         setFiducialPoses(fiducials);
 
@@ -175,10 +170,8 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         visableTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
-    @Log
     Pose2d noteFieldPose = new Pose2d();
 
-    @Log
     Pose2d noteFieldPosePlus14 = new Pose2d();
 
     public Pose2d getNotePose2d() {
@@ -192,7 +185,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
                 LimelightHelpers.setPipelineIndex(limelightName, 1);
             }
 
-            Results results = getResults();
+            Results results = inputs.results;
 
             if (noteInVision(results)) {
                 for (LimelightTarget_Detector ld : results.targets_Detector) {
@@ -327,7 +320,6 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         return angleCheck && distanceCheck && isFacing;
     }
 
-    @Log
     int tagsViable = 0;
 
     public boolean hasTarget(Results result) {
@@ -403,4 +395,9 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     public void disableLEDS() {
         LimelightHelpers.setLEDMode_ForceOff(limelightName);
     }
+
+    public void updateInputs(LimelightIOInputs inputs) {
+        inputs.results = getResults();
+    }
+
 }

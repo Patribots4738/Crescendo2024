@@ -878,10 +878,8 @@ public class RobotContainer implements Logged {
 
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
-        } else {
-            Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-            Monologue.logObj(limelight3g, "Robot/Limelights/limelight3g");
         }
+        
         Monologue.logObj(piPico, "Robot/ColorSensors");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
