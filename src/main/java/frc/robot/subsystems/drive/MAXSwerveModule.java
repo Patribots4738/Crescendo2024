@@ -161,4 +161,22 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
         setBrakeMode();
     }
     
+    public void updateInputs(MAXSwerveModuleIOInputs inputs) {
+        // swerve module position and state
+        inputs.position = this.getPosition();
+        inputs.state = this.getState();
+
+        // drive motor
+        inputs.drivePositionRads = this.getDrivePositionRadians();
+        inputs.driveVelocityRotationsPerSec = driveMotor.getVelocity();
+        inputs.driveAppliedVolts = driveMotor.getAppliedOutput();
+        inputs.driveSupplyCurrentAmps = driveMotor.getOutputCurrent();
+
+
+        // turning motor
+        inputs.turnAppliedVolts = turnMotor.getAppliedOutput();
+        inputs.turnPosition = turnMotor.getPosition();
+        inputs.turnVelocityRotationsPerSec = turnMotor.getVelocity();
+        inputs.turnSupplyCurrentAmps = turnMotor.getOutputCurrent();
+    }
 }
