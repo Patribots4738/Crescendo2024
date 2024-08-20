@@ -40,6 +40,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.calc.PoseCalculations;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -157,7 +158,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
         ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(RobotContainer.swerveMeasuredStates);
 
-        if (FieldConstants.IS_SIMULATION) {
+        if (StateConstants.isSimulation()) {
             resetOdometry(
                     currentPose.exp(
                             new Twist2d(
@@ -182,7 +183,7 @@ public class Swerve extends SubsystemBase implements Logged {
         double pitch = gyro.getPitch().refresh().getValue();
         double roll = gyro.getRoll().refresh().getValue();
 
-        Rotation3d rotation3d = FieldConstants.IS_SIMULATION 
+        Rotation3d rotation3d = StateConstants.isSimulation() 
             ?  new Rotation3d(
                 Units.degreesToRadians(0), 
                 Units.degreesToRadians(0), 

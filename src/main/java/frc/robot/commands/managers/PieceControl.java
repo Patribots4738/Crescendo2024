@@ -1,5 +1,6 @@
 package frc.robot.commands.managers;
 
+import java.sql.SQLNonTransientConnectionException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -22,6 +23,7 @@ import frc.robot.subsystems.ampper.Elevator;
 import frc.robot.subsystems.intake.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
@@ -148,7 +150,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !piPico.hasNoteShooter() || FieldConstants.IS_SIMULATION),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter() || StateConstants.isSimulation()),
                 stopIntakeAndIndexer());
     }
 
@@ -233,7 +235,7 @@ public class PieceControl implements Logged {
             Commands.either(
                 Commands.waitSeconds(.1),
                 Commands.waitUntil(() -> !piPico.hasNoteShooter()),
-                () -> FieldConstants.IS_SIMULATION),
+                () -> StateConstants.isSimulation()),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             ampper.outtakeSlow(),
@@ -251,12 +253,12 @@ public class PieceControl implements Logged {
             Commands.either(
                 Commands.waitSeconds(.1),
                 Commands.waitUntil(() -> !piPico.hasNoteShooter()),
-                () -> FieldConstants.IS_SIMULATION),
+                () -> StateConstants.isSimulation()),
             Commands.waitSeconds(.1),
             Commands.either(
                 Commands.waitSeconds(.1),
                 Commands.waitUntil(() -> piPico.fallingEdgeHasNoteElevator()),
-                () -> FieldConstants.IS_SIMULATION).withTimeout(.254), 
+                () -> StateConstants.isSimulation()).withTimeout(.254), 
             stopIntakeAndIndexer()
         );
     }

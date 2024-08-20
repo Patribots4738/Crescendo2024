@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.IntakeConstants;
+import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.SafeSpark.TelemetryPreference;
 
@@ -17,7 +18,7 @@ public class Intake extends SubsystemBase implements IntakeIO {
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
     
     @AutoLogOutput (key = "Intake/NotePossession")
-    private boolean notePossession = FieldConstants.IS_SIMULATION;
+    private boolean notePossession = StateConstants.isSimulation();
 
     public Intake() {
         motor = new Neo(IntakeConstants.INTAKE_CAN_ID, false);

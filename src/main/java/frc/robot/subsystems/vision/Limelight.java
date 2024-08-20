@@ -28,6 +28,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.calc.LimelightHelpers;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Detector;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
@@ -70,7 +71,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     @Override
     public void periodic() {
         updateInputs(inputs);
-        if (FieldConstants.IS_SIMULATION) {
+        if (StateConstants.isSimulation()) {
             updateCameras(robotPoseSupplier.get());
         } else {
             if (pipelineIndex == 0) {
@@ -165,7 +166,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     public Pose2d getNotePose2d() {
         Translation2d noteTranslationFromRobot;
         Pose2d nextNoteFieldPose = noteFieldPose;
-        if (FieldConstants.IS_SIMULATION) {
+        if (StateConstants.isSimulation()) {
             noteFieldPose = robotPoseSupplier.get().nearest(FieldConstants.GET_CENTERLINE_NOTES());
             noteTranslationFromRobot = noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation();
         } else {
@@ -195,7 +196,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             noteTranslationFromRobot.getY()
         ).plus(Rotation2d.fromDegrees(180));
 
-        double distanceThreshold = FieldConstants.IS_SIMULATION ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
+        double distanceThreshold = StateConstants.isSimulation() ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
         if ((noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation().getNorm() > distanceThreshold)
             || noteFieldPose.getTranslation().getDistance(nextNoteFieldPose.getTranslation()) > Units.inchesToMeters(3)) {
 
@@ -216,7 +217,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     }
 
     public boolean noteInVision() {
-        return (FieldConstants.IS_SIMULATION && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
+        return (StateConstants.isSimulation() && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
             (inputs.validResult
             && inputs.targetTxs.length > 0 
             && inputs.limelightTA > 0.5 
