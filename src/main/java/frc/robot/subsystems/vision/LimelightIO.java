@@ -26,6 +26,7 @@ public interface LimelightIO {
         public double noteCalcX = 0.0;
         public long currentTime = 0;
         public long lastUpdate = 0;
+        public int pipelineIndex = 0;
 
     }
 

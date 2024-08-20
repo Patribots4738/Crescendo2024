@@ -49,7 +49,6 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
-    private int pipelineIndex;
 
     public boolean isConnected = false;
     
@@ -62,7 +61,6 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     public Limelight(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName, int pipelineIndex) {
         // Uses network tables to check status of limelight
         this.limelightName = limelightName;
-        this.pipelineIndex = pipelineIndex;
         timingTestEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName, "TIMING_TEST_ENTRY");
         this.robotPoseSupplier = robotPoseSupplier;
         this.poseEstimator = poseEstimator;
@@ -77,10 +75,10 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         if (StateConstants.isSimulation()) {
             updateCameras(robotPoseSupplier.get());
         } else {
-            if (pipelineIndex == 0) {
+            if (inputs.pipelineIndex == 0) {
                 updatePoseEstimator();
                 setFiducialPoses();
-            } else if (pipelineIndex == 1) {
+            } else if (inputs.pipelineIndex == 1) {
                 notePose2d = getNotePose2d();
             }
         }
@@ -95,8 +93,8 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     }
 
     private void updatePoseEstimator() {
-        if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 0) {
-            LimelightHelpers.setPipelineIndex(limelightName, 0);
+        if (inputs.pipelineIndex != 0) {
+            setPipelineIndex(0);
         }
         
         Pose2d estimatedRobotPose = inputs.botPose2d;
@@ -156,6 +154,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
     public void setPipelineIndex(int index) {
         LimelightHelpers.setPipelineIndex(limelightName, index);
+        inputs.pipelineIndex = index;
     }
 
     private void setFiducialPoses() {
@@ -181,8 +180,8 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             noteFieldPose = robotPoseSupplier.get().nearest(FieldConstants.GET_CENTERLINE_NOTES());
             noteTranslationFromRobot = noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation();
         } else {
-            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) != 1) {
-                LimelightHelpers.setPipelineIndex(limelightName, 1);
+            if (inputs.pipelineIndex != 1) {
+                setPipelineIndex(1);
             }
 
             if (noteInVision()) {
@@ -396,31 +395,28 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             inputs.targetTys = new double[results.targets_Fiducials.length];
             int index = 0;
             
-            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) == 0) {
+            if (inputs.pipelineIndex == 0) {
                 for (LimelightTarget_Fiducial target : targetFiducials) {
                     inputs.targetIDs[index] = (int) target.fiducialID;
                     inputs.targetTxs[index] = target.tx;
                     inputs.targetTys[index] = target.ty;
                 }
+                inputs.botPose2d = results.getBotPose2d_wpiBlue();
+                inputs.botPose3d = results.getBotPose3d_wpiBlue();
+                inputs.botPose2dTargetSpace = LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
             } else {
                 for (LimelightTarget_Detector target : targetDetectors) {
                     inputs.targetTxs[index] = target.tx;
                     inputs.targetTys[index] = target.ty;
                 }
-            }
-
-            inputs.botPose2d = results.getBotPose2d_wpiBlue();
-            inputs.botPose3d = results.getBotPose3d_wpiBlue();
-            inputs.latencyPipeline = results.latency_pipeline;
-            inputs.latencyCapture = results.latency_capture;
-            inputs.limelightTA = LimelightHelpers.getTA(limelightName);
-            inputs.botPose2dTargetSpace = LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
-            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) == 1) {
                 targetDetectors[0].calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
                 targetDetectors[0].calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
                 inputs.noteCalcX = targetDetectors[0].calcX;
                 inputs.noteCalcY = targetDetectors[0].calcY;
             }
+            inputs.latencyPipeline = results.latency_pipeline;
+            inputs.latencyCapture = results.latency_capture;
+            inputs.limelightTA = LimelightHelpers.getTA(limelightName);
             inputs.lastUpdate = LimelightHelpers.getLimelightNTTableEntry(limelightName, "tl").getLastChange();
         }
     }

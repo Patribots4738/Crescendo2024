@@ -881,7 +881,6 @@ public class RobotContainer implements Logged {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
         }
         
-        Monologue.logObj(piPico, "Robot/ColorSensors");
         Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
         
         Monologue.logObj(pathPlannerStorage, "Robot");
