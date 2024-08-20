@@ -8,6 +8,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -151,7 +152,7 @@ public class Swerve extends SubsystemBase implements Logged {
         this.isAlignedToAmp = isAlignedToAmp(); 
     }
 
-    @Log
+    @AutoLogOutput(key = "Swerve/currentPose2d")
     Pose2d currentPose = new Pose2d();
 
     public void logPositions() {
@@ -211,7 +212,8 @@ public class Swerve extends SubsystemBase implements Logged {
                rotation3d);
 
         RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
-
+        Logger.recordOutput("Swerve/robotPose3d", RobotContainer.robotPose3d);
+        Logger.recordOutput("Swerve/chassisSpeeds", speeds);
     }
 
     /**
