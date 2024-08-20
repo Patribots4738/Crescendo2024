@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.ColorMatchResult;
 
@@ -144,6 +145,7 @@ public class PicoColorSensor implements AutoCloseable, PicoColorSensorIO {
         while (threadRunning.get()) {
             
             int read = SerialPortJNI.serialRead(port, inputs.buffer, inputs.buffer.length - 1);
+            Logger.processInputs("SubsystemInputs/ColorSensor", inputs);
             
             if (read <= 0) {
                 try {
