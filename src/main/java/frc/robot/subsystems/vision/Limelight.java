@@ -162,7 +162,6 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
         for (int targetID : inputs.targetIDs) {
             if (targetID < aprilTagFieldLayout.getTags().size()) {
-                aprilTagFieldLayout.getTagPose(targetID);
                 knownFiducials.add(aprilTagFieldLayout.getTagPose(targetID).get());
             }
         }
