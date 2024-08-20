@@ -11,6 +11,7 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.subsystems.ampper.AmpperIOInputsAutoLogged;
 import frc.robot.util.Constants.ModuleConstants;
 import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.rev.Neo;
@@ -23,14 +24,14 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
 
     @AutoLogOutput(key = "MAXSwerveModule/DesiredState")
     private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
-
+    private final MAXSwerveModuleIOInputsAutoLogged inputs;
     /**
      * Constructs a MAXSwerveModule and configures the driving and turning motor,
      * encoder, and PID controller. This configuration is specific to the REV
      * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
      * Encoder.
      */
-    public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+    public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset, MAXSwerveModuleIOInputsAutoLogged inputs) {
         driveMotor = new Neo(drivingCANId, true);
         
         // Invert the turning encoder, since the output shaft rotates in the opposite
@@ -39,7 +40,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
 
         turnMotor = new Neo(turningCANId, false, ModuleConstants.TURNING_ENCODER_INVERTED, true);
         this.chassisAngularOffset = chassisAngularOffset;
-
+        this.inputs = inputs;
         resetEncoders();
         configMotors();
         desiredState.angle = new Rotation2d(turnMotor.getPosition());
@@ -161,7 +162,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
         setBrakeMode();
     }
     
-    public void updateInputs(MAXSwerveModuleIOInputs inputs) {
+    public void updateInputs() {
         // swerve module position and state
         inputs.position = this.getPosition();
         inputs.state = this.getState();
