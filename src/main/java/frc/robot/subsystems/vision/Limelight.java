@@ -6,6 +6,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -43,7 +45,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
     private final LimelightIOInputsAutoLogged inputs = new LimelightIOInputsAutoLogged();
 
-    Pose3d[] visableTags;
+    Pose3d[] visibleTags;
 
     private static NetworkTableEntry timingTestEntry;
     private static boolean timingTestEntryValue = false;
@@ -71,6 +73,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     @Override
     public void periodic() {
         updateInputs(inputs);
+        Logger.processInputs("SubsystemInputs/" + limelightName, inputs);
         if (StateConstants.isSimulation()) {
             updateCameras(robotPoseSupplier.get());
         } else {
@@ -81,6 +84,14 @@ public class Limelight extends SubsystemBase implements LimelightIO {
                 notePose2d = getNotePose2d();
             }
         }
+        Logger.recordOutput(limelightName + "/VisibleTags", visibleTags);
+        Logger.recordOutput(limelightName + "/IsConnected", isConnected);
+        Logger.recordOutput(limelightName + "/EstimatedPose2d", estimatedPose2d);
+        Logger.recordOutput(limelightName + "/TimeDifference", timeDifference);
+        Logger.recordOutput(limelightName + "/NotePose2d", notePose2d);
+        Logger.recordOutput(limelightName + "/NoteFieldPose", noteFieldPose);
+        Logger.recordOutput(limelightName + "/NoteFieldPosePlus14", noteFieldPosePlus14);
+        Logger.recordOutput(limelightName + "/TagsViable", tagsViable);
     }
 
     private void updatePoseEstimator() {
@@ -156,7 +167,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             }
         }
 
-        visableTags = knownFiducials.toArray(new Pose3d[0]);
+        visibleTags = knownFiducials.toArray(new Pose3d[0]);
     }
 
     Pose2d noteFieldPose = new Pose2d();
@@ -271,7 +282,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
                 }
             }
         }
-        visableTags = poses.toArray(new Pose3d[0]);
+        visibleTags = poses.toArray(new Pose3d[0]);
     }
 
     /**
