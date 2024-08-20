@@ -25,6 +25,8 @@ public interface MAXSwerveModuleIO {
         public SwerveModuleState state = new SwerveModuleState();
     }
 
-    default void updateInputs(MAXSwerveModuleIOInputs inputs) {}
+    default void updateInputs(MAXSwerveModuleIOInputs inputs) {
+        
+    }
 
 }

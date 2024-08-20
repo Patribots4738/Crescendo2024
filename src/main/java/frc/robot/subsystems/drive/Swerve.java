@@ -7,6 +7,9 @@ package frc.robot.subsystems.drive;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -50,11 +53,10 @@ public class Swerve extends SubsystemBase implements Logged {
     public static double twistScalar = 4;
     private Rotation2d gyroRotation2d = new Rotation2d();
 
-    @Log
+    @AutoLogOutput(key = "Swerve/AlignedToAmp")
     private boolean isAlignedToAmp = false;
 
     private final MAXSwerveModule frontLeft, frontRight, rearLeft, rearRight;
-
     // The gyro sensor
     private final Pigeon2 gyro;
 
@@ -70,22 +72,26 @@ public class Swerve extends SubsystemBase implements Logged {
         frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
             DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
-            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET,
+            new MAXSwerveModuleIOInputsAutoLogged());
 
         frontRight = new MAXSwerveModule(
             DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
             DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
-            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET,
+            new MAXSwerveModuleIOInputsAutoLogged());
 
         rearLeft = new MAXSwerveModule(
             DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
             DriveConstants.REAR_LEFT_TURNING_CAN_ID,
-            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
+            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET,
+            new MAXSwerveModuleIOInputsAutoLogged());
 
         rearRight = new MAXSwerveModule(
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
-            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);     
+            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET,
+            new MAXSwerveModuleIOInputsAutoLogged());     
 
         swerveModules = new MAXSwerveModule[] {
             frontLeft,
@@ -138,14 +144,15 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
+        updateSwerveModuleInputs();
         gyroRotation2d = gyro.getRotation2d();
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroRotation2d, getModulePositions());
         
         logPositions();
-        this.isAlignedToAmp = isAlignedToAmp();
+        this.isAlignedToAmp = isAlignedToAmp(); 
     }
 
-    @Log
+    @AutoLogOutput(key = "Swerve/currentPose2d")
     Pose2d currentPose = new Pose2d();
 
     public void logPositions() {
@@ -205,7 +212,8 @@ public class Swerve extends SubsystemBase implements Logged {
                rotation3d);
 
         RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
-
+        Logger.recordOutput("Swerve/robotPose3d", RobotContainer.robotPose3d);
+        Logger.recordOutput("Swerve/chassisSpeeds", speeds);
     }
 
     /**
@@ -491,5 +499,11 @@ public class Swerve extends SubsystemBase implements Logged {
         );
         double robotX = this.getPose().getTranslation().getDistance(touchingAmpPose);
         return MathUtil.isNear(0, robotX, AutoConstants.AUTO_ALIGNMENT_DEADBAND);
+    }
+
+    public void updateSwerveModuleInputs() {
+        for (MAXSwerveModule swerveModule : swerveModules) {
+            swerveModule.updateInputs();
+        }
     }
 }
