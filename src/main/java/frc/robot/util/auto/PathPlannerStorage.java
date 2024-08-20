@@ -365,7 +365,7 @@ public class PathPlannerStorage implements Logged {
         double x_cushon = Units.inchesToMeters(40);
         double y_cushon = Units.inchesToMeters(12);
         return 
-            limelight.noteInVision(limelight.getResults())
+            limelight.noteInVision()
             && ((Robot.isBlueAlliance() && noteTranslation.getX() < FieldConstants.CENTERLINE_X + x_cushon)
                 || (Robot.isRedAlliance() && noteTranslation.getX() > FieldConstants.CENTERLINE_X - x_cushon)
             && noteTranslation.getDistance(swerve.getPose().getTranslation()) < 2.75

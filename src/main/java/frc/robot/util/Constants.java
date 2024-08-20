@@ -64,6 +64,10 @@ public final class Constants {
                 case SIMBOT -> Mode.SIM;
             };
         }
+
+        public static boolean isSimulation() {
+            return getMode() == Mode.SIM;
+        }
         
         public enum Mode {
             /** Running on a real robot. */

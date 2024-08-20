@@ -57,6 +57,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.LimelightMapping;
 import frc.robot.util.calc.PoseCalculations;
@@ -774,7 +775,7 @@ public class RobotContainer implements Logged {
             Commands.either(
                 pieceControl.intakeUntilNote(),
                 Commands.waitUntil(operator::getYButton),
-                () -> !FieldConstants.IS_SIMULATION
+                () -> !StateConstants.isSimulation()
             )
         );
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
@@ -785,7 +786,7 @@ public class RobotContainer implements Logged {
             Commands.either(
                 pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
                 Commands.waitUntil(() -> !operator.getYButton()), 
-                () -> !FieldConstants.IS_SIMULATION
+                () -> !StateConstants.isSimulation()
             )
         );
         // This one too, what a necessary nightmare :(
@@ -795,7 +796,7 @@ public class RobotContainer implements Logged {
                     Commands.either(
                         pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity),
                         Commands.waitUntil(() -> !operator.getYButton()), 
-                        () -> !FieldConstants.IS_SIMULATION
+                        () -> !StateConstants.isSimulation()
                     )
                 )
             );
@@ -825,7 +826,7 @@ public class RobotContainer implements Logged {
                     Commands.either(
                         pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
                         Commands.waitUntil(() -> !operator.getYButton()), 
-                        () -> !FieldConstants.IS_SIMULATION
+                        () -> !StateConstants.isSimulation()
                     )
                 )
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
@@ -837,7 +838,7 @@ public class RobotContainer implements Logged {
                     Commands.either(
                         pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
                         Commands.waitUntil(() -> !operator.getYButton()), 
-                        () -> !FieldConstants.IS_SIMULATION
+                        () -> !StateConstants.isSimulation()
                     )
                 )
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));

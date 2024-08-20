@@ -75,7 +75,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         } else {
             if (pipelineIndex == 0) {
                 updatePoseEstimator();
-                getTags();
+                setFiducialPoses();
             } else if (pipelineIndex == 1) {
                 notePose2d = getNotePose2d();
             }
@@ -87,10 +87,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             LimelightHelpers.setPipelineIndex(limelightName, 0);
         }
         
-        Results result = inputs.results;
-        Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
-
-        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
+        Pose2d estimatedRobotPose = inputs.botPose2d;
         
         this.estimatedPose2d = estimatedRobotPose;
         RobotContainer.visionErrorPose = RobotContainer.robotPose2d.minus(estimatedRobotPose);
@@ -99,21 +96,21 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         if ((Robot.gameMode == GameMode.DISABLED || 
             Robot.gameMode == GameMode.AUTONOMOUS
                 && Robot.currentTimestamp - RobotContainer.gameModeStart < 1.75)
-                && hasTarget(result)) {
+                && hasTarget()) {
             xyStds = 0.001;
             radStds = 0.0002;
             
             poseEstimator.setVisionMeasurementStdDevs(
                 VecBuilder.fill(xyStds, xyStds, radStds));
             poseEstimator.addVisionMeasurement(estimatedRobotPose,
-                Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
+                Timer.getFPGATimestamp() - getLatencyDiffSeconds());
         }
-        else if (RobotContainer.enableVision && hasTarget(result)) {
+        else if (RobotContainer.enableVision && hasTarget()) {
             // multiple targets detected
-            if (targets.length > 1) {
+            if (inputs.targetIDs.length > 1) {
                 if (Robot.gameMode == GameMode.TELEOP) {
                     // Trust the vision even MORE
-                    if (targets.length > 2) {
+                    if (inputs.targetIDs.length > 2) {
                         xyStds = Math.hypot(0.002, 0.003);
                     } else {
                         // We can only see two tags, (still trustable)
@@ -125,7 +122,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
                 radStds = Units.degreesToRadians(2);
             }
             // 1 target with large area and close to estimated roxose
-            else if (LimelightHelpers.getTA(limelightName) > 0.14) {
+            else if (inputs.limelightTA > 0.14) {
                 xyStds = Math.hypot(0.015, 0.033);
                 radStds = Units.degreesToRadians(7);
             }
@@ -137,7 +134,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             poseEstimator.setVisionMeasurementStdDevs(
                 VecBuilder.fill(xyStds, xyStds, radStds));
             poseEstimator.addVisionMeasurement(estimatedRobotPose,
-                Timer.getFPGATimestamp() - getLatencyDiffSeconds(result));
+                Timer.getFPGATimestamp() - getLatencyDiffSeconds());
         }
     }
 
@@ -149,21 +146,12 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         LimelightHelpers.setPipelineIndex(limelightName, index);
     }
 
-    private LimelightTarget_Fiducial[] getTags() {
-        LimelightTarget_Fiducial[] fiducials = inputs.results.targets_Fiducials;
-        
-        setFiducialPoses(fiducials);
-
-        return fiducials;
-    }
-
-    private void setFiducialPoses(LimelightTarget_Fiducial[] fiducials) {
+    private void setFiducialPoses() {
         ArrayList<Pose3d> knownFiducials = new ArrayList<>();
 
-        for (LimelightTarget_Fiducial target : fiducials) {
-            int tagID = (int) target.fiducialID;
-            if (tagID < aprilTagFieldLayout.getTags().size()) {
-                knownFiducials.add(aprilTagFieldLayout.getTagPose(tagID).get());
+        for (int targetID : inputs.targetIDs) {
+            if (targetID < aprilTagFieldLayout.getTags().size()) {
+                knownFiducials.add(aprilTagFieldLayout.getTagPose(targetID).get());
             }
         }
 
@@ -185,17 +173,11 @@ public class Limelight extends SubsystemBase implements LimelightIO {
                 LimelightHelpers.setPipelineIndex(limelightName, 1);
             }
 
-            Results results = inputs.results;
-
-            if (noteInVision(results)) {
-                for (LimelightTarget_Detector ld : results.targets_Detector) {
-                    ld.calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
-                    ld.calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
-                }
+            if (noteInVision()) {
 
                 Translation2d noteTranslationFromCamera = new Translation2d(
-                    results.targets_Detector[0].calcY,
-                    -results.targets_Detector[0].calcX
+                    inputs.noteCalcY,
+                    -inputs.noteCalcX
                 );
 
                 noteTranslationFromRobot = noteTranslationFromCamera
@@ -233,29 +215,25 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         return noteFieldPosePlus14;
     }
 
-    public boolean noteInVision(Results results) {
+    public boolean noteInVision() {
         return (FieldConstants.IS_SIMULATION && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
-            (results.valid 
-            && results.targets_Detector.length > 0 
-            && LimelightHelpers.getTA(limelightName) > 0.5 
-            && results.targets_Detector[0].tx != 0 
-            && results.targets_Detector[0].ty != 0);
+            (inputs.validResult
+            && inputs.targetTxs.length > 0 
+            && inputs.limelightTA > 0.5 
+            && inputs.targetTxs[0] != 0 
+            && inputs.targetTys[0] != 0);
     }
     
     public Pose2d getPose2d() {
-        return LimelightHelpers.getBotPose2d_wpiBlue(limelightName);
+        return inputs.botPose2d;
     }
 
     public double getTagID() {
-        return LimelightHelpers.getFiducialID(limelightName);
+        return inputs.targetIDs[0];
     }
 
     public double getLatencyDiffSeconds() {
-        return (LimelightHelpers.getLatency_Pipeline(limelightName)/1000d) - (LimelightHelpers.getLatency_Capture(limelightName)/1000d); 
-    }
-
-    public double getLatencyDiffSeconds(Results result) {
-        return (result.latency_pipeline/1000.0) - (result.latency_capture/1000.0); 
+        return (inputs.latencyPipeline/1000d) - (inputs.latencyCapture/1000d); 
     }
 
     // The below code is for simulation only
@@ -322,24 +300,23 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
     int tagsViable = 0;
 
-    public boolean hasTarget(Results result) {
+    public boolean hasTarget() {
 
-        Pose2d estimatedRobotPose = result.getBotPose2d_wpiBlue();
-        LimelightTarget_Fiducial[] targets = result.targets_Fiducials;
+        Pose2d estimatedRobotPose = inputs.botPose2d;
 
         double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
-        if (result == null || !result.valid
-            || (LimelightHelpers.getTA(limelightName) < singleTagAmbiguityThreshold && result.targets_Fiducials.length == 1)
-            || (result.targets_Fiducials.length > 1 && LimelightHelpers.getTA(limelightName) < 0.05)
+        if (inputs.validResult
+            || (inputs.limelightTA < singleTagAmbiguityThreshold && inputs.targetIDs.length == 1)
+            || (inputs.targetIDs.length > 1 && inputs.limelightTA < 0.05)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
             || Double.isNaN(estimatedRobotPose.getX()) 
             || Double.isNaN(estimatedRobotPose.getY()) 
             || Double.isNaN(estimatedRobotPose.getRotation().getRadians())
-            || targets.length == 0
-            || Double.valueOf(targets[0].tx).equals(null)
-            || Double.valueOf(targets[0].ty).equals(null)
-            || !Double.isFinite(targets[0].tx)
-            || !Double.isFinite(targets[0].ty))
+            || inputs.targetIDs.length == 0
+            || Double.valueOf(inputs.targetTxs[0]).equals(null)
+            || Double.valueOf(inputs.targetTys[0]).equals(null) 
+            || !Double.isFinite(inputs.targetTxs[0])
+            || !Double.isFinite(inputs.targetTys[0]))
         {
             return false;
         }
@@ -352,20 +329,17 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         // Force an update and get current time
         timingTestEntryValue = !timingTestEntryValue; // flip test value
         timingTestEntry.setBoolean(timingTestEntryValue);
-        long currentTime = timingTestEntry.getLastChange();
-
-        // Get most recent update from limelight
-        long lastUpdate = LimelightHelpers.getLimelightNTTableEntry(limelightName, "tl").getLastChange();
+        inputs.currentTime = timingTestEntry.getLastChange();
 
         // Calculate limelights last update
-        timeDifference = currentTime - lastUpdate;
+        timeDifference = inputs.currentTime - inputs.lastUpdate;
         isConnected = timeDifference < CameraConstants.LIMELIGHT_MAX_UPDATE_TIME;
 
         return isConnected;
     }
 
     public Pose2d getRobotPoseTargetSpace() {
-        return LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
+        return inputs.botPose2dTargetSpace;
     }
 
     public Command blinkLeds(DoubleSupplier duration) {
@@ -397,7 +371,46 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     }
 
     public void updateInputs(LimelightIOInputs inputs) {
-        inputs.results = getResults();
+        Results results = getResults();
+
+        inputs.validResult = results != null && results.valid;
+
+        if (!inputs.validResult) {
+            LimelightTarget_Fiducial[] targetFiducials = results.targets_Fiducials;
+            LimelightTarget_Detector[] targetDetectors = results.targets_Detector;
+
+            inputs.targetIDs = new int[results.targets_Fiducials.length];
+            inputs.targetTxs = new double[results.targets_Fiducials.length];
+            inputs.targetTys = new double[results.targets_Fiducials.length];
+            int index = 0;
+            
+            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) == 0) {
+                for (LimelightTarget_Fiducial target : targetFiducials) {
+                    inputs.targetIDs[index] = (int) target.fiducialID;
+                    inputs.targetTxs[index] = target.tx;
+                    inputs.targetTys[index] = target.ty;
+                }
+            } else {
+                for (LimelightTarget_Detector target : targetDetectors) {
+                    inputs.targetTxs[index] = target.tx;
+                    inputs.targetTys[index] = target.ty;
+                }
+            }
+
+            inputs.botPose2d = results.getBotPose2d_wpiBlue();
+            inputs.botPose3d = results.getBotPose3d_wpiBlue();
+            inputs.latencyPipeline = results.latency_pipeline;
+            inputs.latencyCapture = results.latency_capture;
+            inputs.limelightTA = LimelightHelpers.getTA(limelightName);
+            inputs.botPose2dTargetSpace = LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
+            if (LimelightHelpers.getCurrentPipelineIndex(limelightName) == 1) {
+                targetDetectors[0].calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+                targetDetectors[0].calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
+                inputs.noteCalcX = targetDetectors[0].calcX;
+                inputs.noteCalcY = targetDetectors[0].calcY;
+            }
+            inputs.lastUpdate = LimelightHelpers.getLimelightNTTableEntry(limelightName, "tl").getLastChange();
+        }
     }
 
 }
