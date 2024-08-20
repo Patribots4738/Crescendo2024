@@ -6,8 +6,8 @@ public interface PivotIO {
 
     @AutoLog
     class PivotIOInputs {
-        public double desiredAngle = 0.0;
-        public double realAngle = 0.0;
+        public double targetPositionDegrees = 0.0;
+        public double positionDegrees = 0.0;
         public double appliedVolts = 0.0;
         public double outputCurrentAmps = 0.0;
     }

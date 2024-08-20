@@ -55,16 +55,16 @@ public class Pivot extends SubsystemBase implements PivotIO {
         Logger.processInputs("SubsystemInputs/Pivot", inputs);
 
 		atDesiredAngle = 
-            MathUtil.isNear(inputs.realAngle, inputs.desiredAngle, ShooterConstants.PIVOT_DEADBAND_DEGREES);
+            MathUtil.isNear(inputs.positionDegrees, inputs.targetPositionDegrees, ShooterConstants.PIVOT_DEADBAND_DEGREES);
 
         atDesiredPassAngle = 
-            MathUtil.isNear(inputs.realAngle, inputs.desiredAngle, ShooterConstants.PIVOT_PASS_DEADBAND_DEGREES);
+            MathUtil.isNear(inputs.positionDegrees, inputs.targetPositionDegrees, ShooterConstants.PIVOT_PASS_DEADBAND_DEGREES);
 
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
 			NTConstants.PIVOT_OFFSET_METERS.getZ(),
-			new Rotation3d(0, -Units.degreesToRadians(inputs.realAngle), 0)
+			new Rotation3d(0, -Units.degreesToRadians(inputs.positionDegrees), 0)
 		);
 	}
 
@@ -125,8 +125,8 @@ public class Pivot extends SubsystemBase implements PivotIO {
     }
 
     public void updateInputs(PivotIOInputs inputs) {
-        inputs.desiredAngle = this.getAngle();
-        inputs.realAngle = this.getTargetAngle();
+        inputs.targetPositionDegrees = this.getAngle();
+        inputs.positionDegrees = this.getTargetAngle();
         inputs.appliedVolts = motor.getAppliedOutput();
         inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
