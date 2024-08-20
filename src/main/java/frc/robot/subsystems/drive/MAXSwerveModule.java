@@ -54,8 +54,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
     public SwerveModuleState getState() {
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
-        return new SwerveModuleState(driveMotor.getVelocity(),
-                new Rotation2d(turnMotor.getPosition() - chassisAngularOffset));
+        return inputs.state;
     }
 
     public SparkPIDController getDrivingPIDController() {
@@ -74,15 +73,13 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
     public SwerveModulePosition getPosition() {
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.
-        return new SwerveModulePosition(
-                driveMotor.getPosition(),
-                new Rotation2d(turnMotor.getPosition() - chassisAngularOffset));
+        return inputs.position;
     }
 
     // gets the rotations of the wheel converted to radians
     // We need to undo the position conversion factor
     public double getDrivePositionRadians() {
-        return (driveMotor.getPosition() / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS) * 2 * Math.PI;
+        return inputs.drivePositionRads;
     }
 
     /**
@@ -164,11 +161,16 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
     
     public void updateInputs() {
         // swerve module position and state
-        inputs.position = this.getPosition();
-        inputs.state = this.getState();
+
+        inputs.position = new SwerveModulePosition(
+            driveMotor.getPosition(),
+            new Rotation2d(turnMotor.getPosition() - chassisAngularOffset));
+        
+        inputs.state = new SwerveModuleState(driveMotor.getVelocity(),
+            new Rotation2d(turnMotor.getPosition() - chassisAngularOffset));
 
         // drive motor
-        inputs.drivePositionRads = this.getDrivePositionRadians();
+        inputs.drivePositionRads = (driveMotor.getPosition() / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS) * 2 * Math.PI;
         inputs.driveVelocityRotationsPerSec = driveMotor.getVelocity();
         inputs.driveAppliedVolts = driveMotor.getAppliedOutput();
         inputs.driveSupplyCurrentAmps = driveMotor.getOutputCurrent();
