@@ -613,7 +613,7 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
 
-        public static final boolean SINGLE_DRIVER_MODE = true;
+        public static final boolean SINGLE_DRIVER_MODE = false;
     }
 
     public static final class LEDConstants {
