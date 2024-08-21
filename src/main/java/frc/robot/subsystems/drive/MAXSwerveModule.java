@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.SparkPIDController;
 
@@ -159,6 +160,9 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
         setBrakeMode();
     }
     
+    public void processInputs() {
+        Logger.processInputs("SubsystemInputs/MAXSwerveModule", inputs);
+    }
     public void updateInputs() {
         // swerve module position and state
 

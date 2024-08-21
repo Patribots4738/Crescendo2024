@@ -97,6 +97,8 @@ public final class Constants {
 
         public static final double PASS_ROTATION_DEADBAND = 10;
 
+        public static final double ODOMETRY_FREQUENCY = 250.0;
+
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
         public static final double TRACK_WIDTH = Units.inchesToMeters(25.5);
