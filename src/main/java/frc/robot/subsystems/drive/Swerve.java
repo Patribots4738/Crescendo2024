@@ -144,7 +144,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        updateSwerveModuleInputs();
+        updateAndProcessSwerveModuleInputs();
         gyroRotation2d = gyro.getRotation2d();
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroRotation2d, getModulePositions());
         
@@ -501,9 +501,10 @@ public class Swerve extends SubsystemBase implements Logged {
         return MathUtil.isNear(0, robotX, AutoConstants.AUTO_ALIGNMENT_DEADBAND);
     }
 
-    public void updateSwerveModuleInputs() {
+    public void updateAndProcessSwerveModuleInputs() {
         for (MAXSwerveModule swerveModule : swerveModules) {
             swerveModule.updateInputs();
+            swerveModule.processInputs();
         }
     }
 }
