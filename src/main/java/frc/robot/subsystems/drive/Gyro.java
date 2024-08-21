@@ -21,8 +21,16 @@ public class Gyro implements GyroIO {
     }
 
 
-    public Rotation2d getYaw() {
+    public Rotation2d getYawRotation2D() {
         return inputs.yawPosition;
+    }
+
+    public double getYawRadians() {
+        return inputs.yawPosition.getRadians();
+    }
+
+    public double getYawDegrees() {
+        return inputs.yawPosition.getDegrees();
     }
 
     public double getYawVelocity() {
@@ -32,7 +40,8 @@ public class Gyro implements GyroIO {
     public void setYaw(double value) {
         pigeon.setYaw(value);
     }
-
+    
+    // could have pitch/roll as inputs but no need realistically
     public double getPitch() {
         return pigeon.getPitch().refresh().getValueAsDouble();
     }
@@ -43,6 +52,8 @@ public class Gyro implements GyroIO {
     public void processInputs() {
         Logger.processInputs("SubsystemInputs/Gyro", inputs);
     }
+
+
     @Override
     public void updateInputs() {
         inputs.yawPosition = Rotation2d.fromDegrees(pigeon.getYaw().refresh().getValueAsDouble());
