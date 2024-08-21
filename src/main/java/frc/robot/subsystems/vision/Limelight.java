@@ -386,33 +386,41 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
         inputs.validResult = results != null && results.valid;
 
-        if (!inputs.validResult) {
+        if (inputs.validResult) {
             LimelightTarget_Fiducial[] targetFiducials = results.targets_Fiducials;
             LimelightTarget_Detector[] targetDetectors = results.targets_Detector;
 
             inputs.targetIDs = new int[results.targets_Fiducials.length];
-            inputs.targetTxs = new double[results.targets_Fiducials.length];
-            inputs.targetTys = new double[results.targets_Fiducials.length];
             int index = 0;
             
             if (inputs.pipelineIndex == 0) {
-                for (LimelightTarget_Fiducial target : targetFiducials) {
-                    inputs.targetIDs[index] = (int) target.fiducialID;
-                    inputs.targetTxs[index] = target.tx;
-                    inputs.targetTys[index] = target.ty;
+                inputs.targetTxs = new double[targetFiducials.length];
+                inputs.targetTys = new double[targetFiducials.length];
+                if (targetFiducials.length > 0) {
+                    for (LimelightTarget_Fiducial target : targetFiducials) {
+                        inputs.targetIDs[index] = (int) target.fiducialID;
+                        inputs.targetTxs[index] = target.tx;
+                        inputs.targetTys[index] = target.ty;
+                        index++;
+                    }
                 }
                 inputs.botPose2d = results.getBotPose2d_wpiBlue();
                 inputs.botPose3d = results.getBotPose3d_wpiBlue();
                 inputs.botPose2dTargetSpace = LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
             } else {
-                for (LimelightTarget_Detector target : targetDetectors) {
-                    inputs.targetTxs[index] = target.tx;
-                    inputs.targetTys[index] = target.ty;
+                if (targetDetectors.length > 0) {
+                    inputs.targetTxs = new double[targetDetectors.length];
+                    inputs.targetTys = new double[targetDetectors.length];
+                    for (LimelightTarget_Detector target : targetDetectors) {
+                        inputs.targetTxs[index] = target.tx;
+                        inputs.targetTys[index] = target.ty;
+                        index++;
+                    }
+                    targetDetectors[0].calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
+                    targetDetectors[0].calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
+                    inputs.noteCalcX = targetDetectors[0].calcX;
+                    inputs.noteCalcY = targetDetectors[0].calcY;
                 }
-                targetDetectors[0].calculateXDistance(CameraConstants.LL2Pose.getRotation().toRotation2d().getRadians());
-                targetDetectors[0].calculateYDistance(CameraConstants.LL2Pose.getZ(), CameraConstants.LL2Pose.getRotation().getY());
-                inputs.noteCalcX = targetDetectors[0].calcX;
-                inputs.noteCalcY = targetDetectors[0].calcY;
             }
             inputs.latencyPipeline = results.latency_pipeline;
             inputs.latencyCapture = results.latency_capture;
