@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -11,9 +12,7 @@ public class Gyro implements GyroIO {
     private final Pigeon2 pigeon;
     public static final int id = 0;
     private final GyroIOInputsAutoLogged inputs;
-    
-    @AutoLogOutput(key = "Gyro/Rotation2d")
-    private Rotation2d gyroRotation2d;
+
 
     public Gyro(GyroIOInputsAutoLogged inputs) {
         pigeon = new Pigeon2(id);
@@ -41,7 +40,9 @@ public class Gyro implements GyroIO {
         return pigeon.getRoll().refresh().getValueAsDouble();
     }
 
-
+    public void processInputs() {
+        Logger.processInputs("SubsystemInputs/Gyro", inputs);
+    }
     @Override
     public void updateInputs() {
         inputs.yawPosition = Rotation2d.fromDegrees(pigeon.getYaw().refresh().getValueAsDouble());

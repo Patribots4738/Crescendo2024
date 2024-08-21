@@ -58,7 +58,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
     private final MAXSwerveModule frontLeft, frontRight, rearLeft, rearRight;
     // The gyro sensor
-    private final Pigeon2 gyro;
+    private final Gyro gyro;
 
     private final MAXSwerveModule[] swerveModules;
 
@@ -100,7 +100,7 @@ public class Swerve extends SubsystemBase implements Logged {
             rearRight
         };
             
-        gyro = new Pigeon2(DriveConstants.PIGEON_CAN_ID);
+        gyro = new Gyro(new GyroIOInputsAutoLogged());
         gyro.setYaw(0);
         resetEncoders();
         setBrakeMode();
@@ -116,7 +116,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
         poseEstimator = new SwerveDrivePoseEstimator(
             DriveConstants.DRIVE_KINEMATICS,
-            gyro.getRotation2d(),
+            gyro.getYaw(),
             getModulePositions(),
             new Pose2d(),
             // State measurements
@@ -145,7 +145,8 @@ public class Swerve extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         updateAndProcessSwerveModuleInputs();
-        gyroRotation2d = gyro.getRotation2d();
+        updateAndProcessGyroInputs();
+        gyroRotation2d = gyro.getYaw();
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroRotation2d, getModulePositions());
         
         logPositions();
@@ -187,8 +188,8 @@ public class Swerve extends SubsystemBase implements Logged {
             RobotContainer.robotPose2d = currentPose;
         }
 
-        double pitch = gyro.getPitch().refresh().getValue();
-        double roll = gyro.getRoll().refresh().getValue();
+        double pitch = gyro.getPitch();
+        double roll = gyro.getRoll();
 
         Rotation3d rotation3d = StateConstants.isSimulation() 
             ?  new Rotation3d(
@@ -506,5 +507,10 @@ public class Swerve extends SubsystemBase implements Logged {
             swerveModule.updateInputs();
             swerveModule.processInputs();
         }
+    }
+
+    public void updateAndProcessGyroInputs() {
+        gyro.updateInputs();
+        gyro.processInputs();
     }
 }
