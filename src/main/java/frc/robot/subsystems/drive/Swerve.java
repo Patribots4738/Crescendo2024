@@ -116,7 +116,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
         poseEstimator = new SwerveDrivePoseEstimator(
             DriveConstants.DRIVE_KINEMATICS,
-            gyro.getYaw(),
+            gyro.getYawRotation2D(),
             getModulePositions(),
             new Pose2d(),
             // State measurements
@@ -146,7 +146,7 @@ public class Swerve extends SubsystemBase implements Logged {
     public void periodic() {
         updateAndProcessSwerveModuleInputs();
         updateAndProcessGyroInputs();
-        gyroRotation2d = gyro.getYaw();
+        gyroRotation2d = gyro.getYawRotation2D();
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroRotation2d, getModulePositions());
         
         logPositions();
