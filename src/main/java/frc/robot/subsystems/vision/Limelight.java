@@ -72,7 +72,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     public void periodic() {
         updateInputs(inputs);
         Logger.processInputs("SubsystemInputs/" + limelightName, inputs);
-        if (StateConstants.isSimulation()) {
+        if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
             if (inputs.pipelineIndex == 0) {
@@ -176,7 +176,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     public Pose2d getNotePose2d() {
         Translation2d noteTranslationFromRobot;
         Pose2d nextNoteFieldPose = noteFieldPose;
-        if (StateConstants.isSimulation()) {
+        if (FieldConstants.IS_SIMULATION) {
             noteFieldPose = robotPoseSupplier.get().nearest(FieldConstants.GET_CENTERLINE_NOTES());
             noteTranslationFromRobot = noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation();
         } else {
@@ -206,7 +206,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             noteTranslationFromRobot.getY()
         ).plus(Rotation2d.fromDegrees(180));
 
-        double distanceThreshold = StateConstants.isSimulation() ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
+        double distanceThreshold = FieldConstants.IS_SIMULATION ? Units.inchesToMeters(18) : Units.inchesToMeters(20);
         if ((noteFieldPose.relativeTo(robotPoseSupplier.get()).getTranslation().getNorm() > distanceThreshold)
             || noteFieldPose.getTranslation().getDistance(nextNoteFieldPose.getTranslation()) > Units.inchesToMeters(3)) {
 
@@ -227,7 +227,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
     }
 
     public boolean noteInVision() {
-        return (StateConstants.isSimulation() && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
+        return (FieldConstants.IS_SIMULATION && ((int) Robot.currentTimestamp/3) % 2 == 0) ||
             (inputs.validResult
             && inputs.targetTxs.length > 0 
             && inputs.limelightTA > 0.5 

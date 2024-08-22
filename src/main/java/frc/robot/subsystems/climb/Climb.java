@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.rev.Neo;
@@ -34,7 +35,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, true);
         // invert right motor in real life, not in sim
-        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true, !StateConstants.isSimulation());
+        rightMotor = new Neo(ClimbConstants.RIGHT_CLIMB_CAN_ID, true, !FieldConstants.IS_SIMULATION);
 
         configureMotors();
     }

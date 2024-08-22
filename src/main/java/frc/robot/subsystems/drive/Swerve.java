@@ -159,7 +159,7 @@ public class Swerve extends SubsystemBase {
 
         ChassisSpeeds speeds = DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(RobotContainer.swerveMeasuredStates);
 
-        if (StateConstants.isSimulation()) {
+        if (FieldConstants.IS_SIMULATION) {
             resetOdometry(
                     currentPose.exp(
                             new Twist2d(
@@ -184,7 +184,7 @@ public class Swerve extends SubsystemBase {
         double pitch = gyro.getPitch();
         double roll = gyro.getRoll();
 
-        Rotation3d rotation3d = StateConstants.isSimulation() 
+        Rotation3d rotation3d = FieldConstants.IS_SIMULATION 
             ?  new Rotation3d(
                 Units.degreesToRadians(0), 
                 Units.degreesToRadians(0), 

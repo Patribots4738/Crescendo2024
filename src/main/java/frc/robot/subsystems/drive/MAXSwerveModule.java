@@ -12,8 +12,8 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ModuleConstants;
-import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.rev.Neo;
 
 public class MAXSwerveModule implements MAXSwerveModuleIO {
@@ -93,7 +93,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
         correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(chassisAngularOffset));
 
         // Optimize the reference state to avoid spinning further than 90 degrees.
-        if (!StateConstants.isSimulation()) {
+        if (!FieldConstants.IS_SIMULATION) {
             correctedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
                     new Rotation2d(turnMotor.getPosition()));
         }

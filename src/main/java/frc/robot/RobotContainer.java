@@ -775,7 +775,7 @@ public class RobotContainer implements Logged {
             Commands.either(
                 pieceControl.intakeUntilNote(),
                 Commands.waitUntil(operator::getYButton),
-                () -> !StateConstants.isSimulation()
+                () -> !FieldConstants.IS_SIMULATION
             )
         );
         NamedCommands.registerCommand("StopIntake", pieceControl.stopIntakeAndIndexer());
@@ -786,7 +786,7 @@ public class RobotContainer implements Logged {
             Commands.either(
                 pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
                 Commands.waitUntil(() -> !operator.getYButton()), 
-                () -> !StateConstants.isSimulation()
+                () -> !FieldConstants.IS_SIMULATION
             )
         );
         // This one too, what a necessary nightmare :(
@@ -796,7 +796,7 @@ public class RobotContainer implements Logged {
                     Commands.either(
                         pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity),
                         Commands.waitUntil(() -> !operator.getYButton()), 
-                        () -> !StateConstants.isSimulation()
+                        () -> !FieldConstants.IS_SIMULATION
                     )
                 )
             );
@@ -826,7 +826,7 @@ public class RobotContainer implements Logged {
                     Commands.either(
                         pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
                         Commands.waitUntil(() -> !operator.getYButton()), 
-                        () -> !StateConstants.isSimulation()
+                        () -> !FieldConstants.IS_SIMULATION
                     )
                 )
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
@@ -838,7 +838,7 @@ public class RobotContainer implements Logged {
                     Commands.either(
                         pieceControl.noteToShootUsingSensor(swerve::getPose, swerve::getRobotRelativeVelocity),
                         Commands.waitUntil(() -> !operator.getYButton()), 
-                        () -> !StateConstants.isSimulation()
+                        () -> !FieldConstants.IS_SIMULATION
                     )
                 )
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
