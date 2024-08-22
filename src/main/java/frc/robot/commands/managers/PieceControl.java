@@ -281,7 +281,7 @@ public class PieceControl implements Logged {
     public Command stopEjecting() {
         return Commands.parallel(
             elevator.toBottomCommand(),
-            stopAllMotors()
+            stopIntakeAndIndexer()
         );
     }
 
