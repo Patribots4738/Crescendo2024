@@ -48,17 +48,18 @@ public final class Constants {
 
     public static final class StateConstants {
 
-        private static RobotType robotType = RobotType.COMPBOT;
+        private static RobotType robotType = RobotType.SIMBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
+                System.out.println("Incorrect robot type selected, changing to real robot");
                 robotType = RobotType.COMPBOT;
             }
             return robotType;
         }
 
         public static Mode getMode() {
-            return switch (robotType) {
+            return switch (getRobot()) {
                 case COMPBOT -> FieldConstants.IS_SIMULATION ? Mode.REPLAY : Mode.REAL;
                 case SIMBOT -> Mode.SIM;
             };
