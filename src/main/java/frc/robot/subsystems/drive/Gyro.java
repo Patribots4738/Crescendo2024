@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -10,14 +9,11 @@ import edu.wpi.first.math.util.Units;
 
 public class Gyro implements GyroIO {
     private final Pigeon2 pigeon;
-    public static final int id = 0;
-    private final GyroIOInputsAutoLogged inputs;
+    private final GyroIOInputsAutoLogged inputs = new GyroIOInputsAutoLogged();
 
 
-    public Gyro(GyroIOInputsAutoLogged inputs) {
-        pigeon = new Pigeon2(id);
-        pigeon.optimizeBusUtilization();
-        this.inputs = inputs;
+    public Gyro(int gyroCANId) {
+        pigeon = new Pigeon2(gyroCANId);
     }
 
 
@@ -43,21 +39,20 @@ public class Gyro implements GyroIO {
     
     // could have pitch/roll as inputs but no need realistically
     public double getPitch() {
-        return pigeon.getPitch().refresh().getValueAsDouble();
+        return pigeon.getPitch().refresh().getValue();
     }
+
     public double getRoll() {
-        return pigeon.getRoll().refresh().getValueAsDouble();
+        return pigeon.getRoll().refresh().getValue();
     }
 
     public void processInputs() {
         Logger.processInputs("SubsystemInputs/Gyro", inputs);
     }
 
-
-    @Override
     public void updateInputs() {
-        inputs.yawPosition = Rotation2d.fromDegrees(pigeon.getYaw().refresh().getValueAsDouble());
+        inputs.yawPosition = pigeon.getRotation2d();
         inputs.yawVelocityRadsPerSec = 
-            Units.degreesToRadians(pigeon.getAngularVelocityZWorld().refresh().getValueAsDouble());
+            Units.degreesToRadians(pigeon.getAngularVelocityZWorld().refresh().getValue());
     }
 }

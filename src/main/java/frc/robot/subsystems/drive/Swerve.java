@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import java.util.Arrays;
@@ -45,10 +44,8 @@ import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.StateConstants;
 import frc.robot.util.calc.PoseCalculations;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class Swerve extends SubsystemBase implements Logged {
+public class Swerve extends SubsystemBase {
 
     public static double twistScalar = 4;
     private Rotation2d gyroRotation2d = new Rotation2d();
@@ -72,26 +69,22 @@ public class Swerve extends SubsystemBase implements Logged {
         frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
             DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
-            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET,
-            new MAXSwerveModuleIOInputsAutoLogged());
+            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
         frontRight = new MAXSwerveModule(
             DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
             DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
-            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET,
-            new MAXSwerveModuleIOInputsAutoLogged());
+            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
         rearLeft = new MAXSwerveModule(
             DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
             DriveConstants.REAR_LEFT_TURNING_CAN_ID,
-            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET,
-            new MAXSwerveModuleIOInputsAutoLogged());
+            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
         rearRight = new MAXSwerveModule(
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
-            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET,
-            new MAXSwerveModuleIOInputsAutoLogged());     
+            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);     
 
         swerveModules = new MAXSwerveModule[] {
             frontLeft,
@@ -100,7 +93,7 @@ public class Swerve extends SubsystemBase implements Logged {
             rearRight
         };
             
-        gyro = new Gyro(new GyroIOInputsAutoLogged());
+        gyro = new Gyro(DriveConstants.PIGEON_CAN_ID);
         gyro.setYaw(0);
         resetEncoders();
         setBrakeMode();
@@ -266,7 +259,7 @@ public class Swerve extends SubsystemBase implements Logged {
         drive(0, 0, 0, false);
     }
     
-    @Log
+    @AutoLogOutput (key = "Swerve/DesiredHDCPose")
     Pose2d desiredHDCPose = new Pose2d();
     public void setDesiredPose(Pose2d pose) {
         desiredHDCPose = pose;

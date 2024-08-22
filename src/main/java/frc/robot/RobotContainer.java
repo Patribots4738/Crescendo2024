@@ -874,9 +874,6 @@ public class RobotContainer implements Logged {
         Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
         Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
 
-        Monologue.logObj(swerve, "Robot/Swerve");
-    
-
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
         }

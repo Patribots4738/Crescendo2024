@@ -48,7 +48,7 @@ public final class Constants {
 
     public static final class StateConstants {
 
-        private static RobotType robotType = RobotType.COMPBOT;
+        private static RobotType robotType = RobotType.SIMBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
