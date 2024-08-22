@@ -1,6 +1,5 @@
 package frc.robot.commands.managers;
 
-import java.sql.SQLNonTransientConnectionException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -8,6 +7,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -18,12 +18,12 @@ import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
 import frc.robot.subsystems.colorsensor.PicoColorSensor;
-import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.subsystems.ampper.Elevator;
 import frc.robot.subsystems.intake.Indexer;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.StateConstants;
+import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
@@ -150,7 +150,7 @@ public class PieceControl implements Logged {
                 ampper.intake(),
                 indexer.toShooter(),
                 shooterCmds.getNoteTrajectoryCommand(poseSupplier, speedSupplier),
-                Commands.waitUntil(() -> !piPico.hasNoteShooter() || StateConstants.isSimulation()),
+                Commands.waitUntil(() -> !piPico.hasNoteShooter() || FieldConstants.IS_SIMULATION),
                 stopIntakeAndIndexer());
     }
 
@@ -235,7 +235,7 @@ public class PieceControl implements Logged {
             Commands.either(
                 Commands.waitSeconds(.1),
                 Commands.waitUntil(() -> !piPico.hasNoteShooter()),
-                () -> StateConstants.isSimulation()),
+                () -> FieldConstants.IS_SIMULATION),
             NT.getWaitCommand("noteToTrap1"), // 0.2
             stopIntakeAndIndexer(),
             ampper.outtakeSlow(),
@@ -253,12 +253,12 @@ public class PieceControl implements Logged {
             Commands.either(
                 Commands.waitSeconds(.1),
                 Commands.waitUntil(() -> !piPico.hasNoteShooter()),
-                () -> StateConstants.isSimulation()),
+                () -> FieldConstants.IS_SIMULATION),
             Commands.waitSeconds(.1),
             Commands.either(
                 Commands.waitSeconds(.1),
                 Commands.waitUntil(() -> piPico.fallingEdgeHasNoteElevator()),
-                () -> StateConstants.isSimulation()).withTimeout(.254), 
+                () -> FieldConstants.IS_SIMULATION).withTimeout(.254), 
             stopIntakeAndIndexer()
         );
     }
@@ -281,7 +281,7 @@ public class PieceControl implements Logged {
     public Command stopEjecting() {
         return Commands.parallel(
             elevator.toBottomCommand(),
-            stopIntakeAndIndexer()
+            stopAllMotors()
         );
     }
 
