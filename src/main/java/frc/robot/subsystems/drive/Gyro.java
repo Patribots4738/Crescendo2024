@@ -39,11 +39,11 @@ public class Gyro implements GyroIO {
     
     // could have pitch/roll as inputs but no need realistically
     public double getPitch() {
-        return pigeon.getPitch().refresh().getValue();
+        return pigeon.getPitch().refresh().getValueAsDouble();
     }
 
     public double getRoll() {
-        return pigeon.getRoll().refresh().getValue();
+        return pigeon.getRoll().refresh().getValueAsDouble();
     }
 
     public void processInputs() {
