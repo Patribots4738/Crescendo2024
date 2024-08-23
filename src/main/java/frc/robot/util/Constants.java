@@ -48,7 +48,7 @@ public final class Constants {
 
     public static final class StateConstants {
 
-        private static RobotType robotType = RobotType.SIMBOT;
+        private static RobotType robotType = RobotType.COMPBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -64,10 +64,6 @@ public final class Constants {
                 case SIMBOT -> Mode.SIM;
             };
         }
-
-        public static boolean isSimulation() {
-            return getMode() == Mode.SIM;
-        }
         
         public enum Mode {
             /** Running on a real robot. */
@@ -75,7 +71,6 @@ public final class Constants {
 
             /** Running a physics simulator. */
             SIM,
-
             /** Replaying from a log file. */
             REPLAY
         }
