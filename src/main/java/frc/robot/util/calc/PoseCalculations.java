@@ -1,10 +1,14 @@
 package frc.robot.util.calc;
 
+import java.util.List;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
@@ -109,4 +113,37 @@ public class PoseCalculations implements Logged {
     public static boolean closeToSpeaker() {
         return RobotContainer.distanceToSpeakerMeters < 7.3;
     }
+
+    /**
+     * Detects if the robot is inside of the area of the stage
+     * 
+     * @return true if the robot is inside of the area of the stage
+     */
+    public static boolean inStageTriangle(Pose2d position) {
+        
+        List<Translation2d> points = FieldConstants.GET_STAGE_POINTS(); 
+
+        double a1 = points.get(0).minus(position.getTranslation()).getNorm();
+        double b1 = points.get(2).minus(position.getTranslation()).getNorm();
+        double c1 = points.get(2).minus(points.get(0)).getNorm();
+        double s1 = 0.5 * (a1 + b1 + c1);
+
+        double a2 = points.get(0).minus(position.getTranslation()).getNorm();
+        double b2 = points.get(1).minus(position.getTranslation()).getNorm();
+        double c2 = points.get(1).minus(points.get(0)).getNorm();
+        double s2 = 0.5 * (a2 + b2 + c2);
+
+        double a3 = points.get(1).minus(position.getTranslation()).getNorm();
+        double b3 = points.get(2).minus(position.getTranslation()).getNorm();
+        double c3 = points.get(2).minus(points.get(1)).getNorm();
+        double s3 = 0.5 * (a3 + b3 + c3);
+
+        double mainArea = 0.5 * Math.abs(points.get(2).getY() - points.get(1).getY()) * Math.abs(points.get(1).getX() - points.get(0).getX());
+        double area1 = Math.sqrt(s1 * (s1 - a1) * (s1 - b1) * (s1 - c1));
+        double area2 = Math.sqrt(s2 * (s2 - a2) * (s2 - b2) * (s2 - c2));
+        double area3 = Math.sqrt(s3 * (s3 - a3) * (s3 - b3) * (s3 - c3));
+
+        return MathUtil.applyDeadband(mainArea - (area1 + area2 + area3), AutoConstants.UNDER_STAGE_DEADBAND) == 0;
+    }
+
 }

@@ -382,6 +382,8 @@ public final class Constants {
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
 
+        public static final double UNDER_STAGE_DEADBAND = 0.02;
+
         /*
          * XY:
          *  P: 5.2
@@ -832,6 +834,23 @@ public final class Constants {
             add(new Pose3d(GeometryUtil.flipFieldPose(blueChain3.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
         }};
 
+        public static final List<Translation2d> STAGE_POINTS = new ArrayList<Translation2d>() {{
+
+            // Blue points
+            Translation2d bluePoint1 = new Translation2d(3.026, 4.064);
+            Translation2d bluePoint2 = new Translation2d(5.801, 2.507);
+            Translation2d bluePoint3 = new Translation2d(5.801, 5.667);
+            add(bluePoint1);
+            add(bluePoint2);
+            add(bluePoint3);
+
+            // Red points
+            add(GeometryUtil.flipFieldPosition(bluePoint1));
+            add(GeometryUtil.flipFieldPosition(bluePoint2));
+            add(GeometryUtil.flipFieldPosition(bluePoint3));
+
+        }};
+
         // Speaker Positions: Blue alliance left
         // @formatter:off
         //
@@ -852,7 +871,7 @@ public final class Constants {
         public static final List<Pose2d> AMP_POSITIONS = new ArrayList<Pose2d>() {{
             // All points are in meters and radians
             // All relative to the blue origin
-            Pose2d bluePose = new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90));
+            Pose2d bluePose = new Pose2d(1.807, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90));
             Pose2d redPose = GeometryUtil.flipFieldPose(bluePose);
             add(bluePose);
             add(redPose);
@@ -921,6 +940,11 @@ public final class Constants {
             return CHAIN_POSITIONS.subList(startIndex, startIndex + 3);
         }
 
+        public static List<Translation2d> GET_STAGE_POINTS() {
+            int startIndex = Robot.isRedAlliance() ? 3 : 0;
+            return STAGE_POINTS.subList(startIndex, startIndex + 3);
+        }
+ 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;

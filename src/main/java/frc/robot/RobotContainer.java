@@ -378,6 +378,12 @@ public class RobotContainer implements Logged {
             ).onFalse(
                 driver.setRumble(() -> 0)
             );
+        
+        // Controller rumble if climb hooks are up and we are inside of stage area
+        // AKA driver is good to climb
+        new Trigger(climb::getHooksUp).and(() -> PoseCalculations.inStageTriangle(robotPose2d))
+            .onTrue(driver.setRumble(() -> 0.5))
+            .onFalse(driver.setRumble(() -> 0));
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {

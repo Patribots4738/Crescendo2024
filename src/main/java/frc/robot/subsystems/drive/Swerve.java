@@ -208,6 +208,7 @@ public class Swerve extends SubsystemBase {
         RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
         Logger.recordOutput("Swerve/robotPose3d", RobotContainer.robotPose3d);
         Logger.recordOutput("Swerve/chassisSpeeds", speeds);
+        Logger.recordOutput("Swerve/IsUnderStage", PoseCalculations.inStageTriangle(currentPose));
     }
 
     /**
