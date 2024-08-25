@@ -448,7 +448,7 @@ public class RobotContainer implements Logged {
                         // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        PoseCalculations::closeToSpeaker)
+                        () -> PoseCalculations.closeToSpeaker() || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
                             limelight3g.setLEDState(() -> false)
