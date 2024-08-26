@@ -30,7 +30,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.StateConstants;
+import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.calc.LimelightHelpers;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Detector;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;

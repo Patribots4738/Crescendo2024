@@ -46,7 +46,7 @@ import monologue.Logged;
  */
 public final class Constants {
 
-    public static final class StateConstants {
+    public static final class LoggingConstants {
 
         private static RobotType robotType = RobotType.COMPBOT;
 
@@ -79,6 +79,10 @@ public final class Constants {
             COMPBOT,
             SIMBOT
         }
+
+        public static final String SUBSYSTEM_LOG_PATH = "Subsystems/";
+        public static final String CALC_LOG_PATH = "Calc/";
+        public static final String MANAGER_LOG_PATH = "Managers/";
 
     }
 

@@ -42,7 +42,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.StateConstants;
+import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.calc.PoseCalculations;
 
 public class Swerve extends SubsystemBase {

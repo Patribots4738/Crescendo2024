@@ -14,7 +14,7 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Constants.StateConstants;
+import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.rev.Neo;
 
 public class Pivot extends SubsystemBase implements PivotIO {

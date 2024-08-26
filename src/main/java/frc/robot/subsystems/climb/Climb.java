@@ -16,7 +16,7 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.StateConstants;
+import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.rev.Neo;
 
 public class Climb extends SubsystemBase implements ClimbIO {

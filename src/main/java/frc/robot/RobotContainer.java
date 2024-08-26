@@ -57,7 +57,7 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Constants.StateConstants;
+import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.LimelightMapping;
 import frc.robot.util.calc.PoseCalculations;

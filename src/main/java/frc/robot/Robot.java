@@ -21,7 +21,7 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
-import frc.robot.util.Constants.StateConstants;
+import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.NeoPhysicsSim;
 import monologue.Monologue;
@@ -63,7 +63,7 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
 
-        switch (StateConstants.getMode()) {
+        switch (LoggingConstants.getMode()) {
             case REAL:
                 Logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs")); // Log to a USB stick ("/U/logs")
                 Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
