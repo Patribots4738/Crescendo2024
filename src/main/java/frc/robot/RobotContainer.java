@@ -635,7 +635,8 @@ public class RobotContainer implements Logged {
         configureCommonDriverBindings(controller);
 
         controller.a()
-            .onTrue(swerve.resetHDCCommand().alongWith(pieceControl.moveNoteThenElevator().onlyIf(() -> !(climb.getHooksUp() || elevator.isUp()))))
+            .onTrue(swerve.resetHDCCommand()
+                .alongWith(pieceControl.moveNoteThenElevator().onlyIf(() -> !(climb.getHooksUp() || elevator.isUp()))))
             .whileTrue(
                 Commands.sequence(
                     Commands.either(
@@ -645,11 +646,14 @@ public class RobotContainer implements Logged {
                     .alongWith(
                         limelight3g.setLEDState(() -> true)))
             .onFalse(
-                limelight3g.setLEDState(() -> false).alongWith(elevator.toBottomCommand()));
+                limelight3g.setLEDState(() -> false))
+            .negate().and(() -> !controller.getXButton())
+                .onTrue(elevator.toBottomCommand());
 
         controller.x()
             .onTrue(pieceControl.moveNoteThenElevator())
-            .onFalse(elevator.toBottomCommand());
+            .negate().and(() -> !controller.getAButton())
+                .onTrue(elevator.toBottomCommand());
 
         controller.b()
             .onTrue(pieceControl.blepNote());

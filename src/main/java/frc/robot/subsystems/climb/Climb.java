@@ -146,10 +146,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
     public Command toggleCommand() {
         return Commands.either(
             toBottomCommand(), 
-            Commands.either(
-                toMiddleCommand(), 
-                toTopCommand(), 
-                () -> inputs.leftTargetPositionMeters == ClimbConstants.BOTTOM_LIMIT), 
+            toTopCommand(),
             () -> inputs.leftTargetPositionMeters == ClimbConstants.TOP_LIMIT);
     }
 
