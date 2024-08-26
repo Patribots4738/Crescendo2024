@@ -651,7 +651,7 @@ public class RobotContainer implements Logged {
                 .onTrue(elevator.toBottomCommand());
 
         controller.x()
-            .onTrue(pieceControl.moveNoteThenElevator())
+            .onTrue(pieceControl.moveNoteThenElevator().onlyIf(() -> !elevator.isUp()))
             .negate().and(() -> !controller.getAButton())
                 .onTrue(elevator.toBottomCommand());
 

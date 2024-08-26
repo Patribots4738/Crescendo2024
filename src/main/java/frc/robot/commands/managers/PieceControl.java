@@ -314,12 +314,12 @@ public class PieceControl implements Logged {
                     placeWhenReady()
                         .andThen(setHasPiece(false)),
                     Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)
-                ),
+                ).andThen(ampper.stopCommand()),
                 () -> elevator.getDesiredPosition() <= 0
             ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
                 .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));
     }
-
+\[]
     private Command setDislodging(boolean dislodging) {
         return Commands.runOnce(() -> {
             elevatorDislodging = dislodging;
@@ -383,6 +383,7 @@ public class PieceControl implements Logged {
                     .andThen(
                         elevatorToBottom()
                         .alongWith(shooterCmds.raisePivot())
+                        .alongWith(ampper.stopCommand())
                     ),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);
@@ -472,7 +473,8 @@ public class PieceControl implements Logged {
     public Command moveNoteThenElevator() {
         return Commands.sequence(
             moveNote(false),
-            elevator.toTopCommand());
+            elevator.toTopCommand(),
+            prepPiece());
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
