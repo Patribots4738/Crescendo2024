@@ -162,6 +162,10 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
         return stuckOnGuillotine;
     }
 
+    public boolean isUp() {
+        return inputs.targetPositionMeters > 0;
+    }
+
     // If we are trying to get up but we have been near guillotine for more than or equal to 0.1s then we are stuck
     public void updateStuck() {
         stuckOnGuillotine =  

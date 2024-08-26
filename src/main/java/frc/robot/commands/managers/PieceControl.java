@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -23,7 +22,6 @@ import frc.robot.subsystems.intake.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
@@ -469,6 +467,12 @@ public class PieceControl implements Logged {
                         Commands.none(),
                         () -> !currentlyMovingNote)
                 );
+    }
+
+    public Command moveNoteThenElevator() {
+        return Commands.sequence(
+            moveNote(false),
+            elevator.toTopCommand());
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)

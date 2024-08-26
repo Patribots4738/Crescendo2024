@@ -236,7 +236,7 @@ public class RobotContainer implements Logged {
                 swerve::getPose,
                 () -> driver.getLeftTrigger() 
                 || driver.getLeftBumper() 
-                || (!OIConstants.SINGLE_DRIVER_MODE 
+                || (OIConstants.OPERATOR_PRESENT 
                     && operator.getLeftBumper())
             )
         );
@@ -273,11 +273,17 @@ public class RobotContainer implements Logged {
             return;
         }
 
-        if (OIConstants.SINGLE_DRIVER_MODE) {
-            configureSoloDiverBindings(driver);
-        } else {
-            configureDriverBindings(driver);
-            configureOperatorBindings(operator);
+        switch (OIConstants.DRIVER_MODE) {
+            case SINGLE:
+                configureSoloDriverBindings(driver);
+                break;
+            case DOUBLE:
+                configureDriverBindings(driver);
+                configureOperatorBindings(operator);
+                break;
+            case DEV:
+                configureDevDriverBindings(driver);
+                break;
         }
         
 
@@ -328,7 +334,7 @@ public class RobotContainer implements Logged {
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
-        new Trigger(swerve::isAlignedToAmp).or(shooterCalc.readyToShootSupplier())
+        new Trigger(() -> PoseCalculations.isAlignedToAmp(robotPose2d)).or(shooterCalc.readyToShootSupplier())
             .onTrue(driver.setRumble(() -> 0.5))
             .onFalse(driver.setRumble(() -> 0));
         
@@ -342,7 +348,7 @@ public class RobotContainer implements Logged {
                     // Whether that be source or not
                     driver.getLeftTrigger() 
                     || driver.getXButton() 
-                    || (!OIConstants.SINGLE_DRIVER_MODE 
+                    || (OIConstants.OPERATOR_PRESENT 
                         &&(operator.getLeftBumper() 
                         || operator.getStartButton() 
                         || operator.getBackButton()))
@@ -481,11 +487,11 @@ public class RobotContainer implements Logged {
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
         
 
-        // Intake controls
+        // Intake controls 
         // The warning of dead code only applies if we are using single driver mode
-        controller.leftTrigger()
+        controller.leftBumper()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .negate().and(() -> OIConstants.SINGLE_DRIVER_MODE || !operator.getLeftBumper())
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
       
         controller.rightBumper()
@@ -500,7 +506,7 @@ public class RobotContainer implements Logged {
             .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
     }
 
-    private void configureSoloDiverBindings(PatriBoxController controller) {
+    private void configureSoloDriverBindings(PatriBoxController controller) {
         
         configureCommonDriverBindings(controller);
 
@@ -539,8 +545,7 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeAuto())
-            .negate().and(driver.leftTrigger().negate())
-            .onTrue(pieceControl.stopIntakeAndIndexer());
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
     }
 
@@ -569,7 +574,7 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(
                 alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
 
-        controller.leftBumper()
+        controller.leftTrigger()
             .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose)
                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
@@ -589,7 +594,7 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .negate().and(driver.leftTrigger().negate())
+            .negate().and(driver.leftBumper().negate())
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -622,6 +627,39 @@ public class RobotContainer implements Logged {
 
         controller.rightStick().toggleOnTrue(
             elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY())));
+
+    }
+
+    private void configureDevDriverBindings(PatriBoxController controller) {
+
+        configureCommonDriverBindings(controller);
+
+        controller.a()
+            .onTrue(swerve.resetHDCCommand().alongWith(pieceControl.moveNoteThenElevator().onlyIf(() -> !(climb.getHooksUp() || elevator.isUp()))))
+            .whileTrue(
+                Commands.sequence(
+                    Commands.either(
+                        alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
+                        alignmentCmds.ampAlignmentCommand(controller::getLeftX),
+                        climb::getHooksUp))
+                    .alongWith(
+                        limelight3g.setLEDState(() -> true)))
+            .onFalse(
+                limelight3g.setLEDState(() -> false).alongWith(elevator.toBottomCommand()));
+
+        controller.x()
+            .onTrue(pieceControl.moveNoteThenElevator())
+            .onFalse(elevator.toBottomCommand());
+
+        controller.b()
+            .onTrue(pieceControl.blepNote());
+
+        controller.y()
+            .onTrue(climb.toggleCommand());
+
+        controller.leftTrigger()
+            .whileTrue(pieceControl.sourceShooterIntake())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
     }
 

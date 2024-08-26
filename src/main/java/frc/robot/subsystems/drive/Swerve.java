@@ -143,7 +143,7 @@ public class Swerve extends SubsystemBase {
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroRotation2d, getModulePositions());
         
         logPositions();
-        this.isAlignedToAmp = isAlignedToAmp(); 
+        this.isAlignedToAmp = PoseCalculations.isAlignedToAmp(currentPose); 
     }
 
     @AutoLogOutput(key = "Swerve/currentPose2d")
@@ -483,17 +483,6 @@ public class Swerve extends SubsystemBase {
             PoseCalculations.closeToSpeaker()
                 ? AutoConstants.AUTO_ROTATION_TOLERANCE_RADIANS
                 : AutoConstants.PASS_ROTATION_TOLERANCE_RADIANS);
-    }
-
-    public boolean isAlignedToAmp() {
-        Translation2d touchingAmpPose = new Translation2d(
-            FieldConstants.GET_AMP_POSITION().getX(),
-            FieldConstants.GET_AMP_POSITION().getY() 
-                - DriveConstants.ROBOT_LENGTH_METERS / 2.0
-                - DriveConstants.BUMPER_LENGTH_METERS
-        );
-        double robotX = this.getPose().getTranslation().getDistance(touchingAmpPose);
-        return MathUtil.isNear(0, robotX, AutoConstants.AUTO_ALIGNMENT_DEADBAND);
     }
 
     public void updateAndProcessSwerveModuleInputs() {

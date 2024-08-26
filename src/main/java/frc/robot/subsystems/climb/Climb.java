@@ -143,6 +143,16 @@ public class Climb extends SubsystemBase implements ClimbIO {
             () -> inputs.leftTargetPositionMeters == ClimbConstants.TOP_LIMIT || inputs.rightTargetPositionMeters == ClimbConstants.BOTTOM_LIMIT);
     }
 
+    public Command toggleCommand() {
+        return Commands.either(
+            toBottomCommand(), 
+            Commands.either(
+                toMiddleCommand(), 
+                toTopCommand(), 
+                () -> inputs.leftTargetPositionMeters == ClimbConstants.BOTTOM_LIMIT), 
+            () -> inputs.leftTargetPositionMeters == ClimbConstants.TOP_LIMIT);
+    }
+
     public BooleanSupplier atDesiredPosition() {
 		return () -> (
             MathUtil.applyDeadband(

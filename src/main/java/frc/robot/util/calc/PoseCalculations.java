@@ -10,6 +10,7 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -144,6 +145,17 @@ public class PoseCalculations implements Logged {
         double area3 = Math.sqrt(s3 * (s3 - a3) * (s3 - b3) * (s3 - c3));
 
         return MathUtil.applyDeadband(mainArea - (area1 + area2 + area3), AutoConstants.UNDER_STAGE_DEADBAND) == 0;
+    }
+
+    public static boolean isAlignedToAmp(Pose2d position) {
+        Translation2d touchingAmpPose = new Translation2d(
+            FieldConstants.GET_AMP_POSITION().getX(),
+            FieldConstants.GET_AMP_POSITION().getY() 
+                - DriveConstants.ROBOT_LENGTH_METERS / 2.0
+                - DriveConstants.BUMPER_LENGTH_METERS
+        );
+        double robotX = position.getTranslation().getDistance(touchingAmpPose);
+        return MathUtil.isNear(0, robotX, AutoConstants.AUTO_ALIGNMENT_DEADBAND);
     }
 
 }
