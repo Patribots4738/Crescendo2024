@@ -503,7 +503,22 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
         
         controller.povRight()
-            .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
+            .toggleOnTrue(Commands.sequence(
+                    elevator.toBottomCommand(),
+                    swerve.resetHDCCommand(),
+                    limelight3g.setLEDState(() -> true),
+                    alignmentCmds.moveAndPreparePresetCommand(swerve.getPose(),
+                         driver::getLeftX,
+                         driver::getLeftY).
+                    finallyDo(
+
+                        () -> 
+                            limelight3g.setLEDState(() -> false)
+                            .andThen(shooterCmds.raisePivot()
+                                .alongWith(shooterCmds.stopShooter())
+                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                            .schedule()
+            )));
     }
 
     private void configureSoloDriverBindings(PatriBoxController controller) {
@@ -577,6 +592,9 @@ public class RobotContainer implements Logged {
         controller.leftTrigger()
             .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose)
                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        
+        
+        
     }
 
     private void configureOperatorBindings(PatriBoxController controller) {

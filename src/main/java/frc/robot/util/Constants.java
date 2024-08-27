@@ -48,7 +48,7 @@ public final class Constants {
 
     public static final class LoggingConstants {
 
-        private static RobotType robotType = RobotType.COMPBOT;
+        private static RobotType robotType = RobotType.SIMBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -909,6 +909,11 @@ public final class Constants {
             add(redPose);
         }};
 
+        public static final List<Pose2d> PRESET_SHOT_POSITIONS = new ArrayList<Pose2d>() {{
+            add(FieldConstants.ORBIT_POSE);
+            add(FieldConstants.PODIUM_SHOT_SPOT);
+        }};
+
         private static int getAllianceIndex(Alliance defaultAlliance) {
             return defaultAlliance == Alliance.Blue
                 ? (Robot.isRedAlliance() ? 1 : 0) 
@@ -1062,9 +1067,9 @@ public final class Constants {
         }};
 
         // 12.4ft from the speaker
-        public static final Translation2d PODIUM_SHOT_SPOT = new Translation2d(2.55, 4.19);
+        public static final Pose2d PODIUM_SHOT_SPOT = new Pose2d(2.55, 4.19, new Rotation2d(0));
         // 9.76ft from the speaker
-        public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
+        public static final Pose2d ORBIT_POSE = new Pose2d(2.884, 6.304, new Rotation2d(0));
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             // We only want the blue alliance speaker translation since

@@ -64,6 +64,10 @@ public class PoseCalculations implements Logged {
         return FieldConstants.GET_SHOOTING_POSITIONS().get(1);
     }
 
+    public static Pose2d getClosestPose(List<Pose2d> poses, Pose2d pose) {
+        return pose.nearest(poses);
+    }
+
     public static String getBestShootingPoseString(Pose2d position) {
         closestShootingPose = getBestShootingPose(position);
         if (closestShootingPose.equals(FieldConstants.GET_SHOOTING_POSITIONS().get(0)))

@@ -96,6 +96,17 @@ public class AlignmentCalc {
             );
     }
 
+    public ChassisSpeeds getPresetAlignmentSpeeds(Pose2d pose) {
+        swerve.setDesiredPose(pose);
+        return
+            AutoConstants.HDC.calculate(
+                swerve.getPose(),
+                pose,
+                0,
+                pose.getRotation()
+            );
+    }
+
     /**
      * Supplier for the amp alignment chassis speeds
      * 
@@ -103,6 +114,10 @@ public class AlignmentCalc {
      */
     public Supplier<ChassisSpeeds> getAmpAlignmentSpeedsSupplier() {
         return () -> getAmpAlignmentSpeeds();
+    }
+
+    public Supplier<ChassisSpeeds> getPresetAlignmentSpeedsSupplier(Pose2d pose) {
+        return () -> getPresetAlignmentSpeeds(pose);
     }
 
     /**
