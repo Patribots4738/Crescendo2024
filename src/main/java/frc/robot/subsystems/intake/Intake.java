@@ -17,7 +17,7 @@ public class Intake extends SubsystemBase implements IntakeIO {
     private final Neo motor;
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
     
-    @AutoLogOutput (key = "Intake/NotePossession")
+    @AutoLogOutput (key = "Subsystems/Intake/NotePossession")
     private boolean notePossession = FieldConstants.IS_SIMULATION;
 
     public Intake() {

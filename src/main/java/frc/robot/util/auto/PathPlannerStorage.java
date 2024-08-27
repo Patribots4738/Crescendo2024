@@ -19,19 +19,20 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.custom.PatriSendableChooser;
+import monologue.Logged;
+import monologue.Annotations.Log;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.vision.Limelight;
-import monologue.Logged;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
  * This file represents all of the auto paths that we will have
@@ -45,16 +46,15 @@ public class PathPlannerStorage implements Logged {
     private final BooleanSupplier shooterSensor;
     private final BooleanSupplier elevatorSensor;
     
-    @Log.NT
+    @Log
     private PatriSendableChooser<Command> autoChooser = new PatriSendableChooser<>();
 
     public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>();
 
     public static List<Pose2d> NOTE_POSES = FieldConstants.GET_CENTERLINE_NOTES();
 
-    @IgnoreLogged
     private Swerve swerve;
-    @IgnoreLogged
+    
     private Limelight limelight;
 
     public static final PathConstraints PATH_CONSTRAINTS = 

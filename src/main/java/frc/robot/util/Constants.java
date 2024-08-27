@@ -80,10 +80,6 @@ public final class Constants {
             SIMBOT
         }
 
-        public static final String SUBSYSTEM_LOG_PATH = "Subsystems/";
-        public static final String CALC_LOG_PATH = "Calc/";
-        public static final String MANAGER_LOG_PATH = "Managers/";
-
     }
 
     public static final class DriveConstants {
@@ -149,7 +145,7 @@ public final class Constants {
         public static final boolean GYRO_REVERSED = true;
     }
 
-    public static final class TuningConstants implements Logged {
+    public static final class TuningConstants {
         public final int DRIVE_INDEX = 0;
         public final int PIVOT_INDEX = 1;
         public final int SHOOTER_INDEX = 2;

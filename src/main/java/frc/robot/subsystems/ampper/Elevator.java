@@ -25,13 +25,13 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
     
     private double hitGuillotineTimestamp = 0;
 
-    @AutoLogOutput(key = "Elevator/DesiredOverridePosition")
+    @AutoLogOutput(key = "Subsystems/Elevator/DesiredOverridePosition")
     private double desiredOverridePos = 0;
 
-    @AutoLogOutput(key = "Elevator/OverrideMode")
+    @AutoLogOutput(key = "Subsystems/Elevator/OverrideMode")
     private boolean overrideMode = false;
 
-    @AutoLogOutput(key = "Elevator/AtDesiredPosition")
+    @AutoLogOutput(key = "Subsystems/Elevator/AtDesiredPosition")
     private boolean atDesiredPos = false;
     
     private boolean stuckOnGuillotine = false;

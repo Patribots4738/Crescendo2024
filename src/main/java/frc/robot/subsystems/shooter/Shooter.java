@@ -19,10 +19,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    @AutoLogOutput (key = "Shooter/AtDesiredRPM")
+    @AutoLogOutput (key = "Subsystems/Shooter/AtDesiredRPM")
     private boolean atDesiredRPM = false;
 
-    @AutoLogOutput (key = "Shooter/AtDesiredPassRPM")
+    @AutoLogOutput (key = "Subsystems/Shooter/AtDesiredPassRPM")
     private boolean atDesiredPassRPM = false;
 
     public Shooter() {

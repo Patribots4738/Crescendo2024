@@ -16,7 +16,6 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.rev.Neo;
 
 public class Climb extends SubsystemBase implements ClimbIO {
@@ -26,10 +25,10 @@ public class Climb extends SubsystemBase implements ClimbIO {
 
     private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
-    @AutoLogOutput(key = "Climb/AtDesiredPosition")
+    @AutoLogOutput(key = "Subsystems/Climb/AtDesiredPosition")
     private boolean atDesiredPos = false;
     
-    @AutoLogOutput(key = "Climb/HooksUp")
+    @AutoLogOutput(key = "Subsystems/Climb/HooksUp")
     private boolean hooksUp = false;
 
     public Climb() {

@@ -42,7 +42,6 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.calc.PoseCalculations;
 
 public class Swerve extends SubsystemBase {
@@ -50,7 +49,7 @@ public class Swerve extends SubsystemBase {
     public static double twistScalar = 4;
     private Rotation2d gyroRotation2d = new Rotation2d();
 
-    @AutoLogOutput(key = "Swerve/AlignedToAmp")
+    @AutoLogOutput(key = "Subsystems/Swerve/AlignedToAmp")
     private boolean isAlignedToAmp = false;
 
     private final MAXSwerveModule frontLeft, frontRight, rearLeft, rearRight;
@@ -146,7 +145,7 @@ public class Swerve extends SubsystemBase {
         this.isAlignedToAmp = PoseCalculations.isAlignedToAmp(currentPose); 
     }
 
-    @AutoLogOutput(key = "Swerve/currentPose2d")
+    @AutoLogOutput(key = "Subsystems/Swerve/CurrentPose2d")
     Pose2d currentPose = new Pose2d();
 
     public void logPositions() {
@@ -206,9 +205,14 @@ public class Swerve extends SubsystemBase {
                rotation3d);
 
         RobotContainer.distanceToSpeakerMeters = currentPose.getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION());
-        Logger.recordOutput("Swerve/robotPose3d", RobotContainer.robotPose3d);
-        Logger.recordOutput("Swerve/chassisSpeeds", speeds);
-        Logger.recordOutput("Swerve/IsUnderStage", PoseCalculations.inStageTriangle(currentPose));
+        Logger.recordOutput("Subsystems/Swerve/RobotPose3d", RobotContainer.robotPose3d);
+        Logger.recordOutput("Subsystems/Swerve/ChassisSpeeds", speeds);
+        Logger.recordOutput("Subsystems/Swerve/IsUnderStage", PoseCalculations.inStageTriangle(currentPose));
+
+        Logger.recordOutput("Subsystems/Swerve/Modules/FrontLeft/DesiredState", frontLeft.getDesiredState());
+        Logger.recordOutput("Subsystems/Swerve/Modules/FrontRight/DesiredState", frontRight.getDesiredState());
+        Logger.recordOutput("Subsystems/Swerve/Modules/RearLeft/DesiredState", rearLeft.getDesiredState());
+        Logger.recordOutput("Subsystems/Swerve/Modules/RearRight/DesiredState", rearRight.getDesiredState());
     }
 
     /**
@@ -260,7 +264,7 @@ public class Swerve extends SubsystemBase {
         drive(0, 0, 0, false);
     }
     
-    @AutoLogOutput (key = "Swerve/DesiredHDCPose")
+    @AutoLogOutput (key = "Subsystems/Swerve/DesiredHDCPose")
     Pose2d desiredHDCPose = new Pose2d();
     public void setDesiredPose(Pose2d pose) {
         desiredHDCPose = pose;

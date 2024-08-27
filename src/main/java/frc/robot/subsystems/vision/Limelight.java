@@ -82,14 +82,14 @@ public class Limelight extends SubsystemBase implements LimelightIO {
                 notePose2d = getNotePose2d();
             }
         }
-        Logger.recordOutput(limelightName + "/VisibleTags", visibleTags);
-        Logger.recordOutput(limelightName + "/IsConnected", isConnected);
-        Logger.recordOutput(limelightName + "/EstimatedPose2d", estimatedPose2d);
-        Logger.recordOutput(limelightName + "/TimeDifference", timeDifference);
-        Logger.recordOutput(limelightName + "/NotePose2d", notePose2d);
-        Logger.recordOutput(limelightName + "/NoteFieldPose", noteFieldPose);
-        Logger.recordOutput(limelightName + "/NoteFieldPosePlus14", noteFieldPosePlus14);
-        Logger.recordOutput(limelightName + "/TagsViable", tagsViable);
+        Logger.recordOutput("Subsystems/" + limelightName + "/VisibleTags", visibleTags);
+        Logger.recordOutput("Subsystems/" + limelightName + "/IsConnected", isConnected);
+        Logger.recordOutput("Subsystems/" + limelightName + "/EstimatedPose2d", estimatedPose2d);
+        Logger.recordOutput("Subsystems/" + limelightName + "/TimeDifference", timeDifference);
+        Logger.recordOutput("Subsystems/" + limelightName + "/NotePose2d", notePose2d);
+        Logger.recordOutput("Subsystems/" + limelightName + "/NoteFieldPose", noteFieldPose);
+        Logger.recordOutput("Subsystems/" + limelightName + "/NoteFieldPosePlus14", noteFieldPosePlus14);
+        Logger.recordOutput("Subsystems/" + limelightName + "/TagsViable", tagsViable);
     }
 
     private void updatePoseEstimator() {
