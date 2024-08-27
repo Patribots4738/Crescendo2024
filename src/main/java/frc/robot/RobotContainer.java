@@ -67,8 +67,10 @@ import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.rev.Neo;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class RobotContainer {
+public class RobotContainer implements Logged {
 
     private PowerDistribution pdh;
 
@@ -133,7 +135,7 @@ public class RobotContainer {
     public static boolean hasPiece = true;
     @AutoLogOutput (key = "Draggables/EnableVision")
     public static boolean enableVision = true;
-
+    @Log
     public static Field2d field2d = new Field2d();
     
     public RobotContainer() {

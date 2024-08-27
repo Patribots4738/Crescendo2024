@@ -19,8 +19,6 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.custom.PatriSendableChooser;
-import monologue.Logged;
-import monologue.Annotations.Log;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Robot.GameMode;
@@ -33,6 +31,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This file represents all of the auto paths that we will have
@@ -41,13 +40,13 @@ import org.littletonrobotics.junction.AutoLogOutput;
  * with each segment having its own method 
  * to make sure that the modularity stays clean
  */
-public class PathPlannerStorage implements Logged {
+public class PathPlannerStorage {
 
     private final BooleanSupplier shooterSensor;
     private final BooleanSupplier elevatorSensor;
     
-    @Log
-    private PatriSendableChooser<Command> autoChooser = new PatriSendableChooser<>();
+
+    private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
 
     public static final ArrayList<Pose2d> AUTO_STARTING_POSITIONS = new ArrayList<Pose2d>();
 
@@ -119,18 +118,18 @@ public class PathPlannerStorage implements Logged {
     }
 
     public Command getSelectedAuto() {
-        return autoChooser.getSelected();
+        return autoChooser.get();
     }
 
     public String getSelectedAutoName() {
-        return autoChooser.getSelectedName();
+        return autoChooser.getSendableChooser().getSelected();
     }
 
-    public void bindListener(Consumer<Command> consumer) {
-        autoChooser.onChange(consumer);
+    public void bindListener(Consumer<String> consumer) {
+        autoChooser.getSendableChooser().onChange(consumer);
     }
 
-    public PatriSendableChooser<Command> getAutoChooser() {
+    public LoggedDashboardChooser<Command> getAutoChooser() {
         return this.autoChooser;
     }
 
@@ -147,7 +146,7 @@ public class PathPlannerStorage implements Logged {
         ).ignoringDisable(true);
     }
 
-    private Consumer<Command> getUpdatePathViewerCommand() {
+    private Consumer<String> getUpdatePathViewerCommand() {
         return (command) -> {
             updatePathViewerCommand().schedule();
         };
