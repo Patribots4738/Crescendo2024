@@ -22,7 +22,6 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
 
     private double chassisAngularOffset = 0;
 
-    @AutoLogOutput(key = "MAXSwerveModule/DesiredState")
     private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
     private final MAXSwerveModuleIOInputsAutoLogged inputs = new MAXSwerveModuleIOInputsAutoLogged();
     /**
@@ -103,6 +102,10 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
         turnMotor.setTargetPosition(correctedDesiredState.angle.getRadians());
 
         this.desiredState = correctedDesiredState;
+    }
+
+    public SwerveModuleState getDesiredState() {
+        return desiredState;
     }
 
     /**

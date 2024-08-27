@@ -2,6 +2,8 @@ package frc.robot.util.calc;
 
 import java.util.List;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,10 +14,8 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class PoseCalculations implements Logged {
+public class PoseCalculations {
 
     /**
      * Calculates the intercepts of the chain based on the given robot position.
@@ -48,10 +48,10 @@ public class PoseCalculations implements Logged {
         return position.nearest(FieldConstants.GET_CHAIN_POSITIONS());
     }
 
-    @Log
+    @AutoLogOutput (key = "Calc/PoseCalc/ClosestShootingPose")
     private static Pose2d closestShootingPose;
 
-    @Log
+    @AutoLogOutput (key = "Calc/PoseCalc/BestShootingPose")
     public static Pose2d getBestShootingPose(Pose2d position) {
         double yValue = position.getY();
         if (yValue > 5)

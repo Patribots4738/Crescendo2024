@@ -2,6 +2,9 @@ package frc.robot;
 
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -57,7 +60,6 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.OIConstants;
 import frc.robot.util.Constants.ShooterConstants;
-import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.calc.LimelightMapping;
 import frc.robot.util.calc.PoseCalculations;
@@ -65,10 +67,8 @@ import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.rev.Neo;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
 import monologue.Logged;
-import monologue.Monologue;
+import monologue.Annotations.Log;
 
 public class RobotContainer implements Logged {
 
@@ -81,79 +81,62 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
-    @IgnoreLogged
     private Swerve swerve;
-    @IgnoreLogged
     private final Intake intake;
-    @IgnoreLogged
     private Limelight limelight3g;
-    @IgnoreLogged
     private Limelight limelight3;
-    @IgnoreLogged
     private LimelightMapping limelightMapper;
-    @IgnoreLogged
     private final Climb climb;
-    @IgnoreLogged
     private Pivot pivot;
-    @IgnoreLogged
     private Shooter shooter;
-    @IgnoreLogged
     private Elevator elevator;
     
-    @IgnoreLogged
     private CalibrationControl calibrationControl;
-    @IgnoreLogged
     private PathPlannerStorage pathPlannerStorage;
-    @IgnoreLogged
     private ShooterCalc shooterCalc;
-    @IgnoreLogged
     public static HDCTuner HDCTuner;
 
     private final LedStrip ledStrip;
-    @IgnoreLogged
     private Indexer indexer;
-    @IgnoreLogged
     private Ampper ampper;
     private ShooterCmds shooterCmds;
-    @IgnoreLogged
     private PicoColorSensor piPico;
 
-    @IgnoreLogged
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
     private boolean fieldRelativeToggle = true;
     private final BooleanSupplier robotRelativeSupplier;
     
-    @Log
+    @AutoLogOutput (key = "Draggables/Components3d")
     public static Pose3d[] components3d = new Pose3d[5];
-    @Log
+    @AutoLogOutput (key = "Draggables/DesiredComponents3d")
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
-    @Log
+    @AutoLogOutput (key = "Draggables/NotePose3ds")
     public static Pose3d[] notePose3ds = new Pose3d[12];
-    @Log
+    @AutoLogOutput (key = "Draggables/HighNotePose3ds")
     public static Pose3d[] highNotePose3ds = new Pose3d[12];
-    @Log
+    @AutoLogOutput (key = "Draggables/FreshCode")
     private boolean freshCode = true;
+    @AutoLogOutput (key = "Draggables/RobotPose2d")
+    public static Pose2d robotPose2d = new Pose2d();
+    @AutoLogOutput (key = "Draggables/VisionErrorPose")
+    public static Transform2d visionErrorPose = new Transform2d();
+    @AutoLogOutput (key = "Draggables/DistanceToSpeakerMeters")
+    public static double distanceToSpeakerMeters = 0;
+    @AutoLogOutput (key = "Draggables/RobotPose3d")
+    public static Pose3d robotPose3d = new Pose3d();
+    @AutoLogOutput (key = "Draggables/SwerveMeasuredStates")
+    public static SwerveModuleState[] swerveMeasuredStates;
+    @AutoLogOutput (key = "Draggables/SwerveDesiredStates")
+    public static SwerveModuleState[] swerveDesiredStates;
+    @AutoLogOutput (key = "Draggables/GameModeStart")
+    public static double gameModeStart = 0;
+    @AutoLogOutput (key = "Draggables/HasPiece")
+    public static boolean hasPiece = true;
+    @AutoLogOutput (key = "Draggables/EnableVision")
+    public static boolean enableVision = true;
     @Log
     public static Field2d field2d = new Field2d();
-    @Log
-    public static Pose2d robotPose2d = new Pose2d();
-    @Log
-    public static Transform2d visionErrorPose = new Transform2d();
-    @Log
-    public static double distanceToSpeakerMeters = 0;
-    @Log
-    public static Pose3d robotPose3d = new Pose3d();
-    @Log
-    public static SwerveModuleState[] swerveMeasuredStates;
-    @Log
-    public static SwerveModuleState[] swerveDesiredStates;
-    @Log
-    public static double gameModeStart = 0;
-    @Log
-    public static boolean hasPiece = true;
-    @Log
-    public static boolean enableVision = true;
     
     public RobotContainer() {
 
@@ -259,10 +242,8 @@ public class RobotContainer implements Logged {
             .andThen(enableVision()));
         
         configureButtonBindings();
-        configureLoggingPaths();
 
         pdh.setSwitchableChannel(false);
-        Monologue.updateAll();
 
     }
     
@@ -669,7 +650,7 @@ public class RobotContainer implements Logged {
                 .onTrue(elevator.toBottomCommand());
 
         controller.x()
-            .onTrue(pieceControl.moveNoteThenElevator())
+            .onTrue(pieceControl.moveNoteThenElevator().onlyIf(() -> !elevator.isUp()))
             .negate().and(() -> !controller.getAButton())
                 .onTrue(elevator.toBottomCommand());
 
@@ -932,21 +913,6 @@ public class RobotContainer implements Logged {
                 NamedCommands.registerCommand("C" + i + "toC" + j + "nonOBJ", pathPlannerStorage.generateCenterLogicNonOBJ(i, j, swerve));
             }
         }
-    }
-
-    private void configureLoggingPaths() {
-        Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
-        Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
-        Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
-        Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
-
-        if (CameraConstants.FIELD_CALIBRATION_MODE) {
-            Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
-        }
-        
-        Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
-        
-        Monologue.logObj(pathPlannerStorage, "Robot");
     }
 
     /**

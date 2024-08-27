@@ -22,10 +22,10 @@ public class Pivot extends SubsystemBase implements PivotIO {
 
     private final PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
 	
-	@AutoLogOutput (key = "Pivot/AtDesiredAngle")
+	@AutoLogOutput (key = "Subsystems/Pivot/AtDesiredAngle")
 	private boolean atDesiredAngle = false;
 
-    @AutoLogOutput (key = "Pivot/AtDesiredPassAngle")
+    @AutoLogOutput (key = "Subsystems/Pivot/AtDesiredPassAngle")
 	private boolean atDesiredPassAngle = false;
 
 

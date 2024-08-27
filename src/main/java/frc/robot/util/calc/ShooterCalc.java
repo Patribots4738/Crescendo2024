@@ -2,6 +2,8 @@ package frc.robot.util.calc;
 
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,15 +19,11 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Logged;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
 
-public class ShooterCalc implements Logged {
+public class ShooterCalc {
     
-    @IgnoreLogged
     private Shooter shooter;
-    @IgnoreLogged
+
     private Pivot pivot;
 
     public ShooterCalc(Shooter shooter, Pivot pivot) {
@@ -33,9 +31,14 @@ public class ShooterCalc implements Logged {
         this.pivot = pivot;
     }
     
-    
-    @Log
-    double realHeight, gravitySpeedL, gravitySpeedR, gravityAngle;
+    @AutoLogOutput (key = "Calc/ShooterCalc/RealHeight")
+    double realHeight; 
+    @AutoLogOutput (key = "Calc/ShooterCalc/GravitySpeedLeft")
+    double gravitySpeedL;
+    @AutoLogOutput (key = "Calc/ShooterCalc/GravitySpeedRight")
+    double gravitySpeedR;
+    @AutoLogOutput (key = "Calc/ShooterCalc/GravityAngle")
+    double gravityAngle;
 
     /**
      * Calculates the shooter speeds required to reach the speaker position.
@@ -165,15 +168,15 @@ public class ShooterCalc implements Logged {
         return ShooterConstants.INTERPOLATION_MAP.get(distanceFeet);
     }
 
-    @Log
+    @AutoLogOutput (key = "Calc/ShooterCalc/AngleToSpeaker")
     Rotation2d currentAngleToSpeaker = new Rotation2d();
-    @Log
+    @AutoLogOutput (key = "Calc/ShooterCalc/DesiredSWDPose")
     public Pose2d desiredSWDPose = new Pose2d();
-    @Log
+    @AutoLogOutput (key = "Calc/ShooterCalc/DesiredNoteMPS")
     double desiredMPSForNote = 0;
-    @Log
+    @AutoLogOutput (key = "Calc/ShooterCalc/DegreesToSpeakerReferenced")
     double degreesToSpeakerReferenced = 0;
-    @Log
+    @AutoLogOutput (key = "Calc/ShooterCalc/AngleDifference")
     double angleDifference = 0;
 
     /**

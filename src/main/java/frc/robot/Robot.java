@@ -82,7 +82,6 @@ public class Robot extends LoggedRobot {
         Logger.start(); 
 
         robotContainer = new RobotContainer();
-        Monologue.setupMonologue(robotContainer, "Robot/Draggables", false, true);
 
         DataLogManager.start();
         DataLogManager.logNetworkTables(true);

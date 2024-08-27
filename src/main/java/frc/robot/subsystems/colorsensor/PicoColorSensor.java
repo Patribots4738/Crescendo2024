@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -86,13 +85,13 @@ public class PicoColorSensor implements AutoCloseable, PicoColorSensorIO {
     private final PicoColorSensorIOInputsAutoLogged inputs = new PicoColorSensorIOInputsAutoLogged();
 
     private final AtomicBoolean debugPrints = new AtomicBoolean();
-    @AutoLogOutput (key = "ColorSensor/HasColorElevator")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/HasColorElevator")
     private boolean hasColorElevator;
-    @AutoLogOutput (key = "ColorSensor/HasColorShooter")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/HasColorShooter")
     private boolean hasColorShooter;
-    @AutoLogOutput (key = "ColorSensor/ProximityElevator")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/ProximityElevator")
     private int proximityElevator;
-    @AutoLogOutput (key = "ColorSensor/ProximityShooter")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/ProximityShooter")
     private int proximityShooter;
     private final RawColor colorElevator = new RawColor();
     private final RawColor colorShooter = new RawColor();
@@ -103,19 +102,19 @@ public class PicoColorSensor implements AutoCloseable, PicoColorSensorIO {
 
     private Color detectedColorElevator = new Color(0.0, 0.0, 0.0);
     private Color detectedColorShooter = new Color(0.0, 0.0, 0.0);
-    @AutoLogOutput (key = "ColorSensor/ElevatorColor")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/ElevatorColor")
     private String elevatorColorString;
-    @AutoLogOutput (key = "ColorSensor/ShooterColor")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/ShooterColor")
     private String shooterColorString;
-    @AutoLogOutput (key = "ColorSensor/HasNoteElevator")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/HasNoteElevator")
     private boolean hasNoteElevator = false;
-    @AutoLogOutput (key = "ColorSensor/HasNoteShooter")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/HasNoteShooter")
     private boolean hasNoteShooter = false;
     private ColorMatchResult elevatorMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColorElevator);
     private ColorMatchResult shooterMatch = ColorSensorConstants.COLOR_MATCH.matchClosestColor(detectedColorShooter);
-    @AutoLogOutput (key = "ColorSensor/MatchElevator")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/MatchElevator")
     private String matchStringElevator;
-    @AutoLogOutput (key = "ColorSensor/MatchShooter")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/MatchShooter")
     private String matchStringShooter;
     private TransistorPower powerToPico;
     private double disabledTimestamp = 0;
@@ -270,7 +269,7 @@ public class PicoColorSensor implements AutoCloseable, PicoColorSensorIO {
         readThread.start();
     }
 
-    @AutoLogOutput (key = "ColorSensor/ElevatorSensorConnected")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/ElevatorSensorConnected")
     public boolean elevatorSensorConnected() {
         try {
             threadLock.lock();
@@ -280,7 +279,7 @@ public class PicoColorSensor implements AutoCloseable, PicoColorSensorIO {
         }
     }
 
-    @AutoLogOutput (key = "ColorSensor/ShooterSensorConnected")
+    @AutoLogOutput (key = "Subsystems/ColorSensor/ShooterSensorConnected")
     public boolean shooterSensorConnected() {
         try {
             threadLock.lock();

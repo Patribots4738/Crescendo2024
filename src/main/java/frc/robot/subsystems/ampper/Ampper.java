@@ -10,7 +10,7 @@ import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Logged;
 
-public class Ampper extends SubsystemBase implements Logged, AmpperIO {
+public class Ampper extends SubsystemBase implements AmpperIO {
     private final Neo motor;
     private final AmpperIOInputsAutoLogged inputs = new AmpperIOInputsAutoLogged();
 
