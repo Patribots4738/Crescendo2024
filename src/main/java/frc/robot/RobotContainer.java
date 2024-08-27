@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -135,7 +136,6 @@ public class RobotContainer implements Logged {
     public static boolean hasPiece = true;
     @AutoLogOutput (key = "Draggables/EnableVision")
     public static boolean enableVision = true;
-    @Log
     public static Field2d field2d = new Field2d();
     
     public RobotContainer() {
@@ -232,6 +232,8 @@ public class RobotContainer implements Logged {
         
         initializeComponents();
         prepareNamedCommands();
+
+        SmartDashboard.putData(field2d);
 
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
