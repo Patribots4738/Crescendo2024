@@ -1,8 +1,11 @@
 package frc.robot.commands.drive;
 
+import java.nio.file.attribute.PosixFileAttributeView;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.pathplanner.lib.util.GeometryUtil;
 
@@ -30,6 +33,9 @@ public class AlignmentCmds {
     private ShooterCmds shooterCmds;
     @IgnoreLogged
     public AlignmentCalc alignmentCalc;
+
+    @AutoLogOutput(key = "Swerve/IsHeLost")
+    private Pose2d isHeLost = new Pose2d();
 
     public AlignmentCmds(Swerve swerve, Climb climb, ShooterCmds shooterCmds) {
         this.climb = climb;
@@ -78,25 +84,26 @@ public class AlignmentCmds {
     }
 
 
-    public Command moveToPresetCommand(Pose2d pose, DoubleSupplier driverX, DoubleSupplier driverY) {
+    public Command moveToPresetCommand(Supplier<Pose2d> robotPose, DoubleSupplier driverX, DoubleSupplier driverY) {
+        isHeLost = robotPose.get();
         return 
             getAutoAlignmentCommand(
-                alignmentCalc.getPresetAlignmentSpeedsSupplier(pose), 
+                alignmentCalc.getPresetAlignmentSpeedsSupplier(robotPose.get()), 
                 () ->
                     ChassisSpeeds.fromFieldRelativeSpeeds(
-                        driverX.getAsDouble(),
-                        driverY.getAsDouble(),
                         0,
-                        swerve.getPose().getRotation()
+                        0,
+                        0,
+                        robotPose.get().getRotation()
                     )
             );
     }
 
 
-    public Command moveAndPreparePresetCommand(Pose2d pose, DoubleSupplier driverX, DoubleSupplier driverY) {
-        Pose2d targetPose = PoseCalculations.getClosestPose(FieldConstants.PRESET_SHOT_POSITIONS, pose);
+    public Command moveAndPreparePresetCommand(Supplier<Pose2d> robotPose, DoubleSupplier driverX, DoubleSupplier driverY) {
+        Pose2d targetPose = PoseCalculations.getClosestShootingPose(robotPose.get());
         return Commands.parallel(
-            moveToPresetCommand(targetPose, driverX, driverY),
+            moveToPresetCommand(robotPose, driverX, driverY),
             shooterCmds.prepareFireCommand(() -> targetPose.getTranslation(), Robot::isRedAlliance)
 
         );

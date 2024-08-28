@@ -488,7 +488,7 @@ public class RobotContainer implements Logged {
                     elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
                     limelight3g.setLEDState(() -> true),
-                    alignmentCmds.moveAndPreparePresetCommand(swerve.getPose(),
+                    alignmentCmds.moveAndPreparePresetCommand( swerve::getPose,
                          driver::getLeftX,
                          driver::getLeftY).
                     finallyDo(

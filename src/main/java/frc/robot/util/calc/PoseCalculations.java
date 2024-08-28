@@ -64,8 +64,8 @@ public class PoseCalculations {
         return FieldConstants.GET_SHOOTING_POSITIONS().get(1);
     }
 
-    public static Pose2d getClosestPose(List<Pose2d> poses, Pose2d pose) {
-        return pose.nearest(poses);
+    public static Pose2d getClosestShootingPose(Pose2d pose) {
+        return pose.nearest(FieldConstants.PRESET_SHOT_POSITIONS);                                                                                                                                                                                                                                                                                                                                                                           
     }
 
     public static String getBestShootingPoseString(Pose2d position) {

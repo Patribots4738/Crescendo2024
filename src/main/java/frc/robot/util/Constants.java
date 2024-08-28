@@ -80,6 +80,10 @@ public final class Constants {
             SIMBOT
         }
 
+        public static final String SUBSYSTEM_LOG_PATH = "Subsystems/";
+        public static final String CALC_LOG_PATH = "Calc/";
+        public static final String MANAGER_LOG_PATH = "Managers/";
+
     }
 
     public static final class DriveConstants {
@@ -145,7 +149,7 @@ public final class Constants {
         public static final boolean GYRO_REVERSED = true;
     }
 
-    public static final class TuningConstants {
+    public static final class TuningConstants implements Logged {
         public final int DRIVE_INDEX = 0;
         public final int PIVOT_INDEX = 1;
         public final int SHOOTER_INDEX = 2;
@@ -906,8 +910,14 @@ public final class Constants {
         }};
 
         public static final List<Pose2d> PRESET_SHOT_POSITIONS = new ArrayList<Pose2d>() {{
-            add(FieldConstants.ORBIT_POSE);
-            add(FieldConstants.PODIUM_SHOT_SPOT);
+            Pose2d orbitBluePose = new Pose2d(3.653, 5.957, new Rotation2d(-2.929));
+            Pose2d podiumBlueShotSpot = new Pose2d(2.425, 4.416, new Rotation2d(2.614));
+            add(podiumBlueShotSpot);
+            
+            add(new Pose2d(0, 0, new Rotation2d(0)));
+            add(orbitBluePose);
+            add(GeometryUtil.flipFieldPose(orbitBluePose));
+            add(GeometryUtil.flipFieldPose(podiumBlueShotSpot));
         }};
 
         private static int getAllianceIndex(Alliance defaultAlliance) {
@@ -916,10 +926,14 @@ public final class Constants {
                 : (Robot.isBlueAlliance() ? 1 : 0);
         }
 
+
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
+        public static List<Pose2d> GET_PRESET_SHOT_POSES() {
+            return PRESET_SHOT_POSITIONS;
+        }
         public static Pose2d GET_SUBWOOFER_POSITION() {
             return SUBWOOFER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
