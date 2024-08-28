@@ -68,10 +68,8 @@ import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class RobotContainer implements Logged {
+public class RobotContainer {
 
     private PowerDistribution pdh;
 
