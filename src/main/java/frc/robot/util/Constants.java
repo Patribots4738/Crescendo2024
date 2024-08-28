@@ -34,7 +34,6 @@ import frc.robot.Robot;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
 
 /**
  * Welcome to the home of the many many variables :D
@@ -48,7 +47,7 @@ public final class Constants {
 
     public static final class LoggingConstants {
 
-        private static RobotType robotType = RobotType.SIMBOT;
+        private static RobotType robotType = RobotType.DEVBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -60,6 +59,7 @@ public final class Constants {
 
         public static Mode getMode() {
             return switch (getRobot()) {
+                case DEVBOT -> FieldConstants.IS_SIMULATION ? Mode.SIM : Mode.REAL;
                 case COMPBOT -> FieldConstants.IS_SIMULATION ? Mode.REPLAY : Mode.REAL;
                 case SIMBOT -> Mode.SIM;
             };
@@ -76,6 +76,7 @@ public final class Constants {
         }
 
         public enum RobotType {
+            DEVBOT,
             COMPBOT,
             SIMBOT
         }
