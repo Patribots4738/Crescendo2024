@@ -34,9 +34,6 @@ public class AlignmentCmds {
     @IgnoreLogged
     public AlignmentCalc alignmentCalc;
 
-    @AutoLogOutput(key = "Swerve/IsHeLost")
-    private Pose2d isHeLost = new Pose2d();
-
     public AlignmentCmds(Swerve swerve, Climb climb, ShooterCmds shooterCmds) {
         this.climb = climb;
         this.swerve = swerve;
@@ -85,7 +82,7 @@ public class AlignmentCmds {
 
 
     public Command moveToPresetCommand() {
-        // isHeLost = robotPose.get();
+
         return 
             getAutoAlignmentCommand(  
                 alignmentCalc.getPresetAlignmentSpeedsSupplier(), 
