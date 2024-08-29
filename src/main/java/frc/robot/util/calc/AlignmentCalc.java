@@ -96,14 +96,15 @@ public class AlignmentCalc {
             );
     }
 
-    public ChassisSpeeds getPresetAlignmentSpeeds(Pose2d pose) {
-        swerve.setDesiredPose(pose);
+    public ChassisSpeeds getPresetAlignmentSpeeds() {
+        Pose2d targetPose = PoseCalculations.getClosestShootingPose(swerve.getPose());
+        swerve.setDesiredPose(targetPose);
         return
             AutoConstants.HDC.calculate(
                 swerve.getPose(),
-                pose,
+                targetPose,
                 0,
-                pose.getRotation()
+                targetPose.getRotation()
             );
     }
 
@@ -116,8 +117,8 @@ public class AlignmentCalc {
         return () -> getAmpAlignmentSpeeds();
     }
 
-    public Supplier<ChassisSpeeds> getPresetAlignmentSpeedsSupplier(Pose2d pose) {
-        return () -> getPresetAlignmentSpeeds(pose);
+    public Supplier<ChassisSpeeds> getPresetAlignmentSpeedsSupplier() {
+        return () -> getPresetAlignmentSpeeds();
     }
 
     /**

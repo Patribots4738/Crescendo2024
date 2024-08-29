@@ -84,28 +84,28 @@ public class AlignmentCmds {
     }
 
 
-    public Command moveToPresetCommand(Supplier<Pose2d> robotPose, DoubleSupplier driverX, DoubleSupplier driverY) {
-        isHeLost = robotPose.get();
+    public Command moveToPresetCommand() {
+        // isHeLost = robotPose.get();
         return 
-            getAutoAlignmentCommand(
-                alignmentCalc.getPresetAlignmentSpeedsSupplier(robotPose.get()), 
+            getAutoAlignmentCommand(  
+                alignmentCalc.getPresetAlignmentSpeedsSupplier(), 
                 () ->
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         0,
                         0,
                         0,
-                        robotPose.get().getRotation()
+                        swerve.getPose().getRotation()
                     )
             );
     }
 
 
-    public Command moveAndPreparePresetCommand(Supplier<Pose2d> robotPose, DoubleSupplier driverX, DoubleSupplier driverY) {
-        Pose2d targetPose = PoseCalculations.getClosestShootingPose(robotPose.get());
+    public Command moveAndPreparePresetCommand() {
         return Commands.parallel(
-            moveToPresetCommand(robotPose, driverX, driverY),
-            shooterCmds.prepareFireCommand(() -> targetPose.getTranslation(), Robot::isRedAlliance)
-
+            moveToPresetCommand(),
+            shooterCmds.prepareFireCommand(
+                 () ->PoseCalculations.getClosestShootingPose(swerve.getPose()).getTranslation(),
+                 Robot::isRedAlliance)
         );
     }
 

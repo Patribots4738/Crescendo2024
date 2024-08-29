@@ -488,9 +488,7 @@ public class RobotContainer {
                     elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
                     limelight3g.setLEDState(() -> true),
-                    alignmentCmds.moveAndPreparePresetCommand( swerve::getPose,
-                         driver::getLeftX,
-                         driver::getLeftY).
+                    alignmentCmds.moveAndPreparePresetCommand().
                     finallyDo(
 
                         () -> 
