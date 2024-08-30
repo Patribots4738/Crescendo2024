@@ -618,7 +618,7 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
 
-        public static final DriverMode DRIVER_MODE = DriverMode.DEV;
+        public static final DriverMode DRIVER_MODE = DriverMode.DOUBLE;
 
         public enum DriverMode {
             SINGLE,
@@ -1177,16 +1177,16 @@ public final class Constants {
                 0.204,
                 -0.234,
                 0.651,
-                new Rotation3d(0, Units.degreesToRadians(13), 0));
+                new Rotation3d(0, Units.degreesToRadians(15), 0));
         public static final Pose3d LL2Pose =
             new Pose3d(
                 // forward positive, right positive, up positive
                 -0.272724,
                 -0.311903,
-                0.433974,
+                0.651,
                 // Pitch angle is measure from the horizontal
                 // it is negative because it points down
-                new Rotation3d(0, Units.degreesToRadians(-11), Units.degreesToRadians(180)));
+                new Rotation3d(0, Units.degreesToRadians(15), Units.degreesToRadians(180)));
 
         public static final Pose3d[] cameras = new Pose3d[] {LL3Pose, LL2Pose};
     }

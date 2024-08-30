@@ -147,7 +147,7 @@ public class PathPlannerStorage {
     }
 
     private Consumer<String> getUpdatePathViewerCommand() {
-        return (command) -> {
+        return (string) -> {
             updatePathViewerCommand().schedule();
         };
     }
@@ -201,7 +201,7 @@ public class PathPlannerStorage {
      */
     private Command generateObjectDetectionCommand(int i, int endingNote, boolean goingDown, SequentialCommandGroup commandGroup) {
         int currentIndex = i - 1;
-    int nextIndex = currentIndex + (goingDown ? 1 : -1);
+        int nextIndex = currentIndex + (goingDown ? 1 : -1);
 
         if ((goingDown && i < endingNote) || (!goingDown && i > endingNote)) {
             return Commands.defer(
