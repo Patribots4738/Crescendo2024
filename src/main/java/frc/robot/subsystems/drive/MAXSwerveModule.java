@@ -77,7 +77,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
     // gets the rotations of the wheel converted to radians
     // We need to undo the position conversion factor
     public double getDrivePositionRadians() {
-        return inputs.drivePositionRads;
+        return inputs.drivePositionMeters;
     }
 
     /**
@@ -94,7 +94,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
         // Optimize the reference state to avoid spinning further than 90 degrees.
         if (!FieldConstants.IS_SIMULATION) {
             correctedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
-                    new Rotation2d(turnMotor.getPosition()));
+                    new Rotation2d(inputs.turnPositionRads));
         }
 
         // Command driving and turning SPARKS MAX towards their respective setpoints.
@@ -175,16 +175,16 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
             new Rotation2d(turnMotor.getPosition() - chassisAngularOffset));
 
         // drive motor
-        inputs.drivePositionRads = (driveMotor.getPosition() / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS) * 2 * Math.PI;
-        inputs.driveVelocityRotationsPerSec = driveMotor.getVelocity();
+        inputs.drivePositionMeters = (driveMotor.getPosition() / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS) * 2 * Math.PI;
+        inputs.driveVelocityMPS = driveMotor.getVelocity();
         inputs.driveAppliedVolts = driveMotor.getAppliedOutput();
         inputs.driveSupplyCurrentAmps = driveMotor.getOutputCurrent();
 
 
         // turning motor
         inputs.turnAppliedVolts = turnMotor.getAppliedOutput();
-        inputs.turnPosition = turnMotor.getPosition();
-        inputs.turnVelocityRotationsPerSec = turnMotor.getVelocity();
+        inputs.turnPositionRads = turnMotor.getPosition();
+        inputs.turnVelocityRadsPerSec = turnMotor.getVelocity();
         inputs.turnSupplyCurrentAmps = turnMotor.getOutputCurrent();
     }
 }
