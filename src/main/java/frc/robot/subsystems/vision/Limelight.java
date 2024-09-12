@@ -389,12 +389,13 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         LimelightTarget_Fiducial[] targetFiducials = results.targets_Fiducials;
         LimelightTarget_Detector[] targetDetectors = results.targets_Detector;
 
-        inputs.targetIDs = new int[results.targets_Fiducials.length];
+        inputs.targetTxs = new double[targetFiducials.length];
+        inputs.targetTys = new double[targetFiducials.length];
+        
         int index = 0;
         
         if (inputs.pipelineIndex == 0) {
-            inputs.targetTxs = new double[targetFiducials.length];
-            inputs.targetTys = new double[targetFiducials.length];
+            inputs.targetIDs = new int[results.targets_Fiducials.length];
             for (LimelightTarget_Fiducial target : targetFiducials) {
                 inputs.targetIDs[index] = (int) target.fiducialID;
                 inputs.targetTxs[index] = target.tx;
@@ -405,8 +406,6 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             inputs.botPose3d = results.getBotPose3d_wpiBlue();
             inputs.botPose2dTargetSpace = LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
         } else {
-            inputs.targetTxs = new double[targetDetectors.length];
-            inputs.targetTys = new double[targetDetectors.length];
             for (LimelightTarget_Detector target : targetDetectors) {
                 inputs.targetTxs[index] = target.tx;
                 inputs.targetTys[index] = target.ty;
