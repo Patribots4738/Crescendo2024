@@ -391,11 +391,11 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
         inputs.targetTxs = new double[targetFiducials.length];
         inputs.targetTys = new double[targetFiducials.length];
+        inputs.targetIDs = new int[results.targets_Fiducials.length];
         
         int index = 0;
         
         if (inputs.pipelineIndex == 0) {
-            inputs.targetIDs = new int[results.targets_Fiducials.length];
             for (LimelightTarget_Fiducial target : targetFiducials) {
                 inputs.targetIDs[index] = (int) target.fiducialID;
                 inputs.targetTxs[index] = target.tx;
