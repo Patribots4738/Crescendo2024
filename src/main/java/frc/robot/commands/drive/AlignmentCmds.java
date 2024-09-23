@@ -1,11 +1,8 @@
 package frc.robot.commands.drive;
 
-import java.nio.file.attribute.PosixFileAttributeView;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.pathplanner.lib.util.GeometryUtil;
 
@@ -13,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Robot;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.subsystems.climb.Climb;
