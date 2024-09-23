@@ -98,8 +98,6 @@ public class Intake extends SubsystemBase implements IntakeIO {
 
     public void updateInputs(IntakeIOInputsAutoLogged inputs) {
         inputs.targetPercent = motor.getTargetPercent();
-        inputs.velocityRPM = motor.getVelocity();
-        inputs.positionRotations = motor.getPosition();
         inputs.appliedVolts = motor.getAppliedOutput();
         inputs.outputCurrentAmps = motor.getOutputCurrent();
     }

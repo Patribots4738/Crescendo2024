@@ -8,8 +8,6 @@ public interface IndexerIO {
     class IndexerIOInputs {
 
         public double targetPercent = 0.0;
-        public double positionRotations = 0.0;
-        public double velocityRPM = 0.0;
         public double appliedVolts = 0.0;
         public double outputCurrentAmps = 0.0;
 

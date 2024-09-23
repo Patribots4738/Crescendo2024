@@ -111,8 +111,6 @@ public class Ampper extends SubsystemBase implements AmpperIO {
 
     public void updateInputs(AmpperIOInputs inputs) {
         inputs.targetPercent = motor.getTargetPercent();
-        inputs.positionRotations = motor.getPosition();
-        inputs.velocityRPM = motor.getVelocity();
         inputs.appliedVolts = motor.getAppliedOutput();
         inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
