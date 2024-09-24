@@ -122,6 +122,8 @@ public class RobotContainer {
     public static Transform2d visionErrorPose = new Transform2d();
     @AutoLogOutput (key = "Draggables/DistanceToSpeakerMeters")
     public static double distanceToSpeakerMeters = 0;
+    @AutoLogOutput (key = "Draggables/DistanceToSpeakerFeet")
+    public static double distanceToSpeakerFeet = 0;
     @AutoLogOutput (key = "Draggables/RobotPose3d")
     public static Pose3d robotPose3d = new Pose3d();
     @AutoLogOutput (key = "Draggables/SwerveMeasuredStates")

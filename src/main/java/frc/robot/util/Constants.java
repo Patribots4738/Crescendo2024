@@ -215,7 +215,7 @@ public final class Constants {
         public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
             {
                 put(4, SpeedAngleTriplet.of(1763.0, 2316.0, 56.1));
-                put(5, SpeedAngleTriplet.of(1763.0, 2316.0, 57.6));
+                put(5, SpeedAngleTriplet.of(1763.0, 2316.0, 54.5));
                 // put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
                 // put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
                 // put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
@@ -261,14 +261,14 @@ public final class Constants {
                 // put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 34));
 
                 // NEW SHOOTER WOOOHOO
-                put(6, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
-                put(7, SpeedAngleTriplet.of(3160.0, 2865.0, 46.3));
-                put(8, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
-                put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
-                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
+                put(6, SpeedAngleTriplet.of(3007.0, 2850.0, 48.2));
+                put(7, SpeedAngleTriplet.of(3160.0, 2865.0, 45.0));
+                put(8, SpeedAngleTriplet.of(3314.0, 3020.0, 42.5));
+                put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 38.1));
+                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 36.3));
                 put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
-                put(12, SpeedAngleTriplet.of(3947.0, 3580.0, 33.8));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 31.8));
+                put(12, SpeedAngleTriplet.of(3947.0, 3580.0, 32.7));
+                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 31.8)); // start here
                 // Future note, 13.2ft is a common shot which should have its own calibration point
                 put(14, SpeedAngleTriplet.of(4214.0, 3755.0, 30.9)); 
                 put(15, SpeedAngleTriplet.of(4515.0, 4043.0, 30.9));
@@ -1171,11 +1171,13 @@ public final class Constants {
 
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
+        public static final double LIMELIGHT_3G_TA_CUTOFF = 0.078;
+
         public static final Pose3d LL3Pose = 
             new Pose3d(
                 // forward positive, right positive, up positive
-                0.204,
-                -0.234,
+                0.2872, // Mind control ll pose
+                0.234,
                 0.651,
                 new Rotation3d(0, Units.degreesToRadians(15), 0));
         public static final Pose3d LL2Pose =
