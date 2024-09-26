@@ -683,8 +683,8 @@ public class RobotContainer {
         controller.rightX(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
 
-        controller.back(eventLoop).onTrue(calibrationControl.incrementDistance(-1));
-        controller.start(eventLoop).onTrue(calibrationControl.incrementDistance(1));
+        controller.back(eventLoop).onTrue(calibrationControl.incrementDistance(-0.5));
+        controller.start(eventLoop).onTrue(calibrationControl.incrementDistance(0.5));
 
         controller.a(eventLoop).onTrue(calibrationControl.logTriplet());
 

@@ -57,7 +57,7 @@ public class CalibrationControl {
         });
     }
 
-    public Command incrementDistance(int increment) {
+    public Command incrementDistance(double increment) {
         return Commands.runOnce(() -> {
             distance += increment; 
             logDistance();

@@ -42,6 +42,7 @@ import frc.robot.commands.drive.DriveHDC;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ModuleConstants;
 import frc.robot.util.calc.PoseCalculations;
 
 public class Swerve extends SubsystemBase {
@@ -68,22 +69,26 @@ public class Swerve extends SubsystemBase {
         frontLeft = new MAXSwerveModule(
             DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
             DriveConstants.FRONT_LEFT_TURNING_CAN_ID,
-            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+            DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET,
+            ModuleConstants.FRONT_LEFT_INDEX);
 
         frontRight = new MAXSwerveModule(
             DriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
             DriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
-            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+            DriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET,
+            ModuleConstants.FRONT_RIGHT_INDEX);
 
         rearLeft = new MAXSwerveModule(
             DriveConstants.REAR_LEFT_DRIVING_CAN_ID,
             DriveConstants.REAR_LEFT_TURNING_CAN_ID,
-            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
+            DriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET,
+            ModuleConstants.REAR_LEFT_INDEX);
 
         rearRight = new MAXSwerveModule(
             DriveConstants.REAR_RIGHT_DRIVING_CAN_ID,
             DriveConstants.REAR_RIGHT_TURNING_CAN_ID,
-            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);     
+            DriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET,
+            ModuleConstants.REAR_RIGHT_INDEX);     
 
         swerveModules = new MAXSwerveModule[] {
             frontLeft,

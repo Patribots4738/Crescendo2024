@@ -22,6 +22,8 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
 
     private double chassisAngularOffset = 0;
 
+    private final int index;
+
     private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
     private final MAXSwerveModuleIOInputsAutoLogged inputs = new MAXSwerveModuleIOInputsAutoLogged();
     /**
@@ -30,7 +32,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
      * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
      * Encoder.
      */
-    public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+    public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset, int index) {
         driveMotor = new Neo(drivingCANId, true);
         
         // Invert the turning encoder, since the output shaft rotates in the opposite
@@ -39,6 +41,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
 
         turnMotor = new Neo(turningCANId, false, ModuleConstants.TURNING_ENCODER_INVERTED, true);
         this.chassisAngularOffset = chassisAngularOffset;
+        this.index = index;
         resetEncoders();
         configMotors();
         desiredState.angle = new Rotation2d(turnMotor.getPosition());
@@ -162,7 +165,7 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
     }
     
     public void processInputs() {
-        Logger.processInputs("SubsystemInputs/MAXSwerveModule", inputs);
+        Logger.processInputs("SubsystemInputs/MAXSwerveModule" + index, inputs);
     }
     public void updateInputs() {
         // swerve module position and state
