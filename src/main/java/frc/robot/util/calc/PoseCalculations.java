@@ -133,13 +133,13 @@ public class PoseCalculations {
         double c1 = points.get(2).minus(points.get(0)).getNorm();
         double s1 = 0.5 * (a1 + b1 + c1);
 
-        double a2 = points.get(0).minus(position.getTranslation()).getNorm();
+        double a2 = a1;
         double b2 = points.get(1).minus(position.getTranslation()).getNorm();
         double c2 = points.get(1).minus(points.get(0)).getNorm();
         double s2 = 0.5 * (a2 + b2 + c2);
 
-        double a3 = points.get(1).minus(position.getTranslation()).getNorm();
-        double b3 = points.get(2).minus(position.getTranslation()).getNorm();
+        double a3 = b2;
+        double b3 = b1;
         double c3 = points.get(2).minus(points.get(1)).getNorm();
         double s3 = 0.5 * (a3 + b3 + c3);
 
