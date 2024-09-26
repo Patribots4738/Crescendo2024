@@ -145,6 +145,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         .andThen(setSpeedCommand(desiredSpeed));
     }
 
+    @Override
     public void updateInputs(ShooterIOInputs inputs) {
         inputs.leftVelocityRPM = leftMotor.getVelocity();
         inputs.leftTargetVelocityRPM = leftMotor.getTargetVelocity();

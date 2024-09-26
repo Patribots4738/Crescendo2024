@@ -121,6 +121,7 @@ public class Pivot extends SubsystemBase implements PivotIO {
         return atDesiredPassAngle;
     }
 
+    @Override
     public void updateInputs(PivotIOInputs inputs) {
         inputs.targetPositionDegrees = this.getTargetAngle();
         inputs.positionDegrees = this.getAngle();

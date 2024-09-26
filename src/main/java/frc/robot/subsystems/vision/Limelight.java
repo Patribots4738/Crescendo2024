@@ -381,6 +381,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         LimelightHelpers.setLEDMode_ForceOff(limelightName);
     }
 
+    @Override
     public void updateInputs(LimelightIOInputs inputs) {
         Results results = getResults();
 

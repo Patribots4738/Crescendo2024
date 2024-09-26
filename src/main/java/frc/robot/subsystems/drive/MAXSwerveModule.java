@@ -167,6 +167,8 @@ public class MAXSwerveModule implements MAXSwerveModuleIO {
     public void processInputs() {
         Logger.processInputs("SubsystemInputs/MAXSwerveModule" + index, inputs);
     }
+
+    @Override
     public void updateInputs() {
         // swerve module position and state
 

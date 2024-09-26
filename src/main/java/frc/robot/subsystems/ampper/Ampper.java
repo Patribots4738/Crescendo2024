@@ -109,6 +109,7 @@ public class Ampper extends SubsystemBase implements AmpperIO {
         return Commands.runOnce(() -> motor.setBrakeMode()).ignoringDisable(true);
     }
 
+    @Override
     public void updateInputs(AmpperIOInputs inputs) {
         inputs.targetPercent = motor.getTargetPercent();
         inputs.appliedVolts = motor.getAppliedOutput();

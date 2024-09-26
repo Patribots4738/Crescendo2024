@@ -77,6 +77,7 @@ public class Indexer extends SubsystemBase implements IndexerIO {
         return false;
     }
 
+    @Override
     public void updateInputs(IndexerIOInputs inputs) {
         inputs.targetPercent = motor.getTargetPercent();
         inputs.appliedVolts = motor.getAppliedOutput();

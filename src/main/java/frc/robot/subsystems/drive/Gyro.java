@@ -50,6 +50,7 @@ public class Gyro implements GyroIO {
         Logger.processInputs("SubsystemInputs/Gyro", inputs);
     }
 
+    @Override
     public void updateInputs() {
         inputs.yawPosition = pigeon.getRotation2d();
         inputs.yawVelocityRadsPerSec = 

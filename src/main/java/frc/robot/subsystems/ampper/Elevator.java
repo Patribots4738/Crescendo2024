@@ -193,6 +193,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
         .finallyDo(() -> overrideMode = false);
     } 
 
+    @Override
     public void updateInputs(ElevatorIOInputs inputs) {
         inputs.positionRotations = motor.getPosition();
         inputs.targetPositionMeters = motor.getTargetPosition();
