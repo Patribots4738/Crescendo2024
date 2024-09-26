@@ -166,7 +166,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
     }
 
     @Override
-    public void updateInputs(ClimbIOInputsAutoLogged inputs) {
+    public void updateInputs(ClimbIOInputs inputs) {
 
         inputs.leftPositionMeters = leftMotor.getPosition();
         inputs.leftTargetPositionMeters = leftMotor.getTargetPosition();

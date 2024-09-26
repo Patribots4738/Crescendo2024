@@ -97,7 +97,7 @@ public class Intake extends SubsystemBase implements IntakeIO {
     }
 
     @Override
-    public void updateInputs(IntakeIOInputsAutoLogged inputs) {
+    public void updateInputs(IntakeIOInputs inputs) {
         inputs.targetPercent = motor.getTargetPercent();
         inputs.appliedVolts = motor.getAppliedOutput();
         inputs.outputCurrentAmps = motor.getOutputCurrent();
