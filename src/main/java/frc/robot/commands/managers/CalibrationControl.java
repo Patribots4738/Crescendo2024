@@ -136,11 +136,11 @@ public class CalibrationControl {
 
     public Command logTriplet() {
         return Commands.runOnce(
-                () -> System.out.println("put(" + (int) distance + ", SpeedAngleTriplet.of("+Math.round(desiredTriplet.getLeftSpeed())+".0, "+Math.round(desiredTriplet.getRightSpeed())+".0, "+desiredTriplet.getAngle()+"));"));
+                () -> System.out.println("put(" + (int)(distance * 10) / 10.0 + ", SpeedAngleTriplet.of("+Math.round(desiredTriplet.getLeftSpeed())+".0, "+Math.round(desiredTriplet.getRightSpeed())+".0, "+desiredTriplet.getAngle()+"));"));
     }
 
     public void logDistance() {
-        System.out.println("Distance: " + (int) distance + "ft");
+        System.out.println("Distance: " + (int)(distance * 10) / 10.0 + "ft");
     }
 
     public void logSpeeds() {
