@@ -31,6 +31,9 @@ public class Climb extends SubsystemBase implements ClimbIO {
     @AutoLogOutput(key = "Subsystems/Climb/HooksUp")
     private boolean hooksUp = false;
 
+    @AutoLogOutput(key = "Subsystems/Climb/ToggleMode")
+    private boolean toggleMode = false;
+
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, true);
         // invert right motor in real life, not in sim
@@ -132,7 +135,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
     }
 
     public Command toBottomCommand() {
-        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT));
+        return runOnce(() -> setPosition(ClimbConstants.BOTTOM_LIMIT)).alongWith(setToggleMode(false));
     }
 
     public Command povUpCommand() {
@@ -143,10 +146,10 @@ public class Climb extends SubsystemBase implements ClimbIO {
     }
 
     public Command toggleCommand() {
-        return Commands.either(
-            toBottomCommand(), 
-            toTopCommand(),
-            () -> inputs.leftTargetPositionMeters == ClimbConstants.TOP_LIMIT);
+        return Commands.either( 
+            toTopCommand().alongWith(setToggleMode(true)),
+            toBottomCommand(),
+            () -> inputs.leftTargetPositionMeters == 0);
     }
 
     public BooleanSupplier atDesiredPosition() {
@@ -163,6 +166,14 @@ public class Climb extends SubsystemBase implements ClimbIO {
 
     public boolean getHooksUp() {
         return (inputs.leftTargetPositionMeters > 0 || inputs.rightTargetPositionMeters > 0);
+    }
+
+    public boolean getToggleMode() {
+        return toggleMode;
+    }
+
+    public Command setToggleMode(boolean newMode) {
+        return Commands.runOnce(() -> toggleMode = newMode);
     }
 
     @Override

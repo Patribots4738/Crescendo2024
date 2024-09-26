@@ -406,7 +406,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
             inputs.botPose2d = results.getBotPose2d_wpiBlue();
             inputs.botPose3d = results.getBotPose3d_wpiBlue();
             inputs.botPose2dTargetSpace = LimelightHelpers.getBotPose3d_TargetSpace(limelightName).toPose2d();
-        } else {
+        } else if (inputs.pipelineIndex == 1) {
             for (LimelightTarget_Detector target : targetDetectors) {
                 inputs.targetTxs[index] = target.tx;
                 inputs.targetTys[index] = target.ty;

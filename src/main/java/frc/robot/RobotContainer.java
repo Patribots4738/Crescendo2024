@@ -303,7 +303,7 @@ public class RobotContainer {
         // if shootWhenReady is called at while this condition is true
         new Trigger(() -> 
             Robot.gameMode == GameMode.TELEOP
-            && shooter.getAverageSpeed() > 2500
+            && shooter.getAverageSpeed() > 1700
             && shooter.getAverageTargetSpeed() != 2500
             && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
             && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
@@ -373,6 +373,10 @@ public class RobotContainer {
         new Trigger(climb::getHooksUp).and(() -> PoseCalculations.inStageTriangle(robotPose2d))
             .onTrue(driver.setRumble(() -> 0.5))
             .onFalse(driver.setRumble(() -> 0));
+
+        new Trigger(climb::getToggleMode)
+            .onTrue(swerve.resetHDCCommand())
+            .whileTrue(alignmentCmds.chainRotationalAlignment(driver::getLeftX, driver::getLeftY, robotRelativeSupplier));  
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {
@@ -549,6 +553,9 @@ public class RobotContainer {
 
         configureCommonDriverBindings(controller);
 
+        controller.leftStick()
+            .onTrue(shooterCmds.prepareSubwooferCommand());
+
         controller.a()
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(
@@ -564,17 +571,17 @@ public class RobotContainer {
 
         controller.x()
             .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, true));
+                alignmentCmds.moveAndPreparePresetCommand());
 
-        controller.b()
-            .toggleOnTrue(
-                alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
+        // controller.b()
+        //     .toggleOnTrue(
+        //         alignmentCmds.preparePresetPose(controller::getLeftX, controller::getLeftY, false));
 
-        controller.leftTrigger()
-            .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
-        
-        
+        controller.y()
+            .onTrue(climb.toggleCommand());
+
+        controller.leftBumper()
+            .onTrue(pieceControl.blepNote());
         
     }
 
