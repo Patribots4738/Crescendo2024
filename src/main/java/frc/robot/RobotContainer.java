@@ -580,7 +580,7 @@ public class RobotContainer {
         controller.y()
             .onTrue(climb.toggleCommand());
 
-        controller.leftBumper()
+        controller.leftTrigger()
             .onTrue(pieceControl.blepNote());
         
     }
