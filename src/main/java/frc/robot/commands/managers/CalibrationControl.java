@@ -3,6 +3,8 @@ package frc.robot.commands.managers;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
@@ -10,20 +12,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class CalibrationControl implements Logged {
+public class CalibrationControl {
 
     private SpeedAngleTriplet desiredTriplet = SpeedAngleTriplet.of(3311.0, 3034.0, 30.3);
 
-    @Log
-    private double leftSpeed = 3311, rightSpeed = 3034, angle = 30;
+    @AutoLogOutput (key = "Managers/CalibrationControl/LeftSpeed")
+    private double leftSpeed = 3311;
+    
+    @AutoLogOutput (key = "Managers/CalibrationControl/RightSpeed")
+    private double rightSpeed = 3034;
 
-    @Log
-    private boolean pivotLock, leftLock, rightLock;
+    @AutoLogOutput (key = "Managers/CalibrationControl/Angle")
+    private double angle = 30;
 
-    @Log
+    @AutoLogOutput (key = "Managers/CalibrationControl/PivotLock")
+    private boolean pivotLock;
+    
+    @AutoLogOutput (key = "Managers/CalibrationControl/LeftLock")
+    private boolean leftLock;
+    
+    @AutoLogOutput (key = "Managers/CalibrationControl/RightLock")
+    private boolean rightLock;
+
+    @AutoLogOutput (key = "Managers/CalibrationControl/Distance")
     private double distance = 0;
 
     private ShooterCmds shooterCmds;
@@ -45,7 +57,7 @@ public class CalibrationControl implements Logged {
         });
     }
 
-    public Command incrementDistance(int increment) {
+    public Command incrementDistance(double increment) {
         return Commands.runOnce(() -> {
             distance += increment; 
             logDistance();

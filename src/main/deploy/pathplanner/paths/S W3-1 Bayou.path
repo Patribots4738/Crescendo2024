@@ -16,32 +16,32 @@
     },
     {
       "anchor": {
-        "x": 2.4787036360186945,
-        "y": 4.168998797124134
+        "x": 2.4553382440098215,
+        "y": 4.4758132069455625
       },
       "prevControl": {
-        "x": 2.2313539056437075,
-        "y": 3.9274690604050284
+        "x": 2.2079885136348345,
+        "y": 4.2342834702264565
       },
       "nextControl": {
-        "x": 2.8694036335441093,
-        "y": 4.5505058535313045
+        "x": 2.8460382415352363,
+        "y": 4.857320263352733
       },
       "isLocked": false,
       "linkedName": "W3 Pickup"
     },
     {
       "anchor": {
-        "x": 2.377581283717999,
-        "y": 5.35
+        "x": 2.0113957958412367,
+        "y": 5.378253593386619
       },
       "prevControl": {
-        "x": 1.5110766903129929,
-        "y": 5.274190671183922
+        "x": 1.145914832282723,
+        "y": 5.291535853302232
       },
       "nextControl": {
-        "x": 3.051687332769572,
-        "y": 5.408976637306263
+        "x": 3.1606075951005406,
+        "y": 5.4934000313860505
       },
       "isLocked": false,
       "linkedName": null
@@ -63,17 +63,17 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7,
-      "rotationDegrees": 146.64239816427872,
+      "rotationDegrees": 158.25924699388764,
       "rotateFast": false
     },
     {
       "waypointRelativePos": 1.7999999999999998,
-      "rotationDegrees": -177.54423533374379,
+      "rotationDegrees": 170.6683195762387,
       "rotateFast": false
     },
     {
       "waypointRelativePos": 2.55,
-      "rotationDegrees": -159.93962834871448,
+      "rotationDegrees": -146.99446263627644,
       "rotateFast": false
     }
   ],
@@ -95,7 +95,7 @@
       "maxWaypointRelativePos": 0.5499999999999999,
       "constraints": {
         "maxVelocity": 5.0,
-        "maxAcceleration": 3.0,
+        "maxAcceleration": 2.7,
         "maxAngularVelocity": 1137.21,
         "maxAngularAcceleration": 1492.9
       }
@@ -150,7 +150,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -149.36,
+    "rotation": -156.9427737708922,
     "rotateFast": false
   },
   "reversed": false,

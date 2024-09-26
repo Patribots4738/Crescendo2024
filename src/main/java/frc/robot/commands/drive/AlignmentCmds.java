@@ -12,10 +12,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.subsystems.Climb;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.AlignmentCalc;
+import frc.robot.util.calc.PoseCalculations;
 import monologue.Annotations.IgnoreLogged;
 
 public class AlignmentCmds {
@@ -73,6 +74,32 @@ public class AlignmentCmds {
                         swerve.getPose().getRotation()
                     )
             );
+    }
+
+
+    public Command moveToPresetCommand() {
+
+        return 
+            getAutoAlignmentCommand(  
+                alignmentCalc.getPresetAlignmentSpeedsSupplier(), 
+                () ->
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                        0,
+                        0,
+                        0,
+                        swerve.getPose().getRotation()
+                    )
+            );
+    }
+
+
+    public Command moveAndPreparePresetCommand() {
+        return Commands.parallel(
+            moveToPresetCommand(),
+            shooterCmds.prepareFireCommand(
+                 () ->PoseCalculations.getClosestShootingPose(swerve.getPose()).getTranslation(),
+                 Robot::isRedAlliance)
+        );
     }
 
     public Command ampRotationalAlignmentCommand(DoubleSupplier driverX, DoubleSupplier driverY) {
@@ -178,11 +205,11 @@ public class AlignmentCmds {
         // The true condition represents the pose closer to C1
         // Which is to the left of the driver
         return Commands.either(
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.ORBIT_POSE),
-            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_SHOT_SPOT),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.ORBIT_POSE.getTranslation()),
+            prepareFireAndRotateCommand(driverX, driverY, FieldConstants.PODIUM_SHOT_SPOT.getTranslation()),
             // No way I just found my first XOR use case :D
             () -> Robot.isRedAlliance() ^ xButtonPressed
-        );
+        );  
     }
 
     private Command prepareFireAndRotateCommand(DoubleSupplier driverX, DoubleSupplier driverY, Translation2d pose) {

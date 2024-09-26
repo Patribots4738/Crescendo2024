@@ -2,19 +2,26 @@ package frc.robot;
 
 import java.util.Optional;
 
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
+import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.NeoPhysicsSim;
 import monologue.Monologue;
@@ -28,7 +35,7 @@ import monologue.Monologue;
  * build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
 
     private static Optional<Alliance> alliance = Optional.empty();
     public static GameMode gameMode = GameMode.DISABLED;
@@ -48,8 +55,33 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+
+        // Git metadata for tracking version for AKit
+        Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+
+        switch (LoggingConstants.getMode()) {
+            case REAL:
+                Logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs")); // Log to a USB stick ("/U/logs")
+                Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+                break;
+            case REPLAY:
+                String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+                Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil
+                    .addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+                    break;
+            case SIM:
+                Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+                break;
+        }
+        
+        Logger.start(); 
+
         robotContainer = new RobotContainer();
-        Monologue.setupMonologue(robotContainer, "Robot/Draggables", false, true);
 
         DataLogManager.start();
         DataLogManager.logNetworkTables(true);

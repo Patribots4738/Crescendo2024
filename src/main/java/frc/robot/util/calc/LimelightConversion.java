@@ -1,6 +1,8 @@
 package frc.robot.util.calc;
 
 import org.json.simple.JSONObject;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -47,8 +49,8 @@ import java.util.HashMap;
  *      ]
  *  }
  */
-public class LimelightConversion implements Logged {
-    @Log
+public class LimelightConversion {
+    @AutoLogOutput (key = "Calc/LimelightMapping/TagMap")
     public final HashMap<String, JSONObject[]> tagMap = new HashMap<>();
     private int tagLength = 16;
 

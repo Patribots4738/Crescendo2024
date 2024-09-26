@@ -32,6 +32,7 @@ public class Neo extends SafeSpark {
     private double targetVelocity = 0;
     private double targetPercent = 0;
 
+
     /**
      * Creates a new Neo motor with the default settings.
      * This assumes no inversion and is relative encoder only

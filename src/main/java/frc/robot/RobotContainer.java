@@ -2,6 +2,9 @@ package frc.robot;
 
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -39,7 +43,16 @@ import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
 import frc.robot.leds.Strips.LedStrip;
 import frc.robot.leds.Commands.LPI;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ampper.Ampper;
+import frc.robot.subsystems.ampper.Elevator;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.colorsensor.PicoColorSensor;
+import frc.robot.subsystems.drive.Swerve;
+import frc.robot.subsystems.intake.Indexer;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Pivot;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.vision.Limelight;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.DriveConstants;
@@ -55,12 +68,8 @@ import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.rev.Neo;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
-import monologue.Monologue;
 
-public class RobotContainer implements Logged {
+public class RobotContainer {
 
     private PowerDistribution pdh;
 
@@ -71,79 +80,63 @@ public class RobotContainer implements Logged {
     private final PatriBoxController driver;
     private final PatriBoxController operator;
 
-    @IgnoreLogged
     private Swerve swerve;
-    @IgnoreLogged
     private final Intake intake;
-    @IgnoreLogged
     private Limelight limelight3g;
-    @IgnoreLogged
     private Limelight limelight3;
-    @IgnoreLogged
     private LimelightMapping limelightMapper;
-    @IgnoreLogged
     private final Climb climb;
-    @IgnoreLogged
     private Pivot pivot;
-    @IgnoreLogged
     private Shooter shooter;
-    @IgnoreLogged
     private Elevator elevator;
     
-    @IgnoreLogged
     private CalibrationControl calibrationControl;
-    @IgnoreLogged
     private PathPlannerStorage pathPlannerStorage;
-    @IgnoreLogged
     private ShooterCalc shooterCalc;
-    @IgnoreLogged
     public static HDCTuner HDCTuner;
 
     private final LedStrip ledStrip;
-    @IgnoreLogged
     private Indexer indexer;
-    @IgnoreLogged
     private Ampper ampper;
     private ShooterCmds shooterCmds;
-    @IgnoreLogged
     private PicoColorSensor piPico;
 
-    @IgnoreLogged
     private PieceControl pieceControl;
     private AlignmentCmds alignmentCmds;
     private boolean fieldRelativeToggle = true;
     private final BooleanSupplier robotRelativeSupplier;
     
-    @Log
+    @AutoLogOutput (key = "Draggables/Components3d")
     public static Pose3d[] components3d = new Pose3d[5];
-    @Log
+    @AutoLogOutput (key = "Draggables/DesiredComponents3d")
     public static Pose3d[] desiredComponents3d = new Pose3d[5];
-    @Log
+    @AutoLogOutput (key = "Draggables/NotePose3ds")
     public static Pose3d[] notePose3ds = new Pose3d[12];
-    @Log
+    @AutoLogOutput (key = "Draggables/HighNotePose3ds")
     public static Pose3d[] highNotePose3ds = new Pose3d[12];
-    @Log
+    @AutoLogOutput (key = "Draggables/FreshCode")
     private boolean freshCode = true;
-    @Log
-    public static Field2d field2d = new Field2d();
-    @Log
+    @AutoLogOutput (key = "Draggables/RobotPose2d")
     public static Pose2d robotPose2d = new Pose2d();
-    @Log
+    @AutoLogOutput (key = "Draggables/VisionErrorPose")
     public static Transform2d visionErrorPose = new Transform2d();
-    @Log
+    @AutoLogOutput (key = "Draggables/DistanceToSpeakerMeters")
     public static double distanceToSpeakerMeters = 0;
-    @Log
+    @AutoLogOutput (key = "Draggables/DistanceToSpeakerFeet")
+    public static double distanceToSpeakerFeet = 0;
+    @AutoLogOutput (key = "Draggables/RobotPose3d")
     public static Pose3d robotPose3d = new Pose3d();
-    @Log
+    @AutoLogOutput (key = "Draggables/SwerveMeasuredStates")
     public static SwerveModuleState[] swerveMeasuredStates;
-    @Log
+    @AutoLogOutput (key = "Draggables/SwerveDesiredStates")
     public static SwerveModuleState[] swerveDesiredStates;
-    @Log
+    @AutoLogOutput (key = "Draggables/GameModeStart")
     public static double gameModeStart = 0;
-    @Log
+    @AutoLogOutput (key = "Draggables/HasPiece")
     public static boolean hasPiece = true;
-    @Log
+    @AutoLogOutput (key = "Draggables/EnableVision")
     public static boolean enableVision = true;
+    public static Field2d field2d = new Field2d();
     
     public RobotContainer() {
 
@@ -226,7 +219,7 @@ public class RobotContainer implements Logged {
                 swerve::getPose,
                 () -> driver.getLeftTrigger() 
                 || driver.getLeftBumper() 
-                || (!OIConstants.SINGLE_DRIVER_MODE 
+                || (OIConstants.OPERATOR_PRESENT 
                     && operator.getLeftBumper())
             )
         );
@@ -240,6 +233,8 @@ public class RobotContainer implements Logged {
         initializeComponents();
         prepareNamedCommands();
 
+        SmartDashboard.putData(field2d);
+
         pathPlannerStorage.configureAutoChooser();
         pathPlannerStorage.getAutoChooser().addOption("WheelRadiusCharacterization",
             disableVision()
@@ -249,10 +244,8 @@ public class RobotContainer implements Logged {
             .andThen(enableVision()));
         
         configureButtonBindings();
-        configureLoggingPaths();
 
         pdh.setSwitchableChannel(false);
-        Monologue.updateAll();
 
     }
     
@@ -263,11 +256,17 @@ public class RobotContainer implements Logged {
             return;
         }
 
-        if (OIConstants.SINGLE_DRIVER_MODE) {
-            configureSoloDiverBindings(driver);
-        } else {
-            configureDriverBindings(driver);
-            configureOperatorBindings(operator);
+        switch (OIConstants.DRIVER_MODE) {
+            case SINGLE:
+                configureSoloDriverBindings(driver);
+                break;
+            case DOUBLE:
+                configureDriverBindings(driver);
+                configureOperatorBindings(operator);
+                break;
+            case DEV:
+                configureDevDriverBindings(driver);
+                break;
         }
         
 
@@ -318,7 +317,7 @@ public class RobotContainer implements Logged {
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
-        new Trigger(swerve::isAlignedToAmp).or(shooterCalc.readyToShootSupplier())
+        new Trigger(() -> PoseCalculations.isAlignedToAmp(robotPose2d)).or(shooterCalc.readyToShootSupplier())
             .onTrue(driver.setRumble(() -> 0.5))
             .onFalse(driver.setRumble(() -> 0));
         
@@ -332,7 +331,7 @@ public class RobotContainer implements Logged {
                     // Whether that be source or not
                     driver.getLeftTrigger() 
                     || driver.getXButton() 
-                    || (!OIConstants.SINGLE_DRIVER_MODE 
+                    || (OIConstants.OPERATOR_PRESENT 
                         &&(operator.getLeftBumper() 
                         || operator.getStartButton() 
                         || operator.getBackButton()))
@@ -368,6 +367,12 @@ public class RobotContainer implements Logged {
             ).onFalse(
                 driver.setRumble(() -> 0)
             );
+        
+        // Controller rumble if climb hooks are up and we are inside of stage area
+        // AKA driver is good to climb
+        new Trigger(climb::getHooksUp).and(() -> PoseCalculations.inStageTriangle(robotPose2d))
+            .onTrue(driver.setRumble(() -> 0.5))
+            .onFalse(driver.setRumble(() -> 0));
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {
@@ -438,7 +443,7 @@ public class RobotContainer implements Logged {
                         // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        PoseCalculations::closeToSpeaker)
+                        () -> PoseCalculations.closeToSpeaker() || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
                             limelight3g.setLEDState(() -> false)
@@ -465,11 +470,11 @@ public class RobotContainer implements Logged {
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
         
 
-        // Intake controls
+        // Intake controls 
         // The warning of dead code only applies if we are using single driver mode
-        controller.leftTrigger()
+        controller.leftBumper()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .negate().and(() -> OIConstants.SINGLE_DRIVER_MODE || !operator.getLeftBumper())
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
       
         controller.rightBumper()
@@ -481,10 +486,23 @@ public class RobotContainer implements Logged {
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
         
         controller.povRight()
-            .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(false)));
+            .toggleOnTrue(Commands.sequence(
+                    elevator.toBottomCommand(),
+                    swerve.resetHDCCommand(),
+                    limelight3g.setLEDState(() -> true),
+                    alignmentCmds.moveAndPreparePresetCommand().
+                    finallyDo(
+
+                        () -> 
+                            limelight3g.setLEDState(() -> false)
+                            .andThen(shooterCmds.raisePivot()
+                                .alongWith(shooterCmds.stopShooter())
+                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                            .schedule()
+            )));
     }
 
-    private void configureSoloDiverBindings(PatriBoxController controller) {
+    private void configureSoloDriverBindings(PatriBoxController controller) {
         
         configureCommonDriverBindings(controller);
 
@@ -523,8 +541,7 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeAuto())
-            .negate().and(driver.leftTrigger().negate())
-            .onTrue(pieceControl.stopIntakeAndIndexer());
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
     }
 
@@ -553,9 +570,12 @@ public class RobotContainer implements Logged {
             .toggleOnTrue(
                 alignmentCmds.preparePresetPose(driver::getLeftX, driver::getLeftY, false));
 
-        controller.leftBumper()
+        controller.leftTrigger()
             .toggleOnTrue(shooterCmds.preparePassCommand(swerve::getPose)
                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        
+        
+        
     }
 
     private void configureOperatorBindings(PatriBoxController controller) {
@@ -573,7 +593,7 @@ public class RobotContainer implements Logged {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .negate().and(driver.leftTrigger().negate())
+            .negate().and(driver.leftBumper().negate())
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -609,6 +629,43 @@ public class RobotContainer implements Logged {
 
     }
 
+    private void configureDevDriverBindings(PatriBoxController controller) {
+
+        configureCommonDriverBindings(controller);
+
+        controller.a()
+            .onTrue(swerve.resetHDCCommand()
+                .alongWith(pieceControl.moveNoteThenElevator().onlyIf(() -> !(climb.getHooksUp() || elevator.isUp()))))
+            .whileTrue(
+                Commands.sequence(
+                    Commands.either(
+                        alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
+                        alignmentCmds.ampAlignmentCommand(controller::getLeftX),
+                        climb::getHooksUp))
+                    .alongWith(
+                        limelight3g.setLEDState(() -> true)))
+            .onFalse(
+                limelight3g.setLEDState(() -> false))
+            .negate().and(() -> !controller.getXButton())
+                .onTrue(elevator.toBottomCommand());
+
+        controller.x()
+            .onTrue(pieceControl.moveNoteThenElevator().onlyIf(() -> !elevator.isUp()))
+            .negate().and(() -> !controller.getAButton())
+                .onTrue(elevator.toBottomCommand());
+
+        controller.b()
+            .onTrue(pieceControl.blepNote());
+
+        controller.y()
+            .onTrue(climb.toggleCommand());
+
+        controller.leftTrigger()
+            .whileTrue(pieceControl.sourceShooterIntake())
+            .onFalse(pieceControl.stopIntakeAndIndexer());
+
+    }
+
     private void configureCalibrationBindings(PatriBoxController controller, EventLoop eventLoop) {
         controller.leftBumper(eventLoop)
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
@@ -626,8 +683,8 @@ public class RobotContainer implements Logged {
         controller.rightX(0.3, eventLoop)
             .whileTrue(calibrationControl.incrementRightSpeed(() -> (int) (controller.getRightX() * 5)));
 
-        controller.back(eventLoop).onTrue(calibrationControl.incrementDistance(-1));
-        controller.start(eventLoop).onTrue(calibrationControl.incrementDistance(1));
+        controller.back(eventLoop).onTrue(calibrationControl.incrementDistance(-0.5));
+        controller.start(eventLoop).onTrue(calibrationControl.incrementDistance(0.5));
 
         controller.a(eventLoop).onTrue(calibrationControl.logTriplet());
 
@@ -856,32 +913,6 @@ public class RobotContainer implements Logged {
                 NamedCommands.registerCommand("C" + i + "toC" + j + "nonOBJ", pathPlannerStorage.generateCenterLogicNonOBJ(i, j, swerve));
             }
         }
-    }
-
-    private void configureLoggingPaths() {
-        Monologue.logObj(shooterCalc, "Robot/Math/shooterCalc");
-        Monologue.logObj(calibrationControl, "Robot/Math/calibrationControl");
-        Monologue.logObj(HDCTuner, "Robot/Math/HDCTuner");
-        Monologue.logObj(pieceControl, "Robot/Math/PieceControl");
-
-        Monologue.logObj(swerve, "Robot/Swerve");
-
-        Monologue.logObj(intake, "Robot/Subsystems/intake");
-        Monologue.logObj(climb, "Robot/Subsystems/climb");
-        if (CameraConstants.FIELD_CALIBRATION_MODE) {
-            Monologue.logObj(limelightMapper, "Robot/Limelights/limelightMapper");
-        } else {
-            Monologue.logObj(limelight3, "Robot/Limelights/limelight3");
-            Monologue.logObj(limelight3g, "Robot/Limelights/limelight3g");
-        }
-        Monologue.logObj(piPico, "Robot/ColorSensors");
-        Monologue.logObj(shooter, "Robot/Subsystems/shooter");
-        Monologue.logObj(elevator, "Robot/Subsystems/elevator");
-        Monologue.logObj(pivot, "Robot/Subsystems/pivot");
-        Monologue.logObj(ampper, "Robot/Subsystems/ampper");
-        Monologue.logObj(pieceControl, "Robot/Managers/pieceControl");
-        
-        Monologue.logObj(pathPlannerStorage, "Robot");
     }
 
     /**

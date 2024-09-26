@@ -10,9 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
@@ -97,6 +96,18 @@ public class AlignmentCalc {
             );
     }
 
+    public ChassisSpeeds getPresetAlignmentSpeeds() {
+        Pose2d targetPose = PoseCalculations.getClosestShootingPose(swerve.getPose());
+        swerve.setDesiredPose(targetPose);
+        return
+            AutoConstants.HDC.calculate(
+                swerve.getPose(),
+                targetPose,
+                0,
+                targetPose.getRotation()
+            );
+    }
+
     /**
      * Supplier for the amp alignment chassis speeds
      * 
@@ -104,6 +115,10 @@ public class AlignmentCalc {
      */
     public Supplier<ChassisSpeeds> getAmpAlignmentSpeedsSupplier() {
         return () -> getAmpAlignmentSpeeds();
+    }
+
+    public Supplier<ChassisSpeeds> getPresetAlignmentSpeedsSupplier() {
+        return () -> getPresetAlignmentSpeeds();
     }
 
     /**

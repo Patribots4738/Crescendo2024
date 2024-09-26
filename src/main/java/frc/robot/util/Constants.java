@@ -31,10 +31,11 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
+import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.LoggingConstants.RobotType;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
 
 /**
  * Welcome to the home of the many many variables :D
@@ -45,6 +46,49 @@ import monologue.Logged;
  * or in a comment next to it.
  */
 public final class Constants {
+
+    public static final class LoggingConstants {
+
+        private static RobotType robotType = RobotType.DEVBOT;
+
+        public static RobotType getRobot() {
+            if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
+                System.out.println("Incorrect robot type selected, changing to real robot");
+                robotType = RobotType.COMPBOT;
+            }
+            return robotType;
+        }
+
+        public static Mode getMode() {
+            return switch (getRobot()) {
+                case DEVBOT -> FieldConstants.IS_SIMULATION ? Mode.SIM : Mode.REAL;
+                case COMPBOT -> FieldConstants.IS_SIMULATION ? Mode.REPLAY : Mode.REAL;
+                case SIMBOT -> Mode.SIM;
+            };
+        }
+        
+        public enum Mode {
+            /** Running on a real robot. */
+            REAL,
+
+            /** Running a physics simulator. */
+            SIM,
+            /** Replaying from a log file. */
+            REPLAY
+        }
+
+        public enum RobotType {
+            DEVBOT,
+            COMPBOT,
+            SIMBOT
+        }
+
+        public static final String SUBSYSTEM_LOG_PATH = "Subsystems/";
+        public static final String CALC_LOG_PATH = "Calc/";
+        public static final String MANAGER_LOG_PATH = "Managers/";
+
+    }
+
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
@@ -55,6 +99,8 @@ public final class Constants {
         public static final double MAX_TELEOP_SPEED_METERS_PER_SECOND = 4.7;
 
         public static final double PASS_ROTATION_DEADBAND = 10;
+
+        public static final double ODOMETRY_FREQUENCY = 250.0;
 
         // Chassis configuration
         // Distance between centers of right and left wheels on robot
@@ -106,7 +152,7 @@ public final class Constants {
         public static final boolean GYRO_REVERSED = true;
     }
 
-    public static final class TuningConstants implements Logged {
+    public static final class TuningConstants {
         public final int DRIVE_INDEX = 0;
         public final int PIVOT_INDEX = 1;
         public final int SHOOTER_INDEX = 2;
@@ -168,67 +214,24 @@ public final class Constants {
          * The distances are in feet, the speeds are in RPM, and the angles are in
          * degrees.
          */
-        public static final HashMap<Integer, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Integer, SpeedAngleTriplet>() {
+        public static final HashMap<Double, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Double, SpeedAngleTriplet>() {
             {
-                put(4, SpeedAngleTriplet.of(1763.0, 2316.0, 56.1));
-                put(5, SpeedAngleTriplet.of(1763.0, 2316.0, 57.6));
-                // put(6, SpeedAngleTriplet.of(2088.0, 2088.0, 50.0)); 
-                // put(7, SpeedAngleTriplet.of(2188.0, 2188.0, 45.7));
-                // put(8, SpeedAngleTriplet.of(2313.0, 2313.0, 41.3));
-                // put(9, SpeedAngleTriplet.of(2465.0, 2465.0, 40.5));
-                // put(10, SpeedAngleTriplet.of(2633.0, 2633.0, 38.1));
-                // put(11, SpeedAngleTriplet.of(2795.0, 2795.0, 35.8));
-                // put(12, SpeedAngleTriplet.of(2993.0, 2993.0, 34.3)); 
-                // put(13, SpeedAngleTriplet.of(3526.0, 3526.0, 32.3));
-                // put(14, SpeedAngleTriplet.of(3561.0, 3561.0, 31.0));
-                // put(15, SpeedAngleTriplet.of(3756.0, 3756.0, 29.9));
-                // put(16, SpeedAngleTriplet.of(3928.0, 3928.0, 30.0));
-                // put(17, SpeedAngleTriplet.of(3928.0, 3928.0, 29.1));
-
-                // V2
-                // put(6, SpeedAngleTriplet.of(2127.0, 2127.0, 48.3));
-                // put(7, SpeedAngleTriplet.of(2127.0, 2127.0, 46.0));
-                // put(8, SpeedAngleTriplet.of(2528.0, 2528.0, 41.9));
-                // put(9, SpeedAngleTriplet.of(2600.0, 2600.0, 37.5));
-                // put(10, SpeedAngleTriplet.of(2884.0, 2894.0, 37.1));
-                // put(11, SpeedAngleTriplet.of(2924.0, 2930.0, 33.3));
-                // put(12, SpeedAngleTriplet.of(2924.0, 2930.0, 32.3));
-                // // V3 (note inside of indexer)
-                // put(13, SpeedAngleTriplet.of(3311.0, 3034.0, 30.3));
-                // put(14, SpeedAngleTriplet.of(3589.0, 3312.0, 30.3));
-                // // 2/28/24 - this was the day after bands were added
-                // put(15, SpeedAngleTriplet.of(3726.0, 3600.0, 27.3));
-
-                // put(16, SpeedAngleTriplet.of(3986.0, 3990.0, 33.7));
-                // put(17, SpeedAngleTriplet.of(3986.0, 3990.0, 33));
-                // put(18, SpeedAngleTriplet.of(3986.0, 3990.0, 32.5));
-                // put(19, SpeedAngleTriplet.of(4201.0, 4205.0, 32.0));
-
-                // put(7, SpeedAngleTriplet.of(2840.0, 2850.0, 44.6));
-                // put(8, SpeedAngleTriplet.of(2810.0, 2820.0, 39.5));
-                // put(9, SpeedAngleTriplet.of(2886.0, 2886.0, 38.4));
-                // put(10, SpeedAngleTriplet.of(2888.0, 2897.0, 36.6));
-                // // Driverstation has some words for you:
-                // //   樀愀瘀愀㨀㐀㄀㈀⤀㨀 䰀漀漀瀀 琀椀洀攀 漀昀 　⸀　㈀猀 漀瘀攀爀爀甀渀 ＀෾਀＀￾￾￾￾￾⃾ ＀෾਀＀
-                // put(11, SpeedAngleTriplet.of(2943.0, 2930.0, 36));
-                // put(12, SpeedAngleTriplet.of(2943.0, 2935.0, 35.9));
-                // put(13, SpeedAngleTriplet.of(3319.0, 3042.0, 35.3));
-                // put(14, SpeedAngleTriplet.of(3587.0, 3310.0, 34.7));
-                // put(15, SpeedAngleTriplet.of(3586.0, 3371.0, 34));
-
-                // NEW SHOOTER WOOOHOO
-                put(6, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
-                put(7, SpeedAngleTriplet.of(3160.0, 2865.0, 46.3));
-                put(8, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
-                put(9, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
-                put(10, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
-                put(11, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
-                put(12, SpeedAngleTriplet.of(3947.0, 3580.0, 33.8));
-                put(13, SpeedAngleTriplet.of(4075.0, 3691.0, 31.8));
-                // Future note, 13.2ft is a common shot which should have its own calibration point
-                put(14, SpeedAngleTriplet.of(4214.0, 3755.0, 30.9)); 
-                put(15, SpeedAngleTriplet.of(4515.0, 4043.0, 30.9));
-                put(16, SpeedAngleTriplet.of(4190.0, 3731.0, 26.7));
+                put(4.0, SpeedAngleTriplet.of(2316.0, 1763.0, 57.5));
+                put(5.0, SpeedAngleTriplet.of(2316.0, 1763.0, 54.1));
+                put(6.0, SpeedAngleTriplet.of(3007.0, 2818.0, 48.1));
+                put(7.0, SpeedAngleTriplet.of(3008.0, 2818.0, 44.9));
+                put(7.5, SpeedAngleTriplet.of(3304.0, 2997.0, 43.3)); 
+                put(8.0, SpeedAngleTriplet.of(3319.0, 3024.0, 42.4));
+                // put(8.5, SpeedAngleTriplet.of(3445.0, 3128.0, 40.9));
+                put(9.0, SpeedAngleTriplet.of(3606.0, 3305.0, 39.6));
+                put(10.0, SpeedAngleTriplet.of(3842.0, 3441.0, 37.6));
+                put(11.0, SpeedAngleTriplet.of(3965.0, 3647.0, 36.2));
+                put(12.0, SpeedAngleTriplet.of(4147.0, 3781.0, 34.1));
+                put(12.5, SpeedAngleTriplet.of(4320.0, 3945.0, 34.0));
+                put(13.0, SpeedAngleTriplet.of(4490.0, 4106.0, 33.7));
+                put(14.0, SpeedAngleTriplet.of( 4214.0, 3755.0, 30.9)); 
+                put(15.0, SpeedAngleTriplet.of( 4515.0, 4043.0, 30.9));
+                put(16.0, SpeedAngleTriplet.of( 4190.0, 3731.0, 26.7));
                 
             }
         };
@@ -236,7 +239,7 @@ public final class Constants {
         public static final InterpolatingTreeMap<Double, SpeedAngleTriplet> INTERPOLATION_MAP = new InterpolatingTreeMap<>(
                 InverseInterpolator.forDouble(),
                 SpeedAngleTriplet.getInterpolator()) {{
-            for (Map.Entry<Integer, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
+            for (Map.Entry<Double, SpeedAngleTriplet> entry : SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP.entrySet()) {
                 put(entry.getKey().doubleValue(), entry.getValue());
             }
         }};
@@ -322,7 +325,7 @@ public final class Constants {
         public static final double TOP_LIMIT = 0.517;
         public static final double BOTTOM_LIMIT = 0.0;
 
-        public static final double CLIMB_DEADBAND = 0.002;
+        public static final double CLIMB_DEADBAND = 0.005;
         
         public static final double DISTANCE_FROM_ORIGIN_METERS = 0.3048;
     }
@@ -342,6 +345,8 @@ public final class Constants {
         public static final double PASS_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(10);
 
         public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
+
+        public static final double UNDER_STAGE_DEADBAND = 0.02;
 
         /*
          * XY:
@@ -502,7 +507,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4989692140582187*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.504919579940926*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
@@ -554,6 +559,12 @@ public final class Constants {
         public static final int NEO_CURRENT_LIMIT = 50; // amps
         public static final int VORTEX_CURRENT_LIMIT = 80; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps
+        
+        public static final int FRONT_LEFT_INDEX = 0;
+        public static final int FRONT_RIGHT_INDEX = 1;
+        public static final int REAR_LEFT_INDEX = 2;
+        public static final int REAR_RIGHT_INDEX = 3;
+
     }
 
     public static final class OIConstants {
@@ -572,7 +583,15 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
 
-        public static final boolean SINGLE_DRIVER_MODE = true;
+        public static final DriverMode DRIVER_MODE = DriverMode.DOUBLE;
+
+        public enum DriverMode {
+            SINGLE,
+            DOUBLE,
+            DEV
+        }
+
+        public static boolean OPERATOR_PRESENT = DRIVER_MODE == DriverMode.DOUBLE;
     }
 
     public static final class LEDConstants {
@@ -793,6 +812,23 @@ public final class Constants {
             add(new Pose3d(GeometryUtil.flipFieldPose(blueChain3.toPose2d())).plus(new Transform3d(0.0, 0.0, CHAIN_HEIGHT_METERS, new Rotation3d())));
         }};
 
+        public static final List<Translation2d> STAGE_POINTS = new ArrayList<Translation2d>() {{
+
+            // Blue points
+            Translation2d bluePoint1 = new Translation2d(3.026, 4.064);
+            Translation2d bluePoint2 = new Translation2d(5.801, 2.507);
+            Translation2d bluePoint3 = new Translation2d(5.801, 5.667);
+            add(bluePoint1);
+            add(bluePoint2);
+            add(bluePoint3);
+
+            // Red points
+            add(GeometryUtil.flipFieldPosition(bluePoint1));
+            add(GeometryUtil.flipFieldPosition(bluePoint2));
+            add(GeometryUtil.flipFieldPosition(bluePoint3));
+
+        }};
+
         // Speaker Positions: Blue alliance left
         // @formatter:off
         //
@@ -813,7 +849,7 @@ public final class Constants {
         public static final List<Pose2d> AMP_POSITIONS = new ArrayList<Pose2d>() {{
             // All points are in meters and radians
             // All relative to the blue origin
-            Pose2d bluePose = new Pose2d(1.827, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90));
+            Pose2d bluePose = new Pose2d(1.807, FIELD_HEIGHT_METERS, Rotation2d.fromDegrees(-90));
             Pose2d redPose = GeometryUtil.flipFieldPose(bluePose);
             add(bluePose);
             add(redPose);
@@ -839,16 +875,31 @@ public final class Constants {
             add(redPose);
         }};
 
+        public static final List<Pose2d> PRESET_SHOT_POSITIONS = new ArrayList<Pose2d>() {{
+            Pose2d orbitBluePose = new Pose2d(3.653, 5.957, new Rotation2d(-2.929));
+            Pose2d podiumBlueShotSpot = new Pose2d(2.425, 4.416, new Rotation2d(2.614));
+            add(podiumBlueShotSpot);
+            
+            add(new Pose2d(0, 0, new Rotation2d(0)));
+            add(orbitBluePose);
+            add(GeometryUtil.flipFieldPose(orbitBluePose));
+            add(GeometryUtil.flipFieldPose(podiumBlueShotSpot));
+        }};
+
         private static int getAllianceIndex(Alliance defaultAlliance) {
             return defaultAlliance == Alliance.Blue
                 ? (Robot.isRedAlliance() ? 1 : 0) 
                 : (Robot.isBlueAlliance() ? 1 : 0);
         }
 
+
         public static Pose2d GET_SPEAKER_POSITION() {
             return SPEAKER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
+        public static List<Pose2d> GET_PRESET_SHOT_POSES() {
+            return PRESET_SHOT_POSITIONS;
+        }
         public static Pose2d GET_SUBWOOFER_POSITION() {
             return SUBWOOFER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
@@ -882,6 +933,11 @@ public final class Constants {
             return CHAIN_POSITIONS.subList(startIndex, startIndex + 3);
         }
 
+        public static List<Translation2d> GET_STAGE_POINTS() {
+            int startIndex = Robot.isRedAlliance() ? 3 : 0;
+            return STAGE_POINTS.subList(startIndex, startIndex + 3);
+        }
+ 
         public static final double CHAIN_LENGTH_METERS = Units.inchesToMeters(100);
 
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
@@ -987,9 +1043,9 @@ public final class Constants {
         }};
 
         // 12.4ft from the speaker
-        public static final Translation2d PODIUM_SHOT_SPOT = new Translation2d(2.55, 4.19);
+        public static final Pose2d PODIUM_SHOT_SPOT = new Pose2d(2.55, 4.19, new Rotation2d(0));
         // 9.76ft from the speaker
-        public static final Translation2d ORBIT_POSE = new Translation2d(2.884, 6.304);
+        public static final Pose2d ORBIT_POSE = new Pose2d(2.884, 6.304, new Rotation2d(0));
 
         public static final List<Pose2d> SHOOTING_POSITIONS = new ArrayList<Pose2d>() {{
             // We only want the blue alliance speaker translation since
@@ -1080,22 +1136,24 @@ public final class Constants {
 
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
+        public static final double LIMELIGHT_3G_TA_CUTOFF = 0.078;
+
         public static final Pose3d LL3Pose = 
             new Pose3d(
                 // forward positive, right positive, up positive
-                0.204,
-                -0.234,
+                0.2872, // Mind control ll pose
+                0.234,
                 0.651,
-                new Rotation3d(0, Units.degreesToRadians(13), 0));
+                new Rotation3d(0, Units.degreesToRadians(15), 0));
         public static final Pose3d LL2Pose =
             new Pose3d(
                 // forward positive, right positive, up positive
                 -0.272724,
                 -0.311903,
-                0.433974,
+                0.651,
                 // Pitch angle is measure from the horizontal
                 // it is negative because it points down
-                new Rotation3d(0, Units.degreesToRadians(-11), Units.degreesToRadians(180)));
+                new Rotation3d(0, Units.degreesToRadians(15), Units.degreesToRadians(180)));
 
         public static final Pose3d[] cameras = new Pose3d[] {LL3Pose, LL2Pose};
     }

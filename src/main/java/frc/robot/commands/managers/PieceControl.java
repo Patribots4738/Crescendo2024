@@ -4,10 +4,11 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -17,47 +18,42 @@ import frc.robot.Robot;
 import frc.robot.Robot.GameMode;
 import frc.robot.RobotContainer;
 import frc.robot.commands.logging.NT;
-import frc.robot.subsystems.PicoColorSensor;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Ampper;
+import frc.robot.subsystems.colorsensor.PicoColorSensor;
+import frc.robot.subsystems.ampper.Elevator;
+import frc.robot.subsystems.intake.Indexer;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
 
-public class PieceControl implements Logged {
+public class PieceControl {
     
-    @IgnoreLogged
     private Intake intake;
-    @IgnoreLogged
-    private Indexer indexer;
     
-    @IgnoreLogged
+    private Indexer indexer;
+
     private Elevator elevator;
-    @IgnoreLogged
+
     private Ampper ampper;
-    @IgnoreLogged
+
     private ShooterCmds shooterCmds;
-    @IgnoreLogged
+
     private PicoColorSensor piPico;
 
-    @Log
+    @AutoLogOutput (key = "Managers/PieceControl/ShooterMode")
     private boolean shooterMode = false;
 
     // State representing if we are trying to unstuck the elevator
-    @Log
+    @AutoLogOutput (key = "Managers/PieceControl/ElevatorDislodging")
     private boolean elevatorDislodging = false;
-    @Log
+
+    @AutoLogOutput (key = "Managers/PieceControl/MovingNote")
     private boolean currentlyMovingNote = false;
 
-    @Log
+    @AutoLogOutput (key = "Managers/PieceControl/HasPiece")
     private boolean hasPiece = false;
 
     public PieceControl(
@@ -246,7 +242,7 @@ public class PieceControl implements Logged {
 
     public Command noteToTrap2() {
         return Commands.sequence(
-            ampper.setSpeedCommand(-.7),
+            ampper.setPercentCommand(-.7),
             shooterCmds.stowPivot(),
             indexer.setPercentCommand(.7),   
             intake.inCommandSlow(),
@@ -316,7 +312,7 @@ public class PieceControl implements Logged {
                     placeWhenReady()
                         .andThen(setHasPiece(false)),
                     Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)
-                ),
+                ).andThen(ampper.stopCommand()),
                 () -> elevator.getDesiredPosition() <= 0
             ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
                 .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));
@@ -385,12 +381,13 @@ public class PieceControl implements Logged {
                     .andThen(
                         elevatorToBottom()
                         .alongWith(shooterCmds.raisePivot())
+                        .alongWith(ampper.stopCommand())
                     ),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);
     }
 
-    @Log
+    @AutoLogOutput (key = "Managers/PieceControl/PlaceWhenReady")
     private boolean placeWhenReady = false;
 
     public boolean shouldPlaceWhenReady() {
@@ -436,7 +433,7 @@ public class PieceControl implements Logged {
         return Commands.runOnce(() -> this.currentlyMovingNote = currentlyMovingNote);
     }
 
-    @Log
+    @AutoLogOutput (key = "Managers/PieceControl/DesiredSide")
     private boolean desiredSide = false;
 
     public Command moveNote(boolean desiredSide) {
@@ -469,6 +466,13 @@ public class PieceControl implements Logged {
                         Commands.none(),
                         () -> !currentlyMovingNote)
                 );
+    }
+
+    public Command moveNoteThenElevator() {
+        return Commands.sequence(
+            moveNote(false),
+            elevator.toTopCommand(),
+            prepPiece());
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)

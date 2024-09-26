@@ -1,11 +1,12 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.climb;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,21 +16,20 @@ import frc.robot.RobotContainer;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
-import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class Climb extends SubsystemBase implements Logged {
+public class Climb extends SubsystemBase implements ClimbIO {
 
     private final Neo leftMotor;
     private final Neo rightMotor;
 
-    @Log
-    private double posLeft = 0, posRight = 0, targetPosRight = 0, targetPosLeft = 0;
+    private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
 
-    @Log
-    private boolean atDesiredPos = false, hooksUp = false;
+    @AutoLogOutput(key = "Subsystems/Climb/AtDesiredPosition")
+    private boolean atDesiredPos = false;
+    
+    @AutoLogOutput(key = "Subsystems/Climb/HooksUp")
+    private boolean hooksUp = false;
 
     public Climb() {
         leftMotor = new Neo(ClimbConstants.LEFT_CLIMB_CAN_ID, true);
@@ -52,20 +52,27 @@ public class Climb extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
-        targetPosLeft = leftMotor.getTargetPosition();
-        targetPosRight = rightMotor.getTargetPosition();
-        posLeft = leftMotor.getPosition();
-        posRight = rightMotor.getPosition();
 
-        atDesiredPos = atDesiredPosition().getAsBoolean();
+        updateInputs(inputs);
+        Logger.processInputs("SubsystemInputs/Climb", inputs);
+
+        atDesiredPos = (
+            MathUtil.applyDeadband(
+				Math.abs(
+						inputs.leftPositionMeters - inputs.leftTargetPositionMeters),
+				ClimbConstants.CLIMB_DEADBAND) == 0 &&
+            MathUtil.applyDeadband(
+				Math.abs(
+						inputs.rightPositionMeters - inputs.rightTargetPositionMeters),
+				ClimbConstants.CLIMB_DEADBAND) == 0);
         hooksUp = getHooksUp();
 
         RobotContainer.components3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
-            0, 0, leftMotor.getPosition(),
+            0, 0, inputs.leftPositionMeters,
             new Rotation3d()
         );
         RobotContainer.components3d[NTConstants.RIGHT_CLIMB_INDEX] = new Pose3d(
-            0, 0, rightMotor.getPosition(),
+            0, 0, inputs.rightPositionMeters,
             new Rotation3d()
         );
     }
@@ -90,13 +97,13 @@ public class Climb extends SubsystemBase implements Logged {
                 ClimbConstants.BOTTOM_LIMIT,
                 ClimbConstants.TOP_LIMIT);
 
-        if (targetPosLeft != pos1) {
+        if (inputs.leftTargetPositionMeters != pos1) {
             leftMotor.setTargetPosition(pos1);
         }
 
-        if (targetPosRight != pos2)
-
-        rightMotor.setTargetPosition(pos2);
+        if (inputs.rightTargetPositionMeters != pos2) {
+            rightMotor.setTargetPosition(pos2);
+        }
 
         RobotContainer.desiredComponents3d[NTConstants.LEFT_CLIMB_INDEX] = new Pose3d(
             0, 0, pos1,
@@ -132,22 +139,44 @@ public class Climb extends SubsystemBase implements Logged {
         return Commands.either(
             toMiddleCommand(), 
             toTopCommand(), 
-            () -> targetPosLeft == ClimbConstants.TOP_LIMIT || targetPosRight == ClimbConstants.BOTTOM_LIMIT);
+            () -> inputs.leftTargetPositionMeters == ClimbConstants.TOP_LIMIT || inputs.rightTargetPositionMeters == ClimbConstants.BOTTOM_LIMIT);
+    }
+
+    public Command toggleCommand() {
+        return Commands.either(
+            toBottomCommand(), 
+            toTopCommand(),
+            () -> inputs.leftTargetPositionMeters == ClimbConstants.TOP_LIMIT);
     }
 
     public BooleanSupplier atDesiredPosition() {
 		return () -> (
             MathUtil.applyDeadband(
 				Math.abs(
-						leftMotor.getPosition() - leftMotor.getTargetPosition()),
+						inputs.leftPositionMeters - inputs.leftTargetPositionMeters),
 				ClimbConstants.CLIMB_DEADBAND) == 0 &&
             MathUtil.applyDeadband(
 				Math.abs(
-						rightMotor.getPosition() - rightMotor.getTargetPosition()),
+						inputs.rightPositionMeters - inputs.rightTargetPositionMeters),
 				ClimbConstants.CLIMB_DEADBAND) == 0);
 	}
 
     public boolean getHooksUp() {
-        return (leftMotor.getTargetPosition() > 0 || rightMotor.getTargetPosition() > 0);
+        return (inputs.leftTargetPositionMeters > 0 || inputs.rightTargetPositionMeters > 0);
+    }
+
+    @Override
+    public void updateInputs(ClimbIOInputs inputs) {
+
+        inputs.leftPositionMeters = leftMotor.getPosition();
+        inputs.leftTargetPositionMeters = leftMotor.getTargetPosition();
+        inputs.leftAppliedVolts = leftMotor.getAppliedOutput();
+        inputs.leftOutputCurrentAmps = leftMotor.getOutputCurrent();
+
+        inputs.rightPositionMeters = rightMotor.getPosition();
+        inputs.rightTargetPositionMeters = rightMotor.getTargetPosition();
+        inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
+        inputs.rightOutputCurrentAmps = rightMotor.getOutputCurrent();
+
     }
 }

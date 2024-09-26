@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.ampper;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -7,44 +9,45 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.rev.Neo;
 import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class Ampper extends SubsystemBase implements Logged {
+public class Ampper extends SubsystemBase implements AmpperIO {
     private final Neo motor;
-
-    @Log
-    private double desiredSpeed = 0;
+    private final AmpperIOInputsAutoLogged inputs = new AmpperIOInputsAutoLogged();
 
     public Ampper() {
         motor = new Neo(ElevatorConstants.AMPPER_CAN_ID, false, ElevatorConstants.AMPPER_INVERTION);
         motor.setSmartCurrentLimit(ElevatorConstants.AMPPER_CURRENT_LIMIT);
     }
 
+    @Override
+    public void periodic() {
+        updateInputs(inputs);
+        Logger.processInputs("SubsystemInputs/Ampper", inputs);
+    }
+ 
     public Command intakeFromHandoff() {
         return intake()
             .andThen(Commands.waitSeconds(ElevatorConstants.INTAKE_TIME))
             .andThen(stopCommand());
     }
 
-    public void setSpeed(double percent) {
+    public void setPercent(double percent) {
         percent = 
             MathUtil.clamp(
                 percent, 
                 ElevatorConstants.AMPPER_LOWER_PERCENT_LIMIT, 
                 ElevatorConstants.AMPPER_UPPER_PERCENT_LIMIT);
-        if (desiredSpeed != percent) {
-            desiredSpeed = percent;
-            
+        if (inputs.targetPercent != percent) {
             motor.set(percent);
         }
     }
 
     public Command outtake() {
-        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_OUTTAKE_PERCENT));
+        return runOnce(() -> setPercent(ElevatorConstants.AMPPER_OUTTAKE_PERCENT));
     }
 
     public Command outtakeSlow() {
-        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_OUTTAKE_SLOW));
+        return runOnce(() -> setPercent(ElevatorConstants.AMPPER_OUTTAKE_SLOW));
     }
 
     public Command outtakeSlow(double seconds) {
@@ -56,19 +59,19 @@ public class Ampper extends SubsystemBase implements Logged {
     }
 
     public Command intakeSlow() {
-        return runOnce(() -> setSpeed(0.4));
+        return runOnce(() -> setPercent(0.4));
     }
 
     public Command intakeSlow(double speed) {
-        return runOnce(() -> setSpeed(speed));
+        return runOnce(() -> setPercent(speed));
     }
 
     public Command stopCommand() {
-        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_STOP_PERCENT));
+        return runOnce(() -> setPercent(ElevatorConstants.AMPPER_STOP_PERCENT));
     }
 
     public Command intake() {
-        return runOnce(() -> setSpeed(ElevatorConstants.AMPPER_INTAKE_PERCENT));
+        return runOnce(() -> setPercent(ElevatorConstants.AMPPER_INTAKE_PERCENT));
     }
 
     public Command intake(double seconds) {
@@ -91,11 +94,11 @@ public class Ampper extends SubsystemBase implements Logged {
         return Commands.either(
             outtakeSlow(), 
             stopCommand(), 
-            () -> desiredSpeed == 0);
+            () -> inputs.targetPercent == 0);
     }
 
-    public Command setSpeedCommand(double speed) {
-        return runOnce(() -> setSpeed(speed));
+    public Command setPercentCommand(double percent) {
+        return runOnce(() -> setPercent(percent));
     }
 
     public Command setCoastMode() {
@@ -104,5 +107,12 @@ public class Ampper extends SubsystemBase implements Logged {
 
     public Command setBrakeMode() {
         return Commands.runOnce(() -> motor.setBrakeMode()).ignoringDisable(true);
+    }
+
+    @Override
+    public void updateInputs(AmpperIOInputs inputs) {
+        inputs.targetPercent = motor.getTargetPercent();
+        inputs.appliedVolts = motor.getAppliedOutput();
+        inputs.outputCurrentAmps = motor.getOutputCurrent();
     }
 }

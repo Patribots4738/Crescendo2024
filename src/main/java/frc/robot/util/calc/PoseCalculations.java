@@ -1,16 +1,21 @@
 package frc.robot.util.calc;
 
+import java.util.List;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.ClimbConstants;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class PoseCalculations implements Logged {
+public class PoseCalculations {
 
     /**
      * Calculates the intercepts of the chain based on the given robot position.
@@ -43,10 +48,10 @@ public class PoseCalculations implements Logged {
         return position.nearest(FieldConstants.GET_CHAIN_POSITIONS());
     }
 
-    @Log
+    @AutoLogOutput (key = "Calc/PoseCalc/ClosestShootingPose")
     private static Pose2d closestShootingPose;
 
-    @Log
+    @AutoLogOutput (key = "Calc/PoseCalc/BestShootingPose")
     public static Pose2d getBestShootingPose(Pose2d position) {
         double yValue = position.getY();
         if (yValue > 5)
@@ -57,6 +62,10 @@ public class PoseCalculations implements Logged {
             return FieldConstants.GET_SHOOTING_POSITIONS().get(2);
         // R
         return FieldConstants.GET_SHOOTING_POSITIONS().get(1);
+    }
+
+    public static Pose2d getClosestShootingPose(Pose2d pose) {
+        return pose.nearest(FieldConstants.PRESET_SHOT_POSITIONS);                                                                                                                                                                                                                                                                                                                                                                           
     }
 
     public static String getBestShootingPoseString(Pose2d position) {
@@ -109,4 +118,48 @@ public class PoseCalculations implements Logged {
     public static boolean closeToSpeaker() {
         return RobotContainer.distanceToSpeakerMeters < 7.3;
     }
+
+    /**
+     * Detects if the robot is inside of the area of the stage
+     * 
+     * @return true if the robot is inside of the area of the stage
+     */
+    public static boolean inStageTriangle(Pose2d position) {
+        
+        List<Translation2d> points = FieldConstants.GET_STAGE_POINTS(); 
+
+        double a1 = points.get(0).minus(position.getTranslation()).getNorm();
+        double b1 = points.get(2).minus(position.getTranslation()).getNorm();
+        double c1 = points.get(2).minus(points.get(0)).getNorm();
+        double s1 = 0.5 * (a1 + b1 + c1);
+
+        double a2 = a1;
+        double b2 = points.get(1).minus(position.getTranslation()).getNorm();
+        double c2 = points.get(1).minus(points.get(0)).getNorm();
+        double s2 = 0.5 * (a2 + b2 + c2);
+
+        double a3 = b2;
+        double b3 = b1;
+        double c3 = points.get(2).minus(points.get(1)).getNorm();
+        double s3 = 0.5 * (a3 + b3 + c3);
+
+        double mainArea = 0.5 * Math.abs(points.get(2).getY() - points.get(1).getY()) * Math.abs(points.get(1).getX() - points.get(0).getX());
+        double area1 = Math.sqrt(s1 * (s1 - a1) * (s1 - b1) * (s1 - c1));
+        double area2 = Math.sqrt(s2 * (s2 - a2) * (s2 - b2) * (s2 - c2));
+        double area3 = Math.sqrt(s3 * (s3 - a3) * (s3 - b3) * (s3 - c3));
+
+        return MathUtil.applyDeadband(mainArea - (area1 + area2 + area3), AutoConstants.UNDER_STAGE_DEADBAND) == 0;
+    }
+
+    public static boolean isAlignedToAmp(Pose2d position) {
+        Translation2d touchingAmpPose = new Translation2d(
+            FieldConstants.GET_AMP_POSITION().getX(),
+            FieldConstants.GET_AMP_POSITION().getY() 
+                - DriveConstants.ROBOT_LENGTH_METERS / 2.0
+                - DriveConstants.BUMPER_LENGTH_METERS
+        );
+        double robotX = position.getTranslation().getDistance(touchingAmpPose);
+        return MathUtil.isNear(0, robotX, AutoConstants.AUTO_ALIGNMENT_DEADBAND);
+    }
+
 }
