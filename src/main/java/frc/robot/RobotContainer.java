@@ -167,7 +167,7 @@ public class RobotContainer {
             // limelightMapper.printJSON();
         } else {
             limelight3g = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-threeg", 0);
-            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 1);
             limelight3.disableLEDS();
             limelight3g.disableLEDS();
         }
