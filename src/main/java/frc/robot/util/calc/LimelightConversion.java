@@ -12,8 +12,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N4;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.custom.Scale3d;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
 import java.util.HashMap;
 

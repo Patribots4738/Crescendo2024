@@ -17,17 +17,15 @@ import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.AlignmentCalc;
 import frc.robot.util.calc.PoseCalculations;
-import monologue.Annotations.IgnoreLogged;
 
 public class AlignmentCmds {
-    
-    @IgnoreLogged
+
     private Climb climb;
-    @IgnoreLogged
+
     private Swerve swerve;
 
     private ShooterCmds shooterCmds;
-    @IgnoreLogged
+    
     public AlignmentCalc alignmentCalc;
 
     public AlignmentCmds(Swerve swerve, Climb climb, ShooterCmds shooterCmds) {

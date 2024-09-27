@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
 
 public class Ampper extends SubsystemBase implements AmpperIO {
     private final Neo motor;

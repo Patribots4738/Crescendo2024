@@ -19,12 +19,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
-import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.rev.Neo;
 import frc.robot.util.rev.NeoPhysicsSim;
-import monologue.Monologue;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -99,8 +97,6 @@ public class Robot extends LoggedRobot {
      * and
      * SmartDashboard integrated updating.
      */
-    private boolean updatedAlready = false;
-    private boolean updateTimer = false;
     private boolean startedURCL = false;
 
     @Override
@@ -108,18 +104,12 @@ public class Robot extends LoggedRobot {
         // Set the previous to the current timestamp before it updates
         Robot.previousTimestamp = Robot.currentTimestamp;
         Robot.currentTimestamp = Timer.getFPGATimestamp();
-        if (gameMode != GameMode.DISABLED) {
-            Monologue.updateAll();
-        }
-        else {
-            updateTimer = (int) (Robot.currentTimestamp / 10) % 2 == 0;
-            if (updateTimer && !updatedAlready) {
-                updatedAlready = true;
-                Monologue.updateAll();
-            } else if (!updateTimer) {
-                updatedAlready = false;
-            }
-        }
+
+        RobotContainer.displayTime = 
+            DriverStation.isFMSAttached()
+                ? Timer.getMatchTime() // Display time left in current match mode (auto/teleop)
+                : Robot.currentTimestamp - RobotContainer.gameModeStart; // Display time since mode start
+
         CommandScheduler.getInstance().run();
     }
 
@@ -143,13 +133,10 @@ public class Robot extends LoggedRobot {
         // Shut off NetworkTables broadcasting for most logging calls
         // if we are at competition
         RobotContainer.gameModeStart = currentTimestamp;
-        // Monologue.setFileOnly(DriverStation.isFMSAttached());
     }
 
     @Override   
     public void autonomousInit() {
-        // Update "constants"
-        Monologue.updateAll();
         if (!startedURCL) {
             URCL.start(NeoMotorConstants.CAN_ID_MAP);
             startedURCL = true;

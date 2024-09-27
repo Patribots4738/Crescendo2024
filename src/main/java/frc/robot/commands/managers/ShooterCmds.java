@@ -18,13 +18,11 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Annotations.IgnoreLogged;
 
 public class ShooterCmds {
     
-    @IgnoreLogged
     private Pivot pivot;
-    @IgnoreLogged
+    
     private Shooter shooter;
 
     private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet();

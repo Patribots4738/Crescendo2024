@@ -138,6 +138,10 @@ public class RobotContainer {
     public static boolean enableVision = true;
     @AutoLogOutput (key  ="Draggables/Limelight3GTA")
     public static double limelightTA = 0.0;
+    @AutoLogOutput (key = "Draggables/Timer")
+    public static double displayTime = 0.0;
+    @AutoLogOutput (key = "Draggables/Voltage")
+    public static double voltage = 0.0;
 
     public static Field2d field2d = new Field2d();
     
