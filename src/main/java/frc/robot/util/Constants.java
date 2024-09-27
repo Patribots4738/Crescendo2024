@@ -342,7 +342,7 @@ public final class Constants {
         public static final double AUTO_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(2);
         public static final double PASS_ROTATION_TOLERANCE_RADIANS = Units.degreesToRadians(10);
 
-        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(3);
+        public static final double AUTO_ALIGNMENT_DEADBAND = Units.inchesToMeters(1.5);
 
         public static final double UNDER_STAGE_DEADBAND = 0.02;
 

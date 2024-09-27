@@ -75,6 +75,9 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
+            if (limelightName.equals("limelight-threeg")) {
+                RobotContainer.limelightTA = Math.round(inputs.limelightTA * 10000) / 10000;
+            }
             if (inputs.pipelineIndex == 0) {
                 updatePoseEstimator();
                 setFiducialPoses();
@@ -317,7 +320,7 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
         double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
         if (!inputs.validResult
-            || (inputs.limelightTA < singleTagAmbiguityThreshold && inputs.targetIDs.length == 1)
+            // || (inputs.limelightTA < singleTagAmbiguityThreshold && inputs.targetIDs.length == 1)
             || (inputs.targetIDs.length > 1 && inputs.limelightTA < CameraConstants.LIMELIGHT_3G_TA_CUTOFF)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
             || Double.isNaN(estimatedRobotPose.getX()) 

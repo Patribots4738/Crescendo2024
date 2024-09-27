@@ -136,6 +136,9 @@ public class RobotContainer {
     public static boolean hasPiece = true;
     @AutoLogOutput (key = "Draggables/EnableVision")
     public static boolean enableVision = true;
+    @AutoLogOutput (key  ="Draggables/Limelight3GTA")
+    public static double limelightTA = 0.0;
+
     public static Field2d field2d = new Field2d();
     
     public RobotContainer() {
@@ -164,7 +167,7 @@ public class RobotContainer {
             // limelightMapper.printJSON();
         } else {
             limelight3g = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-threeg", 0);
-            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 1);
+            limelight3 = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "limelight-three", 0);
             limelight3.disableLEDS();
             limelight3g.disableLEDS();
         }
