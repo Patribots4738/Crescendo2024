@@ -2,7 +2,6 @@ package frc.robot;
 
 import java.util.function.BooleanSupplier;
 
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -136,12 +135,10 @@ public class RobotContainer {
     public static boolean hasPiece = true;
     @AutoLogOutput (key = "Draggables/EnableVision")
     public static boolean enableVision = true;
-    @AutoLogOutput (key  ="Draggables/Limelight3GTA")
-    public static double limelightTA = 0.0;
     @AutoLogOutput (key = "Draggables/Timer")
     public static double displayTime = 0.0;
-    @AutoLogOutput (key = "Draggables/Voltage")
-    public static double voltage = 0.0;
+    @AutoLogOutput (key = "Draggables/ShooterReady")
+    public static boolean shooterReady = false;
 
     public static Field2d field2d = new Field2d();
     
@@ -479,14 +476,19 @@ public class RobotContainer {
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
+
+        controller.x()
+            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
+            .onTrue(pieceControl.stopIntakeAndIndexer());
         
 
         // Intake controls 
         // The warning of dead code only applies if we are using single driver mode
-        controller.leftBumper()
-            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
-            .onTrue(pieceControl.stopIntakeAndIndexer());
+        // controller.leftBumper()
+        //     .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
+        //     .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
+        //     .onTrue(pieceControl.stopIntakeAndIndexer());
       
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
@@ -560,29 +562,21 @@ public class RobotContainer {
 
         configureCommonDriverBindings(controller);
 
-        controller.leftStick()
-            .onTrue(shooterCmds.prepareSubwooferCommand());
-
         controller.a()
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(
                 Commands.sequence(
                     Commands.either(
                         alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
-                        alignmentCmds.ampAlignmentCommand(controller::getLeftX),
+                        alignmentCmds.ampRotationalAlignmentCommand(controller::getLeftX, controller::getLeftY),
                         climb::getHooksUp))
                     .alongWith(
                         limelight3g.setLEDState(() -> true)))
             .onFalse(
                 limelight3g.setLEDState(() -> false));
 
-        controller.x()
-            .toggleOnTrue(
-                alignmentCmds.moveAndPreparePresetCommand());
-
-        // controller.b()
-        //     .toggleOnTrue(
-        //         alignmentCmds.preparePresetPose(controller::getLeftX, controller::getLeftY, false));
+        controller.b()
+            .toggleOnTrue(shooterCmds.prepareSubwooferCommand());
 
         controller.y()
             .onTrue(climb.toggleCommand());
@@ -631,7 +625,7 @@ public class RobotContainer {
             .onTrue(pieceControl.panicEjectNote())
             .onFalse(pieceControl.stopPanicEject());
 
-        controller.start().or(controller.back()).or(controller.y())
+        controller.start().or(controller.back())
             .whileTrue(pieceControl.sourceShooterIntake())
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
@@ -640,6 +634,9 @@ public class RobotContainer {
 
         controller.rightStick().toggleOnTrue(
             elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY())));
+
+        controller.y()
+            .onTrue(shooterCmds.preparePassCommand(() -> robotPose2d));
 
     }
 

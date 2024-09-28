@@ -73,9 +73,6 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         if (FieldConstants.IS_SIMULATION) {
             updateCameras(robotPoseSupplier.get());
         } else {
-            if (limelightName.equals("limelight-threeg")) {
-                RobotContainer.limelightTA = Math.round(inputs.limelightTA * 10000) / 10000;
-            }
             updatePoseEstimator();
             setFiducialPoses();
         }
