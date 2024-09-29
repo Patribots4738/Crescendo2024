@@ -426,8 +426,7 @@ public class RobotContainer {
         // to be facing AWAY FROM the driver station
         controller.start()
             .onTrue(Commands.runOnce(() -> 
-                swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve
-            ));
+                swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve));
         
         // Upon hitting start button
         // reset the orientation of the robot
@@ -458,9 +457,7 @@ public class RobotContainer {
                             .andThen(shooterCmds.raisePivot()
                                 .alongWith(shooterCmds.stopShooter())
                                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-                            .schedule()
-                        )
-                );
+                            .schedule()));
 
 
         // Climbing controls
@@ -492,9 +489,10 @@ public class RobotContainer {
       
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
-            .onFalse(pieceControl.stopEjecting());
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getRightBumper())
+            .onTrue(pieceControl.stopEjecting());
 
-        // POV left and right are uncommonly used but needed incase of emergency
+        // POV left is uncommonly used but needed incase of emergency
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
         
@@ -503,16 +501,14 @@ public class RobotContainer {
                     elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
                     limelight3g.setLEDState(() -> true),
-                    alignmentCmds.moveAndPreparePresetCommand().
-                    finallyDo(
-
-                        () -> 
-                            limelight3g.setLEDState(() -> false)
-                            .andThen(shooterCmds.raisePivot()
-                                .alongWith(shooterCmds.stopShooter())
-                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-                            .schedule()
-            )));
+                    alignmentCmds.moveAndPreparePresetCommand()
+                        .finallyDo(
+                            () -> 
+                                limelight3g.setLEDState(() -> false)
+                                .andThen(shooterCmds.raisePivot()
+                                    .alongWith(shooterCmds.stopShooter())
+                                    .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                                .schedule())));
     }
 
     private void configureSoloDriverBindings(PatriBoxController controller) {
@@ -565,11 +561,7 @@ public class RobotContainer {
         controller.a()
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(
-                Commands.sequence(
-                    Commands.either(
-                        alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
-                        alignmentCmds.ampRotationalAlignmentCommand(controller::getLeftX, controller::getLeftY),
-                        climb::getHooksUp))
+                alignmentCmds.ampRotationalAlignmentCommand(controller::getLeftX, controller::getLeftY)
                     .alongWith(
                         limelight3g.setLEDState(() -> true)))
             .onFalse(
@@ -601,12 +593,13 @@ public class RobotContainer {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .negate().and(driver.leftBumper().negate())
+            .negate().and(driver.b().negate())
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
-            .onFalse(pieceControl.stopEjecting());
+            .negate().and(driver.rightBumper().negate())
+            .onTrue(pieceControl.stopEjecting());
 
         controller.rightTrigger()
             .onTrue(pieceControl

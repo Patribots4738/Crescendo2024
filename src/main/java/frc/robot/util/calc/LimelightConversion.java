@@ -1,7 +1,6 @@
 package frc.robot.util.calc;
 
 import org.json.simple.JSONObject;
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.Matrix;

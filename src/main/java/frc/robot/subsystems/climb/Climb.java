@@ -149,7 +149,7 @@ public class Climb extends SubsystemBase implements ClimbIO {
         return Commands.either( 
             toTopCommand().alongWith(setToggleMode(true)),
             toBottomCommand(),
-            () -> inputs.leftTargetPositionMeters == 0);
+            () -> !hooksUp);
     }
 
     public BooleanSupplier atDesiredPosition() {

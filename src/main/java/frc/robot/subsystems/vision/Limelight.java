@@ -306,9 +306,9 @@ public class Limelight extends SubsystemBase implements LimelightIO {
 
         Pose2d estimatedRobotPose = inputs.botPose2d;
 
-        double singleTagAmbiguityThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
+        double singleTagAreaThreshold = Robot.gameMode == GameMode.AUTONOMOUS ? 0.175 : 0.141;
         if (!inputs.validResult
-            // || (inputs.limelightTA < singleTagAmbiguityThreshold && inputs.targetIDs.length == 1)
+            || (inputs.limelightTA < singleTagAreaThreshold && inputs.targetIDs.length == 1)
             || (inputs.targetIDs.length > 1 && inputs.limelightTA < CameraConstants.LIMELIGHT_3G_TA_CUTOFF)
             || (estimatedRobotPose.getX() == 0 && estimatedRobotPose.getY() == 0)
             || Double.isNaN(estimatedRobotPose.getX()) 
