@@ -65,6 +65,7 @@ import frc.robot.util.calc.LimelightMapping;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
+import frc.robot.util.custom.SelectiveConditionalCommand;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.rev.Neo;
 
@@ -221,8 +222,7 @@ public class RobotContainer {
         shooter.setDefaultCommand(
             pieceControl.getAutomaticShooterSpeeds(
                 swerve::getPose,
-                () -> driver.getLeftTrigger() 
-                || driver.getLeftBumper() 
+                () -> driver.getXButton() 
                 || (OIConstants.OPERATOR_PRESENT 
                     && operator.getLeftBumper())
             )
@@ -442,6 +442,7 @@ public class RobotContainer {
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
+                    shooterCmds.setDriverShooting(true),
                     elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
                     limelight3g.setLEDState(() -> true),
@@ -453,10 +454,15 @@ public class RobotContainer {
                         () -> PoseCalculations.closeToSpeaker() || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
-                            limelight3g.setLEDState(() -> false)
-                            .andThen(shooterCmds.raisePivot()
-                                .alongWith(shooterCmds.stopShooter())
-                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
+                            shooterCmds.setDriverShooting(false)
+                            .andThen(limelight3g.setLEDState(() -> false))
+                            .andThen(
+                                new SelectiveConditionalCommand(
+                                    Commands.none(),
+                                    shooterCmds.raisePivot()
+                                        .alongWith(shooterCmds.stopShooter())
+                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+                                    shooterCmds::getOperatorShooting))
                             .schedule()));
 
 
@@ -470,7 +476,7 @@ public class RobotContainer {
         // Note to target will either place amp or shoot,
         // depending on if the elevator is up or not
         controller.rightTrigger()
-            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> controller.getLeftBumper())
+            .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> operator.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
 
@@ -629,7 +635,22 @@ public class RobotContainer {
             elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY())));
 
         controller.y()
-            .onTrue(shooterCmds.preparePassCommand(() -> robotPose2d));
+            .whileTrue(
+                shooterCmds.setOperatorShooting(true)
+                    .andThen( 
+                        new ActiveConditionalCommand(
+                            shooterCmds.prepareStillSpeakerCommand(() -> robotPose2d),
+                            shooterCmds.preparePassCommand(() -> robotPose2d),
+                            PoseCalculations::closeToSpeaker)))
+            .onFalse(
+                shooterCmds.setOperatorShooting(false)
+                    .andThen(
+                        new SelectiveConditionalCommand(
+                            Commands.none(),
+                            shooterCmds.stopShooter()
+                                .alongWith(shooterCmds.raisePivot())
+                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+                            shooterCmds::getDriverShooting)));
 
     }
 

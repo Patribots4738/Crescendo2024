@@ -1,4 +1,4 @@
-package frc.robot.commands.managers;
+package frc.robot.util.custom;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
@@ -22,6 +22,7 @@ import java.util.function.BooleanSupplier;
  * This class is provided by the NewCommands VendorDep
  */
 public class SelectiveConditionalCommand extends Command {
+    
     private final Command onTrueCommand;
     private final Command onFalseCommand;
     private final BooleanSupplier conditionSupplier;

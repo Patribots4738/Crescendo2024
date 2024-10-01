@@ -3,6 +3,8 @@ package frc.robot.commands.managers;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.pathplanner.lib.util.GeometryUtil;
 
 import edu.wpi.first.math.Pair;
@@ -28,6 +30,13 @@ public class ShooterCmds {
     private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet();
     
     public ShooterCalc shooterCalc;
+
+    @AutoLogOutput (key = "Managers/ShooterCmds/DriverShooting")
+    private boolean driverShooting = false;
+
+    @AutoLogOutput (key = "Managers/ShooterCmds/OperatorShooting")
+    private boolean operatorShooting = false;
+    
 
     public ShooterCmds(Shooter shooter, Pivot pivot, ShooterCalc shooterCalc) {
         this.pivot = pivot;
@@ -201,5 +210,21 @@ public class ShooterCmds {
     public Command raisePivot() {
         return pivot.setAngleCommand(ShooterConstants.PIVOT_RAISE_ANGLE_DEGREES);
 	}
+
+    public Command setOperatorShooting(boolean newOperatorShooting) {
+        return Commands.runOnce(() -> this.operatorShooting = newOperatorShooting);
+    }
+
+    public boolean getOperatorShooting() {
+        return operatorShooting;
+    }
+
+    public Command setDriverShooting(boolean newDriverShooting) {
+        return Commands.runOnce(() -> this.driverShooting = newDriverShooting);
+    }
+
+    public boolean getDriverShooting() {
+        return driverShooting;
+    }
     
 }
