@@ -794,6 +794,16 @@ public final class Constants {
             add(GeometryUtil.flipFieldPose(blueSubwoofer));
         }};
 
+        public static final List<Pose2d> SAMPLE_PASS_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Source
+            Pose2d bluePos = new Pose2d(9.892, 1.511, Rotation2d.fromRadians(2.637));
+            add(bluePos);
+
+            // Red Source
+            add(GeometryUtil.flipFieldPose(bluePos));
+        }};
         public static final List<Pose3d> CHAIN_POSE3DS = new ArrayList<Pose3d>() {{
             // All points are in meters and radians
             // All relative to the blue origin
@@ -921,6 +931,10 @@ public final class Constants {
         }
         public static Pose2d GET_SUBWOOFER_POSITION() {
             return SUBWOOFER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_SAMPLE_PASS_POSITION() {
+            return SAMPLE_PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_CENTER_PASS_APEX_POSITION() {

@@ -427,6 +427,10 @@ public class RobotContainer {
         controller.start()
             .onTrue(Commands.runOnce(() -> 
                 swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve));
+
+        controller.back()
+            .onTrue(Commands.runOnce(() ->
+                swerve.resetOdometry(FieldConstants.GET_SAMPLE_PASS_POSITION()), swerve));
         
         // Upon hitting start button
         // reset the orientation of the robot
