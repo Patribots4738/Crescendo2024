@@ -245,7 +245,7 @@ public final class Constants {
         public static final double SHOOTER_WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
         public static final double GRAVITY = 9.81;
         public static final double SPEAKER_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
-        public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.PASS_HEIGHT_METERS);
+        public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.CENTER_PASS_HEIGHT_METERS);
 
     }
 
@@ -733,7 +733,8 @@ public final class Constants {
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
-        public static final double PASS_HEIGHT_METERS = Units.feetToMeters(13.5);
+        public static final double CENTER_PASS_HEIGHT_METERS = Units.feetToMeters(13.5);
+        public static final double SOURCE_PASS_HEIGHT_METERS = Units.feetToMeters(16.5);
 
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
@@ -853,7 +854,7 @@ public final class Constants {
             add(redPose);
         }};
         
-        public static final List<Pose2d> PASS_APEX_POSITIONS = new ArrayList<Pose2d>() {{
+        public static final List<Pose2d> CENTER_PASS_APEX_POSITIONS = new ArrayList<Pose2d>() {{
 
             // I swear bulldogs and hawaiin kids just had to get in here somehow
             Pose2d bluePose = new Pose2d(4.581, 4.359, Rotation2d.fromDegrees(0));
@@ -863,10 +864,30 @@ public final class Constants {
             add(redPose);
         }};
 
-        public static final List<Pose2d> PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
+        public static final List<Pose2d> SOURCE_PASS_APEX_POSITIONS = new ArrayList<Pose2d>() {{
+
+            Pose2d bluePose = new Pose2d(11.1323, 4.414, Rotation2d.fromDegrees(0));
+            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
+
+            add(bluePose);
+            add(redPose);
+
+        }};
+
+        public static final List<Pose2d> CENTER_PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
 
             // I swear bulldogs and hawaiin kids just had to get in here somehow
             Pose2d bluePose = new Pose2d(1.07, 6.99, Rotation2d.fromDegrees(0));
+            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
+
+            add(bluePose);
+            add(redPose);
+        }};
+
+        public static final List<Pose2d> SOURCE_PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
+
+            // I swear bulldogs and hawaiin kids just had to get in here somehow
+            Pose2d bluePose = new Pose2d(8.544, 6.316, Rotation2d.fromDegrees(0));
             Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
 
             add(bluePose);
@@ -902,12 +923,20 @@ public final class Constants {
             return SUBWOOFER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
-        public static Pose2d GET_PASS_APEX_POSITION() {
-            return PASS_APEX_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        public static Pose2d GET_CENTER_PASS_APEX_POSITION() {
+            return CENTER_PASS_APEX_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
-        public static Pose2d GET_PASS_TARGET_POSITION() {
-            return PASS_TARGET_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        public static Pose2d GET_SOURCE_PASS_APEX_POSITION() {
+            return SOURCE_PASS_APEX_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_CENTER_PASS_TARGET_POSITION() {
+            return CENTER_PASS_TARGET_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        }
+
+        public static Pose2d GET_SOURCE_PASS_TARGET_POSITION() {
+            return SOURCE_PASS_TARGET_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_SOURCE_POSITION() {
@@ -941,6 +970,9 @@ public final class Constants {
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
         public static double BLUE_WING_X = 5.84;
         public static double RED_WING_X = 10.7;
+
+        public static double BLUE_SOURCE_PASS_X = 12.73;
+        public static double RED_SOURCE_PASS_X = 3.94;
 
         // need to update
         private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);
@@ -1190,7 +1222,8 @@ public final class Constants {
             put("dropPiece1", 0.5);
 
             put("ampPosition", 0.37);
-            put("atan++", 0.86);
+            put("centerAtan++", 0.86);
+            put("sourceAtan++", 0.86);
 
             put("placeOuttake", 0.6995);
             put("prepPiece", 0.3);
