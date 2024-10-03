@@ -137,16 +137,15 @@ public class ShooterCalc {
                     ? FieldConstants.GET_SOURCE_PASS_TARGET_POSITION() 
                     : FieldConstants.GET_CENTER_PASS_TARGET_POSITION());
 
-        // Calculate the distance and height in meters from the robot to the pass apex
-        double distanceMeters = robotPose.getTranslation().getNorm() / 2.0;
-        double heightMeters = 
+        // Calculate the distance and height in meters from the robot to the pass target pose
+        double rangeMeters = robotPose.getTranslation().getNorm();
+        double v0z = 
             sourcePass
-                ? FieldConstants.SOURCE_PASS_HEIGHT_METERS + NT.getValue("sourceAtan++")
-                : FieldConstants.CENTER_PASS_HEIGHT_METERS + NT.getValue("centerAtan++");
+                ? ShooterConstants.SOURCE_PASS_V0Z
+                : ShooterConstants.CENTER_PASS_V0Z;
 
         // Return a new rotation object that represents the pivot angle
-        // The pivot angle is calculated based on the speaker's height and the distance to the speaker
-        return new Rotation2d(distanceMeters, heightMeters);
+        return new Rotation2d(Math.atan((-2*v0z*v0z)/(rangeMeters*-ShooterConstants.GRAVITY)));
     }
 
     /**
@@ -341,7 +340,11 @@ public class ShooterCalc {
     }
 
     private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle) {
-        double desiredRPM = velocityToRPM(ShooterConstants.PASS_V0Z / (pivotAngle.getSin()));
+        double v0z =
+            PoseCalculations.inSourcePassZone(robotPose)
+                ? ShooterConstants.SOURCE_PASS_V0Z
+                : ShooterConstants.CENTER_PASS_V0Z;
+        double desiredRPM = velocityToRPM(v0z / (pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
 }

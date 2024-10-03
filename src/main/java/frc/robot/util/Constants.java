@@ -245,7 +245,8 @@ public final class Constants {
         public static final double SHOOTER_WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
         public static final double GRAVITY = 9.81;
         public static final double SPEAKER_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
-        public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.CENTER_PASS_HEIGHT_METERS);
+        public static final double CENTER_PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.CENTER_PASS_HEIGHT_METERS);
+        public static final double SOURCE_PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SOURCE_PASS_HEIGHT_METERS);
 
     }
 
