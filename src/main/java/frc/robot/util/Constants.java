@@ -734,8 +734,8 @@ public final class Constants {
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
-        public static final double CENTER_PASS_HEIGHT_METERS = Units.feetToMeters(13.5);
-        public static final double SOURCE_PASS_HEIGHT_METERS = Units.feetToMeters(16.5);
+        public static final double CENTER_PASS_HEIGHT_METERS = Units.feetToMeters(10.5);
+        public static final double SOURCE_PASS_HEIGHT_METERS = Units.feetToMeters(10.5);
 
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
@@ -799,7 +799,7 @@ public final class Constants {
             // All points are in meters and radians
             // All relative to the blue origin
             // Blue Source
-            Pose2d bluePos = new Pose2d(9.892, 1.511, Rotation2d.fromRadians(2.637));
+            Pose2d bluePos = new Pose2d(8.268, 5.736, Rotation2d.fromRadians(2.858));
             add(bluePos);
 
             // Red Source
@@ -891,7 +891,7 @@ public final class Constants {
         public static final List<Pose2d> SOURCE_PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
 
             // I swear bulldogs and hawaiin kids just had to get in here somehow
-            Pose2d bluePose = new Pose2d(8.544, 6.316, Rotation2d.fromDegrees(0));
+            Pose2d bluePose = new Pose2d(7.068, 7.266, Rotation2d.fromDegrees(0));
             Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
 
             add(bluePose);

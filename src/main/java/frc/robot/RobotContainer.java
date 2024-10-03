@@ -479,11 +479,6 @@ public class RobotContainer {
             .onTrue(pieceControl.noteToTarget(swerve::getPose, swerve::getRobotRelativeVelocity, swerve::atHDCAngle, () -> operator.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
-
-        controller.x()
-            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
-            .onTrue(pieceControl.stopIntakeAndIndexer());
         
 
         // Intake controls 
@@ -515,6 +510,7 @@ public class RobotContainer {
                                     .alongWith(shooterCmds.stopShooter())
                                     .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                                 .schedule())));
+
     }
 
     private void configureSoloDriverBindings(PatriBoxController controller) {
@@ -575,6 +571,11 @@ public class RobotContainer {
 
         controller.b()
             .toggleOnTrue(shooterCmds.prepareSubwooferCommand());
+
+        controller.x()
+            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
+            .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.y()
             .onTrue(
@@ -691,6 +692,12 @@ public class RobotContainer {
         controller.leftTrigger()
             .whileTrue(pieceControl.sourceShooterIntake())
             .onFalse(pieceControl.stopIntakeAndIndexer());
+
+        controller.y()
+            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
+            .onTrue(pieceControl.stopIntakeAndIndexer());
+            
 
     }
 
