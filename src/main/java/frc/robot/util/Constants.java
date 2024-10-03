@@ -581,7 +581,7 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
 
-        public static final DriverMode DRIVER_MODE = DriverMode.DOUBLE;
+        public static final DriverMode DRIVER_MODE = DriverMode.DEV;
 
         public enum DriverMode {
             SINGLE,
@@ -794,7 +794,7 @@ public final class Constants {
             add(GeometryUtil.flipFieldPose(blueSubwoofer));
         }};
 
-        public static final List<Pose2d> SAMPLE_PASS_POSITIONS = new ArrayList<Pose2d>() {{
+        public static final List<Pose2d> SAMPLE_CENTER_PASS_POSITIONS = new ArrayList<Pose2d>() {{
             // All points are in meters and radians
             // All relative to the blue origin
             // Blue Source
@@ -804,6 +804,18 @@ public final class Constants {
             // Red Source
             add(GeometryUtil.flipFieldPose(bluePos));
         }};
+
+        public static final List<Pose2d> SAMPLE_SOURCE_PASS_POSITIONS = new ArrayList<Pose2d>() {{
+            // All points are in meters and radians
+            // All relative to the blue origin
+            // Blue Source
+            Pose2d bluePos = new Pose2d(15.482, 1.143, Rotation2d.fromRadians(2.689));
+            add(bluePos);
+
+            // Red Source
+            add(GeometryUtil.flipFieldPose(bluePos));
+        }};
+
         public static final List<Pose3d> CHAIN_POSE3DS = new ArrayList<Pose3d>() {{
             // All points are in meters and radians
             // All relative to the blue origin
@@ -863,26 +875,7 @@ public final class Constants {
             add(bluePose);
             add(redPose);
         }};
-        
-        public static final List<Pose2d> CENTER_PASS_APEX_POSITIONS = new ArrayList<Pose2d>() {{
 
-            // I swear bulldogs and hawaiin kids just had to get in here somehow
-            Pose2d bluePose = new Pose2d(4.581, 4.359, Rotation2d.fromDegrees(0));
-            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
-
-            add(bluePose);
-            add(redPose);
-        }};
-
-        public static final List<Pose2d> SOURCE_PASS_APEX_POSITIONS = new ArrayList<Pose2d>() {{
-
-            Pose2d bluePose = new Pose2d(11.1323, 4.414, Rotation2d.fromDegrees(0));
-            Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
-
-            add(bluePose);
-            add(redPose);
-
-        }};
 
         public static final List<Pose2d> CENTER_PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
 
@@ -933,16 +926,12 @@ public final class Constants {
             return SUBWOOFER_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
-        public static Pose2d GET_SAMPLE_PASS_POSITION() {
-            return SAMPLE_PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        public static Pose2d GET_SAMPLE_CENTER_PASS_POSITION() {
+            return SAMPLE_CENTER_PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
-        public static Pose2d GET_CENTER_PASS_APEX_POSITION() {
-            return CENTER_PASS_APEX_POSITIONS.get(getAllianceIndex(Alliance.Blue));
-        }
-
-        public static Pose2d GET_SOURCE_PASS_APEX_POSITION() {
-            return SOURCE_PASS_APEX_POSITIONS.get(getAllianceIndex(Alliance.Blue));
+        public static Pose2d GET_SAMPLE_SOURCE_PASS_POSITION() {
+            return SAMPLE_SOURCE_PASS_POSITIONS.get(getAllianceIndex(Alliance.Blue));
         }
 
         public static Pose2d GET_CENTER_PASS_TARGET_POSITION() {
@@ -984,9 +973,6 @@ public final class Constants {
         public static double CENTERLINE_X = FIELD_WIDTH_METERS / 2.0;
         public static double BLUE_WING_X = 5.84;
         public static double RED_WING_X = 10.7;
-
-        public static double BLUE_SOURCE_PASS_X = 12.73;
-        public static double RED_SOURCE_PASS_X = 3.94;
 
         // need to update
         private static double CENTERLINE_FIRST_Y = Units.inchesToMeters(29.638);

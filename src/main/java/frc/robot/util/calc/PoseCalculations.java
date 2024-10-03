@@ -165,8 +165,8 @@ public class PoseCalculations {
     public static boolean inSourcePassZone(Pose2d position) {
         return 
             Robot.isRedAlliance()
-                ? position.getX() < FieldConstants.RED_SOURCE_PASS_X
-                : position.getX() > FieldConstants.BLUE_SOURCE_PASS_X;
+                ? position.getX() < FieldConstants.BLUE_WING_X
+                : position.getX() > FieldConstants.RED_WING_X;
     }
 
 }

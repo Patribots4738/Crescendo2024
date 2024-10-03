@@ -427,10 +427,6 @@ public class RobotContainer {
         controller.start()
             .onTrue(Commands.runOnce(() -> 
                 swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve));
-
-        controller.back()
-            .onTrue(Commands.runOnce(() ->
-                swerve.resetOdometry(FieldConstants.GET_SAMPLE_PASS_POSITION()), swerve));
         
         // Upon hitting start button
         // reset the orientation of the robot
@@ -581,7 +577,11 @@ public class RobotContainer {
             .toggleOnTrue(shooterCmds.prepareSubwooferCommand());
 
         controller.y()
-            .onTrue(climb.toggleCommand());
+            .onTrue(
+                Commands.either( 
+                    climb.toTopCommand().alongWith(climb.setToggleMode(true)),
+                    climb.toBottomCommand().alongWith(shooterCmds.stowPivot()),
+                    () -> !climb.getHooksUp()));
 
         controller.leftTrigger()
             .onTrue(pieceControl.blepNote());
@@ -662,32 +662,31 @@ public class RobotContainer {
 
         configureCommonDriverBindings(controller);
 
-        controller.a()
-            .onTrue(swerve.resetHDCCommand()
-                .alongWith(pieceControl.moveNoteThenElevator().onlyIf(() -> !(climb.getHooksUp() || elevator.isUp()))))
-            .whileTrue(
-                Commands.sequence(
-                    Commands.either(
-                        alignmentCmds.trapAlignmentCommand(controller::getLeftX, controller::getLeftY),
-                        alignmentCmds.ampAlignmentCommand(controller::getLeftX),
-                        climb::getHooksUp))
-                    .alongWith(
-                        limelight3g.setLEDState(() -> true)))
-            .onFalse(
-                limelight3g.setLEDState(() -> false))
-            .negate().and(() -> !controller.getXButton())
-                .onTrue(elevator.toBottomCommand());
-
         controller.x()
-            .onTrue(pieceControl.moveNoteThenElevator().onlyIf(() -> !elevator.isUp()))
-            .negate().and(() -> !controller.getAButton())
-                .onTrue(elevator.toBottomCommand());
+            .onTrue(
+                swerve.resetOdometryCommand(FieldConstants::GET_SAMPLE_CENTER_PASS_POSITION));
 
-        controller.b()
-            .onTrue(pieceControl.blepNote());
+        controller.b()  
+            .onTrue(
+                swerve.resetOdometryCommand(FieldConstants::GET_SAMPLE_SOURCE_PASS_POSITION));
 
-        controller.y()
-            .onTrue(climb.toggleCommand());
+        controller.a()
+            .whileTrue(
+                shooterCmds.setOperatorShooting(true)
+                    .andThen( 
+                        new ActiveConditionalCommand(
+                            shooterCmds.prepareStillSpeakerCommand(() -> robotPose2d),
+                            shooterCmds.preparePassCommand(() -> robotPose2d),
+                            PoseCalculations::closeToSpeaker)))
+            .onFalse(
+                shooterCmds.setOperatorShooting(false)
+                    .andThen(
+                        new SelectiveConditionalCommand(
+                            Commands.none(),
+                            shooterCmds.stopShooter()
+                                .alongWith(shooterCmds.raisePivot())
+                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+                            shooterCmds::getDriverShooting)));
 
         controller.leftTrigger()
             .whileTrue(pieceControl.sourceShooterIntake())

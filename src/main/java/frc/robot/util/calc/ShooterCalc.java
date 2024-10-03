@@ -134,11 +134,11 @@ public class ShooterCalc {
         robotPose = 
             robotPose.relativeTo(
                 sourcePass 
-                    ? FieldConstants.GET_SOURCE_PASS_APEX_POSITION() 
-                    : FieldConstants.GET_CENTER_PASS_APEX_POSITION());
+                    ? FieldConstants.GET_SOURCE_PASS_TARGET_POSITION() 
+                    : FieldConstants.GET_CENTER_PASS_TARGET_POSITION());
 
         // Calculate the distance and height in meters from the robot to the pass apex
-        double distanceMeters = robotPose.getTranslation().getNorm();
+        double distanceMeters = robotPose.getTranslation().getNorm() / 2.0;
         double heightMeters = 
             sourcePass
                 ? FieldConstants.SOURCE_PASS_HEIGHT_METERS + NT.getValue("sourceAtan++")
@@ -342,6 +342,6 @@ public class ShooterCalc {
 
     private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle) {
         double desiredRPM = velocityToRPM(ShooterConstants.PASS_V0Z / (pivotAngle.getSin()));
-        return Pair.of(desiredRPM/1.4, desiredRPM/1.4);
+        return Pair.of(desiredRPM, desiredRPM);
     }
 }
