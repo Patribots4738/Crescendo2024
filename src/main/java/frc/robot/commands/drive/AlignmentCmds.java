@@ -199,13 +199,13 @@ public class AlignmentCmds {
                 climb::getHooksUp);
     }
 
-    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier, boolean lowPass) {
         return
             passRotationalAlignment(driverX, driverY, shooterCmds)
                 .alongWith(
                    new SelectiveConditionalCommand(
                         Commands.none(), 
-                        shooterCmds.preparePassCommand(swerve::getPose),
+                        shooterCmds.preparePassCommand(swerve::getPose, lowPass),
                         shooterCmds::getOperatorShooting));
     }
 

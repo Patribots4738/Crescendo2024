@@ -450,7 +450,7 @@ public class RobotContainer {
                         // This runs SWD on heading control 
                         // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                        alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier, false),
                         () -> PoseCalculations.closeToSpeaker() || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
@@ -560,6 +560,27 @@ public class RobotContainer {
 
         configureCommonDriverBindings(controller);
 
+        controller.leftStick()
+            .toggleOnTrue(
+                Commands.sequence(
+                    shooterCmds.setDriverShooting(true),
+                    elevator.toBottomCommand(),
+                    swerve.resetHDCCommand(),
+                    limelight3g.setLEDState(() -> true),
+                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier, true)
+                    ).finallyDo(
+                        () -> 
+                            shooterCmds.setDriverShooting(false)
+                            .andThen(limelight3g.setLEDState(() -> false))
+                            .andThen(
+                                new SelectiveConditionalCommand(
+                                    Commands.none(),
+                                    shooterCmds.raisePivot()
+                                        .alongWith(shooterCmds.stopShooter())
+                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+                                    shooterCmds::getOperatorShooting))
+                            .schedule()));
+
         controller.a()
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(
@@ -645,7 +666,7 @@ public class RobotContainer {
                     .andThen( 
                         new ActiveConditionalCommand(
                             shooterCmds.prepareStillSpeakerCommand(() -> robotPose2d),
-                            shooterCmds.preparePassCommand(() -> robotPose2d),
+                            shooterCmds.preparePassCommand(() -> robotPose2d, false),
                             PoseCalculations::closeToSpeaker)))
             .onFalse(
                 shooterCmds.setOperatorShooting(false)
@@ -677,7 +698,7 @@ public class RobotContainer {
                     .andThen( 
                         new ActiveConditionalCommand(
                             shooterCmds.prepareStillSpeakerCommand(() -> robotPose2d),
-                            shooterCmds.preparePassCommand(() -> robotPose2d),
+                            shooterCmds.preparePassCommand(() -> robotPose2d, false),
                             PoseCalculations::closeToSpeaker)))
             .onFalse(
                 shooterCmds.setOperatorShooting(false)

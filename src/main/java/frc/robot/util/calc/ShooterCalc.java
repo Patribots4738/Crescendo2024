@@ -84,9 +84,9 @@ public class ShooterCalc {
             );
     }
 
-    public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose) {
-        Rotation2d pivotAngle = calculatePassPivotAngle(robotPose);
-        Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForPassApex(robotPose, pivotAngle);
+    public SpeedAngleTriplet calculatePassTriplet(Pose2d robotPose, boolean lowPass) {
+        Rotation2d pivotAngle = calculatePassPivotAngle(robotPose, lowPass);
+        Pair<Number, Number> shooterSpeeds = calculateShooterSpeedsForPassApex(robotPose, pivotAngle, lowPass);
         return SpeedAngleTriplet.of(
             // Don't ask. It works. Is this how we finally beat the hawaiian kids?
             shooterSpeeds.getFirst(),
@@ -126,7 +126,7 @@ public class ShooterCalc {
         );
     }
 
-    public Rotation2d calculatePassPivotAngle(Pose2d robotPose) {
+    public Rotation2d calculatePassPivotAngle(Pose2d robotPose, boolean lowPass) {
 
         boolean sourcePass = PoseCalculations.inSourcePassZone(robotPose);
 
@@ -139,13 +139,12 @@ public class ShooterCalc {
 
         // Calculate the distance and height in meters from the robot to the pass target pose
         double rangeMeters = robotPose.getTranslation().getNorm();
-        double v0z = 
-            sourcePass
-                ? ShooterConstants.SOURCE_PASS_V0Z
-                : ShooterConstants.CENTER_PASS_V0Z;
+        double v0z = ShooterConstants.PASS_V0Z;
+
+        double theta = Math.atan((-2*v0z*v0z)/(rangeMeters*-ShooterConstants.GRAVITY));
 
         // Return a new rotation object that represents the pivot angle
-        return new Rotation2d(Math.atan((-2*v0z*v0z)/(rangeMeters*-ShooterConstants.GRAVITY)));
+        return new Rotation2d(lowPass ? Math.PI / 2 - theta : theta);
     }
 
     /**
@@ -210,7 +209,8 @@ public class ShooterCalc {
         double velocityArcTan = Math.atan2(
             velocityTangent,
             (target.equals(FieldConstants.GET_CENTER_PASS_TARGET_POSITION()) || target.equals(FieldConstants.GET_SOURCE_PASS_TARGET_POSITION())
-                ? rpmToVelocity(calculatePassTriplet(robotPose).getSpeeds()) 
+                // Run this calculation with high pass triplet, as low pass requires little rotational precision in swd
+                ? rpmToVelocity(calculatePassTriplet(robotPose, false).getSpeeds())
                 : rpmToVelocity(calculateSWDTriplet(robotPose, robotVelocity).getSpeeds())
             // rpmToVelocity(calculateShooterSpeedsForApex(robotPose, calculatePivotAngle(robotPose)))
         ));
@@ -339,12 +339,9 @@ public class ShooterCalc {
         return Pair.of(desiredRPM, desiredRPM);
     }
 
-    private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle) {
-        double v0z =
-            PoseCalculations.inSourcePassZone(robotPose)
-                ? ShooterConstants.SOURCE_PASS_V0Z
-                : ShooterConstants.CENTER_PASS_V0Z;
-        double desiredRPM = velocityToRPM(v0z / (pivotAngle.getSin()));
+    private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle, boolean lowPass) {
+        double v0z = ShooterConstants.PASS_V0Z;
+        double desiredRPM = velocityToRPM(v0z / (lowPass ? pivotAngle.getCos() : pivotAngle.getSin()));
         return Pair.of(desiredRPM, desiredRPM);
     }
 }

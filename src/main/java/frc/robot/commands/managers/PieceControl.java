@@ -489,7 +489,8 @@ public class PieceControl {
                                     && Robot.gameMode == GameMode.TELEOP 
                                     && DriverStation.isFMSAttached())
                                 ? shooterCmds.shooterCalc.calculatePassTriplet(
-                                    robotPose.get()
+                                    robotPose.get(),
+                                    false
                                 ).getSpeeds()
                                 : shooterCmds.shooterCalc.calculateSpeakerTriplet(
                                     robotPose.get().getTranslation()

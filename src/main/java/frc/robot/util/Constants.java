@@ -195,17 +195,15 @@ public final class Constants {
         public static final double SHOOTER_PASS_RPM_DEADBAND = 150;
 
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
-        public static final double PIVOT_UPPER_LIMIT_DEGREES = 59;
+        public static final double PIVOT_UPPER_LIMIT_DEGREES = 56;
         public static final double PIVOT_RAISE_ANGLE_DEGREES = 49;
 
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
 
-        public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.NEO_FREE_SPEED_RPM;
-        public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.NEO_FREE_SPEED_RPM;
+        public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.VORTEX_FREE_SPEED_RPM;
+        public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.VORTEX_FREE_SPEED_RPM;
 
         public static final double DEFAULT_RPM = 2500;
-        
-        public static final double SHOOTER_PASS_SECONDS = 2;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
         /**
@@ -245,8 +243,7 @@ public final class Constants {
         public static final double SHOOTER_WHEEL_DIAMETER_METERS = Units.inchesToMeters(3);
         public static final double GRAVITY = 9.81;
         public static final double SPEAKER_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SPEAKER_HEIGHT_METERS);
-        public static final double CENTER_PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.CENTER_PASS_HEIGHT_METERS);
-        public static final double SOURCE_PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.SOURCE_PASS_HEIGHT_METERS);
+        public static final double PASS_V0Z = Math.sqrt(ShooterConstants.GRAVITY*2*FieldConstants.PASS_HEIGHT_METERS);
 
     }
 
@@ -582,7 +579,7 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
 
-        public static final DriverMode DRIVER_MODE = DriverMode.DEV;
+        public static final DriverMode DRIVER_MODE = DriverMode.DOUBLE;
 
         public enum DriverMode {
             SINGLE,
@@ -734,8 +731,7 @@ public final class Constants {
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
-        public static final double CENTER_PASS_HEIGHT_METERS = Units.feetToMeters(10.5);
-        public static final double SOURCE_PASS_HEIGHT_METERS = Units.feetToMeters(10.5);
+        public static final double PASS_HEIGHT_METERS = Units.feetToMeters(9.5);
 
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
