@@ -489,8 +489,7 @@ public class PieceControl {
                                     robotPose.get().getTranslation()
                                 ).getSpeeds()
                                 : shooterCmds.shooterCalc.calculatePassTriplet(
-                                    robotPose.get(),
-                                    false
+                                    robotPose.get()
                                 ).getSpeeds()
                         ),
                     shooterCmds.getShooter()

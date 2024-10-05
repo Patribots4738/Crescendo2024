@@ -185,7 +185,7 @@ public class AlignmentCalc {
      */
     public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose()));
     }
 
     public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {

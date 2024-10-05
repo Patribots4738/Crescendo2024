@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.util.Constants.AutoConstants;
@@ -168,6 +169,14 @@ public class PoseCalculations {
             Robot.isRedAlliance()
                 ? position.getX() < FieldConstants.BLUE_WING_X
                 : position.getX() > FieldConstants.RED_WING_X;
+    }
+
+    public static boolean inLowPassZone(Pose2d position) {
+        return 
+            position.getY() > FieldConstants.GET_STAGE_POINTS().get(2).getY()
+            || (Robot.isRedAlliance() 
+                ? position.getX() > FieldConstants.NOTE_TRANSLATIONS[3].getX() 
+                : position.getX() < FieldConstants.NOTE_TRANSLATIONS[0].getX());
     }
 
 }

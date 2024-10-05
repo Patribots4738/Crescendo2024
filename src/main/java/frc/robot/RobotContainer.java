@@ -451,7 +451,7 @@ public class RobotContainer {
                         // This runs SWD on heading control 
                         // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier, false),
+                        alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         () -> PoseCalculations.closeToSpeaker() || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
@@ -558,20 +558,7 @@ public class RobotContainer {
         configureCommonDriverBindings(controller);
 
         controller.leftStick()
-            .toggleOnTrue(
-                Commands.sequence(
-                    elevator.toBottomCommand(),
-                    swerve.resetHDCCommand(),
-                    limelight3g.setLEDState(() -> true),
-                    alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier, true)
-                    ).finallyDo(
-                        () -> 
-                            limelight3g.setLEDState(() -> false)
-                            .andThen(
-                                shooterCmds.raisePivot()
-                                    .alongWith(shooterCmds.stopShooter())
-                                    .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-                            .schedule()));
+            .onTrue(shooterCmds.prepareSubwooferCommand());
 
         controller.a()
             .onTrue(swerve.resetHDCCommand())
@@ -581,10 +568,7 @@ public class RobotContainer {
                         limelight3g.setLEDState(() -> true)))
             .onFalse(
                 limelight3g.setLEDState(() -> false));
-
-        controller.b()
-            .toggleOnTrue(shooterCmds.prepareSubwooferCommand());
-
+                
         controller.x()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
             .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
