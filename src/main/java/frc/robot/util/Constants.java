@@ -206,6 +206,9 @@ public final class Constants {
         public static final double DEFAULT_RPM = 2500;
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
+
+        public static final double TUNED_SHOOTER_MAX_DISTANCE = 14.0; // update accordingly with map
+        
         /**
          * The distances are in feet, the speeds are in RPM, and the angles are in
          * degrees.
@@ -1107,7 +1110,9 @@ public final class Constants {
         }};
 
         // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-        public static final double AUTOMATIC_SHOOTER_DISTANCE_RADIUS = 8.5;
+        public static final double AUTOMATIC_SHOOTER_DISTANCE_RADIUS_METERS = 8.5;
+
+        public static final double SPEAKER_CLEANUP_DISTANCE_METERS = 3.4;
 
         public static List<Pose2d> GET_SHOOTING_POSITIONS() {
             int startingIndex = Robot.isRedAlliance() ? SHOOTING_POSITIONS.size() / 2 : 0;

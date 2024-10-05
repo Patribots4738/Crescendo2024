@@ -117,6 +117,7 @@ public class PieceControl {
         // start running indexer so it gets up to speed and wait until shooter is at desired 
         // rotation and speed before sending note from ampper into indexer and then into 
         // shooter before stopping ampper and indexer
+        
         return Commands.sequence(
                 intake.inCommand(),
                 ampper.intake(),
@@ -483,25 +484,22 @@ public class PieceControl {
                 Commands.run(
                     () -> 
                         shooterCmds.setSpeeds(
-                            ((Robot.currentTimestamp - RobotContainer.gameModeStart < 7
-                                && Robot.gameMode == GameMode.TELEOP 
-                                && DriverStation.isFMSAttached())
-                                || PoseCalculations.closeToSpeaker())
-                            ? shooterCmds.shooterCalc.calculateSpeakerTriplet(
-                                robotPose.get().getTranslation()
-                            ).getSpeeds()
-                            : shooterCmds.shooterCalc.calculatePassTriplet(
-                                robotPose.get(),
-                                false
-                            ).getSpeeds()
+                            PoseCalculations.closeToSpeaker()
+                                ? shooterCmds.shooterCalc.calculateSpeakerTriplet(
+                                    robotPose.get().getTranslation()
+                                ).getSpeeds()
+                                : shooterCmds.shooterCalc.calculatePassTriplet(
+                                    robotPose.get(),
+                                    false
+                                ).getSpeeds()
                         ),
                     shooterCmds.getShooter()
                 ),
                 shooterCmds.stopShooter(),
                 () -> 
                     ((((piPico.hasNoteShooter() || piPico.hasNoteElevator()
-                            && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-                        || (RobotContainer.distanceToSpeakerMeters < 3.4 
+                            && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS_METERS)
+                        || (RobotContainer.distanceToSpeakerMeters < FieldConstants.SPEAKER_CLEANUP_DISTANCE_METERS 
                             && intaking.getAsBoolean() 
                             && elevator.getDesiredPosition() < ElevatorConstants.NOTE_FIX_POS))
 

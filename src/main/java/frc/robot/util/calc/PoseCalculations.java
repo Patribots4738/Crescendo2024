@@ -14,6 +14,7 @@ import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.ClimbConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
+import frc.robot.util.Constants.ShooterConstants;
 
 public class PoseCalculations {
 
@@ -116,7 +117,7 @@ public class PoseCalculations {
 
     // Note: this method uses a static variable rather than a parameter
     public static boolean closeToSpeaker() {
-        return RobotContainer.distanceToSpeakerMeters < 7.3;
+        return RobotContainer.distanceToSpeakerFeet <= ShooterConstants.TUNED_SHOOTER_MAX_DISTANCE;
     }
 
     /**
