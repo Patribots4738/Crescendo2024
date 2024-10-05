@@ -477,42 +477,42 @@ public class PieceControl {
     }
 
     // Within a range of the [red circle](https://www.desmos.com/calculator/cu3ocssv5d)
-    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, BooleanSupplier intaking) {
+    public Command getAutomaticShooterSpeeds(Supplier<Pose2d> robotPose, BooleanSupplier intaking, BooleanSupplier manualActivation) {
         return 
             new ActiveConditionalCommand(
-                Commands.none(),
-                new ActiveConditionalCommand(
-                    Commands.run(
-                        () -> 
-                            shooterCmds.setSpeeds(
-                                (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
-                                    && Robot.gameMode == GameMode.TELEOP 
-                                    && DriverStation.isFMSAttached())
-                                ? shooterCmds.shooterCalc.calculatePassTriplet(
-                                    robotPose.get(),
-                                    false
-                                ).getSpeeds()
-                                : shooterCmds.shooterCalc.calculateSpeakerTriplet(
-                                    robotPose.get().getTranslation()
-                                ).getSpeeds()
-                            ),
-                        shooterCmds.getShooter()
-                    ),
-                    shooterCmds.stopShooter(),
+                Commands.run(
                     () -> 
-                        (((piPico.hasNoteShooter() || piPico.hasNoteElevator()
-                                && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
-                            || (RobotContainer.distanceToSpeakerMeters < 3.4 
-                                && intaking.getAsBoolean() 
-                                && elevator.getDesiredPosition() < ElevatorConstants.NOTE_FIX_POS))
-                        
-                        || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
-                            && Robot.gameMode == GameMode.TELEOP 
-                            && DriverStation.isFMSAttached())
-                        
-                        && piPico.shooterSensorConnected()))
-                    .onlyIf(() -> Robot.gameMode != GameMode.TEST),
-                () -> shooterCmds.getOperatorShooting() || shooterCmds.getDriverShooting());
+                        shooterCmds.setSpeeds(
+                            ((Robot.currentTimestamp - RobotContainer.gameModeStart < 7
+                                && Robot.gameMode == GameMode.TELEOP 
+                                && DriverStation.isFMSAttached())
+                                || PoseCalculations.closeToSpeaker())
+                            ? shooterCmds.shooterCalc.calculateSpeakerTriplet(
+                                robotPose.get().getTranslation()
+                            ).getSpeeds()
+                            : shooterCmds.shooterCalc.calculatePassTriplet(
+                                robotPose.get(),
+                                false
+                            ).getSpeeds()
+                        ),
+                    shooterCmds.getShooter()
+                ),
+                shooterCmds.stopShooter(),
+                () -> 
+                    ((((piPico.hasNoteShooter() || piPico.hasNoteElevator()
+                            && RobotContainer.distanceToSpeakerMeters < FieldConstants.AUTOMATIC_SHOOTER_DISTANCE_RADIUS)
+                        || (RobotContainer.distanceToSpeakerMeters < 3.4 
+                            && intaking.getAsBoolean() 
+                            && elevator.getDesiredPosition() < ElevatorConstants.NOTE_FIX_POS))
+
+                        && (FieldConstants.IS_SIMULATION || piPico.shooterSensorConnected()))
+                    
+                    || (Robot.currentTimestamp - RobotContainer.gameModeStart < 7
+                        && Robot.gameMode == GameMode.TELEOP 
+                        && DriverStation.isFMSAttached())
+
+                    || manualActivation.getAsBoolean()))
+                .onlyIf(() -> Robot.gameMode != GameMode.TEST);
     }
 
     private Timer doubleAmpTimer = new Timer();

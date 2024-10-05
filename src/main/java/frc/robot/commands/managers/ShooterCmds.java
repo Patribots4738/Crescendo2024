@@ -31,13 +31,6 @@ public class ShooterCmds {
     
     public ShooterCalc shooterCalc;
 
-    @AutoLogOutput (key = "Managers/ShooterCmds/DriverShooting")
-    private boolean driverShooting = false;
-
-    @AutoLogOutput (key = "Managers/ShooterCmds/OperatorShooting")
-    private boolean operatorShooting = false;
-    
-
     public ShooterCmds(Shooter shooter, Pivot pivot, ShooterCalc shooterCalc) {
         this.pivot = pivot;
         this.shooter = shooter;
@@ -210,21 +203,5 @@ public class ShooterCmds {
     public Command raisePivot() {
         return pivot.setAngleCommand(ShooterConstants.PIVOT_RAISE_ANGLE_DEGREES);
 	}
-
-    public Command setOperatorShooting(boolean newOperatorShooting) {
-        return Commands.runOnce(() -> this.operatorShooting = newOperatorShooting);
-    }
-
-    public boolean getOperatorShooting() {
-        return operatorShooting;
-    }
-
-    public Command setDriverShooting(boolean newDriverShooting) {
-        return Commands.runOnce(() -> this.driverShooting = newDriverShooting);
-    }
-
-    public boolean getDriverShooting() {
-        return driverShooting;
-    }
     
 }

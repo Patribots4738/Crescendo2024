@@ -224,7 +224,9 @@ public class RobotContainer {
                 swerve::getPose,
                 () -> driver.getXButton() 
                 || (OIConstants.OPERATOR_PRESENT 
-                    && operator.getLeftBumper())
+                    && operator.getLeftBumper()),
+                () -> OIConstants.OPERATOR_PRESENT 
+                && (driver.getLeftBumper() || operator.getYButton())
             )
         );
 
@@ -442,7 +444,6 @@ public class RobotContainer {
         controller.rightStick()
             .toggleOnTrue(
                 Commands.sequence(
-                    shooterCmds.setDriverShooting(true),
                     elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
                     limelight3g.setLEDState(() -> true),
@@ -454,15 +455,11 @@ public class RobotContainer {
                         () -> PoseCalculations.closeToSpeaker() || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
-                            shooterCmds.setDriverShooting(false)
-                            .andThen(limelight3g.setLEDState(() -> false))
-                            .andThen(
-                                new SelectiveConditionalCommand(
-                                    Commands.none(),
+                            limelight3g.setLEDState(() -> false)
+                                .andThen(
                                     shooterCmds.raisePivot()
                                         .alongWith(shooterCmds.stopShooter())
-                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-                                    shooterCmds::getOperatorShooting))
+                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                             .schedule()));
 
 
@@ -563,22 +560,17 @@ public class RobotContainer {
         controller.leftStick()
             .toggleOnTrue(
                 Commands.sequence(
-                    shooterCmds.setDriverShooting(true),
                     elevator.toBottomCommand(),
                     swerve.resetHDCCommand(),
                     limelight3g.setLEDState(() -> true),
                     alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier, true)
                     ).finallyDo(
                         () -> 
-                            shooterCmds.setDriverShooting(false)
-                            .andThen(limelight3g.setLEDState(() -> false))
+                            limelight3g.setLEDState(() -> false)
                             .andThen(
-                                new SelectiveConditionalCommand(
-                                    Commands.none(),
-                                    shooterCmds.raisePivot()
-                                        .alongWith(shooterCmds.stopShooter())
-                                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-                                    shooterCmds::getOperatorShooting))
+                                shooterCmds.raisePivot()
+                                    .alongWith(shooterCmds.stopShooter())
+                                    .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                             .schedule()));
 
         controller.a()
@@ -660,24 +652,6 @@ public class RobotContainer {
         controller.rightStick().toggleOnTrue(
             elevator.overrideCommand(() -> Units.inchesToMeters(operator.getRightY())));
 
-        controller.y()
-            .whileTrue(
-                shooterCmds.setOperatorShooting(true)
-                    .andThen( 
-                        new ActiveConditionalCommand(
-                            shooterCmds.prepareStillSpeakerCommand(() -> robotPose2d),
-                            shooterCmds.preparePassCommand(() -> robotPose2d, false),
-                            PoseCalculations::closeToSpeaker)))
-            .onFalse(
-                shooterCmds.setOperatorShooting(false)
-                    .andThen(
-                        new SelectiveConditionalCommand(
-                            Commands.none(),
-                            shooterCmds.stopShooter()
-                                .alongWith(shooterCmds.raisePivot())
-                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-                            shooterCmds::getDriverShooting)));
-
     }
 
     private void configureDevDriverBindings(PatriBoxController controller) {
@@ -691,24 +665,6 @@ public class RobotContainer {
         controller.b()  
             .onTrue(
                 swerve.resetOdometryCommand(FieldConstants::GET_SAMPLE_SOURCE_PASS_POSITION));
-
-        controller.a()
-            .whileTrue(
-                shooterCmds.setOperatorShooting(true)
-                    .andThen( 
-                        new ActiveConditionalCommand(
-                            shooterCmds.prepareStillSpeakerCommand(() -> robotPose2d),
-                            shooterCmds.preparePassCommand(() -> robotPose2d, false),
-                            PoseCalculations::closeToSpeaker)))
-            .onFalse(
-                shooterCmds.setOperatorShooting(false)
-                    .andThen(
-                        new SelectiveConditionalCommand(
-                            Commands.none(),
-                            shooterCmds.stopShooter()
-                                .alongWith(shooterCmds.raisePivot())
-                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-                            shooterCmds::getDriverShooting)));
 
         controller.leftTrigger()
             .whileTrue(pieceControl.sourceShooterIntake())

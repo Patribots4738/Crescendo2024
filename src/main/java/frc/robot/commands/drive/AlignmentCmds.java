@@ -191,22 +191,14 @@ public class AlignmentCmds {
             Commands.either(
                 chainRotationalAlignment(driverX, driverY, robotRelativeSupplier),
                 speakerRotationalAlignment(driverX, driverY, shooterCmds)
-                    .alongWith(
-                        new SelectiveConditionalCommand(
-                            Commands.none(), 
-                            shooterCmds.prepareStillSpeakerCommand(swerve::getPose), 
-                            shooterCmds::getOperatorShooting)),
+                    .alongWith(shooterCmds.prepareStillSpeakerCommand(swerve::getPose)),
                 climb::getHooksUp);
     }
 
     public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier, boolean lowPass) {
         return
             passRotationalAlignment(driverX, driverY, shooterCmds)
-                .alongWith(
-                   new SelectiveConditionalCommand(
-                        Commands.none(), 
-                        shooterCmds.preparePassCommand(swerve::getPose, lowPass),
-                        shooterCmds::getOperatorShooting));
+                .alongWith(shooterCmds.preparePassCommand(swerve::getPose, lowPass));
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {
