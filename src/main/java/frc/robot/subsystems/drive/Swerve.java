@@ -271,9 +271,14 @@ public class Swerve extends SubsystemBase {
     }
     
     @AutoLogOutput (key = "Subsystems/Swerve/DesiredHDCPose")
-    Pose2d desiredHDCPose = new Pose2d();
+    private Pose2d desiredHDCPose = new Pose2d();
+
     public void setDesiredPose(Pose2d pose) {
         desiredHDCPose = pose;
+    }
+
+    public Pose2d getDesiredPose() {
+        return desiredHDCPose;
     }
 
     public ChassisSpeeds getRobotRelativeVelocity() {
@@ -454,8 +459,16 @@ public class Swerve extends SubsystemBase {
         AutoConstants.HDC.getThetaController().reset(getPose().getRotation().getRadians());
     }
 
+    public void resetDesiredHDCPose() {
+        setDesiredPose(new Pose2d());
+    }
+
     public Command resetHDCCommand() {
         return Commands.runOnce(() -> resetHDC());
+    }
+
+    public Command resetDesiredHDCPoseCommand() {
+        return Commands.runOnce(() -> resetDesiredHDCPose());
     }
 
     public void reconfigureAutoBuilder() {

@@ -212,18 +212,17 @@ public final class Constants {
         /**
          * The distances are in feet, the speeds are in RPM, and the angles are in
          * degrees.
-         * The distances are in feet, the speeds are in RPM, and the angles are in
-         * degrees.
          */
         public static final HashMap<Double, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Double, SpeedAngleTriplet>() {
             {
-                put(4.0, SpeedAngleTriplet.of(2316.0, 1763.0, 57.5));
+                // PRE-BATB
+                put(4.0, SpeedAngleTriplet.of(2316.0, 1763.0, 56.0));
                 put(5.0, SpeedAngleTriplet.of(2316.0, 1763.0, 54.1));
                 put(6.0, SpeedAngleTriplet.of(3007.0, 2818.0, 48.1));
                 put(7.0, SpeedAngleTriplet.of(3008.0, 2818.0, 44.9));
                 put(7.5, SpeedAngleTriplet.of(3304.0, 2997.0, 43.3)); 
                 put(8.0, SpeedAngleTriplet.of(3319.0, 3024.0, 42.4));
-                // put(8.5, SpeedAngleTriplet.of(3445.0, 3128.0, 40.9));
+                put(8.5, SpeedAngleTriplet.of(3445.0, 3128.0, 40.9));
                 put(9.0, SpeedAngleTriplet.of(3606.0, 3305.0, 39.6));
                 put(10.0, SpeedAngleTriplet.of(3842.0, 3441.0, 37.6));
                 put(11.0, SpeedAngleTriplet.of(3965.0, 3647.0, 36.2));
@@ -231,6 +230,48 @@ public final class Constants {
                 put(12.5, SpeedAngleTriplet.of(4320.0, 3945.0, 34.0));
                 put(13.0, SpeedAngleTriplet.of(4490.0, 4106.0, 33.7));
                 put(14.0, SpeedAngleTriplet.of(4809.0, 4540.0, 33.6));
+
+                // PRE-BATB (FLIPPED)
+                // put(4.0, SpeedAngleTriplet.of(1763.0, 2316.0, 56.0));
+                // put(5.0, SpeedAngleTriplet.of(1763.0, 2316.0, 54.1));
+                // put(6.0, SpeedAngleTriplet.of(2818.0, 3007.0, 48.1));
+                // put(7.0, SpeedAngleTriplet.of(2818.0, 3008.0, 44.9));
+                // put(7.5, SpeedAngleTriplet.of(2997.0, 3304.0, 43.3)); 
+                // put(8.0, SpeedAngleTriplet.of(3024.0, 3319.0, 42.4));
+                // put(8.5, SpeedAngleTriplet.of(3128.0, 3445.0, 40.9));
+                // put(9.0, SpeedAngleTriplet.of(3305.0, 3606.0, 39.6));
+                // put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 37.6));
+                // put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 36.2));
+                // put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 34.1));
+                // put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 34.0));
+                // put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 33.7));
+                // put(14.0, SpeedAngleTriplet.of(4540.0, 4809.0, 33.6));
+
+                // BAYOU
+                // put(6.0, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
+                // put(7.0, SpeedAngleTriplet.of(3160.0, 2865.0, 46.3));
+                // put(8.0, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
+                // put(9.0, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
+                // put(10.0, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
+                // put(11.0, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
+                // put(12.0, SpeedAngleTriplet.of(3921.0, 3558.0, 33.3));
+                // put(13.0, SpeedAngleTriplet.of(4075.0, 3691.0, 30.9));
+                // put(14.0, SpeedAngleTriplet.of(4190.0, 3731.0, 29.4));
+                // put(15.0, SpeedAngleTriplet.of(4531.0, 4058.0, 28));
+                // put(16.0, SpeedAngleTriplet.of(4190.0, 3731.0, 26.7));
+
+                // BAYOU (FLIPPED)
+                // put(6.0, SpeedAngleTriplet.of(2850.0, 3007.0, 50.1));
+                // put(7.0, SpeedAngleTriplet.of(2865.0, 3160.0, 46.3));
+                // put(8.0, SpeedAngleTriplet.of(3017.0, 3310.0, 43.4));
+                // put(9.0, SpeedAngleTriplet.of(3202.0, 3502.0, 40.2));
+                // put(10.0, SpeedAngleTriplet.of(3305.0, 3706.0, 37.8));
+                // put(11.0, SpeedAngleTriplet.of(3539.0, 3856.0, 34.5));
+                // put(12.0, SpeedAngleTriplet.of(3558.0, 3921.0, 33.3));
+                // put(13.0, SpeedAngleTriplet.of(3691.0, 4075.0, 30.9));
+                // put(14.0, SpeedAngleTriplet.of(3731.0, 4190.0, 29.4));
+                // put(15.0, SpeedAngleTriplet.of(4058.0, 4531.0, 28));
+                // put(16.0, SpeedAngleTriplet.of(3731.0, 4190.0, 26.7));
                 
             }
         };

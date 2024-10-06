@@ -159,7 +159,7 @@ public class ShooterCmds {
     }
 
     public Command prepareSubwooferCommand() {
-        return setTripletCommand(shooterCalc.calculateSpeakerTriplet(FieldConstants.GET_SUBWOOFER_POSITION().getTranslation()));
+        return prepareStillSpeakerCommand(FieldConstants::GET_SUBWOOFER_POSITION);
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {
