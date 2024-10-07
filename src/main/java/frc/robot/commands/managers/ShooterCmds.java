@@ -3,8 +3,6 @@ package frc.robot.commands.managers;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import com.pathplanner.lib.util.GeometryUtil;
 
 import edu.wpi.first.math.Pair;

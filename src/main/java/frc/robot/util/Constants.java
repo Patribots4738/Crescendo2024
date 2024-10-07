@@ -207,7 +207,7 @@ public final class Constants {
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
 
-        public static final double TUNED_SHOOTER_MAX_DISTANCE = 14.0; // update accordingly with map
+        public static final double TUNED_SHOOTER_MAX_DISTANCE = 17.0; // update accordingly with map
         
         /**
          * The distances are in feet, the speeds are in RPM, and the angles are in
@@ -216,36 +216,39 @@ public final class Constants {
         public static final HashMap<Double, SpeedAngleTriplet> SPEAKER_DISTANCES_TO_SPEEDS_AND_ANGLE_MAP = new HashMap<Double, SpeedAngleTriplet>() {
             {
                 // PRE-BATB
-                put(4.0, SpeedAngleTriplet.of(2316.0, 1763.0, 56.0));
-                put(5.0, SpeedAngleTriplet.of(2316.0, 1763.0, 54.1));
-                put(6.0, SpeedAngleTriplet.of(3007.0, 2818.0, 48.1));
-                put(7.0, SpeedAngleTriplet.of(3008.0, 2818.0, 44.9));
-                put(7.5, SpeedAngleTriplet.of(3304.0, 2997.0, 43.3)); 
-                put(8.0, SpeedAngleTriplet.of(3319.0, 3024.0, 42.4));
-                put(8.5, SpeedAngleTriplet.of(3445.0, 3128.0, 40.9));
-                put(9.0, SpeedAngleTriplet.of(3606.0, 3305.0, 39.6));
-                put(10.0, SpeedAngleTriplet.of(3842.0, 3441.0, 37.6));
-                put(11.0, SpeedAngleTriplet.of(3965.0, 3647.0, 36.2));
-                put(12.0, SpeedAngleTriplet.of(4147.0, 3781.0, 34.1));
-                put(12.5, SpeedAngleTriplet.of(4320.0, 3945.0, 34.0));
-                put(13.0, SpeedAngleTriplet.of(4490.0, 4106.0, 33.7));
-                put(14.0, SpeedAngleTriplet.of(4809.0, 4540.0, 33.6));
+                // put(4.0, SpeedAngleTriplet.of(2316.0, 1763.0, 56.0));
+                // put(5.0, SpeedAngleTriplet.of(2316.0, 1763.0, 54.1));
+                // put(6.0, SpeedAngleTriplet.of(3007.0, 2818.0, 48.1));
+                // put(7.0, SpeedAngleTriplet.of(3008.0, 2818.0, 44.9));
+                // put(7.5, SpeedAngleTriplet.of(3304.0, 2997.0, 43.3)); 
+                // put(8.0, SpeedAngleTriplet.of(3319.0, 3024.0, 42.4));
+                // put(8.5, SpeedAngleTriplet.of(3445.0, 3128.0, 40.9));
+                // put(9.0, SpeedAngleTriplet.of(3606.0, 3305.0, 39.6));
+                // put(10.0, SpeedAngleTriplet.of(3842.0, 3441.0, 37.6));
+                // put(11.0, SpeedAngleTriplet.of(3965.0, 3647.0, 36.2));
+                // put(12.0, SpeedAngleTriplet.of(4147.0, 3781.0, 34.1));
+                // put(12.5, SpeedAngleTriplet.of(4320.0, 3945.0, 34.0));
+                // put(13.0, SpeedAngleTriplet.of(4490.0, 4106.0, 33.7));
+                // put(14.0, SpeedAngleTriplet.of(4809.0, 4540.0, 33.6));
 
                 // PRE-BATB (FLIPPED)
-                // put(4.0, SpeedAngleTriplet.of(1763.0, 2316.0, 56.0));
-                // put(5.0, SpeedAngleTriplet.of(1763.0, 2316.0, 54.1));
-                // put(6.0, SpeedAngleTriplet.of(2818.0, 3007.0, 48.1));
-                // put(7.0, SpeedAngleTriplet.of(2818.0, 3008.0, 44.9));
-                // put(7.5, SpeedAngleTriplet.of(2997.0, 3304.0, 43.3)); 
-                // put(8.0, SpeedAngleTriplet.of(3024.0, 3319.0, 42.4));
-                // put(8.5, SpeedAngleTriplet.of(3128.0, 3445.0, 40.9));
-                // put(9.0, SpeedAngleTriplet.of(3305.0, 3606.0, 39.6));
-                // put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 37.6));
-                // put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 36.2));
-                // put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 34.1));
-                // put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 34.0));
-                // put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 33.7));
-                // put(14.0, SpeedAngleTriplet.of(4540.0, 4809.0, 33.6));
+                put(4.0, SpeedAngleTriplet.of(1763.0, 2316.0, 56.0));
+                put(5.0, SpeedAngleTriplet.of(1763.0, 2316.0, 54.1));
+                put(6.0, SpeedAngleTriplet.of(2818.0, 3007.0, 48.1));
+                put(7.0, SpeedAngleTriplet.of(2818.0, 3008.0, 44.9));
+                put(7.5, SpeedAngleTriplet.of(2997.0, 3304.0, 43.3)); 
+                put(8.0, SpeedAngleTriplet.of(3024.0, 3319.0, 42.4));
+                put(8.5, SpeedAngleTriplet.of(3128.0, 3445.0, 40.9));
+                put(9.0, SpeedAngleTriplet.of(3305.0, 3606.0, 39.6));
+                put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 37.6));
+                put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 36.2));
+                put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 34.1));
+                put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 34.0));
+                put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 33.7));
+                put(14.0, SpeedAngleTriplet.of(4379.0, 4648.0, 31.5));
+                put(15.0, SpeedAngleTriplet.of(4445.0, 4714.0, 30.4));
+                put(16.0, SpeedAngleTriplet.of(4540.0, 4809.0, 29.7));
+
 
                 // BAYOU
                 // put(6.0, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
@@ -473,10 +476,8 @@ public final class Constants {
             // "S W3-1 S",
             // "S W3-1 S 2",
             "S W3-1 S C2-5 S",
-            "S W3-1 S C2-5 S 2",
             
             "S W3-1 S C1-2 S",
-            "S W3-1 S C1-2 S 2",
 
             "S W3-1 S C3-5 S",
             "S W3-1 S",
@@ -1209,7 +1210,7 @@ public final class Constants {
 
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
-        public static final double LIMELIGHT_3G_TA_CUTOFF = 0.078;
+        public static final double LIMELIGHT_3G_TA_CUTOFF = 0.070;
 
         public static final Pose3d LL3Pose = 
             new Pose3d(

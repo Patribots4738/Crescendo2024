@@ -40,8 +40,6 @@ import frc.robot.commands.managers.CalibrationControl;
 import frc.robot.commands.managers.HDCTuner;
 import frc.robot.commands.managers.PieceControl;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.leds.Strips.LedStrip;
-import frc.robot.leds.Commands.LPI;
 import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.subsystems.ampper.Elevator;
 import frc.robot.subsystems.climb.Climb;
@@ -65,7 +63,6 @@ import frc.robot.util.calc.LimelightMapping;
 import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.PatriBoxController;
-import frc.robot.util.custom.SelectiveConditionalCommand;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.rev.Neo;
 
@@ -95,7 +92,6 @@ public class RobotContainer {
     private ShooterCalc shooterCalc;
     public static HDCTuner HDCTuner;
 
-    private final LedStrip ledStrip;
     private Indexer indexer;
     private Ampper ampper;
     private ShooterCmds shooterCmds;
@@ -174,7 +170,6 @@ public class RobotContainer {
             limelight3g.disableLEDS();
         }
 
-        ledStrip = new LedStrip(swerve::getPose);
         indexer = new Indexer();
         shooter = new Shooter();
         elevator = new Elevator();
@@ -459,8 +454,9 @@ public class RobotContainer {
                             Commands.parallel(
                                 swerve.resetDesiredHDCPoseCommand(),
                                 limelight3g.setLEDState(() -> false),
-                                shooterCmds.raisePivot()
-                                    .alongWith(shooterCmds.stopShooter())
+                                Commands.parallel(
+                                    shooterCmds.raisePivot(),
+                                    shooterCmds.stopShooter())
                                     .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                                 .schedule()));
 
@@ -479,7 +475,7 @@ public class RobotContainer {
                 pieceControl.noteToTarget(
                     swerve::getPose, 
                     swerve::getRobotRelativeVelocity, 
-                    () -> swerve.atHDCAngle() || swerve.getDesiredPose().equals(new Pose2d()), 
+                    () -> swerve.atHDCAngle(), 
                     () -> operator.getLeftBumper())
                     .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
@@ -526,7 +522,7 @@ public class RobotContainer {
             .whileTrue(pieceControl.blepNote())
             .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
 
-        controller.x()
+        controller.leftBumper()
             .whileTrue(pieceControl.sourceShooterIntake())
             .onFalse(pieceControl.stopIntakeAndIndexer().alongWith(shooterCmds.raisePivot()));
 
@@ -571,10 +567,11 @@ public class RobotContainer {
                 shooterCmds.prepareSubwooferCommand()
                     .finallyDo(
                         () -> 
-                            shooterCmds.raisePivot()
-                                .alongWith(shooterCmds.stopShooter())
-                                .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-                                .schedule()));
+                        Commands.parallel(
+                            shooterCmds.raisePivot(),
+                            shooterCmds.stopShooter())
+                            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+                            .schedule()));
 
 
         controller.a()
@@ -584,8 +581,10 @@ public class RobotContainer {
                     .alongWith(
                         limelight3g.setLEDState(() -> true)))
             .onFalse(
-                limelight3g.setLEDState(() -> false)
-                    .alongWith(swerve.resetHDCCommand()));
+                Commands.parallel(
+                    limelight3g.setLEDState(() -> false),
+                    swerve.resetHDCCommand(),
+                    swerve.resetDesiredHDCPoseCommand()));
                 
         controller.x()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
@@ -632,7 +631,7 @@ public class RobotContainer {
                 .noteToTarget(
                     swerve::getPose, 
                     swerve::getRobotRelativeVelocity, 
-                    () -> swerve.atHDCAngle() || swerve.getDesiredPose().equals(new Pose2d()),
+                    () -> swerve.atHDCAngle(),
                     () -> controller.getLeftBumper())
                 .alongWith(driver.setRumble(() -> 0.5, 0.3))
                 .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
@@ -777,9 +776,7 @@ public class RobotContainer {
     }
 
     public void onEnabled() {
-        if (Robot.gameMode == GameMode.TELEOP && !DriverStation.isFMSAttached()) {
-            // new LPI(ledStrip, swerve::getPose, driver, swerve::setDesiredPose).schedule();
-        } else if (Robot.gameMode == GameMode.TEST) {
+        if (Robot.gameMode == GameMode.TEST) {
             CommandScheduler.getInstance().setActiveButtonLoop(testButtonBindingLoop);
         }
         gameModeStart = Robot.currentTimestamp;
@@ -791,7 +788,6 @@ public class RobotContainer {
         double P = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/0P").getDouble(-1);
         double I = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/1I").getDouble(-1);
         double D = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/2D").getDouble(-1);
-
         double P2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/0P").getDouble(-1);
         double I2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/1I").getDouble(-1);
         double D2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/2D").getDouble(-1);
