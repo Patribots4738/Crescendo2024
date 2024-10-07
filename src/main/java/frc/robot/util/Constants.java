@@ -272,6 +272,32 @@ public final class Constants {
                 // put(14.0, SpeedAngleTriplet.of(3731.0, 4190.0, 29.4));
                 // put(15.0, SpeedAngleTriplet.of(4058.0, 4531.0, 28));
                 // put(16.0, SpeedAngleTriplet.of(3731.0, 4190.0, 26.7));
+
+                // WORLDS
+                // put(6.0, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
+                // put(7.0, SpeedAngleTriplet.of(3160.0, 2865.0, 46.3));
+                // put(8.0, SpeedAngleTriplet.of(3310.0, 3017.0, 43.4));
+                // put(9.0, SpeedAngleTriplet.of(3502.0, 3202.0, 40.2));
+                // put(10.0, SpeedAngleTriplet.of(3706.0, 3305.0, 37.8));
+                // put(11.0, SpeedAngleTriplet.of(3856.0, 3539.0, 34.5));
+                // put(12.0, SpeedAngleTriplet.of(3947.0, 3580.0, 33.8));
+                // put(13.0, SpeedAngleTriplet.of(4075.0, 3691.0, 31.8));
+                // put(14.0, SpeedAngleTriplet.of(4214.0, 3755.0, 30.9)); 
+                // put(15.0, SpeedAngleTriplet.of(4515.0, 4043.0, 30.9));
+                // put(16.0, SpeedAngleTriplet.of(4190.0, 3731.0, 26.7));
+
+                // WORLDS (FLIPPED)
+                // put(6.0, SpeedAngleTriplet.of(2850.0, 3007.0, 50.1));
+                // put(7.0, SpeedAngleTriplet.of(2865.0, 3160.0, 46.3));
+                // put(8.0, SpeedAngleTriplet.of(3017.0, 3310.0, 43.4));
+                // put(9.0, SpeedAngleTriplet.of(3202.0, 3502.0, 40.2));
+                // put(10.0, SpeedAngleTriplet.of(3305.0, 3706.0, 37.8));
+                // put(11.0, SpeedAngleTriplet.of(3539.0, 3856.0, 34.5));
+                // put(12.0, SpeedAngleTriplet.of(3580.0, 3947.0, 33.8));
+                // put(13.0, SpeedAngleTriplet.of(3691.0, 4075.0, 31.8));
+                // put(14.0, SpeedAngleTriplet.of(3755.0, 4214.0, 30.9)); 
+                // put(15.0, SpeedAngleTriplet.of(4043.0, 4515.0, 30.9));
+                // put(16.0, SpeedAngleTriplet.of(3731.0, 4190.0, 26.7));
                 
             }
         };
