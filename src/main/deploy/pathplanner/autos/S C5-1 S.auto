@@ -110,13 +110,7 @@
         {
           "type": "named",
           "data": {
-            "name": "C5toC3nonOBJ"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "C3toC5nonOBJ"
+            "name": "C5toC1nonOBJ"
           }
         }
       ]

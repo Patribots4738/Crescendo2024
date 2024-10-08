@@ -42,7 +42,6 @@ public class PathPlannerStorage {
 
     private final BooleanSupplier shooterSensor;
     private final BooleanSupplier elevatorSensor;
-    
 
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
 

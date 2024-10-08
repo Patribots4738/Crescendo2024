@@ -120,6 +120,16 @@ public class PoseCalculations {
         return RobotContainer.distanceToSpeakerFeet <= ShooterConstants.TUNED_SHOOTER_MAX_DISTANCE;
     }
 
+    public static boolean inSpeakerShotZone(Translation2d translation) {
+        Translation2d stealBoxCorner = FieldConstants.GET_STEAL_BOX_CORNER();
+        return 
+            closeToSpeaker() 
+            && ((Robot.isRedAlliance() 
+                    ? translation.getX() < stealBoxCorner.getX() 
+                    : translation.getX() > stealBoxCorner.getX()) 
+                || translation.getY() > stealBoxCorner.getY());
+    }
+
     /**
      * Detects if the robot is inside of the area of the stage
      * 

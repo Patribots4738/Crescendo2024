@@ -98,7 +98,7 @@ public class PieceControl {
     public Command shootWhenReady(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedSupplier, BooleanSupplier atDesiredAngle) {
         return
             Commands.waitUntil(() -> 
-                    (PoseCalculations.closeToSpeaker()
+                    (PoseCalculations.inSpeakerShotZone(poseSupplier.get().getTranslation())
                         ? shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() 
                         : shooterCmds.shooterCalc.readyToPassSupplier().getAsBoolean())
                     && atDesiredAngle.getAsBoolean()
@@ -484,7 +484,7 @@ public class PieceControl {
                 Commands.run(
                     () -> 
                         shooterCmds.setSpeeds(
-                            PoseCalculations.closeToSpeaker()
+                            PoseCalculations.inSpeakerShotZone(robotPose.get().getTranslation())
                                 ? shooterCmds.shooterCalc.calculateSpeakerTriplet(
                                     robotPose.get().getTranslation()
                                 ).getSpeeds()

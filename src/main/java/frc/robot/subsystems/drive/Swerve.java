@@ -503,7 +503,7 @@ public class Swerve extends SubsystemBase {
         return MathUtil.isNear(
             desiredHDCPose.getRotation().getRadians(), 
             getPose().getRotation().getRadians(), 
-            PoseCalculations.closeToSpeaker()
+            PoseCalculations.inSpeakerShotZone(getPose().getTranslation())
                 ? AutoConstants.AUTO_ROTATION_TOLERANCE_RADIANS
                 : AutoConstants.PASS_ROTATION_TOLERANCE_RADIANS);
     }

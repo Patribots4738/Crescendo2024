@@ -134,8 +134,6 @@ public class RobotContainer {
     public static boolean enableVision = true;
     @AutoLogOutput (key = "Draggables/Timer")
     public static double displayTime = 0.0;
-    @AutoLogOutput (key = "Draggables/ShooterReady")
-    public static boolean shooterReady = false;
 
     public static Field2d field2d = new Field2d();
     
@@ -448,7 +446,7 @@ public class RobotContainer {
                         // and shooting-while-still on shooter
                         alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
                         alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        () -> PoseCalculations.closeToSpeaker() || climb.getHooksUp())
+                        () -> PoseCalculations.inSpeakerShotZone(robotPose2d.getTranslation()) || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
                             Commands.parallel(
