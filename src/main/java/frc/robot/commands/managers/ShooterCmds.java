@@ -12,19 +12,17 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.logging.NoteTrajectory;
-import frc.robot.subsystems.Pivot;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.shooter.Pivot;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Annotations.IgnoreLogged;
 
 public class ShooterCmds {
     
-    @IgnoreLogged
     private Pivot pivot;
-    @IgnoreLogged
+    
     private Shooter shooter;
 
     private SpeedAngleTriplet desiredTriplet = new SpeedAngleTriplet();
@@ -137,6 +135,14 @@ public class ShooterCmds {
             }, pivot, shooter);
     }
 
+    public Command preparePivotCommandAuto(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> speeds) {
+        return Commands.run(
+            () -> {
+                desiredTriplet = shooterCalc.calculateSWDTripletAuto(robotPose.get(), speeds.get());
+                pivot.setAngle(desiredTriplet.getAngle());
+            }, pivot);
+    }
+
     public Command prepareStillSpeakerCommand(Supplier<Pose2d> robotPose) {
         return prepareSWDCommand(robotPose, () -> new ChassisSpeeds());
     }
@@ -151,7 +157,7 @@ public class ShooterCmds {
     }
 
     public Command prepareSubwooferCommand() {
-        return setTripletCommand(shooterCalc.calculateSpeakerTriplet(FieldConstants.GET_SUBWOOFER_POSITION().getTranslation()));
+        return prepareStillSpeakerCommand(FieldConstants::GET_SUBWOOFER_POSITION);
     }
 
     public Command getNoteTrajectoryCommand(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> speeds) {

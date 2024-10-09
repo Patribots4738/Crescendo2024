@@ -2,15 +2,21 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.29,
-      "y": 5.55
+      "x": 1.29235458470917,
+      "y": 4.778983272252259
     },
-    "rotation": 179.22577983507193
+    "rotation": 151.53108100340572
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "FullPowerPreload"
+          }
+        },
         {
           "type": "deadline",
           "data": {
@@ -20,15 +26,9 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3-1 2"
+                        "pathName": "S W3-1 Bayou"
                       }
                     },
                     {
@@ -47,9 +47,16 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "PrepareSWD"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "PrepareSWD"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -66,7 +73,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W1 C1"
+                        "pathName": "W1 C3"
                       }
                     },
                     {
@@ -109,13 +116,7 @@
         {
           "type": "named",
           "data": {
-            "name": "C1toC2nonOBJ"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "L C2"
+            "name": "C3toC5nonOBJ"
           }
         }
       ]

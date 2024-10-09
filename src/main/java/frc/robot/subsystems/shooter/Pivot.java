@@ -1,4 +1,7 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.shooter;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -12,18 +15,18 @@ import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NTConstants;
 import frc.robot.util.Constants.ShooterConstants;
 import frc.robot.util.rev.Neo;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class Pivot extends SubsystemBase implements Logged {
+public class Pivot extends SubsystemBase implements PivotIO {
 	private Neo motor;
 
-	@Log
-	private double realAngle = 0, desiredAngle = 0;
+    private final PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
 	
-	@Log
+	@AutoLogOutput (key = "Subsystems/Pivot/AtDesiredAngle")
 	private boolean atDesiredAngle = false;
 
+    @AutoLogOutput (key = "Subsystems/Pivot/AtDesiredPassAngle")
+	private boolean atDesiredPassAngle = false;
+   
 	public Pivot() {
 		motor = new Neo(
             ShooterConstants.SHOOTER_PIVOT_CAN_ID,
@@ -39,22 +42,26 @@ public class Pivot extends SubsystemBase implements Logged {
 		motor.setSmartCurrentLimit(ShooterConstants.PIVOT_CURRENT_LIMIT);
 		motor.setPositionConversionFactor(ShooterConstants.PIVOT_POSITION_CONVERSION_FACTOR);
 		motor.setPID(ShooterConstants.PIVOT_PID);
-        // motor.getAbsoluteEncoder().setZeroOffset(68.8235307-17.6);
+        // motor.getAbsoluteEncoder().setZeroOffset(75.4944688-17.6);
 	}
 
 	@Override
 	public void periodic() {
 
-        realAngle = getAngle();
+        updateInputs(inputs);
+        Logger.processInputs("SubsystemInputs/Pivot", inputs);
 
 		atDesiredAngle = 
-            MathUtil.isNear(realAngle, desiredAngle, ShooterConstants.PIVOT_DEADBAND);
+            MathUtil.isNear(inputs.positionDegrees, inputs.targetPositionDegrees, ShooterConstants.PIVOT_DEADBAND_DEGREES);
+
+        atDesiredPassAngle = 
+            MathUtil.isNear(inputs.positionDegrees, inputs.targetPositionDegrees, ShooterConstants.PIVOT_PASS_DEADBAND_DEGREES);
 
 		RobotContainer.components3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 			NTConstants.PIVOT_OFFSET_METERS.getX(),
 			0,
 			NTConstants.PIVOT_OFFSET_METERS.getZ(),
-			new Rotation3d(0, -Units.degreesToRadians(realAngle), 0)
+			new Rotation3d(0, -Units.degreesToRadians(inputs.positionDegrees), 0)
 		);
 	}
 
@@ -71,7 +78,6 @@ public class Pivot extends SubsystemBase implements Logged {
 				ShooterConstants.PIVOT_UPPER_LIMIT_DEGREES);
 
         motor.setTargetPosition(angle);
-        desiredAngle = angle;
 		
 		RobotContainer.desiredComponents3d[NTConstants.PIVOT_INDEX] = new Pose3d(
 				NTConstants.PIVOT_OFFSET_METERS.getX(),
@@ -110,4 +116,16 @@ public class Pivot extends SubsystemBase implements Logged {
 	public boolean getAtDesiredAngle() {
 		return atDesiredAngle;
 	}
+
+    public boolean getAtDesiredPassAngle() {
+        return atDesiredPassAngle;
+    }
+
+    @Override
+    public void updateInputs(PivotIOInputs inputs) {
+        inputs.targetPositionDegrees = this.getTargetAngle();
+        inputs.positionDegrees = this.getAngle();
+        inputs.appliedVolts = motor.getAppliedOutput();
+        inputs.outputCurrentAmps = motor.getOutputCurrent();
+    }
 }
