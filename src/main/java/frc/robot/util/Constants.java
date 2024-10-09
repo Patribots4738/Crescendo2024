@@ -338,7 +338,7 @@ public final class Constants {
         public static final PatrIDConstants ELEVATOR_PID = new PatrIDConstants(10, 0, 0);
 
         // TODO: set these values
-        public static final double BOTTOM_POS = -.005;
+        public static final double BOTTOM_POS = 0;
         public static final double INTAKE_TIME = 0;
         public static final double AMPPER_OUTTAKE_PERCENT = -1;
         public static final double AMPPER_INTAKE_PERCENT = 1;
@@ -348,8 +348,8 @@ public final class Constants {
         public static final double DEBUG_ELEVATOR_POS = 0.47;
         // This position is not used
         public static final double AMP_PLACE_POS = 0.409;        
-        public static final double NOTE_FIX_POS = 0.036;
-        public static final double INDEX_POS = 0.09;
+        public static final double NOTE_FIX_POS = 0.086;
+        public static final double INDEX_POS = 0.14;
         public static final double DROP_POS = 0.11;
         public static final double GUILLOTONE_POS = 0.224;
         public static final double UNSTUCK_POS = 0.175;
@@ -360,7 +360,7 @@ public final class Constants {
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
 
         public static final double ELEVATOR_TOP_LIMIT = 0.49;
-        public static final double ELEVATOR_BOTTOM_LIMIT = -0.0254;
+        public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
         public static final double AMPPER_LOWER_PERCENT_LIMIT = -1;
         public static final double AMPPER_UPPER_PERCENT_LIMIT = 1;
@@ -495,6 +495,7 @@ public final class Constants {
 
         public static final String[] AUTO_NAMES = new String[] {
             // "S C5-4 S OBJ",
+            "S C2-3 S",
             "S C5-1 S",
             "S C5-3 3-5 S",
 

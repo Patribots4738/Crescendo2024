@@ -603,7 +603,9 @@ public class RobotContainer {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(pieceControl.elevatorToPlacement(false));
+            .onTrue(
+                shooterCmds.stowPivot()
+                    .andThen(pieceControl.elevatorToPlacement(false)));
 
         controller.povLeft()
             .onTrue(pieceControl.elevatorToPlacement(true));
@@ -612,7 +614,9 @@ public class RobotContainer {
             .onTrue(ampper.toggleSpeed());
 
         controller.povDown()
-            .onTrue(pieceControl.elevatorToBottom());
+            .onTrue(
+                shooterCmds.stowPivot()
+                    .andThen(pieceControl.elevatorToBottom()));
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())

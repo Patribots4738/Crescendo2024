@@ -308,14 +308,14 @@ public class PieceControl {
                 Commands.race(
                     shootWhenReady(poseSupplier, speedSupplier, atDesiredAngle)
                         .andThen(setHasPiece(false)),
-                    Commands.waitUntil(() -> elevator.getDesiredPosition() > 0)
+                    Commands.waitUntil(() -> elevator.getDesiredPosition() > ElevatorConstants.BOTTOM_POS)
                 ),
                 Commands.race(
                     placeWhenReady()
                         .andThen(setHasPiece(false)),
-                    Commands.waitUntil(() -> elevator.getDesiredPosition() <= 0)
+                    Commands.waitUntil(() -> elevator.getDesiredPosition() <= ElevatorConstants.BOTTOM_POS)
                 ).andThen(ampper.stopCommand()),
-                () -> elevator.getDesiredPosition() <= 0
+                () -> elevator.getDesiredPosition() <= ElevatorConstants.BOTTOM_POS
             ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
                 .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));
     }
