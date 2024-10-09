@@ -620,7 +620,7 @@ public class RobotContainer {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .negate().and(driver.b().negate())
+            .negate().and(driver.x().negate())
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
@@ -875,7 +875,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("DisableLimelight", disableVision());
         NamedCommands.registerCommand("EnableLimelight", enableVision());
         NamedCommands.registerCommand("FullPowerPreload", 
-            shooter.fullPower(1678)
+            shooter.fullPower(1678) // Say that again?
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(pieceControl.intakeAuto()
                     .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
@@ -894,7 +894,7 @@ public class RobotContainer {
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
 
         NamedCommands.registerCommand("FullPowerPreload3",
-            shooter.fullPower(1678)
+            shooter.fullPower(1678) // Say that again?
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(
                     Commands.either(

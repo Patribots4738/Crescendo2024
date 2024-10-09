@@ -316,8 +316,13 @@ public class PieceControl {
                     Commands.waitUntil(() -> elevator.getDesiredPosition() <= ElevatorConstants.BOTTOM_POS)
                 ).andThen(ampper.stopCommand()),
                 () -> elevator.getDesiredPosition() <= ElevatorConstants.BOTTOM_POS
-            ).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-                .andThen(Commands.defer(() -> intakeUntilNote().onlyIf(operatorWantsToIntake), intakeUntilNote().getRequirements()));
+            )
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+                .raceWith(Commands.waitSeconds(4))
+                .andThen(
+                    Commands.defer(
+                        () -> intakeUntilNote().onlyIf(operatorWantsToIntake), 
+                        intakeUntilNote().getRequirements()));
     }
 
     private Command setDislodging(boolean dislodging) {
