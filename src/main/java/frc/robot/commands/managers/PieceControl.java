@@ -278,7 +278,7 @@ public class PieceControl {
 
     public Command stopEjecting() {
         return Commands.parallel(
-            elevator.toBottomCommand(),
+            elevatorToBottomSafe(),
             stopAllMotors()
         );
     }
@@ -375,8 +375,8 @@ public class PieceControl {
             Commands.sequence(
                 stopIntakeAndIndexer(),
                 Commands.either(
-                    setElevatorPosition(() -> ElevatorConstants.NOTE_FIX_POS), 
-                    setElevatorPosition(() -> ElevatorConstants.TRAP_PLACE_POS), 
+                    elevatorToNoteFixSafe(), 
+                    elevatorToTopSafe(), 
                     () -> povLeftPosition),
                 placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }
@@ -524,5 +524,25 @@ public class PieceControl {
 
     public boolean doubleAmpTimerReady() {
         return doubleAmpTimer.get() > 0.35;
+    }
+
+    public Command setElevatorPositionSafe(DoubleSupplier position) {
+        return Commands.sequence(
+            shooterCmds.stowPivot(),
+            shooterCmds.lockPivot(),
+            elevator.setPositionCommand(position),
+            shooterCmds.unlockPivot());
+    }
+
+    public Command elevatorToTopSafe() {
+        return setElevatorPositionSafe(() -> ElevatorConstants.ELEVATOR_TOP_LIMIT);
+    }
+
+    public Command elevatorToBottomSafe() {
+        return setElevatorPositionSafe(() -> ElevatorConstants.BOTTOM_POS);
+    }
+
+    public Command elevatorToNoteFixSafe() {
+        return setElevatorPositionSafe(() -> ElevatorConstants.NOTE_FIX_POS);
     }
 }

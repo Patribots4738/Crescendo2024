@@ -439,7 +439,7 @@ public class RobotContainer {
             .onTrue(swerve.resetHDCCommand())
             .toggleOnTrue(
                 Commands.sequence(
-                    elevator.toBottomCommand(),
+                    pieceControl.elevatorToBottomSafe().unless(elevator::atDesiredPosition),
                     limelight3g.setLEDState(() -> true),
                     new ActiveConditionalCommand(
                         // This runs SWD on heading control 
@@ -603,9 +603,7 @@ public class RobotContainer {
 
     private void configureOperatorBindings(PatriBoxController controller) {
         controller.povUp()
-            .onTrue(
-                shooterCmds.stowPivot()
-                    .andThen(pieceControl.elevatorToPlacement(false)));
+            .onTrue(pieceControl.elevatorToPlacement(false));
 
         controller.povLeft()
             .onTrue(pieceControl.elevatorToPlacement(true));
@@ -614,9 +612,7 @@ public class RobotContainer {
             .onTrue(ampper.toggleSpeed());
 
         controller.povDown()
-            .onTrue(
-                shooterCmds.stowPivot()
-                    .andThen(pieceControl.elevatorToBottom()));
+            .onTrue(pieceControl.elevatorToBottomSafe());
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
