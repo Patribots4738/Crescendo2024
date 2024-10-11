@@ -133,11 +133,15 @@ public class PathPlannerStorage {
     public Command updatePathViewerCommand() {
         return Commands.either(
             Commands.runOnce(() -> {
+                List<Pose2d> autoPoses = getAutoPoses(getSelectedAutoName());
                 RobotContainer.field2d.getObject("path")
-                    .setPoses(getAutoPoses(getSelectedAutoName()));
+                    .setPoses(autoPoses);
+                if (autoPoses.size() > 0)
+                    RobotContainer.autoStartingPose = autoPoses.get(0);
             }),
             Commands.runOnce(() -> {
                 RobotContainer.field2d.getObject("path").setPoses(new ArrayList<>());
+                RobotContainer.autoStartingPose = new Pose2d();
             }),
             () -> Robot.gameMode == GameMode.DISABLED
         ).ignoringDisable(true);

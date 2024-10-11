@@ -359,7 +359,7 @@ public final class Constants {
         public static final double STUCK_TIME_SECONDS = 0.25;
         public static final double UNSTUCK_OUTTAKE_TIME_SECONDS = 0.3;
 
-        public static final double ELEVATOR_TOP_LIMIT = 0.477;
+        public static final double ELEVATOR_TOP_LIMIT = 0.475;
         public static final double ELEVATOR_BOTTOM_LIMIT = 0;
 
         public static final double AMPPER_LOWER_PERCENT_LIMIT = -1;

@@ -202,12 +202,4 @@ public class ShooterCmds {
         return pivot.setAngleCommand(ShooterConstants.PIVOT_RAISE_ANGLE_DEGREES);
 	}
     
-    public Command lockPivot() {
-        return pivot.setPivotLockCommand(true);
-    }
-
-    public Command unlockPivot() {
-        return pivot.setPivotLockCommand(false);
-    }
-    
 }

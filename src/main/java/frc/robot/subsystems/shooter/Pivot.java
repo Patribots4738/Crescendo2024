@@ -26,9 +26,6 @@ public class Pivot extends SubsystemBase implements PivotIO {
 
     @AutoLogOutput (key = "Subsystems/Pivot/AtDesiredPassAngle")
 	private boolean atDesiredPassAngle = false;
-
-    @AutoLogOutput (key = "Subsystems/Pivot/PivotLock")
-    private boolean pivotLock = false;
    
 	public Pivot() {
 		motor = new Neo(
@@ -75,10 +72,6 @@ public class Pivot extends SubsystemBase implements PivotIO {
 	 * @param double The angle to set the shooter to
 	 */
 	public void setAngle(double angle) {
-
-        if (pivotLock) {
-            return;
-        }
 
 		angle = MathUtil.clamp(
 				angle,
@@ -127,18 +120,6 @@ public class Pivot extends SubsystemBase implements PivotIO {
 
     public boolean getAtDesiredPassAngle() {
         return atDesiredPassAngle;
-    }
-
-    public void setPivotLock(boolean lock) {
-        pivotLock = lock;
-    }
-
-    public Command setPivotLockCommand(boolean lock) {
-        return Commands.runOnce(() -> setPivotLock(lock));
-    }
-
-    public Command togglePivotLockCommand() {
-        return Commands.runOnce(() -> setPivotLock(!pivotLock));
     }
 
     @Override

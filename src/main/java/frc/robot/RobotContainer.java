@@ -134,6 +134,8 @@ public class RobotContainer {
     public static boolean enableVision = true;
     @AutoLogOutput (key = "Draggables/Timer")
     public static double displayTime = 0.0;
+    @AutoLogOutput (key = "Draggables/AutoStatingPose")
+    public static Pose2d autoStartingPose = new Pose2d();
 
     public static Field2d field2d = new Field2d();
     
@@ -471,15 +473,20 @@ public class RobotContainer {
             .onTrue(climb.povUpCommand());
 
         controller.povDown()
-            .onTrue(climb.toBottomCommand().alongWith(shooterCmds.stowPivot()));
+            .onTrue(
+                climb.toBottomCommand()
+                    .alongWith(
+                        Commands.waitUntil(elevator::atDesiredPosition)
+                            .andThen(shooterCmds.stowPivot())));
 
         // POV left is uncommonly used but needed incase of emergency
         controller.povLeft()
-            .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
-
-        // Lock or unlock pivot manually
-        controller.povRight()
-            .onTrue(pivot.togglePivotLockCommand());
+            .onTrue(
+                Commands.sequence(
+                    pieceControl.stopAllMotors(),
+                    Commands.waitUntil(elevator::atDesiredPosition),
+                    shooterCmds.raisePivot()
+                ));
 
     }
 
