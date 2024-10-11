@@ -423,23 +423,14 @@ public class RobotContainer {
         controller.start()
             .onTrue(Commands.runOnce(() -> 
                 swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve));
-        
-        // Upon hitting start button
-        // reset the orientation of the robot
-        // to be facing TOWARDS the driver station
-        // TODO: for testing reset odometry to speaker
-        // controller.start()
-        //     .onTrue(Commands.runOnce(() -> 
-        //         swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION().plus(new Transform2d(0,0, Rotation2d.fromDegrees(180)))), swerve
-        //     ));
-
 
         // Speaker / Source / Chain rotational alignment
         controller.rightStick()
             .onTrue(swerve.resetHDCCommand())
             .toggleOnTrue(
                 Commands.sequence(
-                    pieceControl.elevatorToBottomSafe().unless(elevator::atDesiredPosition),
+                    pieceControl.elevatorToBottomSafe()
+                        .unless(() -> elevator.getDesiredPosition() == ElevatorConstants.BOTTOM_POS),
                     limelight3g.setLEDState(() -> true),
                     new ActiveConditionalCommand(
                         // This runs SWD on heading control 
@@ -457,14 +448,6 @@ public class RobotContainer {
                                     shooterCmds.stopShooter())
                                     .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
                                 .schedule()));
-
-
-        // Climbing controls
-        controller.povUp()
-            .onTrue(climb.povUpCommand());
-
-        controller.povDown()
-            .onTrue(climb.toBottomCommand().alongWith(shooterCmds.stowPivot()));
         
         // Note to target will either place amp or shoot,
         // depending on if the elevator is up or not
@@ -473,42 +456,26 @@ public class RobotContainer {
                 pieceControl.noteToTarget(
                     swerve::getPose, 
                     swerve::getRobotRelativeVelocity, 
-                    () -> swerve.atHDCAngle(), 
-                    () -> operator.getLeftBumper())
+                    swerve::atHDCAngle, 
+                    operator::getLeftBumper)
                     .alongWith(driver.setRumble(() -> 0.5, 0.3))
             .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
-        
-
-        // Intake controls 
-        // The warning of dead code only applies if we are using single driver mode
-        // controller.leftBumper()
-        //     .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
-        //     .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
-        //     .onTrue(pieceControl.stopIntakeAndIndexer());
       
         controller.rightBumper()
             .onTrue(pieceControl.ejectNote())
             .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getRightBumper())
             .onTrue(pieceControl.stopEjecting());
+        
+        // Climbing controls
+        controller.povUp()
+            .onTrue(climb.povUpCommand());
+
+        controller.povDown()
+            .onTrue(climb.toBottomCommand().alongWith(shooterCmds.stowPivot()));
 
         // POV left is uncommonly used but needed incase of emergency
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
-        
-        // Cat smirk
-        // controller.povRight()
-        //     .toggleOnTrue(Commands.sequence(
-        //             elevator.toBottomCommand(),
-        //             swerve.resetHDCCommand(),
-        //             limelight3g.setLEDState(() -> true),
-        //             alignmentCmds.moveAndPreparePresetCommand()
-        //                 .finallyDo(
-        //                     () -> 
-        //                         limelight3g.setLEDState(() -> false)
-        //                         .andThen(shooterCmds.raisePivot()
-        //                             .alongWith(shooterCmds.stopShooter())
-        //                             .withInterruptBehavior(InterruptionBehavior.kCancelSelf))
-        //                         .schedule())));
 
     }
 
@@ -562,22 +529,23 @@ public class RobotContainer {
 
         controller.leftStick()
             .toggleOnTrue(
-                shooterCmds.prepareSubwooferCommand()
-                    .finallyDo(
-                        () -> 
-                        Commands.parallel(
-                            shooterCmds.raisePivot(),
-                            shooterCmds.stopShooter())
-                            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-                            .schedule()));
+                Commands.sequence(
+                    pieceControl.elevatorToBottomSafe(),
+                    shooterCmds.prepareSubwooferCommand()
+                ).finallyDo(
+                    () -> 
+                    Commands.parallel(
+                        shooterCmds.raisePivot(),
+                        shooterCmds.stopShooter())
+                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+                        .schedule()));
 
 
         controller.a()
             .onTrue(swerve.resetHDCCommand())
             .whileTrue(
                 alignmentCmds.ampRotationalAlignmentCommand(controller::getLeftX, controller::getLeftY)
-                    .alongWith(
-                        limelight3g.setLEDState(() -> true)))
+                    .alongWith(limelight3g.setLEDState(() -> true)))
             .onFalse(
                 Commands.parallel(
                     limelight3g.setLEDState(() -> false),

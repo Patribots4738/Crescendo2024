@@ -201,11 +201,7 @@ public class ShooterCmds {
     public Command raisePivot() {
         return pivot.setAngleCommand(ShooterConstants.PIVOT_RAISE_ANGLE_DEGREES);
 	}
-
-    public Command togglePivotLock() {
-        return pivot.togglePivotLockCommand();
-    }
-
+    
     public Command lockPivot() {
         return pivot.setPivotLockCommand(true);
     }

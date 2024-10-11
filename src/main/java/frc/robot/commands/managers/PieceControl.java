@@ -377,19 +377,20 @@ public class PieceControl {
                 Commands.either(
                     elevatorToNoteFixSafe(), 
                     elevatorToTopSafe(), 
-                    () -> povLeftPosition),
+                    () -> povLeftPosition), 
                 placeWhenReady().onlyIf(this::shouldPlaceWhenReady));
     }
 
     public Command placeWhenReady() {
         return
             new SelectiveConditionalCommand(
-                ampper.outtake(NT.getValue("placeOuttake"))
-                    .andThen(
-                        elevatorToBottom()
-                        .alongWith(shooterCmds.raisePivot())
-                        .alongWith(ampper.stopCommand())
-                    ),
+                Commands.sequence(
+                    ampper.outtake(NT.getValue("placeOuttake")),
+                    ampper.stopCommand(),
+                    setPlaceWhenReadyCommand(false),
+                    elevatorToBottomSafe(),
+                    shooterCmds.raisePivot()
+                ),
                 setPlaceWhenReadyCommand(true),
                 elevator::atDesiredPosition);
     }
@@ -448,7 +449,7 @@ public class PieceControl {
                 Commands.runOnce(() -> this.desiredSide = desiredSide),
                 setCurrentlyMovingNote(true),
                 Commands.either(
-                    noteToIndexer(),
+                    intakeUntilNote(),
                     noteToTrap(),
                     () -> desiredSide))
                 .finallyDo(() -> {
