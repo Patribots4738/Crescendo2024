@@ -477,6 +477,10 @@ public class RobotContainer {
         controller.povLeft()
             .onTrue(pieceControl.stopAllMotors().andThen(shooterCmds.raisePivot()));
 
+        // Lock or unlock pivot manually
+        controller.povRight()
+            .onTrue(pivot.togglePivotLockCommand());
+
     }
 
     private void configureSoloDriverBindings(PatriBoxController controller) {

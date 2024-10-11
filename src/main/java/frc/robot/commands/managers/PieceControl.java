@@ -312,8 +312,7 @@ public class PieceControl {
                 ),
                 Commands.race(
                     placeWhenReady()
-                        .andThen(setHasPiece(false)),
-                    Commands.waitUntil(() -> elevator.getDesiredPosition() <= ElevatorConstants.BOTTOM_POS)
+                        .andThen(setHasPiece(false))
                 ).andThen(ampper.stopCommand()),
                 () -> elevator.getDesiredPosition() <= ElevatorConstants.BOTTOM_POS
             )
@@ -530,9 +529,10 @@ public class PieceControl {
     public Command setElevatorPositionSafe(DoubleSupplier position) {
         return Commands.sequence(
             shooterCmds.stowPivot(),
-            shooterCmds.lockPivot(),
-            elevator.setPositionCommand(position),
-            shooterCmds.unlockPivot());
+            // shooterCmds.lockPivot(),
+            elevator.setPositionCommand(position)
+            // shooterCmds.unlockPivot()
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 
     public Command elevatorToTopSafe() {

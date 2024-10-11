@@ -130,16 +130,15 @@ public class Pivot extends SubsystemBase implements PivotIO {
     }
 
     public void setPivotLock(boolean lock) {
-        System.out.println("Setting lock: " + lock);
         pivotLock = lock;
     }
 
     public Command setPivotLockCommand(boolean lock) {
-        return runOnce(() -> setPivotLock(lock));
+        return Commands.runOnce(() -> setPivotLock(lock));
     }
 
     public Command togglePivotLockCommand() {
-        return runOnce(() -> setPivotLock(!pivotLock));
+        return Commands.runOnce(() -> setPivotLock(!pivotLock));
     }
 
     @Override
