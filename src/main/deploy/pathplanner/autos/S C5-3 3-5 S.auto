@@ -2,57 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.29,
-      "y": 5.55
+      "x": 0.701401686491316,
+      "y": 4.439424481685842
     },
-    "rotation": 179.22577983507193
+    "rotation": 120.60276179805513
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "deadline",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "S W3-1 2"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "EnableLimelight"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootInstantlyWhenReady"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PrepareSWD"
-                }
-              }
-            ]
+            "name": "FullPowerPreload3"
           }
         },
         {
@@ -66,7 +28,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W1 C2"
+                        "pathName": "S C5 2"
                       }
                     },
                     {
@@ -109,7 +71,13 @@
         {
           "type": "named",
           "data": {
-            "name": "C2toC5nonOBJ"
+            "name": "C5toC3nonOBJ"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C3toC5nonOBJ"
           }
         }
       ]
