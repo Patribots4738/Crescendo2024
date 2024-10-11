@@ -130,6 +130,7 @@ public class Pivot extends SubsystemBase implements PivotIO {
     }
 
     public void setPivotLock(boolean lock) {
+        System.out.println("Setting lock: " + lock);
         pivotLock = lock;
     }
 
