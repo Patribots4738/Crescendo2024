@@ -305,7 +305,6 @@ public class RobotContainer {
         new Trigger(() -> 
             Robot.gameMode == GameMode.TELEOP
             && shooter.getAverageSpeed() > 1700
-            && shooter.getAverageTargetSpeed() != 2500
             && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
             && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
         .onTrue(Commands.runOnce(() -> 
@@ -326,12 +325,11 @@ public class RobotContainer {
         // The reason we are checking bumpers
         // is so this doesn't happen on pieceControl::moveNote
         new Trigger(
-            () -> piPico.hasNoteShooter() 
+            () -> piPico.hasNoteShooter() || piPico.hasNoteElevator()
                 && (
                     // All of these buttons command intake
                     // Whether that be source or not
-                    driver.getLeftTrigger() 
-                    || driver.getXButton() 
+                    driver.getXButton() 
                     || (OIConstants.OPERATOR_PRESENT 
                         &&(operator.getLeftBumper() 
                         || operator.getStartButton() 
@@ -375,10 +373,10 @@ public class RobotContainer {
             .onTrue(driver.setRumble(() -> 0.5))
             .onFalse(driver.setRumble(() -> 0));
 
-        new Trigger(climb::getToggleMode)
-            .onTrue(swerve.resetHDCCommand())
-            .onFalse(swerve.resetDesiredHDCPoseCommand())
-            .whileTrue(alignmentCmds.chainRotationalAlignment(driver::getLeftX, driver::getLeftY, robotRelativeSupplier));  
+        // new Trigger(climb::getToggleMode)
+        //     .onTrue(swerve.resetHDCCommand())
+        //     .onFalse(swerve.resetDesiredHDCPoseCommand())
+        //     .whileTrue(alignmentCmds.chainRotationalAlignment(driver::getLeftX, driver::getLeftY, robotRelativeSupplier));  
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {

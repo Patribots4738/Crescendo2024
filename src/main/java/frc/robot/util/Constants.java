@@ -49,7 +49,7 @@ public final class Constants {
 
     public static final class LoggingConstants {
 
-        private static RobotType robotType = RobotType.DEVBOT;
+        private static RobotType robotType = RobotType.COMPBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -240,14 +240,14 @@ public final class Constants {
                 put(8.0, SpeedAngleTriplet.of(3024.0, 3319.0, 42.4));
                 put(8.5, SpeedAngleTriplet.of(3128.0, 3445.0, 40.9));
                 put(9.0, SpeedAngleTriplet.of(3305.0, 3606.0, 39.6));
-                put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 37.6));
-                put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 36.2));
-                put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 34.1));
-                put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 34.0));
-                put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 33.7));
-                put(14.0, SpeedAngleTriplet.of(4379.0, 4648.0, 31.5));
-                put(15.0, SpeedAngleTriplet.of(4445.0, 4714.0, 30.4));
-                put(16.0, SpeedAngleTriplet.of(4540.0, 4809.0, 29.7));
+                put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 36.6));
+                put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 35.2));
+                put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 33.1));
+                put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 33.0));
+                put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 32.7));
+                put(14.0, SpeedAngleTriplet.of(4379.0, 4648.0, 30.5));
+                put(15.0, SpeedAngleTriplet.of(4445.0, 4714.0, 29.4));
+                put(16.0, SpeedAngleTriplet.of(4540.0, 4809.0, 28.7));
 
                 // BAYOU
                 // put(6.0, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
@@ -400,7 +400,7 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        // The below values need to be tuned for each new robot.
+        // The below values need to be tuned for each new robot..
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 5;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 5;
@@ -501,6 +501,7 @@ public final class Constants {
             "S W3-1 S C2-3 S", // HOME AUTO
             "S W3-1 S C1-2 S",
             "S W3-1 S C3-5 S",
+            "S W3-1 S C1-3 S",
             "S W3-1 S",
             "S C1-5 S Over W1"
         };
