@@ -47,7 +47,7 @@ public final class Constants {
 
     public static final class LoggingConstants {
 
-        private static RobotType robotType = RobotType.DEVBOT;
+        private static RobotType robotType = RobotType.COMPBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -499,7 +499,7 @@ public final class Constants {
             "S C5-3 3-5 S",
             "S W3-1 S C2-5 S",
             "S W3-1 S C2-3 S", // HOME AUTO
-            "S W3-1 S C1-2 S",
+            // "S W3-1 S C1-2 S",
             "S W3-1 S C3-5 S",
             "S W3-1 S C1-5 S",
             "S W3-1 S",
