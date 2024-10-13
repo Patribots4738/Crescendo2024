@@ -31,8 +31,6 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.LoggingConstants.RobotType;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
@@ -49,7 +47,7 @@ public final class Constants {
 
     public static final class LoggingConstants {
 
-        private static RobotType robotType = RobotType.COMPBOT;
+        private static RobotType robotType = RobotType.DEVBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -197,6 +195,8 @@ public final class Constants {
         public static final double PIVOT_LOWER_LIMIT_DEGREES = 21;
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 56;
         public static final double PIVOT_RAISE_ANGLE_DEGREES = 49;
+
+        public static final double SLIDE_PASS_AVERAGE_RPM = 2500;
 
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
 
@@ -937,7 +937,7 @@ public final class Constants {
         public static final List<Pose2d> CENTER_PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
 
             // I swear bulldogs and hawaiin kids just had to get in here somehow
-            Pose2d bluePose = new Pose2d(1.07, 6.99, Rotation2d.fromDegrees(0));
+            Pose2d bluePose = new Pose2d(0.630, 6.405, Rotation2d.fromDegrees(0));
             Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
 
             add(bluePose);

@@ -543,11 +543,11 @@ public class RobotContainer {
                     shooterCmds.prepareSubwooferCommand()
                 ).finallyDo(
                     () -> 
-                    Commands.parallel(
-                        shooterCmds.raisePivot(),
-                        shooterCmds.stopShooter())
-                        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-                        .schedule()));
+                        Commands.parallel(
+                            shooterCmds.raisePivot(),
+                            shooterCmds.stopShooter())
+                            .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+                            .schedule()));
 
 
         controller.a()
