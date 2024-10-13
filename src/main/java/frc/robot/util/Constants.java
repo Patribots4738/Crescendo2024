@@ -501,7 +501,7 @@ public final class Constants {
             "S W3-1 S C2-3 S", // HOME AUTO
             "S W3-1 S C1-2 S",
             "S W3-1 S C3-5 S",
-            "S W3-1 S C1-3 S",
+            "S W3-1 S C1-5 S",
             "S W3-1 S",
             "S C1-5 S Over W1"
         };
