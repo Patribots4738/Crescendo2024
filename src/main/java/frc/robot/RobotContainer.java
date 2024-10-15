@@ -221,7 +221,7 @@ public class RobotContainer {
                 || (OIConstants.OPERATOR_PRESENT 
                     && operator.getLeftBumper()),
                 () -> OIConstants.OPERATOR_PRESENT 
-                && (driver.getLeftBumper() || operator.getYButton())
+                && (operator.getYButton())
             )
         );
 
@@ -561,7 +561,7 @@ public class RobotContainer {
                     swerve.resetHDCCommand(),
                     swerve.resetDesiredHDCPoseCommand()));
                 
-        controller.x()
+        controller.leftBumper()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
             .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
@@ -579,11 +579,11 @@ public class RobotContainer {
     }
 
     private void configureOperatorBindings(PatriBoxController controller) {
-        controller.povUp()
-            .onTrue(pieceControl.elevatorToPlacement(false));
+        // controller.povUp()
+        //     .onTrue(pieceControl.elevatorToPlacement(false));
 
-        controller.povLeft()
-            .onTrue(pieceControl.elevatorToPlacement(true));
+        // controller.povLeft()
+        //     .onTrue(pieceControl.elevatorToPlacement(true));
 
         controller.povRight()
             .onTrue(ampper.toggleSpeed());
@@ -593,7 +593,7 @@ public class RobotContainer {
 
         controller.leftBumper()
             .whileTrue(pieceControl.intakeUntilNote())
-            .negate().and(driver.x().negate())
+            .negate().and(driver.leftBumper().negate())
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
         controller.rightBumper()
