@@ -16,6 +16,7 @@ import frc.robot.subsystems.shooter.Pivot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.ShooterConstants;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calc.ShooterCalc;
 import frc.robot.util.custom.SpeedAngleTriplet;
 
@@ -147,12 +148,24 @@ public class ShooterCmds {
         return prepareSWDCommand(robotPose, () -> new ChassisSpeeds());
     }
 
-    public Command preparePassCommand(Supplier<Pose2d> robotPose) {
+    public Command preparePassCommand(Supplier<Pose2d> robotPose, BooleanSupplier lowPass) {
         return Commands.run(
             () -> {
-                desiredTriplet = shooterCalc.calculatePassTriplet(robotPose.get());
+                desiredTriplet = shooterCalc.calculatePassTriplet(robotPose.get(), lowPass.getAsBoolean());
                 pivot.setAngle(desiredTriplet.getAngle());
                 shooter.setSpeed(desiredTriplet.getSpeeds());
+            }, pivot, shooter);
+    }
+
+    public Command preparePassCommand(Supplier<Pose2d> robotPose) {
+        return preparePassCommand(robotPose, () -> PoseCalculations.inLowPassZone(robotPose.get()));
+    }
+
+    public Command prepareSlidePassCommand() {
+        return Commands.run(
+            () -> {
+                pivot.setAngle(ShooterConstants.PIVOT_LOWER_LIMIT_DEGREES);
+                shooter.setSpeed(ShooterConstants.SLIDE_PASS_AVERAGE_RPM);
             }, pivot, shooter);
     }
 
