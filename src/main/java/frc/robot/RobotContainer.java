@@ -325,7 +325,7 @@ public class RobotContainer {
         // The reason we are checking bumpers
         // is so this doesn't happen on pieceControl::moveNote
         new Trigger(
-            () -> piPico.hasNoteShooter() || piPico.hasNoteElevator()
+            () -> (piPico.hasNoteShooter() || piPico.hasNoteElevator())
                 && (
                     // All of these buttons command intake
                     // Whether that be source or not
@@ -366,17 +366,7 @@ public class RobotContainer {
             ).onFalse(
                 driver.setRumble(() -> 0)
             );
-        
-        // Controller rumble if climb hooks are up and we are inside of stage area
-        // AKA driver is good to climb
-        new Trigger(climb::getHooksUp).and(() -> PoseCalculations.inStageTriangle(robotPose2d))
-            .onTrue(driver.setRumble(() -> 0.5))
-            .onFalse(driver.setRumble(() -> 0));
 
-        // new Trigger(climb::getToggleMode)
-        //     .onTrue(swerve.resetHDCCommand())
-        //     .onFalse(swerve.resetDesiredHDCPoseCommand())
-        //     .whileTrue(alignmentCmds.chainRotationalAlignment(driver::getLeftX, driver::getLeftY, robotRelativeSupplier));  
     }
     
     private void configureFieldCalibrationBindings(PatriBoxController controller) {
@@ -473,17 +463,22 @@ public class RobotContainer {
         controller.povDown()
             .onTrue(
                 climb.toBottomCommand()
-                    .alongWith(
-                        Commands.waitUntil(elevator::atDesiredPosition)
-                            .andThen(shooterCmds.stowPivot())));
+                    .alongWith(shooterCmds.stowPivot()));
 
-        // POV left is uncommonly used but needed incase of emergency
+        // POV left and right are uncommonly used but needed incase of emergency
         controller.povLeft()
             .onTrue(
                 Commands.sequence(
                     pieceControl.stopAllMotors(),
                     Commands.waitUntil(elevator::atDesiredPosition),
                     shooterCmds.raisePivot()
+                ));
+
+        controller.povRight()
+            .onTrue(
+                Commands.sequence(
+                    pieceControl.stopAllMotors(),
+                    shooterCmds.stowPivot()
                 ));
 
     }
@@ -560,7 +555,6 @@ public class RobotContainer {
                     limelight3g.setLEDState(() -> false),
                     swerve.resetHDCCommand(),
                     swerve.resetDesiredHDCPoseCommand()));
-                
         controller.leftBumper()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
             .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
@@ -622,7 +616,9 @@ public class RobotContainer {
             .onFalse(pieceControl.stopPanicEject());
 
         controller.start().or(controller.back())
-            .whileTrue(pieceControl.sourceShooterIntake())
+            .whileTrue(
+                Commands.waitUntil(elevator::atDesiredPosition)
+                    .andThen(pieceControl.sourceShooterIntake()))
             .onFalse(pieceControl.stopIntakeAndIndexer());
 
         controller.rightStick().and(controller.leftStick())
