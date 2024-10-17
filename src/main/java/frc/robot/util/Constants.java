@@ -31,8 +31,6 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Robot;
-import frc.robot.util.Constants.FieldConstants;
-import frc.robot.util.Constants.LoggingConstants.RobotType;
 import frc.robot.util.custom.PatrIDConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
 import frc.robot.util.rev.Neo;
@@ -198,6 +196,8 @@ public final class Constants {
         public static final double PIVOT_UPPER_LIMIT_DEGREES = 56;
         public static final double PIVOT_RAISE_ANGLE_DEGREES = 49;
 
+        public static final double SLIDE_PASS_AVERAGE_RPM = 2500;
+
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
 
         public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.VORTEX_FREE_SPEED_RPM;
@@ -240,14 +240,14 @@ public final class Constants {
                 put(8.0, SpeedAngleTriplet.of(3024.0, 3319.0, 42.4));
                 put(8.5, SpeedAngleTriplet.of(3128.0, 3445.0, 40.9));
                 put(9.0, SpeedAngleTriplet.of(3305.0, 3606.0, 39.6));
-                put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 37.6));
-                put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 36.2));
-                put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 34.1));
-                put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 34.0));
-                put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 33.7));
-                put(14.0, SpeedAngleTriplet.of(4379.0, 4648.0, 31.5));
-                put(15.0, SpeedAngleTriplet.of(4445.0, 4714.0, 30.4));
-                put(16.0, SpeedAngleTriplet.of(4540.0, 4809.0, 29.7));
+                put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 36.6));
+                put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 35.2));
+                put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 33.1));
+                put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 33.0));
+                put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 32.7));
+                put(14.0, SpeedAngleTriplet.of(4379.0, 4648.0, 30.5));
+                put(15.0, SpeedAngleTriplet.of(4445.0, 4714.0, 29.4));
+                put(16.0, SpeedAngleTriplet.of(4540.0, 4809.0, 28.7));
 
                 // BAYOU
                 // put(6.0, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
@@ -400,7 +400,7 @@ public final class Constants {
 
     public static final class AutoConstants {
 
-        // The below values need to be tuned for each new robot.
+        // The below values need to be tuned for each new robot..
         // They are currently set to the values suggested by Choreo
         public static final double MAX_SPEED_METERS_PER_SECOND = 5;
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 5;
@@ -499,8 +499,9 @@ public final class Constants {
             "S C5-3 3-5 S",
             "S W3-1 S C2-5 S",
             "S W3-1 S C2-3 S", // HOME AUTO
-            "S W3-1 S C1-2 S",
+            // "S W3-1 S C1-2 S",
             "S W3-1 S C3-5 S",
+            "S W3-1 S C1-5 S",
             "S W3-1 S",
             "S C1-5 S Over W1"
         };
@@ -936,7 +937,7 @@ public final class Constants {
         public static final List<Pose2d> CENTER_PASS_TARGET_POSITIONS = new ArrayList<Pose2d>() {{
 
             // I swear bulldogs and hawaiin kids just had to get in here somehow
-            Pose2d bluePose = new Pose2d(1.07, 6.99, Rotation2d.fromDegrees(0));
+            Pose2d bluePose = new Pose2d(0.630, 6.405, Rotation2d.fromDegrees(0));
             Pose2d redPose = GeometryUtil.flipFieldPose(bluePose).plus(new Transform2d(0, 0, Rotation2d.fromDegrees(180)));
 
             add(bluePose);
