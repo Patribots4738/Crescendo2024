@@ -193,10 +193,21 @@ public class AlignmentCmds {
                 climb::getHooksUp);
     }
 
-    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier, BooleanSupplier lowPass) {
         return
             passRotationalAlignment(driverX, driverY, shooterCmds)
-                .alongWith(shooterCmds.preparePassCommand(swerve::getPose));
+                .alongWith(shooterCmds.preparePassCommand(swerve::getPose, lowPass));
+    }
+
+    public Command preparePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+        return preparePassCommand(driverX, driverY, robotRelativeSupplier, () -> PoseCalculations.inLowPassZone(swerve.getPose()));
+    }
+
+    public Command prepareSlidePassCommand(DoubleSupplier driverX, DoubleSupplier driverY, BooleanSupplier robotRelativeSupplier) {
+        return
+            passRotationalAlignment(driverX, driverY, shooterCmds)
+                .alongWith(shooterCmds.prepareSlidePassCommand());
+
     }
 
     public Command preparePresetPose(DoubleSupplier driverX, DoubleSupplier driverY, boolean xButtonPressed) {

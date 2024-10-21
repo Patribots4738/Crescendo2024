@@ -12,9 +12,9 @@ import frc.robot.util.Constants.AutoConstants;
 
 public class HDCTuner extends SubsystemBase {
 
-    @AutoLogOutput (key = "Managers//HDCTuner/PIDControllerIndex")
+    @AutoLogOutput (key = "Managers/HDCTuner/PIDControllerIndex")
     public int PIDControllerIndex = 0;
-    @AutoLogOutput (key = "Managers//HDCTuner/PIDIndex")
+    @AutoLogOutput (key = "Managers/HDCTuner/PIDIndex")
     public int PIDIndex = 0;
 
     public PIDController XYController = AutoConstants.HDC.getXController();
