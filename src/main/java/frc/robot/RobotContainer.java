@@ -579,11 +579,11 @@ public class RobotContainer {
     }
 
     private void configureOperatorBindings(PatriBoxController controller) {
-        // controller.povUp()
-        //     .onTrue(pieceControl.elevatorToPlacement(false));
+        controller.povUp()
+            .onTrue(pieceControl.elevatorToPlacement(false));
 
-        // controller.povLeft()
-        //     .onTrue(pieceControl.elevatorToPlacement(true));
+        controller.povLeft()
+            .onTrue(pieceControl.elevatorToPlacement(true));
 
         controller.povRight()
             .onTrue(ampper.toggleSpeed());
