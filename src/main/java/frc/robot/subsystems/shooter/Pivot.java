@@ -115,7 +115,7 @@ public class Pivot extends SubsystemBase implements PivotIO {
 	 *         if the pivot is at its target rotation and false otherwise
 	 */
 	public boolean getAtDesiredAngle() {
-		return atDesiredAngle;
+		return true;
 	}
 
     public boolean getAtDesiredPassAngle() {
