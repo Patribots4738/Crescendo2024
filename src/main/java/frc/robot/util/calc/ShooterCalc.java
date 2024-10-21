@@ -156,8 +156,7 @@ public class ShooterCalc {
         return () ->  
             pivot.getAtDesiredAngle()
                 && shooter.getAtDesiredRPM()
-                && shooter.getAverageTargetSpeed() > 0
-                && shooter.getAverageTargetSpeed() != ShooterConstants.DEFAULT_RPM;
+                && shooter.getAverageTargetSpeed() > 0;
     }
 
     public BooleanSupplier readyToPassSupplier() {

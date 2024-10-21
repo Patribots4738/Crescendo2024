@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -25,6 +26,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.ampper.Ampper;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.PoseCalculations;
+import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.ElevatorConstants;
 import frc.robot.util.custom.ActiveConditionalCommand;
 import frc.robot.util.custom.SelectiveConditionalCommand;
@@ -102,6 +104,9 @@ public class PieceControl {
                         ? shooterCmds.shooterCalc.readyToShootSupplier().getAsBoolean() 
                         : shooterCmds.shooterCalc.readyToPassSupplier().getAsBoolean())
                     && atDesiredAngle.getAsBoolean()
+                    && Math.hypot(
+                        speedSupplier.get().vxMetersPerSecond, 
+                        speedSupplier.get().vyMetersPerSecond) < DriveConstants.PASS_ROBOT_VELOCITY_THRESHOLD_METERS_PER_SECOND
                 )
             .andThen(noteToShoot(poseSupplier, speedSupplier));
                 

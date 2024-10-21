@@ -98,6 +98,8 @@ public final class Constants {
 
         public static final double PASS_ROTATION_DEADBAND = 10;
 
+        public static final double PASS_ROBOT_VELOCITY_THRESHOLD_METERS_PER_SECOND = 0.5;
+
         public static final double ODOMETRY_FREQUENCY = 250.0;
 
         // Chassis configuration
