@@ -214,6 +214,7 @@ public class Swerve extends SubsystemBase {
         Logger.recordOutput("Subsystems/Swerve/RobotPose3d", RobotContainer.robotPose3d);
         Logger.recordOutput("Subsystems/Swerve/ChassisSpeeds", speeds);
         Logger.recordOutput("Subsystems/Swerve/IsUnderStage", PoseCalculations.inStageTriangle(currentPose));
+        Logger.recordOutput("Subsystems/Swerve/AtHDCAngle", atHDCAngle());
 
         Logger.recordOutput("Subsystems/Swerve/Modules/FrontLeft/DesiredState", frontLeft.getDesiredState());
         Logger.recordOutput("Subsystems/Swerve/Modules/FrontRight/DesiredState", frontRight.getDesiredState());

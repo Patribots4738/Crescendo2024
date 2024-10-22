@@ -2,27 +2,15 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.182727334398768,
-      "y": 6.395529951663276
+      "x": 1.3575481986811355,
+      "y": 5.572415049000463
     },
-    "rotation": 151.53108100340572
+    "rotation": -179.42706130231647
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "FullPowerPreload"
-          }
-        },
         {
           "type": "deadline",
           "data": {
@@ -34,19 +22,25 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3-1 Bayou"
+                        "pathName": "P CA2"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "EnableLimelight"
+                        "name": "ShootInstantlyWhenReady2"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CA2 W2"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootInstantlyWhenReady"
+                        "name": "ShootInstantlyWhenReady1"
                       }
                     }
                   ]
@@ -72,7 +66,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "W1 C1"
+                        "pathName": "W2 C3"
                       }
                     },
                     {
@@ -115,7 +109,7 @@
         {
           "type": "named",
           "data": {
-            "name": "C1toC5nonOBJ"
+            "name": "C3toC5nonOBJ"
           }
         }
       ]

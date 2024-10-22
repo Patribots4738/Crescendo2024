@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.8337621392595704,
-        "y": 7.619282085683008
+        "x": 2.180663101343949,
+        "y": 5.572415049000463
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7043226970071437,
-        "y": 6.471081882119288
+        "x": 2.435610195089068,
+        "y": 5.56513084632203
       },
       "isLocked": false,
-      "linkedName": "A"
+      "linkedName": "CA2"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 5.572415049000463
       },
       "prevControl": {
-        "x": 1.4025888360223773,
-        "y": 4.8310804962873535
+        "x": 2.6543565144927745,
+        "y": 5.576946263544549
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "ToIndexer",
-      "waypointRelativePos": 0.65,
+      "name": "New Event Marker",
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "ToIndexer"
+                "name": "Intake"
               }
             }
           ]
@@ -57,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.7550563255071,
+    "rotation": -179.2747757009407,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Amp",
+  "folder": "Wings",
   "previewStartingState": {
-    "rotation": -90.04297299971782,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

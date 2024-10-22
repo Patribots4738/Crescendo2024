@@ -5,24 +5,12 @@
       "x": 1.182727334398768,
       "y": 6.395529951663276
     },
-    "rotation": 151.53108100340572
+    "rotation": -142.27500495788928
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "FullPowerPreload"
-          }
-        },
         {
           "type": "deadline",
           "data": {
@@ -34,19 +22,25 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3-1 Bayou"
+                        "pathName": "P CA1"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "EnableLimelight"
+                        "name": "ShootInstantlyWhenReady2"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CA1 W1"
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootInstantlyWhenReady"
+                        "name": "ShootInstantlyWhenReady1"
                       }
                     }
                   ]
