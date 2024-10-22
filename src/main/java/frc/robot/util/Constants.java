@@ -98,7 +98,7 @@ public final class Constants {
 
         public static final double PASS_ROTATION_DEADBAND = 10;
 
-        public static final double PASS_ROBOT_VELOCITY_THRESHOLD_METERS_PER_SECOND = 0.5;
+        public static final double PASS_ROBOT_VELOCITY_THRESHOLD_METERS_PER_SECOND = 0.75;
 
         public static final double ODOMETRY_FREQUENCY = 250.0;
 
@@ -507,7 +507,10 @@ public final class Constants {
             "S W3-1 S",
             "S C1-5 S Over W1",
             "S W1 S C1-5 S", // UNTESTED
-            "S W2 S C3-5 S" // UNTESTED
+            "S W2 S C3-5 S", // UNTESTED
+            "S W2 S C1-5 S", // UNTESTED
+            "X-MEN", // UNTESTED
+            "S W2 S C1-2 S W1 S C3-5 S" // UNTESTED
         };
     }
 
