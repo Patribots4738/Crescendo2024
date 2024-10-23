@@ -439,7 +439,7 @@ public final class Constants {
                 AutoConstants.XY_CORRECTION_D);
 
         public static final double ROTATION_CORRECTION_P = 3.725;
-        public static final double ROTATION_CORRECTION_P_TELE = 10.0;
+        public static final double ROTATION_CORRECTION_P_TELE = 7.0;
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -799,6 +799,7 @@ public final class Constants {
         public static final double FIELD_HEIGHT_METERS = 8.2112312;
         public static final double CHAIN_HEIGHT_METERS = Units.feetToMeters(4);
         public static final double SPEAKER_HEIGHT_METERS = 2.082813;
+
         public static final double PASS_HEIGHT_METERS = Units.feetToMeters(9.5);
 
         // Field:
