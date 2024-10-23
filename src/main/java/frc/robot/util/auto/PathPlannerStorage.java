@@ -197,6 +197,18 @@ public class PathPlannerStorage {
         return commandGroup;
     }
 
+    public Command generateCenterLogicDefault(int startingNote, int endingNote, Swerve swerve) {
+        SequentialCommandGroup commandGroup = new SequentialCommandGroup();
+        boolean goingDown = startingNote < endingNote;
+        int increment = goingDown ? 1 : -1;
+
+        for (int i = startingNote; (goingDown && i <= endingNote) || (!goingDown && i >= endingNote); i += increment) {
+            commandGroup.addCommands(generateCenterDefaultCommand(i, endingNote, goingDown, increment, commandGroup));
+        }
+
+        return commandGroup;
+    }
+
     /**
      * Generates a command for the object detection scenario.
      */
@@ -307,6 +319,51 @@ public class PathPlannerStorage {
                     skipNoteCommand,
                     () -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()),
             commandGroup.getRequirements()));
+    }
+
+    private Command generateCenterDefaultCommand(int i, int endingNote, boolean goingDown, int increment, SequentialCommandGroup commandGroup) {
+        String shootingLocation = (i < 3) ? "L" : (i == 3) ? "M" : "R";
+        PathPlannerPath shootNote = PathPlannerPath.fromPathFile("C" + i + " " + shootingLocation);
+
+        if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
+            return Commands.defer(() ->  
+                Commands.sequence(
+                    Commands.deadline(
+                        AutoBuilder.followPath(shootNote),
+                        NamedCommands.getCommand("StopIntake")
+                            .andThen(NamedCommands.getCommand("ToIndexer")
+                                .onlyIf(() -> !shooterSensor.getAsBoolean())),
+                        NamedCommands.getCommand("PrepareSWD")
+                    ),
+                    NamedCommands.getCommand("ShootInstantlyWhenReady")
+                ).onlyIf(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()),
+                commandGroup.getRequirements());
+        }
+
+        PathPlannerPath getNoteAfterShot = PathPlannerPath.fromPathFile(shootingLocation + " C" + (i + increment));
+
+        Command shootAndMoveToNextNote = 
+            Commands.sequence(
+                Commands.deadline(
+                    AutoBuilder.followPath(shootNote)
+                        .raceWith(Commands.waitUntil(() -> !shooterSensor.getAsBoolean() && !elevatorSensor.getAsBoolean() && swerve.insideOwnWing())),
+                    NamedCommands.getCommand("StopIntake")
+                        .andThen(NamedCommands.getCommand("ToIndexer")
+                            .onlyIf(() -> !shooterSensor.getAsBoolean())),
+                    NamedCommands.getCommand("PrepareSWD")
+                ),
+                NamedCommands.getCommand("ShootInstantlyWhenReady"),
+                Commands.deadline(
+                    AutoBuilder.followPath(getNoteAfterShot),
+                    Commands.sequence(
+                        NamedCommands.getCommand("StopAll"),
+                        Commands.waitSeconds(1),
+                        NamedCommands.getCommand("ToIndexer")
+                    )
+                )
+            );
+
+        return Commands.defer(() -> shootAndMoveToNextNote, commandGroup.getRequirements());
     }
 
     /**
