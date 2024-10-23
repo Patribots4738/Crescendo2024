@@ -439,6 +439,7 @@ public final class Constants {
                 AutoConstants.XY_CORRECTION_D);
 
         public static final double ROTATION_CORRECTION_P = 3.725;
+        public static final double ROTATION_CORRECTION_P_TELE = 10.0;
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -447,7 +448,7 @@ public final class Constants {
         public static final boolean USE_OBJECT_DETECTION = true;
 
         private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
-            AutoConstants.ROTATION_CORRECTION_P,
+            AutoConstants.ROTATION_CORRECTION_P_TELE,
             AutoConstants.ROTATION_CORRECTION_I,
             AutoConstants.ROTATION_CORRECTION_D,
             new TrapezoidProfile.Constraints(
