@@ -901,6 +901,7 @@ public class RobotContainer {
                 }
                 NamedCommands.registerCommand("C" + i + "toC" + j, pathPlannerStorage.generateCenterLogicOBJ(i, j, swerve, limelight3));
                 NamedCommands.registerCommand("C" + i + "toC" + j + "nonOBJ", pathPlannerStorage.generateCenterLogicNonOBJ(i, j, swerve));
+                NamedCommands.registerCommand("C" + i + "toC" + j + "default", pathPlannerStorage.generateCenterLogicDefault(i, j, swerve));
             }
         }
     }
