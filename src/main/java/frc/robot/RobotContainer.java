@@ -217,7 +217,7 @@ public class RobotContainer {
         shooter.setDefaultCommand(
             pieceControl.getAutomaticShooterSpeeds(
                 swerve::getPose,
-                () -> driver.getXButton() 
+                () -> driver.getLeftBumper() 
                 || (OIConstants.OPERATOR_PRESENT 
                     && operator.getLeftBumper()),
                 () -> OIConstants.OPERATOR_PRESENT 
@@ -269,7 +269,6 @@ public class RobotContainer {
                 configureDevDriverBindings(driver);
                 break;
         }
-        
 
         configureTimedEvents();
         configureTestBindings();

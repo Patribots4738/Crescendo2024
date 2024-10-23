@@ -257,13 +257,16 @@ public class PathPlannerStorage {
 
         if (i == FieldConstants.CENTER_NOTE_COUNT && goingDown || i == 1 && !goingDown || i == endingNote) {
             return Commands.defer(() ->  
-                AutoBuilder.followPath(shootNote)
-                    .deadlineWith(NamedCommands.getCommand("StopIntake")
-                        .andThen(NamedCommands.getCommand("ToIndexer")
-                            .onlyIf(() -> !shooterSensor.getAsBoolean())))
-                    .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
-                    .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
-                        .onlyIf(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()), 
+                Commands.sequence(
+                    Commands.deadline(
+                        AutoBuilder.followPath(shootNote),
+                        NamedCommands.getCommand("StopIntake")
+                            .andThen(NamedCommands.getCommand("ToIndexer")
+                                .onlyIf(() -> !shooterSensor.getAsBoolean())),
+                        NamedCommands.getCommand("PrepareSWD")
+                    ),
+                    NamedCommands.getCommand("ShootInstantlyWhenReady")
+                ).onlyIf(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()),
                 commandGroup.getRequirements());
         }
 
@@ -271,27 +274,28 @@ public class PathPlannerStorage {
         PathPlannerPath skipNote = PathPlannerPath.fromPathFile("C" + i + " C" + (i + increment));
 
         Command shootAndMoveToNextNote = 
-            AutoBuilder.followPath(shootNote)
-                .deadlineWith(NamedCommands.getCommand("StopIntake")
+            Commands.sequence(
+                Commands.deadline(
+                    AutoBuilder.followPath(shootNote)
+                        .raceWith(Commands.waitUntil(() -> !shooterSensor.getAsBoolean() && !elevatorSensor.getAsBoolean() && swerve.insideOwnWing())),
+                    NamedCommands.getCommand("StopIntake")
                         .andThen(NamedCommands.getCommand("ToIndexer")
-                        .onlyIf(() -> !shooterSensor.getAsBoolean())))
-                .andThen(NamedCommands.getCommand("ShootInstantlyWhenReady"))
-                .deadlineWith(NamedCommands.getCommand("PrepareSWD"))
-                .raceWith(Commands.waitUntil(() -> !shooterSensor.getAsBoolean() && !elevatorSensor.getAsBoolean() && swerve.insideOwnWing()))
-
-                .andThen(
-                    Commands.race(
-                        Commands.sequence(
-                            AutoBuilder.followPath(getNoteAfterShot),
-                            Commands.waitSeconds(.3)
-                        ),
-                        Commands.sequence(
-                            NamedCommands.getCommand("StopAll"),
-                            Commands.waitSeconds(1),
-                            NamedCommands.getCommand("ToIndexer")
-                        )
+                            .onlyIf(() -> !shooterSensor.getAsBoolean())),
+                    NamedCommands.getCommand("PrepareSWD")
+                ),
+                NamedCommands.getCommand("ShootInstantlyWhenReady"),
+                Commands.race(
+                    Commands.sequence(
+                        AutoBuilder.followPath(getNoteAfterShot),
+                        Commands.waitSeconds(.3)
+                    ),
+                    Commands.sequence(
+                        NamedCommands.getCommand("StopAll"),
+                        Commands.waitSeconds(1),
+                        NamedCommands.getCommand("ToIndexer")
                     )
-                );
+                )
+            );
 
         Command skipNoteCommand = AutoBuilder.followPath(skipNote)
             .raceWith(NamedCommands.getCommand("ToIndexer"));

@@ -165,6 +165,7 @@ public class ShooterCalc {
                 && shooter.getAtDesiredPassRPM()
                 && shooter.getAverageTargetSpeed() > 0;
     }
+    
 
     public SpeedAngleTriplet calculateSpeakerTriplet(Translation2d robotPose) {
         // Get our position relative to the desired field element
