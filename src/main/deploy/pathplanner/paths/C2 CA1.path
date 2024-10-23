@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.292109148548377,
-        "y": 5.688962291855375
+        "x": 8.372358473112008,
+        "y": 5.71043314926136
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.866105446496608,
-        "y": 8.033382923908706
+        "x": 5.946354771060239,
+        "y": 8.054853781314689
       },
       "isLocked": false,
       "linkedName": "C2"
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CA"
+      "linkedName": "CA1"
     }
   ],
   "rotationTargets": [],

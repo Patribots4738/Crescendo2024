@@ -20,24 +20,24 @@
         "y": 6.686898058800555
       },
       "prevControl": {
-        "x": 6.805634327255101,
-        "y": 7.081556864520259
+        "x": 6.751872321043296,
+        "y": 7.018159678464746
       },
       "nextControl": {
-        "x": 7.658383515524795,
-        "y": 6.242561695416204
+        "x": 7.731900895900559,
+        "y": 6.304480757109662
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.292109148548377,
-        "y": 5.688962291855375
+        "x": 8.372358473112008,
+        "y": 5.71043314926136
       },
       "prevControl": {
-        "x": 7.549120475348316,
-        "y": 6.3299721275573875
+        "x": 7.629369799911947,
+        "y": 6.351442984963373
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,23 +47,16 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": 136.9677610942732,
+      "rotationDegrees": -166.50045466233195,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.6,
+      "rotationDegrees": 154.23415791817632,
       "rotateFast": false
     }
   ],
-  "constraintZones": [
-    {
-      "name": "SpeedyIntake",
-      "minWaypointRelativePos": 1.2,
-      "maxWaypointRelativePos": 2.0,
-      "constraints": {
-        "maxVelocity": 5.0,
-        "maxAcceleration": 5.0,
-        "maxAngularVelocity": 1137.21,
-        "maxAngularAcceleration": 1492.9
-      }
-    }
-  ],
+  "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
@@ -73,7 +66,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 135.61605990839928,
+    "rotation": 118.92642583525343,
     "rotateFast": true
   },
   "reversed": false,
