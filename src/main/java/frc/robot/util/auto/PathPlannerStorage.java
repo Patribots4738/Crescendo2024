@@ -349,10 +349,10 @@ public class PathPlannerStorage {
                         .raceWith(Commands.waitUntil(() -> !shooterSensor.getAsBoolean() && !elevatorSensor.getAsBoolean() && swerve.insideOwnWing())),
                     NamedCommands.getCommand("StopIntake")
                         .andThen(NamedCommands.getCommand("ToIndexer")
-                            .onlyIf(() -> !shooterSensor.getAsBoolean())),
+                            .unless(shooterSensor)),
                     NamedCommands.getCommand("PrepareSWD")
                 ),
-                NamedCommands.getCommand("ShootInstantlyWhenReady"),
+                NamedCommands.getCommand("ShootInstantlyWhenReady2"),
                 Commands.deadline(
                     AutoBuilder.followPath(getNoteAfterShot),
                     Commands.sequence(

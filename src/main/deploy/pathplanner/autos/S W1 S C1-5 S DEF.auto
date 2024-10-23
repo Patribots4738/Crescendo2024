@@ -2,19 +2,57 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2422530556147342,
-      "y": 7.161301131112901
+      "x": 1.182727334398768,
+      "y": 6.395529951663276
     },
-    "rotation": -124.91237183543709
+    "rotation": -142.27500495788928
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "FullPowerPreload2"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "P CA1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootInstantlyWhenReady2"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CA1 W1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootInstantlyWhenReady1"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
           }
         },
         {
@@ -24,7 +62,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "S C1"
+                  "pathName": "W1 C1"
                 }
               },
               {

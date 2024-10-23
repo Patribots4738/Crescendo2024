@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.182727334398768,
-      "y": 6.395529951663276
+      "x": 1.29235458470917,
+      "y": 4.778983272252259
     },
     "rotation": 151.53108100340572
   },
@@ -11,12 +11,6 @@
     "type": "sequential",
     "data": {
       "commands": [
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.3
-          }
-        },
         {
           "type": "named",
           "data": {
@@ -35,12 +29,6 @@
                       "type": "path",
                       "data": {
                         "pathName": "S W3-1 Bayou"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "EnableLimelight"
                       }
                     },
                     {
