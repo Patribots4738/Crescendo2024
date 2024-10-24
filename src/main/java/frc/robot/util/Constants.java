@@ -510,7 +510,8 @@ public final class Constants {
             "S W2 S C1-2 S W1 S C3-5 S", // UNTESTED
             "S C1-5 S Over W1 DEF",
             "S W1 S C1-5 S DEF",
-            "S W3-1 S C1-5 S DEF"
+            "S W3-1 S C1-5 S DEF",
+            "S W2 S C3-5 S DEF"
         };
     }
 
@@ -570,7 +571,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.504919579940926*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4629649170172998*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
