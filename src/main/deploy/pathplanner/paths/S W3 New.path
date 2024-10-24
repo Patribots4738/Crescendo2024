@@ -1,0 +1,92 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.6743212881722518,
+        "y": 4.43559408955324
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.9822848156334612,
+        "y": 4.178191738242379
+      },
+      "isLocked": false,
+      "linkedName": "8044 P End"
+    },
+    {
+      "anchor": {
+        "x": 2.428325992410636,
+        "y": 4.23940595884741
+      },
+      "prevControl": {
+        "x": 2.2666705412135384,
+        "y": 3.934056773252893
+      },
+      "nextControl": {
+        "x": 2.5524306975069444,
+        "y": 4.473825957362659
+      },
+      "isLocked": false,
+      "linkedName": "W3 Pickup"
+    },
+    {
+      "anchor": {
+        "x": 2.7223165756521888,
+        "y": 4.778983272252259
+      },
+      "prevControl": {
+        "x": 2.5430542238464104,
+        "y": 4.486155265703589
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Houston?"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.15,
+      "rotationDegrees": 156.0780441292195,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 4.2,
+    "maxAngularVelocity": 1137.21,
+    "maxAngularAcceleration": 1492.9
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 164.04118314714827,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Preloads",
+  "previewStartingState": {
+    "rotation": 153.56913073103783,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

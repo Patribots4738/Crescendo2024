@@ -1,0 +1,70 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.319062952234156,
+        "y": 6.650477045408395
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.5157364245518195,
+        "y": 6.74517168022801
+      },
+      "isLocked": false,
+      "linkedName": "CA1"
+    },
+    {
+      "anchor": {
+        "x": 2.9017991665087144,
+        "y": 6.9272767471888095
+      },
+      "prevControl": {
+        "x": 2.646852072763595,
+        "y": 6.803445301655466
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "W1"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 1137.21,
+    "maxAngularAcceleration": 1492.9
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -146.50481532625884,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Wings",
+  "previewStartingState": {
+    "rotation": -144.39546601956695,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

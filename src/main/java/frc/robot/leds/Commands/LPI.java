@@ -6,6 +6,8 @@ package frc.robot.leds.Commands;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.pathplanner.lib.util.GeometryUtil;
 
 import edu.wpi.first.math.MathUtil;
@@ -21,24 +23,23 @@ import frc.robot.leds.Strips.LedStrip;
 import frc.robot.util.Constants.LEDConstants;
 import frc.robot.util.auto.PathPlannerStorage;
 import frc.robot.util.custom.PatriBoxController;
-import monologue.Logged;
 import java.util.function.Consumer;
-import monologue.Annotations.Log;
 
 //https://www.tldraw.com/r/borcubmSklQQYMLikl6YZ?viewport=-1638,-855,3094,1889&page=page:page
-public class LPI extends Command implements Logged{
+public class LPI extends Command {
     /** Creates a new LPI. */
     private final LedStrip ledStrip;
     private final Supplier<Pose2d> positionSupplier;
     private int activeRotationalLED = 0;
     private PatriBoxController xboxController;
 
+    @AutoLogOutput (key = "Draggables/ClosestAutoPose")
     private Pose2d closestPose;
+
     Pose2d currentRobotPosition;
     Translation2d currentRobotTranslation;
     private final Consumer<Pose2d> poseConsumer;
-    
-    @Log
+
     Pose2d cardinalMagnitude;
 
     public LPI(LedStrip ledStrip, Supplier<Pose2d> positionSupplier, PatriBoxController xboxController, Consumer<Pose2d> consumer) {
