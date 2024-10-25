@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.Constants.NeoMotorConstants;
 import frc.robot.util.Constants.LoggingConstants;
 import frc.robot.util.rev.Neo;
@@ -125,7 +126,11 @@ public class Robot extends LoggedRobot {
         // Now while this may not necessarily be a constant...
         // it needs to be updated.
         DriverStation.refreshData();
+        if (!Robot.alliance.equals(Optional.of(DriverStation.getAlliance()))) {
+            robotContainer.set3GPriorityTagID(FieldConstants.SPEAKER_MID_TAGS[Robot.isRedAlliance() ? 0 : 1]);
+        }
         Robot.alliance = DriverStation.getAlliance();
+
     }
 
     @Override
