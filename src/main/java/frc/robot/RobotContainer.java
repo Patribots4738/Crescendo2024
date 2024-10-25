@@ -9,7 +9,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
-
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -755,42 +755,57 @@ public class RobotContainer {
     }
 
     public void updateNTGains() {
-        double P = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/0P").getDouble(-1);
-        double I = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/1I").getDouble(-1);
-        double D = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/2D").getDouble(-1);
-        double P2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/0P").getDouble(-1);
-        double I2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/1I").getDouble(-1);
-        double D2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/2D").getDouble(-1);
+        double HPFCP = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/0P").getDouble(-1);
+        double HPFCI = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/1I").getDouble(-1);
+        double HPFCD = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/2D").getDouble(-1);
+        double HPFCP2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/0P").getDouble(-1);
+        double HPFCI2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/1I").getDouble(-1);
+        double HPFCD2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/2D").getDouble(-1);
 
-        if (P == -1 || I == -1 || D == -1 || P2 == -1 || I2 == -1 || D2 == -1) {
+        double HDCP = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Translation/0P").getDouble(-1);
+        double HDCI = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Translation/1I").getDouble(-1);
+        double HDCD = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Translation/2D").getDouble(-1);
+        double HDCP2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Rotation/0P").getDouble(-1);
+        double HDCI2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Rotation/1I").getDouble(-1);
+        double HDCD2 = NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Rotation/2D").getDouble(-1);
+
+        if (HPFCP == -1 || HPFCI == -1 || HPFCD == -1 || HPFCP2 == -1 || HPFCI2 == -1 || HPFCD2 == -1 ||
+            HDCP == -1 || HDCI == -1 || HDCD == -1 || HDCP2 == -1 || HDCI2 == -1 || HDCD2 == -1) {
             NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/0P").setDouble(AutoConstants.XY_CORRECTION_P);
             NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/1I").setDouble(AutoConstants.XY_CORRECTION_I);
             NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Translation/2D").setDouble(AutoConstants.XY_CORRECTION_D);
             NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/0P").setDouble(AutoConstants.ROTATION_CORRECTION_P);
             NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/1I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
             NetworkTableInstance.getDefault().getTable("Calibration").getEntry("Auto/Rotation/2D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
+
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Translation/0P").setDouble(AutoConstants.XY_CORRECTION_P);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Translation/1I").setDouble(AutoConstants.XY_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Translation/2D").setDouble(AutoConstants.XY_CORRECTION_D);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Rotation/0P").setDouble(AutoConstants.ROTATION_CORRECTION_P_TELE);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Rotation/1I").setDouble(AutoConstants.ROTATION_CORRECTION_I);
+            NetworkTableInstance.getDefault().getTable("Calibration").getEntry("HDC/Rotation/2D").setDouble(AutoConstants.ROTATION_CORRECTION_D);
             return;
-        }
-        
-        if (!(MathUtil.isNear(AutoConstants.HPFC.translationConstants.kP, P, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kI, I, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.translationConstants.kD, D, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kP, P2, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kI, I2, 0.01)
-                && MathUtil.isNear(AutoConstants.HPFC.rotationConstants.kD, D2, 0.01))) 
-        {
+        } else {
             AutoConstants.HPFC = new HolonomicPathFollowerConfig(
                     new PIDConstants(
-                            P,
-                            I,
-                            D),
+                            HPFCP,
+                            HPFCI,
+                            HPFCD),
                     new PIDConstants(
-                            P2,
-                            I2,
-                            D2),
+                            HPFCP2,
+                            HPFCI2,
+                            HPFCD2),
                     DriveConstants.MAX_SPEED_METERS_PER_SECOND,
                     Math.hypot(DriveConstants.WHEEL_BASE, DriveConstants.TRACK_WIDTH) / 2.0,
                     new ReplanningConfig());
+
+            AutoConstants.XY_PID.setP(HDCP);
+            AutoConstants.XY_PID.setI(HDCI);
+            AutoConstants.XY_PID.setD(HDCD);
+            AutoConstants.THETA_PID.setP(HDCP2);
+            AutoConstants.THETA_PID.setI(HDCI2);
+            AutoConstants.THETA_PID.setD(HDCD2);
+
             
             // swerve.reconfigureAutoBuilder();
             // fixPathPlannerCommands();

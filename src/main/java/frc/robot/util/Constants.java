@@ -173,9 +173,9 @@ public final class Constants {
 
         public static final PatrIDConstants SHOOTER_PID = new PatrIDConstants(
             0.002,
-            0,
+            0.000000001,
             0.006,
-            0.0001762
+            0.000168
         );
 
         public static final PatrIDConstants PIVOT_PID = new PatrIDConstants(
@@ -235,21 +235,19 @@ public final class Constants {
 
                 // **** GOOD SPEEDS ****
                 // PRE-BATB (FLIPPED) 
-                put(5.0, SpeedAngleTriplet.of(1763.0, 2316.0, 54.1));
-                put(6.0, SpeedAngleTriplet.of(2818.0, 3007.0, 48.1));
-                put(7.0, SpeedAngleTriplet.of(2818.0, 3008.0, 44.9));
-                put(7.5, SpeedAngleTriplet.of(2997.0, 3304.0, 43.3)); 
-                put(8.0, SpeedAngleTriplet.of(3024.0, 3319.0, 42.4));
-                put(8.5, SpeedAngleTriplet.of(3128.0, 3445.0, 40.9));
-                put(9.0, SpeedAngleTriplet.of(3305.0, 3606.0, 39.6));
-                put(10.0, SpeedAngleTriplet.of(3441.0, 3842.0, 36.6));
-                put(11.0, SpeedAngleTriplet.of(3647.0, 3965.0, 35.2));
-                put(12.0, SpeedAngleTriplet.of(3781.0, 4147.0, 33.1));
-                put(12.5, SpeedAngleTriplet.of(3945.0, 4320.0, 33.0));
-                put(13.0, SpeedAngleTriplet.of(4106.0, 4490.0, 32.7));
-                put(14.0, SpeedAngleTriplet.of(4379.0, 4648.0, 30.5));
-                put(15.0, SpeedAngleTriplet.of(4445.0, 4714.0, 29.4));
-                put(16.0, SpeedAngleTriplet.of(4540.0, 4809.0, 28.7));
+                put(4.0, SpeedAngleTriplet.of(1971.0, 2524.0, 55.2));
+                put(5.0, SpeedAngleTriplet.of(1971.0, 2524.0, 50.7));
+                put(6.0, SpeedAngleTriplet.of(2084.0, 2634.0, 46.5));
+                put(7.0, SpeedAngleTriplet.of(2209.0, 2759.0, 42.4));
+                put(8.0, SpeedAngleTriplet.of(2375.0, 2925.0, 37.6));
+                put(9.0, SpeedAngleTriplet.of(2574.0, 3124.0, 35.0));
+                put(10.0, SpeedAngleTriplet.of(2700.0, 3300.0, 33.2));
+                put(11.0, SpeedAngleTriplet.of(3009.0, 3611.0, 31.6));
+                put(12.0, SpeedAngleTriplet.of(3196.0, 3798.0, 29.6));
+                put(13.0, SpeedAngleTriplet.of(3532.0, 4118.0, 27.6));
+                put(14.0, SpeedAngleTriplet.of(3690.0, 4205.0, 26.8));
+                put(15.0, SpeedAngleTriplet.of(3860.0, 4507.0, 25.9));
+                put(16.0, SpeedAngleTriplet.of(4045.0, 4692.0, 25.6));
 
                 // BAYOU
                 // put(6.0, SpeedAngleTriplet.of(3007.0, 2850.0, 50.1));
@@ -433,13 +431,13 @@ public final class Constants {
         public static final double XY_CORRECTION_I = 0.0125;
         public static final double XY_CORRECTION_D = 0.0125;
 
-        private static final PIDController XY_PID = new PIDController(
+        public static final PIDController XY_PID = new PIDController(
                 AutoConstants.XY_CORRECTION_P,
                 0,
                 AutoConstants.XY_CORRECTION_D);
 
         public static final double ROTATION_CORRECTION_P = 3.725;
-        public static final double ROTATION_CORRECTION_P_TELE = 7.0;
+        public static final double ROTATION_CORRECTION_P_TELE = 5.75;
         public static final double ROTATION_CORRECTION_I = 0;
         public static final double ROTATION_CORRECTION_D = 0;
 
@@ -447,7 +445,7 @@ public final class Constants {
 
         public static final boolean USE_OBJECT_DETECTION = true;
 
-        private static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
+        public static final ProfiledPIDController THETA_PID = new ProfiledPIDController(
             AutoConstants.ROTATION_CORRECTION_P_TELE,
             AutoConstants.ROTATION_CORRECTION_I,
             AutoConstants.ROTATION_CORRECTION_D,
