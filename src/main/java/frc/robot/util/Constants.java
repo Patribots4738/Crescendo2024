@@ -430,21 +430,24 @@ public final class Constants {
         public static final String SKIPPING_UP_PATH_NAME   = "C5-1"  + PATH_EXTENSION;
 
         public static final String[] AUTO_NAMES = new String[] {
-            "S C2-3 S", // HOME AUTO
-            "S C5-1 S",
-            "S C5-3 3-5 S",
-            "S W3-1 S C2-5 S",
-            "S W3-1 S C2-3 S", // HOME AUTO
-            "S W3-1 S C3-5 S",
-            "S W3-1 S",
-            "S W2 S C3-5 S", // UNTESTED
-            "S W2 S C1-5 S", // UNTESTED
-            "X-MEN", // UNTESTED
-            "S W2 S C1-2 S W1 S C3-5 S", // UNTESTED
+            // "S C2-3 S", // HOME AUTO
+            // "S C5-1 S",
+            // "S C5-3 3-5 S",
+            // "S W3-1 S C2-5 S",
+            // "S W3-1 S C2-3 S", // HOME AUTO
+            // "S W3-1 S C3-5 S",
+            // "S W3-1 S",
+            // "S W2 S C3-5 S", // UNTESTED
+            // "S W2 S C1-5 S", // UNTESTED
+            // "X-MEN", // UNTESTED
+            // "S W2 S C1-2 S W1 S C3-5 S", // UNTESTED
             "S C1-5 S Over W1 DEF",
             "S W1 S C1-5 S DEF",
             "S W3-1 S C1-5 S DEF",
-            "S W2 S C3-5 S DEF"
+            "S W2 S C3-5 S DEF",
+            "S W3-1 S C2-5 S DEF",
+            "S W1 S C2-5 S DEF",
+            "S C5-1 S DEF"
         };
     }
 
