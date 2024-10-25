@@ -800,6 +800,8 @@ public final class Constants {
 
         public static final double PASS_HEIGHT_METERS = Units.feetToMeters(9.5);
 
+        public static final int[] SPEAKER_MID_TAGS = {4, 7};
+
         // Field:
         // https://cad.onshape.com/documents/dcbe49ce579f6342435bc298/w/b93673f5b2ec9c9bdcfec487/e/6ecb2d6b7590f4d1c820d5e3
         // Chain Positions: Blue alliance left

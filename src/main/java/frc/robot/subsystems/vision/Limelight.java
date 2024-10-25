@@ -372,6 +372,10 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         LimelightHelpers.setLEDMode_ForceOff(limelightName);
     }
 
+    public void setPriorityTagID(int id) {
+        LimelightHelpers.setPriorityTagID(limelightName, id);
+    }
+
     @Override
     public void updateInputs(LimelightIOInputs inputs) {
         Results results = getResults();
