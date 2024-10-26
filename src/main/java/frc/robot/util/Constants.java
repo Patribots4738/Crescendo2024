@@ -209,7 +209,7 @@ public final class Constants {
 
         public static final double MEASUREMENT_INTERVAL_FEET = 1.0;
 
-        public static final double TUNED_SHOOTER_MAX_DISTANCE = 16.0; // update accordingly with map
+        public static final double TUNED_SHOOTER_MAX_DISTANCE = 19.0; // update accordingly with map
         
         /**
          * The distances are in feet, the speeds are in RPM, and the angles are in
@@ -1184,7 +1184,11 @@ public final class Constants {
 
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
-        public static final double LIMELIGHT_3G_TA_CUTOFF = 0.070;
+        public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_AUTO = 0.070;
+        public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_TELE = 0.046;
+
+        public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_AUTO = 0.175;
+        public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE = 0.141;
 
         public static final Pose3d LL3Pose = 
             new Pose3d(

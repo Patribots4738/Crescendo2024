@@ -86,7 +86,7 @@ public class Robot extends LoggedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
-        RobotController.setBrownoutVoltage(6.0);
+        RobotController.setBrownoutVoltage(8.0);
     }
 
     /**
@@ -126,9 +126,6 @@ public class Robot extends LoggedRobot {
         // Now while this may not necessarily be a constant...
         // it needs to be updated.
         DriverStation.refreshData();
-        if (!Robot.alliance.equals(Optional.of(DriverStation.getAlliance()))) {
-            robotContainer.set3GPriorityTagID(FieldConstants.SPEAKER_MID_TAGS[Robot.isRedAlliance() ? 0 : 1]);
-        }
         Robot.alliance = DriverStation.getAlliance();
 
     }

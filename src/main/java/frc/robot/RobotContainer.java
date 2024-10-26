@@ -248,8 +248,6 @@ public class RobotContainer {
 
         pdh.setSwitchableChannel(false);
 
-        set3GPriorityTagID(FieldConstants.SPEAKER_MID_TAGS[Robot.isRedAlliance() ? 0 : 1]);
-
     }
     
     private void configureButtonBindings() {
