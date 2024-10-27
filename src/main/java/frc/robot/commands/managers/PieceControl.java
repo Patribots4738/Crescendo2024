@@ -495,6 +495,8 @@ public class PieceControl {
                     () -> 
                         shooterCmds.setSpeeds(
                             PoseCalculations.inSpeakerShotZone(robotPose.get().getTranslation())
+                            && Robot.currentTimestamp - RobotContainer.gameModeStart >= 7
+                            || Robot.gameMode == GameMode.AUTONOMOUS
                                 ? shooterCmds.shooterCalc.calculateSpeakerTriplet(
                                     robotPose.get().getTranslation()
                                 ).getSpeeds()

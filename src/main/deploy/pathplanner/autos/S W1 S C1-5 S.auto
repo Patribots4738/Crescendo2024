@@ -40,7 +40,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootInstantlyWhenReady1"
+                        "name": "ShootInstantlyWhenReady"
                       }
                     }
                   ]

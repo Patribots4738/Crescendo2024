@@ -86,7 +86,7 @@ public class Robot extends LoggedRobot {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(DataLogManager.getLog(), true);
         DriverStation.silenceJoystickConnectionWarning(true);
-        RobotController.setBrownoutVoltage(8.0);
+        RobotController.setBrownoutVoltage(6.0);
     }
 
     /**

@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.182727334398768,
-      "y": 6.395529951663276
+      "x": 1.3140196323188638,
+      "y": 7.14361029292672
     },
     "rotation": -142.27500495788928
   },
@@ -40,7 +40,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootInstantlyWhenReady1"
+                        "name": "ShootInstantlyWhenReady"
                       }
                     }
                   ]

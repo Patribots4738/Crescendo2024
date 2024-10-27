@@ -345,14 +345,13 @@ public class PathPlannerStorage {
         Command shootAndMoveToNextNote = 
             Commands.sequence(
                 Commands.deadline(
-                    AutoBuilder.followPath(shootNote)
-                        .raceWith(Commands.waitUntil(() -> !shooterSensor.getAsBoolean() && !elevatorSensor.getAsBoolean() && swerve.insideOwnWing())),
+                    AutoBuilder.followPath(shootNote),
                     NamedCommands.getCommand("StopIntake")
                         .andThen(NamedCommands.getCommand("ToIndexer")
                             .unless(shooterSensor)),
                     NamedCommands.getCommand("PrepareSWD")
                 ),
-                NamedCommands.getCommand("ShootInstantlyWhenReady2"),
+                NamedCommands.getCommand("ShootInstantlyWhenReady"),
                 Commands.deadline(
                     AutoBuilder.followPath(getNoteAfterShot),
                     Commands.sequence(
