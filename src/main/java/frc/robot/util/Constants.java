@@ -233,9 +233,11 @@ public final class Constants {
                 put(12.0, SpeedAngleTriplet.of(3196.0, 3798.0, 29.6));
                 put(13.0, SpeedAngleTriplet.of(3532.0, 4118.0, 27.6));
                 put(14.0, SpeedAngleTriplet.of(3690.0, 4205.0, 26.8));
-                put(15.0, SpeedAngleTriplet.of(3860.0, 4507.0, 25.9));
-                put(16.0, SpeedAngleTriplet.of(4045.0, 4692.0, 25.6));
-
+                put(15.0, SpeedAngleTriplet.of(3860.0, 4507.0, 25.7));
+                put(16.0, SpeedAngleTriplet.of(4045.0, 4692.0, 25.2));
+                put(17.0, SpeedAngleTriplet.of(4163.0, 4810.0, 24.6));
+                put(18.0, SpeedAngleTriplet.of(4306.0, 4955.0, 23.3));
+                put(19.0, SpeedAngleTriplet.of(4389.0, 5038.0, 22.5));
             }
         };
 
