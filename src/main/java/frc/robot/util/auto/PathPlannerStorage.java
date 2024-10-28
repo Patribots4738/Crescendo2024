@@ -336,7 +336,7 @@ public class PathPlannerStorage {
                         NamedCommands.getCommand("PrepareSWD")
                     ),
                     NamedCommands.getCommand("ShootInstantlyWhenReady")
-                ).onlyIf(() -> shooterSensor.getAsBoolean() || elevatorSensor.getAsBoolean()),
+                ),
                 commandGroup.getRequirements());
         }
 

@@ -1191,6 +1191,7 @@ public final class Constants {
 
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_AUTO = 0.175;
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE = 0.141;
+        public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE_PASS = 0.09;
 
         public static final Pose3d LL3Pose = 
             new Pose3d(

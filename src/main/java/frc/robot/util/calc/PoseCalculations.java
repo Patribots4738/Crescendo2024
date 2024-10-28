@@ -104,6 +104,18 @@ public class PoseCalculations {
     }
 
     /**
+     * Detects if the robot is in the opposite wing
+     * Uses the robot's x position to determine if it has crossed the opp wing line.
+     * 
+     * @return true if the robot is in the opposing wing
+     */
+    public static boolean onOppositeWing(double xPosition) {
+        return Robot.isRedAlliance() 
+            ? xPosition < FieldConstants.BLUE_WING_X 
+            : xPosition > FieldConstants.RED_WING_X;
+    }
+
+    /**
      * Detects if the robot is on the opposite side of the field.
      * Uses the robot's x position to determine if it has crossed the centerline.
      * 
@@ -111,8 +123,8 @@ public class PoseCalculations {
      */
     public static boolean onOppositeSide(double xPosition) {
         return Robot.isRedAlliance() 
-            ? xPosition < FieldConstants.BLUE_WING_X 
-            : xPosition > FieldConstants.RED_WING_X;
+            ? xPosition < FieldConstants.CENTERLINE_X 
+            : xPosition > FieldConstants.CENTERLINE_X;
     }
 
     // Note: this method uses a static variable rather than a parameter

@@ -31,6 +31,7 @@ import frc.robot.Robot.GameMode;
 import frc.robot.util.Constants.CameraConstants;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers;
+import frc.robot.util.calc.PoseCalculations;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
 
@@ -309,7 +310,9 @@ public class Limelight extends SubsystemBase implements LimelightIO {
         double singleTagAreaThreshold = 
             Robot.gameMode == GameMode.AUTONOMOUS 
                 ? CameraConstants.LIMELIGHT_3G_SINGLE_TA_CUTOFF_AUTO 
-                : CameraConstants.LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE;
+                : PoseCalculations.onOppositeSide(robotPoseSupplier.get().getX())
+                    ? CameraConstants.LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE_PASS
+                    : CameraConstants.LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE;
 
         double doubleTagAreaThreshold = 
             Robot.gameMode == GameMode.AUTONOMOUS 
