@@ -326,7 +326,7 @@ public class RobotContainer {
                 && (
                     // All of these buttons command intake
                     // Whether that be source or not
-                    driver.getXButton() 
+                    driver.getLeftBumper() 
                     || (OIConstants.OPERATOR_PRESENT 
                         &&(operator.getLeftBumper() 
                         || operator.getStartButton() 
