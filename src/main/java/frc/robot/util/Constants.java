@@ -1187,7 +1187,8 @@ public final class Constants {
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
         public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_AUTO = 0.070;
-        public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_TELE = 0.046;
+        public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_TELE = 0.060
+        ;
 
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_AUTO = 0.175;
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE = 0.141;
