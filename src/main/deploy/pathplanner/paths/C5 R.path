@@ -28,7 +28,13 @@
       "linkedName": "R"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7,
+      "rotationDegrees": 142.93487488555044,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [
     {
       "name": "GrabVision",
@@ -51,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 149.52396142150144,
+    "rotation": 144.48210042252708,
     "rotateFast": false
   },
   "reversed": false,

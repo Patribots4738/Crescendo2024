@@ -335,7 +335,7 @@ public class PathPlannerStorage {
                                 .onlyIf(() -> !shooterSensor.getAsBoolean())),
                         NamedCommands.getCommand("PrepareSWD")
                     ),
-                    NamedCommands.getCommand("ShootInstantlyWhenReady")
+                    NamedCommands.getCommand("ShootInstantlyWhenReady2")
                 ),
                 commandGroup.getRequirements());
         }
@@ -351,7 +351,7 @@ public class PathPlannerStorage {
                             .unless(shooterSensor)),
                     NamedCommands.getCommand("PrepareSWD")
                 ),
-                NamedCommands.getCommand("ShootInstantlyWhenReady"),
+                NamedCommands.getCommand("ShootInstantlyWhenReady2"),
                 Commands.deadline(
                     AutoBuilder.followPath(getNoteAfterShot),
                     Commands.sequence(

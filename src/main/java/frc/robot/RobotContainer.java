@@ -840,7 +840,7 @@ public class RobotContainer {
                         pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity),
                         Commands.waitUntil(() -> !operator.getYButton()), 
                         () -> !FieldConstants.IS_SIMULATION
-                    ).withTimeout(2.0)
+                    ).withTimeout(1.5)
                 )
             );
         NamedCommands.registerCommand("ShootInstantlyWhenReady2",
@@ -848,7 +848,7 @@ public class RobotContainer {
                 pieceControl.noteToShootUsingSensorWhenReady(swerve::getPose, swerve::getRobotRelativeVelocity),
                 Commands.waitUntil(() -> !operator.getYButton()), 
                 () -> !FieldConstants.IS_SIMULATION
-            )
+            ).withTimeout(1.5)
         );
         NamedCommands.registerCommand("ShootWhenReady", pieceControl.shootPreload());
         NamedCommands.registerCommand("RaiseElevator", elevator.toTopCommand());
