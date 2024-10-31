@@ -314,7 +314,7 @@ public class RobotContainer {
             .onTrue(pathPlannerStorage.updatePathViewerCommand())
             .onFalse(pathPlannerStorage.updatePathViewerCommand());
         
-        new Trigger(() -> PoseCalculations.isAlignedToAmp(robotPose2d)).or(shooterCalc.readyToShootSupplier())
+        new Trigger(() -> PoseCalculations.isAlignedToAmp(robotPose2d))
             .onTrue(driver.setRumble(() -> 0.5))
             .onFalse(driver.setRumble(() -> 0));
         
