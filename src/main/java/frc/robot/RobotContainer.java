@@ -304,10 +304,10 @@ public class RobotContainer {
         new Trigger(() -> 
             Robot.gameMode == GameMode.TELEOP
             && shooter.getAverageSpeed() > 1700
-            && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
-            && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
-        .onTrue(Commands.runOnce(() -> driver.setRumble(() -> 1)))
-        .onFalse(Commands.runOnce(() -> driver.setRumble(() -> 0)));
+            && ((swerve.getPose().getX() < FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()) || PoseCalculations.closeToSpeaker()))
+            // && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
+        .onTrue(driver.setRumble(() -> 1.0))
+        .onFalse(driver.setRumble(() -> 0));
         
         // When our alliance changes, reflect that in the path previewer
         new Trigger(Robot::isRedAlliance)
