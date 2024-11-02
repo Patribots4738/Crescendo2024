@@ -863,14 +863,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("DisableLimelight", disableVision());
         NamedCommands.registerCommand("EnableLimelight", enableVision());
         NamedCommands.registerCommand("FullPowerPreload", 
-            shooter.fullPower(1678) // Say that again?
+            shooter.fullPower(2000) // Say that again?
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(pieceControl.intakeAuto()
                     .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
 
         NamedCommands.registerCommand("FullPowerPreload2",
-            shooter.fullPower(2200)
+            shooter.fullPower(2700)
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(
                     Commands.either(

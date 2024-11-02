@@ -509,7 +509,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4629649170172998*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.5*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
@@ -1192,11 +1192,11 @@ public final class Constants {
 
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_AUTO = 0.175;
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE = 0.141;
-        public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE_PASS = 0.09;
+        public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE_PASS = 0.141;
 
         public static final Pose3d LL3Pose = 
             new Pose3d(
-                // forward positive, right positive, up positive
+                // forward positive, right positive, up positive+
                 0.2872, // Mind control ll pose
                 0.234,
                 0.651,

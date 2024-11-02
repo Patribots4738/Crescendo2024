@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -493,17 +494,17 @@ public class PieceControl {
             new ActiveConditionalCommand(
                 Commands.run(
                     () -> 
-                        shooterCmds.setSpeeds(
-                            PoseCalculations.inSpeakerShotZone(robotPose.get().getTranslation())
-                            && Robot.currentTimestamp - RobotContainer.gameModeStart >= 7
-                            || Robot.gameMode == GameMode.AUTONOMOUS
-                                ? shooterCmds.shooterCalc.calculateSpeakerTriplet(
-                                    robotPose.get().getTranslation()
-                                ).getSpeeds()
-                                : shooterCmds.shooterCalc.calculatePassTriplet(
-                                    robotPose.get()
-                                ).getSpeeds()
-                        ),
+                        {
+                            SpeedAngleTriplet desiredTriplet = 
+                                PoseCalculations.inSpeakerShotZone(robotPose.get().getTranslation())
+                                && Robot.currentTimestamp - RobotContainer.gameModeStart >= 7
+                                || Robot.gameMode == GameMode.AUTONOMOUS
+                                    ? shooterCmds.shooterCalc.calculateSpeakerTriplet(robotPose.get().getTranslation())
+                                    : shooterCmds.shooterCalc.calculatePassTriplet(robotPose.get());
+                            Pair<Double, Double> dividedSpeeds = 
+                                Pair.of(desiredTriplet.getLeftSpeed() * 0.7, desiredTriplet.getRightSpeed() * 0.7);
+                            shooterCmds.setSpeeds(dividedSpeeds);
+                        },
                     shooterCmds.getShooter()
                 ),
                 shooterCmds.stopShooter(),

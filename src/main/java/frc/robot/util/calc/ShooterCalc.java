@@ -336,7 +336,7 @@ public class ShooterCalc {
      */
     private Pair<Number, Number> calculateShooterSpeedsForSpeakerApex(Pose2d robotPose, Rotation2d pivotAngle) {
         double desiredRPM = velocityToRPM(ShooterConstants.SPEAKER_V0Z / (pivotAngle.getSin()));
-        return Pair.of(desiredRPM, desiredRPM);
+        return Pair.of(desiredRPM / 1.6, desiredRPM / 1.6);
     }
 
     private Pair<Number, Number> calculateShooterSpeedsForPassApex(Pose2d robotPose, Rotation2d pivotAngle, boolean lowPass) {
