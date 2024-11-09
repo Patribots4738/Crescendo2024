@@ -1,5 +1,7 @@
 package frc.robot.commands.managers;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -7,13 +9,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.AutoConstants;
-import monologue.Annotations.Log;
-import monologue.Logged;
 
-public class HDCTuner extends SubsystemBase implements Logged {
+public class HDCTuner extends SubsystemBase {
 
-    @Log
-    public int PIDControllerIndex = 0, PIDIndex = 0;
+    @AutoLogOutput (key = "Managers/HDCTuner/PIDControllerIndex")
+    public int PIDControllerIndex = 0;
+    @AutoLogOutput (key = "Managers/HDCTuner/PIDIndex")
+    public int PIDIndex = 0;
 
     public PIDController XYController = AutoConstants.HDC.getXController();
 

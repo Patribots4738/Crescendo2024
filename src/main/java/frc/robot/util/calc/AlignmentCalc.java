@@ -10,17 +10,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.commands.managers.ShooterCmds;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.FieldConstants;
-import monologue.Annotations.IgnoreLogged;
 
 public class AlignmentCalc {
 
-    @IgnoreLogged
     private Swerve swerve;
 
     public AlignmentCalc(Swerve swerve) {
@@ -97,6 +94,18 @@ public class AlignmentCalc {
             );
     }
 
+    public ChassisSpeeds getPresetAlignmentSpeeds() {
+        Pose2d targetPose = PoseCalculations.getClosestShootingPose(swerve.getPose());
+        swerve.setDesiredPose(targetPose);
+        return
+            AutoConstants.HDC.calculate(
+                swerve.getPose(),
+                targetPose,
+                0,
+                targetPose.getRotation()
+            );
+    }
+
     /**
      * Supplier for the amp alignment chassis speeds
      * 
@@ -104,6 +113,10 @@ public class AlignmentCalc {
      */
     public Supplier<ChassisSpeeds> getAmpAlignmentSpeedsSupplier() {
         return () -> getAmpAlignmentSpeeds();
+    }
+
+    public Supplier<ChassisSpeeds> getPresetAlignmentSpeedsSupplier() {
+        return () -> getPresetAlignmentSpeeds();
     }
 
     /**
@@ -172,7 +185,7 @@ public class AlignmentCalc {
      */
     public ChassisSpeeds getSpeakerRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
         return 
-            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose(), swerve.getRobotRelativeVelocity()));
+            getRotationalSpeeds(driverX, driverY, shooterCmds.shooterCalc.calculateRobotAngleToSpeaker(swerve.getPose()));
     }
 
     public ChassisSpeeds getPassRotationalSpeeds(double driverX, double driverY, ShooterCmds shooterCmds) {
@@ -277,19 +290,4 @@ public class AlignmentCalc {
         return () -> getTrapControllerSpeeds(driverX.getAsDouble(), driverY.getAsDouble());
     }
 
-    /**
-     * Detects if the robot is on the opposite side of the field.
-     * Uses the robot's x position to determine if it has crossed the centerline.
-     * 
-     * @return true if the robot is on the opposite side of the field
-     */
-    public boolean onOppositeSide() {
-        return Robot.isRedAlliance() 
-            ? swerve.getPose().getX() < FieldConstants.BLUE_WING_X 
-            : swerve.getPose().getX() > FieldConstants.RED_WING_X;
-    }
-
-    public boolean closeToSpeaker() {
-        return RobotContainer.distanceToSpeakerMeters < 7.3;
-    }
 }

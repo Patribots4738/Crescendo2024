@@ -18,14 +18,14 @@ ____
 
 
 This repository is entirely student-created and maintained.
-Attached to this repository is a GitHub project called [Crescendo 2024](<https://github.com/orgs/Patribots4738/projects/3>) in which we utilize as the Agile framework to organize our workflow. With Agile, we map out the season by dividing it into many week long sprints. As a team, we agree upon & decide what must be accomplished in each sprint. We declare each assignment by making issues and then implement it in an associated branch. An estimated priority & size are assigned to each issue/assignment which is then filtered into five categories:
+Attached to this repository is a GitHub project called [Crescendo 2024](<https://github.com/orgs/Patribots4738/projects/3>) in which we utilize as the Agile framework to organize our workflow. With Agile, we map out the season by dividing it into many week-long sprints. As a team, we agree upon & decide what must be accomplished in each sprint. We declare each assignment by making issues and then implement it in an associated branch. An estimated priority & size are assigned to each issue/assignment which is then filtered into five categories:
   - **Backlog** -> Issues that have no status. Essentially a large to-do list.
   - **Ready** -> Issues that are assigned to a programmer & are ready to begin.
   - **In Progress** -> Issues that are currently being worked on by a programmer.
   - **In Review** -> Issues where the assigned programmer has requested revision by colleagues.
-  - **Done** -> Resolved issues with corresponding branches which have merged into our master branch called [`main`](https://github.com/Patribots4738/Crescendo2024/tree/main/src/main).
+  - **Done** -> Resolved issues with corresponding branches which have merged into our master branch, [`main`](https://github.com/Patribots4738/Crescendo2024/tree/main/src/main).
 
-We also love [drawing boards](<https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=5486,-1359,3403,1540&page=page:9NTiPVa29oqzjElya5D6n>)!
+We also love [drawing boards](https://www.tldraw.com/v/YKJloESPqAyu62wxqEQ8U?v=1783,102,6548,3115&p=page)!
     
 We are a team of students, for students, and we are proud to be a part of the _FIRST&reg;_ community.
 Thanks for checking us out, & be sure to star this repository if you find anything helpful or interesting!
@@ -36,12 +36,12 @@ Thanks for checking us out, & be sure to star this repository if you find anythi
 ___
 
 ## ✨ Highlights ✨  
-  - Object detection on Limelight --
+  - Object detection on Limelight -- 
   - Automatic shooter startup
   - Shooting while driving
   - Fully simulated robot, mechanisms, and motors
   - Auto alignment to amp, speaker, stage, and source
-  - Color sensor oriented piece control
+  - Note possession via proximity sensors
   - Log replay using Advantage Scope
   - Modular autonomous routines
   - April Tag interpretation on Limelight --
@@ -78,12 +78,12 @@ ___
   <img src="images/sim/shooting.png" width="70%" />
   
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Path Generation & Modular Autonomous Paths 
-  > We use `PathPlanner` to construct a modular autonomous. In `PathPlanner`, we use named waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, we are able to make quick decisions on whether or not we got the note, or if we should skip trying to get a note that isn't there. Additionally, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of April tags allow us to generate a path from anywhere in the starting zone as long as our Limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW?viewport=-121,-188,2715,1378&page=page:page>) :>
+  > We use `PathPlanner` to construct a modular autonomous. In `PathPlanner`, we use named waypoints, scheduled commands, & bezier curves to generate a singular auto path between a starting position, preferable shooting position, or note location. We then link multiple auto paths together to make one predetermined autonomous. Using note detection & logic, we are able to make quick decisions on whether or not we got the note, or if we should skip trying to get a note that isn't there. Additionally, there is no predetermined starting position when starting a chain of autonomous paths. This year's abundance of April tags allow us to generate a path from anywhere in the starting zone as long as our Limelight has a clear view of a tag. Feel free to check out our [Modular Auto Drawing Board](https://www.tldraw.com/v/YKJloESPqAyu62wxqEQ8U?v=-1110,-527,5267,2375&p=7BIJ2pOYpdPJlpt0lYwGi) :>
   <br /> <img src="images/sim/trajectory.png" width="30%" />
 
 
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Note Detection
-  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when to robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
+  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when the robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
 
   > Here is a GIF of Terry detecting a note and chasing it! 🦖🔎
   
@@ -97,7 +97,7 @@ ___
  > We use Xbox controllers to control the robot. However, the range of the joystick axis from the Xbox controller is the shape of a skewed square with chamfered edges which is preferable for usage. In PatriBoxController, we remapped the range of input to a circle that is easier to use. Here's our [desmos](https://www.desmos.com/calculator/e07raajzh5) if you want to check out the math!
   
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Shooting While Driving 
-> Our robot is able to shoot notes into the speaker while moving! This feature grants us a shorter cycle time and is most evident in autonomous. Shooting while driving uses the real and simulated values of [`noteTrajectory`](src/main/java/frc/robot/commands/logging/NoteTrajectory). If you are curious to learn more, visit our section dedicated to note trajectory in _Simulation and Testing_ or check out the [math](<https://www.tldraw.com/v/mBaJ6QzdW6wNaRUvmB3DW? viewport=-121,-188,2715,1378&page=page:page>) behind it!
+> Our robot is able to shoot notes into the speaker while moving! This feature grants us a shorter cycle time and is most evident in autonomous. Shooting while driving uses the real and simulated values of [`NoteTrajectory.java`](src/main/java/frc/robot/commands/logging/NoteTrajectory.java). If you are curious to learn more, visit our section dedicated to note trajectory in _Simulation and Testing_ or check out the [math](https://www.tldraw.com/v/YKJloESPqAyu62wxqEQ8U?v=-2813,-1245,8760,3950&p=bJblJdcnza_8k5Wko9ZFH) behind it!
 
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Auto Alignment w/ April Tags
 > Another feature for user-friendliness is our robot's ability to align to field objects such as the speaker, stage & amp. When aligned to the speaker, the driver can move the robot anywhere on the field whilst the shooter always faces the speaker. For the amp & stage, the robot becomes locked in a certain axis. This helps the driver with steering & alignment.
@@ -116,35 +116,32 @@ _____
 Our code is formatted in a <ins>command-based</ins> system on VS Code using <ins>Java<ins/>.
  
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Subsystems
-  > [`robot/subsystems`](src/main/java/frc/robot/subsystems) Folder containing class files for each subsystem on the robot.
-  > - **Intake** [`robot/subsystems/intake`](src/main/java/frc/robot/subsystems/intake) An under-the-bumper intake run by a `Neo 550`.
-  > - **Swerve** [`robot/subsystems/swerve`](src/main/java/frc/robot/subsystems/swerve) Drivetrain with four swerve modules using 4 `Neo Vortex`s and 4 `Neo 550`s.
-  > - **Shooter** [`robot/subsystems/shooter`](src/main/java/frc/robot/subsystems/shooter) A shooter that uses 2 `Neo Vortexs` & pivot which uses 1 `Neo 550` with an absolute encoder.
-  > - **Elevator** [`robot/subsystems/elevator`](src/main/java/frc/robot/subsystems/elevator) Elevator for amp & trap placement which uses 1 `Neo v1.1`.
-  > - **Indexer** [`robot/subsystems/indexer`](src/main/java/frc/robot/subsystems/indexer) The Indexer between intake & shooter which uses a `Neo 550`.
-  > - **Climb** [`robot/subsystems/climb`](src/main/java/frc/robot/subsystems/climb) Two independently driven climbs that conform to the curve of the unoccupied chain on stage to keep the robot level with the ground. Uses one `Neo Vortex` each.
-  > - **LEDS** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/leds) Our `WS2812B` LED strip.
-  > - **Limelight** [`robot/subsystems/limelight`](src/main/java/frc/robot/subsystems/limelight) Interaction between the `Limelight` (2 and 3) and the robot.
+  > [`subsystems/`](src/main/java/frc/robot/subsystems) Folder containing class files for each subsystem on the robot.
+  > - **Intake** [`subsystems/Intake`](src/main/java/frc/robot/subsystems/Intake.java) An under-the-bumper intake run by a `Neo 550`.
+  > - **Swerve** [`subsystems/Swerve`](src/main/java/frc/robot/subsystems/Swerve.java) Drivetrain with four swerve modules using 4 `Neo Vortex`s and 4 `Neo 550`s.
+  > - **Shooter** [`subsystems/Shooter`](src/main/java/frc/robot/subsystems/Shooter.java) A shooter that uses 2 `Neo Vortexs` & pivot which uses 1 `Neo 550` with an absolute encoder.
+  > - **Elevator** [`subsystems/Elevator`](src/main/java/frc/robot/subsystems/Elevator.java) Elevator for amp & trap placement which uses 1 `Neo v1.1`.
+  > - **Indexer** [`subsystems/Indexer`](src/main/java/frc/robot/subsystems/Indexer.java) The Indexer between intake & shooter which uses a `Neo 550`.
+  > - **Climb** [`subsystems/Climb`](src/main/java/frc/robot/subsystems/Climb.java) Two independently driven climbs that conform to the curve of the unoccupied chain on stage to keep the robot level with the ground. Uses one `Neo Vortex` each.
+  > - **Limelight** [`subsystems/Limelight`](src/main/java/frc/robot/subsystems/Limelight.java) Interaction between the `Limelight` (2 and 3) and the robot.
       
 
 ###  <img src= "images/surelyanote.png" width="2.5%" /> Commands
-> [`robot/commands`](src/main/java/frc/robot/commands) Folder containing command files that control the robot.
-> - **Alignment Commands** [`robot/commands/drive/alignmentCmds`](src/main/frc/robot/commands/drive/alignmentCmds) File of commands that help auto-align the robot to be locked on a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
-> - **Network Table PID Tuner** [`robot/commands/logging/NTPIDTuner`](src/main/frc/robot/commands/logging/NTPIDTuner) Command file that allows us to alter & tune the PID values via `Advantage Scope`'s Network Tables Tuner for ease of access.
-> - **Selective Conditional Command** [`robot/commands/managers/SelectiveConditionalCommand`](src/main/frc/robot/commands/managers/SelectiveConditionalCommand) Command that is similar to `Commands.either` but instead of just checking the boolean when the Command is originally run, it constantly checks the boolean supplier and runs the correct command.
-> - **Piece Control** [`robot/commands/manager/PieceControl`](src/main/robot/commands/manager/PieceControl) Command file containing various other commands that subsystems use to manage possession over the game piece.
+> [`commands/`](src/main/java/frc/robot/commands) Folder containing command files that control the robot.
+> - **Alignment Commands** [`commands/drive/AlignmentCmds`](src/main/java/frc/robot/commands/drive/AlignmentCmds.java) File of commands that help auto-align the robot to be locked on a certain axis when relative to a field object such as the stage or amp. This helps the driver with steering & alignment.
+> - **Network Table PID Tuner** [`commands/logging/NTPIDTuner`](src/main/java/frc/robot/commands/logging/NTPIDTuner.java) Command file that allows us to alter & tune the PID values via `Advantage Scope`'s Network Tables Tuner for ease of access.
+> - **Selective Conditional Command** [`commands/managers/SelectiveConditionalCommand`](src/main/java/frc/robot/commands/managers/SelectiveConditionalCommand.java) Command that is similar to `Commands.either` but instead of just checking the boolean when the Command is originally run, it constantly checks the boolean supplier and runs the correct command.
+> - **Piece Control** [`commands/managers/PieceControl`](src/main/java/frc/robot/commands/managers/PieceControl.java) Command file containing various other commands that subsystems use to manage possession over the game piece.
 >    - **getAutomaticShooterSpeeds** This is the default command for the shooter subsystem. It brings the shooter up to speed whenever the robot is in our alliance's wing and we have note possession to make the process of intaking, indexing, and then shooting significantly faster
  
  ###  <img src= "images/surelyanote.png" width="2.5%" /> Utilities
-> [`robot/util`](src/main/java/frc/robot/util) Folder containing values, logic, and math used by other files to help them function.
-> - **Constants** [`robot/util/constants`](src/main/java/frc/robot/util/constants) contains constants used throughout the robot code to prevent a mismatch in data & hardcoding values (Ex. PIDFF values & current limits).
-> - **Calc** [`robot/util/calc`](src/main/java/frc/robot/util/calc) contains the calculations required for pivot alinment & shooter speeds when shooting while driving.
-> - **Auto** [`robot/util/auto`](src/main/java/frc/robot/util/auto) Folder containing the storage files for `Choreo` and `PathPlanner`.
+> [`util/`](src/main/java/frc/robot/util) Folder containing values, logic, and math used by other files to help them function.
+> - **Constants** [`util/constants`](src/main/java/frc/robot/util/Constants.java) contains constants used throughout the robot code to prevent a mismatch in data & hardcoding values (Ex. PIDFF values & current limits).
+> - **Calc** [`util/calc`](src/main/java/frc/robot/util/calc) contains the calculations required for pivot alinment & shooter speeds when shooting while driving.
+> - **Auto** [`util/auto`](src/main/java/frc/robot/util/auto) Folder containing the storage files for `Choreo` and `PathPlanner`.
    
 ## Controls 🎮
-[![Driver](/images/drivercontrols.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
-
-[![Operator](/images/operatorcontrols.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=2339,251,5877,2813&page=page:page)
+[![Driver](/images/drivercontrols.png)](https://www.tldraw.com/v/YKJloESPqAyu62wxqEQ8U?v=811,257,6108,2754&p=page)
 
 ## Components & Tools 🛠️
 [![Hardware](/images/hardware.png)](https://www.tldraw.com/r/EolJKYU3QEqxw71uyAqPS?viewport=-4823,-6599,9853,4716&page=page:g60UEEXm6O2yBIoLYfVVB)

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.954170685497026,
-        "y": 5.046924673916537
+        "x": 4.183174586035333,
+        "y": 5.070792224323394
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.965394208503983,
-        "y": 3.8104740935125765
+        "x": 5.167762965936587,
+        "y": 3.902710757696766
       },
       "isLocked": false,
       "linkedName": "M"
@@ -20,8 +20,8 @@
         "y": 4.095455268178173
       },
       "prevControl": {
-        "x": 7.686504779504522,
-        "y": 4.068149070598
+        "x": 6.3243138250982405,
+        "y": 4.1046482092964185
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 5.0,
+    "maxVelocity": 4.5,
     "maxAcceleration": 3.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
@@ -40,7 +40,7 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": 179.96700654552058,
-    "rotateFast": false
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Stage",

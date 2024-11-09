@@ -1,0 +1,107 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3140196323188638,
+      "y": 7.14361029292672
+    },
+    "rotation": -142.27500495788928
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "P CA1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootInstantlyWhenReady2"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CA1 W1"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ShootInstantlyWhenReady"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareSWD"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "W1 C2"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StopAll"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ToIndexer"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "C2toC5default"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Normal",
+  "choreoAuto": false
+}
