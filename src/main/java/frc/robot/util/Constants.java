@@ -47,7 +47,7 @@ public final class Constants {
 
     public static final class LoggingConstants {
 
-        private static RobotType robotType = RobotType.COMPBOT;
+        private static RobotType robotType = RobotType.DEVBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -586,12 +586,13 @@ public final class Constants {
         public static final double CONTROLLER_CORNER_SLOPE_1 = 1 / 0.7;
         public static final double CONTROLLER_CORNER_SLOPE_2 = 0.7;
 
-        public static final DriverMode DRIVER_MODE = DriverMode.DOUBLE;
+        public static final DriverMode DRIVER_MODE = DriverMode.SHOWCASE;
 
         public enum DriverMode {
             SINGLE,
             DOUBLE,
-            DEV
+            DEV,
+            SHOWCASE
         }
 
         public static boolean OPERATOR_PRESENT = DRIVER_MODE == DriverMode.DOUBLE;

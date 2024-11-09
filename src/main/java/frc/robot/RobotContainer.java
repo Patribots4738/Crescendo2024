@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -267,6 +268,9 @@ public class RobotContainer {
                 break;
             case DEV:
                 configureDevDriverBindings(driver);
+                break;
+            case SHOWCASE:
+                configureShowcaseBindings(driver);
                 break;
         }
 
@@ -552,6 +556,7 @@ public class RobotContainer {
                     limelight3g.setLEDState(() -> false),
                     swerve.resetHDCCommand(),
                     swerve.resetDesiredHDCPoseCommand()));
+
         controller.leftBumper()
             .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
             .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
@@ -647,6 +652,78 @@ public class RobotContainer {
             .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
             
+
+    }
+
+    private void configureShowcaseBindings(PatriBoxController controller) {
+
+        controller.povUp()
+            .whileTrue(
+                shooterCmds.stowPivot()
+                    .andThen(elevator.overrideCommand(() -> Units.inchesToMeters(1.0))));
+
+        controller.povDown()
+            .whileTrue(
+                shooterCmds.stowPivot()
+                    .andThen(elevator.overrideCommand(() -> -Units.inchesToMeters(1.0))));
+
+        controller.povRight()
+            .whileTrue(Commands.run(() -> pivot.setAngle(pivot.getAngle() + 5.0)));
+
+        controller.povLeft()
+            .whileTrue(Commands.run(() -> pivot.setAngle(pivot.getAngle() - 5.0)));
+
+        controller.y()
+            .onTrue(
+                Commands.either( 
+                    climb.toTopCommand().alongWith(climb.setToggleMode(true)),
+                    climb.toBottomCommand().alongWith(shooterCmds.stowPivot()),
+                    () -> !climb.getHooksUp()));
+
+        controller.x()
+            .whileTrue(shooter.incrementOverrideRPM(() -> -50.0));
+
+        controller.b()
+            .whileTrue(shooter.incrementOverrideRPM(() -> 50.0));
+
+        controller.leftStick()
+            .onTrue(Commands.runOnce(() -> 
+                swerve.resetOdometry(FieldConstants.GET_SUBWOOFER_POSITION()), swerve));
+
+        controller.rightStick()
+            .toggleOnTrue(
+                shooter.overrideCommand()
+                    .alongWith(Commands.run(() -> driver.setRumble(Math.abs(shooter.getOverrideRPM() / ShooterConstants.SHOOTER_RPM_UPPER_LIMIT))))
+                .finallyDo(() -> driver.setRumble(() -> 0).schedule()));
+
+        controller.leftTrigger()
+            .onTrue(pieceControl.blepNote());
+
+        controller.rightTrigger()
+            .onTrue(
+                pieceControl.noteToTarget(
+                    swerve::getPose, 
+                    () -> new ChassisSpeeds(), 
+                    () -> true, 
+                    operator::getLeftBumper)
+                    .alongWith(driver.setRumble(() -> 0.5, 0.3))
+            .andThen(Commands.runOnce(() -> RobotContainer.hasPiece = false)));
+
+        controller.leftBumper()
+            .whileTrue(pieceControl.intakeNoteDriver(swerve::getPose, swerve::getRobotRelativeVelocity))
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
+            .onTrue(pieceControl.stopIntakeAndIndexer());
+
+        controller.rightBumper()
+            .onTrue(pieceControl.ejectNote())
+            .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getRightBumper())
+            .onTrue(pieceControl.stopEjecting());
+
+        controller.start()
+            .whileTrue(
+                Commands.waitUntil(elevator::atDesiredPosition)
+                    .andThen(pieceControl.sourceShooterIntake()))
+            .onFalse(pieceControl.stopIntakeAndIndexer());
 
     }
 

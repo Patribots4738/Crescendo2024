@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -18,6 +20,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private final Neo rightMotor;
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+
+    @AutoLogOutput (key = "Subsystems/Shooter/DesiredOverrideRPM")
+    private double desiredOverrideRPM = 0.0;
 
     @AutoLogOutput (key = "Subsystems/Shooter/AtDesiredRPM")
     private boolean atDesiredRPM = false;
@@ -82,6 +87,23 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         rightMotor.setTargetVelocity(speeds.getSecond());
     }
 
+    public Command incrementOverrideRPM(DoubleSupplier doubleSupplier) {
+        return Commands.run(
+                () -> desiredOverrideRPM = 
+                    MathUtil.clamp(
+                        desiredOverrideRPM + doubleSupplier.getAsDouble(), 
+                        0, 
+                        ShooterConstants.SHOOTER_RPM_UPPER_LIMIT));
+    }
+
+    public Command overrideCommand() {
+        return setSpeedCommand2(() -> desiredOverrideRPM);
+    }
+
+    public double getOverrideRPM() {
+        return desiredOverrideRPM;
+    }
+
     /**
      * The function is a command that sets the motor speed for both motors
      * to the speed provided
@@ -90,12 +112,16 @@ public class Shooter extends SubsystemBase implements ShooterIO {
      * 
      * @return The method is returning a Command object.
      */
-    public Command setSpeedCommand(double speed) {
-        return Commands.runOnce(() -> setSpeed(speed));
+    public Command setSpeedCommand(DoubleSupplier speed) {
+        return runOnce(() -> setSpeed(speed.getAsDouble()));
     }
 
     public Command setSpeedCommand(Pair<Double, Double> speeds) {
         return runOnce(() -> setSpeed(speeds));
+    }
+
+    public Command setSpeedCommand2(DoubleSupplier speed) {
+        return run(() -> setSpeed(speed.getAsDouble()));
     }
 
     public Pair<Double, Double> getSpeed() {
@@ -113,7 +139,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
      */
     public Command stopCommand() {
         return Commands.either(
-            setSpeedCommand(0),
+            setSpeedCommand(() -> 0),
             runOnce(() -> {
                 leftMotor.set(0);
                 rightMotor.set(0);
@@ -142,7 +168,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             leftMotor.setVoltage(12);
             rightMotor.setVoltage(12);
         }).until(() -> getAverageSpeed() >= desiredSpeed)
-        .andThen(setSpeedCommand(desiredSpeed));
+        .andThen(setSpeedCommand(() -> desiredSpeed));
     }
 
     @Override
