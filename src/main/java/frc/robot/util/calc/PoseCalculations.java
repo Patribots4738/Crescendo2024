@@ -103,6 +103,12 @@ public class PoseCalculations {
         return MathUtil.clamp(calculation, 0.725, ClimbConstants.EXTENSION_LIMIT_METERS);
     }
 
+    public static boolean inAllianceWing(double xPosition) {
+        return Robot.isRedAlliance() 
+            ? xPosition > FieldConstants.RED_WING_X 
+            : xPosition < FieldConstants.BLUE_WING_X;
+    }
+
     /**
      * Detects if the robot is in the opposite wing
      * Uses the robot's x position to determine if it has crossed the opp wing line.
@@ -135,7 +141,7 @@ public class PoseCalculations {
     public static boolean inSpeakerShotZone(Translation2d translation) {
         Translation2d stealBoxCorner = FieldConstants.GET_STEAL_BOX_CORNER();
         return 
-            closeToSpeaker() 
+            inAllianceWing(translation.getX()) 
             && ((Robot.isRedAlliance() 
                     ? translation.getX() < stealBoxCorner.getX() 
                     : translation.getX() > stealBoxCorner.getX()) 

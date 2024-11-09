@@ -304,10 +304,10 @@ public class RobotContainer {
         new Trigger(() -> 
             Robot.gameMode == GameMode.TELEOP
             && shooter.getAverageSpeed() > 1700
-            && swerve.getPose().getX() > FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()
+            && ((swerve.getPose().getX() < FieldConstants.CENTERLINE_X ^ Robot.isBlueAlliance()) || PoseCalculations.closeToSpeaker())
             && limelight3g.getPose2d().getTranslation().getDistance(swerve.getPose().getTranslation()) < Units.inchesToMeters(4))
-        .onTrue(Commands.runOnce(() -> driver.setRumble(() -> 1)))
-        .onFalse(Commands.runOnce(() -> driver.setRumble(() -> 0)));
+        .onTrue(driver.setRumble(() -> 1.0))
+        .onFalse(driver.setRumble(() -> 0));
         
         // When our alliance changes, reflect that in the path previewer
         new Trigger(Robot::isRedAlliance)
@@ -863,14 +863,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("DisableLimelight", disableVision());
         NamedCommands.registerCommand("EnableLimelight", enableVision());
         NamedCommands.registerCommand("FullPowerPreload", 
-            shooter.fullPower(1678) // Say that again?
+            shooter.fullPower(2000) // Say that again?
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(pieceControl.intakeAuto()
                     .alongWith(shooterCmds.getNoteTrajectoryCommand(swerve::getPose, swerve::getRobotRelativeVelocity)))
                 .deadlineWith(shooterCmds.preparePivotCommandAuto(swerve::getPose, swerve::getRobotRelativeVelocity)));
 
         NamedCommands.registerCommand("FullPowerPreload2",
-            shooter.fullPower(2200)
+            shooter.fullPower(2700)
                 .alongWith(Commands.waitUntil(pivot::getAtDesiredAngle))
                 .andThen(
                     Commands.either(

@@ -47,7 +47,7 @@ public final class Constants {
 
     public static final class LoggingConstants {
 
-        private static RobotType robotType = RobotType.DEVBOT;
+        private static RobotType robotType = RobotType.COMPBOT;
 
         public static RobotType getRobot() {
             if (!FieldConstants.IS_SIMULATION && robotType == RobotType.SIMBOT) {
@@ -222,22 +222,22 @@ public final class Constants {
 
                 // **** GOOD SPEEDS ****
                 // PRE-BEACH
-                put(4.0, SpeedAngleTriplet.of(1971.0, 2524.0, 55.2));
-                put(5.0, SpeedAngleTriplet.of(1971.0, 2524.0, 50.7));
-                put(6.0, SpeedAngleTriplet.of(2084.0, 2634.0, 46.5));
-                put(7.0, SpeedAngleTriplet.of(2209.0, 2759.0, 42.4));
-                put(8.0, SpeedAngleTriplet.of(2375.0, 2925.0, 37.6));
-                put(9.0, SpeedAngleTriplet.of(2574.0, 3124.0, 35.0));
-                put(10.0, SpeedAngleTriplet.of(2700.0, 3300.0, 33.2));
-                put(11.0, SpeedAngleTriplet.of(3009.0, 3611.0, 31.6));
-                put(12.0, SpeedAngleTriplet.of(3196.0, 3798.0, 29.6));
-                put(13.0, SpeedAngleTriplet.of(3532.0, 4118.0, 27.6));
-                put(14.0, SpeedAngleTriplet.of(3690.0, 4205.0, 26.8));
-                put(15.0, SpeedAngleTriplet.of(3860.0, 4507.0, 25.7));
-                put(16.0, SpeedAngleTriplet.of(4045.0, 4692.0, 25.2));
-                put(17.0, SpeedAngleTriplet.of(4163.0, 4810.0, 24.6));
-                put(18.0, SpeedAngleTriplet.of(4306.0, 4955.0, 23.3));
-                put(19.0, SpeedAngleTriplet.of(4389.0, 5038.0, 22.5));
+                put(4.0, SpeedAngleTriplet.of(1971.0, 2524.0, 56));
+                put(5.0, SpeedAngleTriplet.of(1971.0, 2524.0, 52.7));
+                put(6.0, SpeedAngleTriplet.of(2084.0, 2634.0, 48.5));
+                put(7.0, SpeedAngleTriplet.of(2089.0, 2639.0, 44.5));
+                put(8.0, SpeedAngleTriplet.of(2375.0, 2925.0, 39.6));
+                put(9.0, SpeedAngleTriplet.of(2574.0, 3124.0, 36.0));
+                put(10.0, SpeedAngleTriplet.of(2700.0, 3300.0, 34.7));
+                put(11.0, SpeedAngleTriplet.of(3009.0, 3611.0, 33.1));
+                put(12.0, SpeedAngleTriplet.of(3196.0, 3798.0, 31.3));
+                put(13.0, SpeedAngleTriplet.of(3532.0, 4118.0, 28.9));
+                put(14.0, SpeedAngleTriplet.of(3690.0, 4205.0, 28.0));
+                put(15.0, SpeedAngleTriplet.of(3860.0, 4507.0, 27.2));
+                put(16.0, SpeedAngleTriplet.of(4045.0, 4692.0, 26.7));
+                put(17.0, SpeedAngleTriplet.of(4163.0, 4810.0, 26.1));
+                put(18.0, SpeedAngleTriplet.of(4306.0, 4955.0, 24.8));
+                put(19.0, SpeedAngleTriplet.of(4389.0, 5038.0, 24.0));
             }
         };
 
@@ -449,7 +449,8 @@ public final class Constants {
             "S W2 S C3-5 S DEF",
             "S W3-1 S C2-5 S DEF",
             "S W1 S C2-5 S DEF",
-            "S C5-1 S DEF"
+            "S C5-1 S DEF",
+            "S C4-1 S DEF"
         };
     }
 
@@ -509,7 +510,7 @@ public final class Constants {
 
         // Calculations required for driving motor conversion factors and feed forward
         public static final double DRIVING_MOTOR_FREE_SPEED_RPS = NeoMotorConstants.VORTEX_FREE_SPEED_RPM / 60;
-        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4629649170172998*2.0);
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(1.4791980575846997*2.0);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
         // 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
         public static final double DRIVING_MOTOR_REDUCTION = (45.0 * CURRENT_GEARING.spurTeeth) / (CURRENT_GEARING.pinionTeeth * 15.0);
@@ -1187,16 +1188,16 @@ public final class Constants {
         public static final long LIMELIGHT_MAX_UPDATE_TIME = 200_000; // Micro Seconds = 0.2 Seconds
 
         public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_AUTO = 0.070;
-        public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_TELE = 0.060
+        public static final double LIMELIGHT_3G_DOUBLE_TA_CUTOFF_TELE = 0.050
         ;
 
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_AUTO = 0.175;
         public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE = 0.141;
-        public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE_PASS = 0.09;
+        public static final double LIMELIGHT_3G_SINGLE_TA_CUTOFF_TELE_PASS = 0.141;
 
         public static final Pose3d LL3Pose = 
             new Pose3d(
-                // forward positive, right positive, up positive
+                // forward positive, right positive, up positive+
                 0.2872, // Mind control ll pose
                 0.234,
                 0.651,
