@@ -202,8 +202,8 @@ public final class Constants {
 
         public static final SpeedAngleTriplet SHOOTER_AMP_TRIPLET = SpeedAngleTriplet.of(712.0, 554.0, 55.4);
 
-        public static final double SHOOTER_RPM_LOWER_LIMIT = -NeoMotorConstants.VORTEX_FREE_SPEED_RPM;
-        public static final double SHOOTER_RPM_UPPER_LIMIT = NeoMotorConstants.VORTEX_FREE_SPEED_RPM;
+        public static final double SHOOTER_RPM_LOWER_LIMIT = -5300;
+        public static final double SHOOTER_RPM_UPPER_LIMIT = 5300;
 
         public static final double DEFAULT_RPM = 2500;
 

@@ -210,20 +210,15 @@ public class RobotContainer {
             swerve,
             driver::getLeftY,
             driver::getLeftX,
+            // () -> 0,
+            // () -> 0,
             () -> -driver.getRightX()/1.6,
             robotRelativeSupplier,
             () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
         ));
 
         shooter.setDefaultCommand(
-            pieceControl.getAutomaticShooterSpeeds(
-                swerve::getPose,
-                () -> driver.getLeftBumper() 
-                || (OIConstants.OPERATOR_PRESENT 
-                    && operator.getLeftBumper()),
-                () -> OIConstants.OPERATOR_PRESENT 
-                && (operator.getYButton())
-            )
+            shooterCmds.stopShooter()
         );
 
         if (FieldConstants.IS_SIMULATION) {
@@ -685,6 +680,9 @@ public class RobotContainer {
 
         controller.b()
             .whileTrue(shooter.incrementOverrideRPM(() -> 50.0));
+
+        controller.a()
+            .onTrue(pieceControl.setShooterModeCommand(false));
 
         controller.leftStick()
             .onTrue(Commands.runOnce(() -> 
