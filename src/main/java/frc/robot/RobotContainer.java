@@ -208,11 +208,11 @@ public class RobotContainer {
 
         swerve.setDefaultCommand(new Drive(
             swerve,
-            driver::getLeftY,
-            driver::getLeftX,
-            // () -> 0,
-            // () -> 0,
-            () -> -driver.getRightX()/1.6,
+            // driver::getLeftY,
+            // driver::getLeftX,
+            () -> 0,
+            () -> 0,
+            () -> -driver.getRightX() / 2.5,
             robotRelativeSupplier,
             () -> (robotRelativeSupplier.getAsBoolean() && Robot.isRedAlliance())
         ));
