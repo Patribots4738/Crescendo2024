@@ -662,8 +662,8 @@ public final class Constants {
             /* 13  */ put(ShooterConstants.SHOOTER_PIVOT_CAN_ID, "ShooterPivot");
             /* 14  */ put(ElevatorConstants.ELEVATOR_CAN_ID, "Elevator");
             /* 15  */ put(ElevatorConstants.AMPPER_CAN_ID, "Amp");
-            /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
-            /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
+            // /* 16  */ put(ClimbConstants.LEFT_CLIMB_CAN_ID, "LeftClimb");
+            // /* 17  */ put(ClimbConstants.RIGHT_CLIMB_CAN_ID, "RightClimb");
         }};
 
         public static final HashMap<String, List<Neo>> MOTOR_GROUPS = new HashMap<String, List<Neo>>();
@@ -691,10 +691,10 @@ public final class Constants {
             MOTOR_GROUPS.put("Elevator", new ArrayList<Neo>() {{
                 add(MOTOR_MAP.get(ElevatorConstants.ELEVATOR_CAN_ID));
             }});
-            MOTOR_GROUPS.put("Climb", new ArrayList<Neo>() {{
-                add(MOTOR_MAP.get(ClimbConstants.LEFT_CLIMB_CAN_ID));
-                add(MOTOR_MAP.get(ClimbConstants.RIGHT_CLIMB_CAN_ID));
-            }});
+            // MOTOR_GROUPS.put("Climb", new ArrayList<Neo>() {{
+            //     add(MOTOR_MAP.get(ClimbConstants.LEFT_CLIMB_CAN_ID));
+            //     add(MOTOR_MAP.get(ClimbConstants.RIGHT_CLIMB_CAN_ID));
+            // }});
 
             return MOTOR_GROUPS;
         }

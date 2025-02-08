@@ -83,7 +83,7 @@ public class RobotContainer {
     private Limelight limelight3g;
     private Limelight limelight3;
     private LimelightMapping limelightMapper;
-    private final Climb climb;
+    // private final Climb climb;
     private Pivot pivot;
     private Shooter shooter;
     private Elevator elevator;
@@ -153,7 +153,7 @@ public class RobotContainer {
         piPico = new PicoColorSensor();
 
         intake = new Intake();
-        climb = new Climb();
+        // climb = new Climb();
         swerve = new Swerve();
         if (CameraConstants.FIELD_CALIBRATION_MODE) {
             limelight3g = new Limelight(swerve.getPoseEstimator(), swerve::getPose, "not-limelight-threeg", 0);
@@ -189,7 +189,7 @@ public class RobotContainer {
         shooterCalc = new ShooterCalc(shooter, pivot);
         shooterCmds = new ShooterCmds(shooter, pivot, shooterCalc);
 
-        alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
+        // alignmentCmds = new AlignmentCmds(swerve, climb, shooterCmds);
 
         pieceControl = new PieceControl(
             intake,
@@ -417,13 +417,13 @@ public class RobotContainer {
                 Commands.sequence(
                     pieceControl.elevatorToBottomSafe()
                         .unless(() -> elevator.getDesiredPosition() == ElevatorConstants.BOTTOM_POS),
-                    limelight3g.setLEDState(() -> true),
-                    new ActiveConditionalCommand(
-                        // This runs SWD on heading control 
-                        // and shooting-while-still on shooter
-                        alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
-                        () -> PoseCalculations.inSpeakerShotZone(robotPose2d.getTranslation()) || climb.getHooksUp())
+                    limelight3g.setLEDState(() -> true)
+                    // new ActiveConditionalCommand(
+                    //     // This runs SWD on heading control 
+                    //     // and shooting-while-still on shooter
+                    //     alignmentCmds.wingRotationalAlignment(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                    //     alignmentCmds.preparePassCommand(controller::getLeftX, controller::getLeftY, robotRelativeSupplier),
+                    //     () -> PoseCalculations.inSpeakerShotZone(robotPose2d.getTranslation()) || climb.getHooksUp())
                     ).finallyDo(
                         () -> 
                             Commands.parallel(
@@ -453,13 +453,13 @@ public class RobotContainer {
             .onTrue(pieceControl.stopEjecting());
         
         // Climbing controls
-        controller.povUp()
-            .onTrue(climb.povUpCommand());
+        // controller.povUp()
+        //     .onTrue(climb.povUpCommand());
 
-        controller.povDown()
-            .onTrue(
-                climb.toBottomCommand()
-                    .alongWith(shooterCmds.stowPivot()));
+        // controller.povDown()
+        //     .onTrue(
+        //         climb.toBottomCommand()
+        //             .alongWith(shooterCmds.stowPivot()));
 
         // POV left and right are uncommonly used but needed incase of emergency
         controller.povLeft()
@@ -557,12 +557,7 @@ public class RobotContainer {
             .negate().and(() -> !OIConstants.OPERATOR_PRESENT  || !operator.getLeftBumper())
             .onTrue(pieceControl.stopIntakeAndIndexer());
 
-        controller.y()
-            .onTrue(
-                Commands.either( 
-                    climb.toTopCommand().alongWith(climb.setToggleMode(true)),
-                    climb.toBottomCommand().alongWith(shooterCmds.stowPivot()),
-                    () -> !climb.getHooksUp()));
+        //  !climb.getHooksUp()));
 
         controller.leftTrigger()
             .onTrue(pieceControl.blepNote());
@@ -668,12 +663,12 @@ public class RobotContainer {
         controller.povLeft()
             .whileTrue(Commands.run(() -> pivot.setAngle(pivot.getAngle() - 5.0)));
 
-        controller.y()
-            .onTrue(
-                Commands.either( 
-                    climb.toTopCommand().alongWith(climb.setToggleMode(true)),
-                    climb.toBottomCommand().alongWith(shooterCmds.stowPivot()),
-                    () -> !climb.getHooksUp()));
+        // controller.y()
+        //     .onTrue(
+        //         Commands.either( 
+        //             climb.toTopCommand().alongWith(climb.setToggleMode(true)),
+        //             climb.toBottomCommand().alongWith(shooterCmds.stowPivot()),
+        //             () -> !climb.getHooksUp()));
 
         controller.x()
             .whileTrue(shooter.incrementOverrideRPM(() -> -50.0));
