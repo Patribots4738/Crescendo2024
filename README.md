@@ -32,7 +32,6 @@ We are a team of students, for students, and we are proud to be a part of the _F
 Thanks for checking us out, & be sure to star this repository if you find anything helpful or interesting!
 
 ### [See how we did!](https://www.statbotics.io/team/4738)
-<img src="images/ILUVUTERRY.png" width="%">
 
 
 <img src="images/ILUVUTERRY.png" width="%">
