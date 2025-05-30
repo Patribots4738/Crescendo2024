@@ -1,13 +1,14 @@
-![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle)
 
 
+![Gradle Build](https://img.shields.io/github/actions/workflow/status/Patribots4738/Crescendo2024/gradle.yml?label=Gradle%20Build&logo=Gradle) |
 [`src/main/java/frc/robot`](src/main/java/frc/robot) shortcut
 
-[![Game Manual](https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png)](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
 
-![Robot Image](images/robot.gif)
+<a href="https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf"><img src="https://soflofrc.firstinflorida.org/wp-content/uploads/sites/23/2023/09/FIRST-IN-SHOW_CRESCENDO_FRC_SocialHQPDP_FB_Cover-1.png" height="225rem"/>
 
-<img src="images/ILUVUTERRY.png" width="100%">
+
+<img src="images\GIF\photoSlideshow.gif" height="225rem"/> 
+
 
 ____
 
@@ -31,6 +32,10 @@ We are a team of students, for students, and we are proud to be a part of the _F
 Thanks for checking us out, & be sure to star this repository if you find anything helpful or interesting!
 
 ### [See how we did!](https://www.statbotics.io/team/4738)
+<img src="images/ILUVUTERRY.png" width="%">
+
+
+<img src="images/ILUVUTERRY.png" width="%">
 
 
 ___
@@ -83,7 +88,7 @@ ___
 
 
   ###  <img src= "images/surelyanote.png" width="2.5%" /> Note Detection
-  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we can detect notes from ~13 feet away. Note detection is incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This is especially useful when the robot is at the center line where path generation without vision can become inaccurate, preventing notes from bumping off of a swerve module. Additionally, we can skip over a spike if no note is detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
+  > Using `Limelight`'s machine learning algorithm accelerated by a `Google Coral`, we detected notes from ~13 feet away at SDR and Bayou regional. Note detection was incorporated in our modular autonomous logic, allowing the robot to hone in on a note and intake it by itself by using path generation and a holonomic drive controller. This was especially useful when the robot is at the center line where path generation without vision became inaccurate, preventing notes from bumping off of a swerve module. Additionally, we could skip over a spike if no note was detected, helping us cut off the faster robots on the other alliance. Those opposing robots are fast!
 
   > Here is a GIF of Terry detecting a note and chasing it! 🦖🔎
   
