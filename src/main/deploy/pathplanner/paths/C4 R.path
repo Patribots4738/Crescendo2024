@@ -3,33 +3,51 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.288642422749572,
-        "y": 2.436296745792339
+        "x": 8.275153080797576,
+        "y": 2.6307895836632413
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.459247140218805,
-        "y": 0.551576467094703
+        "x": 6.804623466884177,
+        "y": 1.1196489249876405
       },
       "isLocked": false,
       "linkedName": "C4"
     },
     {
       "anchor": {
-        "x": 2.739170301035638,
-        "y": 3.1367081173878657
+        "x": 3.0706451141860898,
+        "y": 3.2439017231814775
       },
       "prevControl": {
-        "x": 3.382676179312792,
-        "y": 2.1025022415852965
+        "x": 3.6796086145667286,
+        "y": 1.7097821356840999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "R"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.75,
+      "rotationDegrees": 143.91,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "GrabVision",
+      "minWaypointRelativePos": 0.75,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 2.5,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
@@ -39,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 139.86766847541324,
+    "rotation": 143.91328920967564,
     "rotateFast": false
   },
   "reversed": false,

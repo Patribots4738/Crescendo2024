@@ -14,7 +14,7 @@
     "Normal",
     "OBJ"
   ],
-  "defaultMaxVel": 5.0,
+  "defaultMaxVel": 4.5,
   "defaultMaxAccel": 3.5,
   "defaultMaxAngVel": 1137.21,
   "defaultMaxAngAccel": 1492.9,

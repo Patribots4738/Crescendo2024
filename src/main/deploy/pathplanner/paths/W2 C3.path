@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.901578927457967,
-        "y": 5.538747023742648
+        "x": 2.8726623557949864,
+        "y": 5.572415049000463
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.968894602552702,
-        "y": 4.938417586249554
+        "x": 5.7875591928074,
+        "y": 3.7006243484669565
       },
       "isLocked": false,
       "linkedName": "W2"
@@ -20,8 +20,8 @@
         "y": 4.095455268178173
       },
       "prevControl": {
-        "x": 5.28994536133258,
-        "y": 3.4688666746135275
+        "x": 6.79469113574461,
+        "y": 4.251033666118688
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,51 +30,16 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "StopIntake",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "StopIntake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "ToIndexer",
-      "waypointRelativePos": 0.85,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToIndexer"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 5.0,
+    "maxVelocity": 4.5,
     "maxAcceleration": 3.5,
     "maxAngularVelocity": 1137.21,
     "maxAngularAcceleration": 1492.9
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 179.09166216609205,
+    "velocity": 0.0,
+    "rotation": 179.70097830393772,
     "rotateFast": false
   },
   "reversed": false,

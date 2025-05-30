@@ -1,25 +1,41 @@
 package frc.robot.commands.managers;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.custom.SpeedAngleTriplet;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
-public class CalibrationControl implements Logged {
+public class CalibrationControl {
 
     private SpeedAngleTriplet desiredTriplet = SpeedAngleTriplet.of(3311.0, 3034.0, 30.3);
 
-    @Log
-    private double leftSpeed = 3311, rightSpeed = 3034, angle = 30;
+    @AutoLogOutput (key = "Managers/CalibrationControl/LeftSpeed")
+    private double leftSpeed = 3311;
+    
+    @AutoLogOutput (key = "Managers/CalibrationControl/RightSpeed")
+    private double rightSpeed = 3034;
 
-    @Log
-    private boolean pivotLock, leftLock, rightLock;
+    @AutoLogOutput (key = "Managers/CalibrationControl/Angle")
+    private double angle = 30;
 
-    @Log
+    @AutoLogOutput (key = "Managers/CalibrationControl/PivotLock")
+    private boolean pivotLock;
+    
+    @AutoLogOutput (key = "Managers/CalibrationControl/LeftLock")
+    private boolean leftLock;
+    
+    @AutoLogOutput (key = "Managers/CalibrationControl/RightLock")
+    private boolean rightLock;
+
+    @AutoLogOutput (key = "Managers/CalibrationControl/Distance")
     private double distance = 0;
 
     private ShooterCmds shooterCmds;
@@ -28,19 +44,20 @@ public class CalibrationControl implements Logged {
         this.shooterCmds = shooterCmds;
     }   
 
-    public Command copyCalcTriplet() {
+    public Command copyCalcTriplet(Supplier<Pose2d> poseSupplier) {
         return Commands.runOnce(() -> {
-            SpeedAngleTriplet triplet = shooterCmds.getTriplet();
+            SpeedAngleTriplet triplet = shooterCmds.shooterCalc.calculateSpeakerTriplet(poseSupplier.get().getTranslation());
             desiredTriplet = triplet;
             leftSpeed = triplet.getLeftSpeed();
             rightSpeed = triplet.getRightSpeed();
             angle = triplet.getAngle();
+            System.out.println("Copied triplet for " + Math.round(Units.metersToFeet(poseSupplier.get().getTranslation().getDistance(FieldConstants.GET_SPEAKER_TRANSLATION()))) + " ft");
             logSpeeds();
             logAngle();
         });
     }
 
-    public Command incrementDistance(int increment) {
+    public Command incrementDistance(double increment) {
         return Commands.runOnce(() -> {
             distance += increment; 
             logDistance();
@@ -119,11 +136,11 @@ public class CalibrationControl implements Logged {
 
     public Command logTriplet() {
         return Commands.runOnce(
-                () -> System.out.println("put(" + (int) distance + ", SpeedAngleTriplet.of("+Math.round(desiredTriplet.getLeftSpeed())+".0, "+Math.round(desiredTriplet.getRightSpeed())+".0, "+desiredTriplet.getAngle()+"));"));
+                () -> System.out.println("put(" + (int)(distance * 10) / 10.0 + ", SpeedAngleTriplet.of("+Math.round(desiredTriplet.getLeftSpeed())+".0, "+Math.round(desiredTriplet.getRightSpeed())+".0, "+desiredTriplet.getAngle()+"));"));
     }
 
     public void logDistance() {
-        System.out.println("Distance: " + (int) distance + "ft");
+        System.out.println("Distance: " + (int)(distance * 10) / 10.0 + "ft");
     }
 
     public void logSpeeds() {

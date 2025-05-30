@@ -8,52 +8,52 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6973036409678643,
-        "y": 4.247138796629217
+        "x": 1.7930634442845832,
+        "y": 4.534035167359043
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.4787036360186945,
-        "y": 4.168998797124134
+        "x": 2.484449224217597,
+        "y": 4.359369286114458
       },
       "prevControl": {
-        "x": 2.2313539056437075,
-        "y": 3.9274690604050284
+        "x": 2.3680053033881596,
+        "y": 4.250203110333227
       },
       "nextControl": {
-        "x": 2.8694036335441093,
-        "y": 4.5505058535313045
+        "x": 2.8828287256619016,
+        "y": 4.732850068730926
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.377581283717999,
-        "y": 5.285941142990909
+        "x": 2.484449224217597,
+        "y": 5.298198397813163
       },
       "prevControl": {
-        "x": 1.518041289162086,
-        "y": 5.1526434967763555
+        "x": 1.5820088377782069,
+        "y": 5.210865457189835
       },
       "nextControl": {
-        "x": 3.046269152359308,
-        "y": 5.389641400694642
+        "x": 3.040722540967769,
+        "y": 5.3520312994342465
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.892385986339722,
-        "y": 6.982038779307121
+        "x": 2.883271729453586,
+        "y": 6.979658581285779
       },
       "prevControl": {
-        "x": 1.2422530556147342,
-        "y": 6.025972903009635
+        "x": 1.2239458576103528,
+        "y": 6.048107214636947
       },
       "nextControl": null,
       "isLocked": false,
@@ -63,39 +63,39 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7,
-      "rotationDegrees": 179.78434028883294,
+      "rotationDegrees": 147.9046762148673,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 1.7999999999999998,
+      "waypointRelativePos": 1.85,
       "rotationDegrees": -177.54423533374379,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 2.55,
-      "rotationDegrees": -159.93962834871448,
+      "waypointRelativePos": 2.7,
+      "rotationDegrees": -160.30395935169378,
       "rotateFast": false
     }
   ],
   "constraintZones": [
     {
-      "name": "Slow w2",
-      "minWaypointRelativePos": 2.3000000000000003,
-      "maxWaypointRelativePos": 2.65,
+      "name": "Slow Preload",
+      "minWaypointRelativePos": 0.44999999999999996,
+      "maxWaypointRelativePos": 0.5499999999999999,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 4.2,
+        "maxVelocity": 0.25,
+        "maxAcceleration": 4.0,
         "maxAngularVelocity": 1137.21,
         "maxAngularAcceleration": 1492.9
       }
     },
     {
-      "name": "Slow w3",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.5499999999999999,
+      "name": "Slow w2",
+      "minWaypointRelativePos": 2.05,
+      "maxWaypointRelativePos": 2.7,
       "constraints": {
-        "maxVelocity": 5.0,
-        "maxAcceleration": 3.0,
+        "maxVelocity": 1.0,
+        "maxAcceleration": 4.2,
         "maxAngularVelocity": 1137.21,
         "maxAngularAcceleration": 1492.9
       }
@@ -112,25 +112,7 @@
       }
     }
   ],
-  "eventMarkers": [
-    {
-      "name": "Intake",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 4.2,
@@ -139,13 +121,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -149.36485747779972,
+    "rotation": -151.7935229185301,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Preloads",
   "previewStartingState": {
-    "rotation": 153.56913073103783,
+    "rotation": 146.4872454687277,
     "velocity": 0
   },
   "useDefaultConstraints": false

@@ -5,7 +5,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -17,16 +16,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants.FieldConstants;
 import frc.robot.util.calc.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.calc.LimelightHelpers.Results;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
 import org.json.simple.JSONObject;
+import org.littletonrobotics.junction.AutoLogOutput;
 
-public class LimelightMapping extends SubsystemBase implements Logged {
+public class LimelightMapping extends SubsystemBase {
     private LimelightConversion limelightConversion;
     private HashMap<Integer, Pose3d> poses;
     private String limelightName;
@@ -35,7 +33,7 @@ public class LimelightMapping extends SubsystemBase implements Logged {
     private SwerveDrivePoseEstimator poseEstimator;
     Supplier<Pose2d> robotPoseSupplier;
 
-    @Log
+    @AutoLogOutput (key = "Calc/LimelightMapping/ModifiedTagPoses")
     private Pose3d[] modifiedTagPoses = new Pose3d[16];
 
     public LimelightMapping(SwerveDrivePoseEstimator poseEstimator, Supplier<Pose2d> robotPoseSupplier, String limelightName) {
@@ -188,7 +186,7 @@ public class LimelightMapping extends SubsystemBase implements Logged {
         );
     }
 
-    @Log
+    @AutoLogOutput (key = "Calc/LimelightMapping/EstimatedPose2d")
     Pose2d estimatedPose2d = new Pose2d();
 
     private void updatePoseEstimator() {

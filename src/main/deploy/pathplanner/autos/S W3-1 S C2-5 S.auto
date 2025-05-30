@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "FullPowerPreload"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [
@@ -20,15 +26,9 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootWhenReady"
-                      }
-                    },
-                    {
                       "type": "path",
                       "data": {
-                        "pathName": "S W3-1"
+                        "pathName": "S W3-1 Bayou"
                       }
                     },
                     {
@@ -47,9 +47,16 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "PrepareSWD"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "PrepareSWD"
+                      }
+                    }
+                  ]
                 }
               }
             ]

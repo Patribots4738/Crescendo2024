@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 6.746909589377223,
-        "y": 3.9453038965801706
+        "y": 3.94530389658017
       },
       "isLocked": false,
       "linkedName": "C3"
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 3.954170685497026,
-        "y": 5.046924673916537
+        "x": 4.183174586035333,
+        "y": 5.070792224323394
       },
       "prevControl": {
-        "x": 4.543668034704492,
-        "y": 4.530204775228513
+        "x": 4.772671935242799,
+        "y": 4.554072325635369
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,19 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "GrabVision",
+      "minWaypointRelativePos": 1.4,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 1137.21,
+        "maxAngularAcceleration": 1492.9
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
@@ -55,7 +67,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 172.85862277789553,
+    "rotation": 173.27446529773997,
     "rotateFast": false
   },
   "reversed": false,

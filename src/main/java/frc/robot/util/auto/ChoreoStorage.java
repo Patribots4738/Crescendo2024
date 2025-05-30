@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.util.Constants.AutoConstants;
 import frc.robot.util.Constants.FieldConstants;
-import monologue.Logged;
-import monologue.Annotations.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,11 +22,10 @@ import java.util.function.BooleanSupplier;
  * with each segment having its own method 
  * to make sure that the modularity stays clean
  */
-public class ChoreoStorage implements Logged {
+public class ChoreoStorage {
 
     private final BooleanSupplier hasPieceSupplier;
     private final Map<String, PathPlannerPath> pathCache = new HashMap<>();
-    @Log.NT
     private SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /**

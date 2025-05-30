@@ -8,21 +8,17 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.util.Constants.DriveConstants;
-import monologue.Logged;
-import monologue.Annotations.Log;
 import java.util.function.DoubleSupplier;
 
 // thanks 6328 :D <3
-public class WheelRadiusCharacterization extends Command implements Logged {
+public class WheelRadiusCharacterization extends Command {
     // wheel radius (meters) =
     // gyro delta (radians) * drive base radius (meters) / wheel position delta
     // (radians)
-    @Log
     private double gyroDelta = 0.0, wheelPosDelta = 0.0, currentEffectiveWheelRadius = 0.0;
 
-    @Log
     private double lastGyroYawRads = 0.0, accumGyroYawRads = 0.0;
 
     private double[] startWheelPositions;

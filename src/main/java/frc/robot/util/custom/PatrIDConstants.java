@@ -1,24 +1,22 @@
 package frc.robot.util.custom;
 
-import monologue.Logged;
-import monologue.Annotations.Log;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
  * PID constants used to create PID controllers
  * This class is special becuase of its overloaded constructors
  * It just helps keep everything organized
  */
-public class PatrIDConstants implements Logged {
+public class PatrIDConstants {
 
-    @Log
-    private final double 
-        P, 
-        I, 
-        D, 
-        FF, 
-        iZone,
-        minOutput,
-        maxOutput;
+    private final double P; 
+    private final double I;
+    private final double D;
+    private final double FF;
+    private final double iZone;
+    private final double minOutput;
+    private final double maxOutput;
 
     public PatrIDConstants(double P) {
         this(P, 0);
